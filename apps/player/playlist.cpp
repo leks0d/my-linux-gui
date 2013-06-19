@@ -7,7 +7,7 @@
 #include <limits.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include "../../../../solutions/t80/android/particle/mediacommon/MediaPlayerInterface.h"
+#include "MediaPlayerInterface.h"
 #endif
 
 namespace mango

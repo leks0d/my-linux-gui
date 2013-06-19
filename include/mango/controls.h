@@ -53,13 +53,12 @@ namespace mango
 
 	typedef struct tagCTRL_TRACKBAR_LAYOUT
 	{
-		HINSTANCE m_hInstance ;
 		int		m_iImageBk ;
 		int		m_iImageThumb ;
 		int		m_iImageTrackDone ;
 
-		SIZE	m_sizeThumb ;
-		RECT	m_rcMarginTrack  ; //»¬µÀ±ß¾à	 
+		Size	m_sizeThumb ;
+		Rect	m_rcMarginTrack  ; //»¬µÀ±ß¾à	 
 
 
 	} CTRL_TRACKBAR_LAYOUT, *PCTRL_TRACKBAR_LAYOUT ;

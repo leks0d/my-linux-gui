@@ -62,7 +62,7 @@ LOCAL_SRC_FILES += party/time.cpp
 LOCAL_SRC_FILES += view/button.cpp
 LOCAL_SRC_FILES += view/listView.cpp
 LOCAL_SRC_FILES += view/staticView.cpp
-LOCAL_SRC_FILES += view/trackbar.cpp
+#LOCAL_SRC_FILES += view/trackbar.cpp
 LOCAL_SRC_FILES += view/view.cpp
 LOCAL_SRC_FILES += view/viewZAxis.cpp
 
