@@ -65,6 +65,9 @@ LOCAL_SRC_FILES += view/staticView.cpp
 #LOCAL_SRC_FILES += view/trackbar.cpp
 LOCAL_SRC_FILES += view/view.cpp
 LOCAL_SRC_FILES += view/viewZAxis.cpp
+LOCAL_SRC_FILES += view/TextView.cpp
+LOCAL_SRC_FILES += view/ImageView.cpp
+LOCAL_SRC_FILES += view/SeekBar.cpp
 
 #LOCAL_LDLIBS :=  -llog 
 

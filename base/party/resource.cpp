@@ -44,33 +44,42 @@ namespace mango
 		DWORD dwReadBytes ;
 		DWORD dwOffset ;
 		RESOURCEDATA_ITEM Item ;
+		short* readbuf,i;
 
 		do
 		{
-
-			if (mFile == NULL || id < mHeader.m_dwStringStartItem )
+			if (mFile == NULL || id < mHeader.m_dwStringStartItem ||language >= mHeader.m_dwLanguages)
 				break;
 
 			id  = (id - mHeader.m_dwStringStartItem) * (mHeader.m_dwLanguages) ;
 			id += mHeader.m_dwStringStartItem ;
 			id += 0; //gsys_pUserSessionObj->m_wLanguage ; //mHeader.m_dwLanguages ;
 
+			
+			
 			if (id >= mHeader.m_dwItems)
 				break ;
-
+			//log_i("Resource::loadString sizeof(RESOURCEDATA_HEADER)=0x%x",sizeof(RESOURCEDATA_HEADER));
 			dwOffset = mHeader.m_dwOffsetOfItem + id * sizeof (RESOURCEDATA_ITEM);
+			log_i("Resource::loadString dwOffset=0x%x",dwOffset);
 			fseek(mFile, dwOffset, SEEK_SET);
 			fread(&Item, 1, sizeof (RESOURCEDATA_ITEM), mFile);
 
 			if (Item.m_dwType != (DWORD)RT_STRING)
 				break ;
 
-			iResTChars = Item.m_dwBytes / sizeof (TCHAR) ;
+			iResTChars = Item.m_dwBytes / 2 ;
 			if (bufferSize < iResTChars)
 				break ;
+			log_i("Resource::loadString dwOffset=0x%x,len=%d",Item.m_dwOffset + mHeader.m_dwOffsetOfData,Item.m_dwBytes);
 
-			fseek (mFile, Item.m_dwOffset + mHeader.m_dwOffsetOfData, SEEK_SET);
-			fread (buffer, 1, Item.m_dwBytes, mFile) ;
+			readbuf = new short[255];
+			fseek (mFile, Item.m_dwOffset + mHeader.m_dwOffsetOfData , SEEK_SET);
+			fread (readbuf, 1, Item.m_dwBytes, mFile) ;
+
+			for(i=0;i<Item.m_dwBytes/2;i++){
+				buffer[i] = readbuf[i];
+			}
 
 			buffer[iResTChars] = '\0' ;
 

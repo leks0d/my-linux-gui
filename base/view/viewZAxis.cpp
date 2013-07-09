@@ -251,14 +251,25 @@ namespace mango
 		if (!target)
 			return false;
 
+		View *view,*prev;
+		prev = view = getToppestItem();
+		while(view){
+			log_i("view->name=%s,view->mStyle=%d",view->name,view->mStyle);
+			prev = view;
+			view = view->getParent();
+		}
+		prev->onNotify(NULL, NM_DISMISS, NULL);//窗口切换前发消息给正在显示的View
+		
 		mMutex.lock();
 
 		moveToToppest(target);
 		bringSubToUp(target);
 		bringTopmostToTop();
-
-		mMutex.unlock() ;
-
+		
+		mMutex.unlock();
+		
+		
+		target->onNotify(NULL, NM_DISPLAY, NULL);
 		return true;
 	}
 

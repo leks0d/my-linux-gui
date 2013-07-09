@@ -125,10 +125,10 @@ namespace mango
 		mCharExtra = 0;
 
 		mTextColor = RGB(0, 0, 0);
-		mBkColor = RGB(255, 255, 255);
+		mBkColor = ARGB(255,127, 127, 127);
 
 		mRop2 = 0;		
-		mBkMode = OPAQUE; //TRANSPARENT;		
+		mBkMode = TRANSPARENT; //TRANSPARENT;		
 		mAlpha = 0;		//0 -- È«Í¸Ã÷, 255 -- ²»Í¸
 	}
 
@@ -172,6 +172,48 @@ namespace mango
 
 		safeFree(resourceBuffer);
 		return success;
+	}
+
+	bool Canvas::drawImageResource(int id, int x, int y,int width, bool alpha){
+		bool success = false;
+		RESOURCEIMAGE_HEADER imageHeader;
+
+		Rect	rcBmp, rcClip ;
+		void*	resourceBuffer = NULL;
+
+		do
+		{
+			if (id <= 0)
+				break ;
+
+			resourceBuffer = malloc(RESOURCE_MAX_BYTES);
+			if (resourceBuffer == NULL)
+				break;
+
+			if (gSessionLocal.mResource.loatBitmap(id, &imageHeader, resourceBuffer, RESOURCE_MAX_BYTES) <= 0)
+				break;
+
+			if(width<imageHeader.m_iWidth)
+				imageHeader.m_iWidth = width;
+			
+			viewToCanvas(x, y);
+			getClipRect(rcClip);
+
+			rcBmp.setEx(x, y, imageHeader.m_iWidth, imageHeader.m_iHeight);
+			if (!rcClip.intersect(rcBmp))
+				break ;
+
+			bitBlt_32(mBitmap->getBits(), mBitmap->getWidth(), rcClip.left,  rcClip.top,  rcClip.right - rcClip.left, rcClip.bottom - rcClip.top, \
+				resourceBuffer, imageHeader.m_iWidth, rcClip.left - x, rcClip.top -y, \
+				alpha ? SRCALPHADSTALPHA : SRCCOPY, 255, NULL) ;
+
+			success = true;
+
+		} while (0) ;
+
+		safeFree(resourceBuffer);
+		return success;
+
 	}
 
 

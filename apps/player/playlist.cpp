@@ -55,7 +55,7 @@ namespace mango
 		char  utf8Path[MAX_PATH * 3];
 
 		Charset::wideCharToMultiByte(CP_UTF8, path, String::lstrlen(path), utf8Path, MAX_PATH * 3);
-
+		log_i("setSource utf8Path=%s\n",utf8Path);
 #ifndef WIN32
 		if (gParticleplayer->setSource(utf8Path))
 			return 1;
@@ -66,6 +66,13 @@ namespace mango
 #endif
 	}
 
+	int Playlist::dsetSource(char* path)
+		{
+			if (gParticleplayer->setSource(path))
+				return 1;
+			else
+				return -1;
+		}
 
 
 	int Playlist::prepare()
@@ -150,11 +157,18 @@ namespace mango
 
 	int Playlist::play(PlaylistItem* item)
 	{
-		stop();
-		setSource(item->mPath);
-		prepare();
-		start();
-
+		if(stop() != 1){log_i("stop() fail!");return -1;}else{log_i("stop() success!");}
+		if(setSource(item->mPath) != 1){log_i("setSource() fail!");return -1;}else{log_i("setSource() success!");}
+		if(prepare() != 1){log_i("prepare() fail!");return -1;}else{log_i("prepare() success!");}
+		if(start() != 1){log_i("start() fail!");return -1;}else{log_i("start() success!");}
+		return 0;
+	}
+	int Playlist::dplay(char *path)
+	{
+		if(stop() != 1){log_i("stop() fail!");return -1;}else{log_i("stop() success!");}
+		if(dsetSource(path) != 1){log_i("setSource() fail!");return -1;}else{log_i("setSource() success!");}
+		if(prepare() != 1){log_i("prepare() fail!");return -1;}else{log_i("prepare() success!");}
+		if(start() != 1){log_i("start() fail!");return -1;}else{log_i("start() success!");}
 		return 0;
 	}
 

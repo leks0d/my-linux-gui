@@ -31,6 +31,7 @@ namespace mango
 	}
 
 
+
 	View::~View(void)
 	{
 		gSession.mViewZAxis.del(this);
@@ -80,11 +81,13 @@ namespace mango
 
 		int				titleLen, newTitleLen;
 		LPTSTR			lpNewTitle;
-
+		
 		if (!newTitle) {
 			safeFree(mTitle);
 			return -1;
 		}
+
+		
 
 		newTitleLen = String::lstrlen(newTitle);
 
@@ -106,6 +109,10 @@ namespace mango
 			String::copy (mTitle, newTitle);
 
 		invalidateRect() ;
+
+		name = new char[30];
+		Charset::wideCharToMultiByte(CP_UTF8, newTitle, String::lstrlen(newTitle), name, MAX_PATH * 3);
+		name[29] = '\0';
 
 		return newTitleLen;
 	}

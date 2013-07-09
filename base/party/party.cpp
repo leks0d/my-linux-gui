@@ -17,14 +17,14 @@ namespace mango
 	{
 		gSession.initialize(this);
 		gSessionLocal.initialize(this);
-
+		
 		mSession = &gSession;
 		mSessionLocal = &gSessionLocal; 
 		mViewZAxis = &gViewZAxis;
 
 		mMessageQueue = &gMessageQueue;
 		mMessageQueue->mCustomerThreadId = Thread::getCurrentId();
-
+		
 		gSession.start();
 
 		return 0;

@@ -551,9 +551,6 @@ namespace mango
 		return drawText(wcBuf, -1, x, y);
 	}
 
-
-
-
 	int Canvas::getTextCharacterExtra(void)
 	{
 		return mCharExtra ;
@@ -573,7 +570,7 @@ namespace mango
 	//得到指定长度的字符宽度
 	bool Canvas::getTextExtentPoint(const TCHAR* string,int count, Size& size)
 	{
-		int			cx = 0 ;
+		int	cx = 0 ;
 
 		while (count && *string)
 		{
@@ -662,7 +659,15 @@ namespace mango
 		return mTextColor;
 	}
 
+	void Canvas::setTextSize(int size)
+	{
+		mFont->setSize(size);
+	}
 
+	void Canvas::setTextBackColor(COLORREF color)
+	{
+		mBkColor = color;
+	}
 
 
 }

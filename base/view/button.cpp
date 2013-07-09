@@ -30,10 +30,10 @@ namespace mango
 	{
 		int imageId = 0;
 		Rect rect;
-		Brush brush(RGB(0, 0, 255));
+		Brush brush(RGB(0, 0, 0));
 
 		rect.setEx(0, 0, mRect.right - mRect.left, mRect.bottom - mRect.top); 
-		canvas.fillRect(rect, brush);
+		//canvas.fillRect(rect, brush);
 
 		if (mPressed)
 			imageId = mPressedImageId;

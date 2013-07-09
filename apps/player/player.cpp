@@ -1,6 +1,4 @@
-
 #include "player.h"
-
 
 namespace mango
 {
@@ -21,9 +19,17 @@ namespace mango
 		wakeLock();
 		initialize();
 
+		gmediaprovider.initialize();
+		
+		gmediaprovider.mediascanner();
+
+		mPlayinglist = new Playinglist();
+
+		setVolume(150);
+		
 		mMeidaView = new MediaView (TEXT("Media"), NULL, NULL, 0, SW_NORMAL);
 		mMeidaView->onCreate();
-
+		
 		return messageLoop();
 	}
 
@@ -123,7 +129,7 @@ namespace mango
 int main (int argc, char* argv[])
 {
 #ifndef WIN32
-	mango::Thread::sleep(1000 * 20);
+	mango::Thread::sleep(1000 * 3);
 #endif
 	return mango::gPlayer.main();
 }

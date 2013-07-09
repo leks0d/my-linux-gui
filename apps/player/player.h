@@ -2,11 +2,14 @@
 #include "mango.h"
 #include "resource.h"
 #include "mediaView.h"
-#include "playingView.h"
 #include "playlist.h"
+#include "mediaprovider.h"
+#include "playinglist.h"
+#include "ArrayMediaInfo.h"
+#include "playingView.h"
 
 namespace mango
-{
+{	
 	class Player: public Party
 	{
 	public:
@@ -25,6 +28,7 @@ namespace mango
 	public:
 		MediaView*  mMeidaView;
 		PlayingView* mPlayingView;
+		sqlite3 *db; 
 	};
 
 	extern Player  gPlayer;

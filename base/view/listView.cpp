@@ -919,7 +919,7 @@ namespace mango
 
 	int ListView::onPaint(Canvas& canvas)
 	{
-		log_i("Enter\n");
+		//log_i("Enter\n");
 
 		LISTVIEW_RECORD* record;
 		Brush brush(RGB(255, 255, 255));
@@ -933,7 +933,7 @@ namespace mango
 		{
 			//需要向下查找
 			if (record->m_rect.top + mZonePoint.y > mRect.bottom)
-				break ;
+				break;
 
 			paintRecord(canvas, record, false);
 			record = getNextRecord(record, false);

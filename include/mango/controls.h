@@ -4,6 +4,19 @@
 
 namespace mango
 {
+	
+	class Mstring{
+		public:
+			char* mstr;
+			int pos;
+			int len;
+			Mstring(void){}
+			Mstring(int n){mstr = new char[n];pos=0;len=n;}
+			
+			int mSprintf(const char* str,int n);
+			void clear(){delete mstr;mstr = new char[len];pos=0;}
+			void setPlayTime(int n);
+	};
 
 	class StaticView : public View
 	{
@@ -15,9 +28,7 @@ namespace mango
 
 	public:
 		virtual int onPaint(Canvas& canvas);
-
 	};
-
 
 	class Button : public View
 	{
@@ -42,7 +53,85 @@ namespace mango
 		bool mPressed;
 	};
 
+	class ImageView : public View
+	{
+		public:
+			ImageView(void);
+			ImageView(int id, const TCHAR* title, View* parent, Rect* rect, int style, int show = SW_NORMAL);
+			~ImageView(void);
+			void setImageResoure(int Id);
+			void setImagePath(char* path);	
+			virtual int onPaint(Canvas& canvas);
+		private:
+			char *mImagePath;
+			int resId;
+			int ResType;
+	};
 
+#define TEXT_LAYOUT_LEFT		0
+#define TEXT_LAYOUT_CENTER	1
+#define TEXT_LAYOUT_RIGHT		2
+
+	class TextView : public View
+	{
+		public:
+			TextView(void);
+			TextView(int id, const TCHAR* title, View* parent, Rect* rect, int style, int show = SW_NORMAL);
+			~TextView(void);
+			void setTextResoure(int Id);
+			void setTextString(char* text);
+			void setTextColor(COLORREF color);	
+			void setTextSize(int size);
+			void setTextLayoutType(int layout);
+			void computeLeft(Canvas *canvas);
+			void setBackGround(int nor,int sec){mNormalBgdResId=nor,mSelectBgdResId=sec;};
+			virtual int onPaint(Canvas& canvas);
+			virtual int onTouchDown(int x, int y, int flag);
+			virtual int onTouchUp(int x, int y, int flag);
+		private:
+			char *mText;
+			int resId;
+			int ResType;			
+			COLORREF mColor;
+			int mNormalBgdResId;
+			int mSelectBgdResId;
+			int mSize;
+			int mPress;
+			int mLeft;
+			int mTop;
+			int mLayoutType;
+	};
+
+#define SEEKBAR_TOUCH_DOWM 0
+#define SEEKBAR_TOUCH_CHANGE 1
+#define SEEKBAR_TOUCH_UP 2
+	class SeekBar : public View
+	{
+		public:
+			SeekBar(void);
+			SeekBar(int id, const TCHAR* title, View* parent, Rect* rect, int style, int show = SW_NORMAL);
+			~SeekBar(void);
+			void setImageResoure(int bkgId,int seekId,int thumbId){mBkgImage=bkgId;mSeekImage=seekId;mThumbImage=thumbId;}
+			void setProgress(int n);
+			void setMax(int n){mMax=n;}
+			
+			virtual int onPaint(Canvas& canvas);
+			virtual int onTouchDown(int x, int y, int flag);
+			virtual int onTouchMove(int x, int y, int flag);
+			virtual int onTouchUp(int x, int y, int flag);
+		private:
+			int mBkgImage;
+			int mSeekImage;
+			int mThumbImage;
+			int mProgress;
+			int mMax;
+			int mWidth;
+			int onTouch;
+			int mSeekWidth;
+			int mThumbX;
+			int mBkgLeft;
+			int mSeekLeft;
+	};
 
 #define TBS_VERT                0x0002
 #define TBS_HORZ                0x0000
@@ -63,6 +152,34 @@ namespace mango
 
 	} CTRL_TRACKBAR_LAYOUT, *PCTRL_TRACKBAR_LAYOUT ;
 
+	class StatuBar : public View
+	{
+		public:
+			StatuBar(void);
+			StatuBar(int id, const TCHAR* title, View* parent, Rect* rect, int style, int show = SW_NORMAL);
+			void setVolume(int volume);
+			void setVolumeIcon(int id){mVolumeImage = id;}
+			void setBattery(int bat);
+			void setBatteryIcon(int id){mBatteryImage = id;}
+			virtual ~StatuBar(void);
+			virtual int onCreate();
+			virtual int onDestroy();
+			virtual int onPaint(Canvas& canvas);
+			virtual int onNotify(View* fromView, int code, void* parameter);
+			virtual int onKeyDown(int keyCode, int flag);
+			virtual int onKeyUp(int keyCode, int flag); 
+			virtual int onCommand(int id, int code, View* fromView);
+			
+		private:
+			Button*  mVolumeButton;
+			ImageView* mBatteryIcon;
+			TextView* mBatteryText;
+			TextView* mVolumeText;
+			int mBatteryImage;
+			int mVolumeImage;
+			int mVolume;
+			int mBattery;
+	};
 
 	class Trackbar : public View
 	{

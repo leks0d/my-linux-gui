@@ -1,0 +1,100 @@
+#include <sqlite3.h>
+#include "Id3info.h"
+
+namespace mango
+{	
+	#define TABLE_PATH "/data/mango.db"
+
+	#define TABLE_NAME "music"
+	
+	#define MUSIC_ID "_id"
+	#define MUSIC_PTAH "path"
+	#define MUSIC_NAME "name"	
+	#define MUSIC_NAME_KEY "name_key"	
+	#define MUSIC_TITLE "title"
+	#define MUSIC_TITLE_KEY "title_key"
+	#define MUSIC_ART_ID "artist_id"
+	#define MUSIC_ART "artist"
+	#define MUSIC_ART_KEY "artist_key"
+	#define MUSIC_ALBUM_ID "album_id"
+	#define MUSIC_ALBUM "album"
+	#define MUSIC_ALBUM_KEY "album_key"
+	#define MUSIC_TRACK "track"
+	#define MUSIC_ART_IMG "img_path"
+	#define MUSIC_ADD_TIME "add_time"
+	#define MUSIC_DURATION "duration"
+	#define MUSIC_EXTRA "extra"
+
+	#define MUSIC_TABLE_CREATE "CREATE TABLE IF NOT EXISTS music(\
+	_id INTEGER PRIMARY KEY autoincrement,\
+	path TEXT,\
+	name TEXT,\
+	name_key TEXT,\
+	title TEXT,\
+	title_key TEXT,\
+	artist_id INTEGER,\
+	artist TEXT,\
+	artist_key TEXT,\
+	album_id INTEGER,\
+	album TEXT,\
+	album_key TEXT,\
+	track TEXT,\
+	img_path TEXT,\
+	add_time INTEGER,\
+	duration INTEGER,\
+	extra TEXT\
+	);"
+
+
+	typedef struct
+	{
+		int id;
+		char *path;
+		char *name;
+		char *name_key;
+		char *title;
+		char *title_key;
+		int artist_id;
+		char *artist;
+		char *artist_key;
+		int album_id;
+		char *album;
+		char *album_key;
+		int track;
+		char *img_path;
+		int add_time;
+		int duration;
+		char *extra;
+	}mediainfo;
+
+	struct Musicdb{
+		mediainfo info;
+		struct Musicdb *next;;
+	};
+	typedef struct Musicdb Musicdbinfo;
+	class mediaprovider
+	{
+	public:
+		mediaprovider(void);
+		int mediascanner();
+		int filescanner(char *path);
+		int getmediainfo(char *path,mediainfo *info);
+		
+//		int ismusic(char *path);
+		int initialize(void);
+		int exec(char *sql,void *arg,int (*callback)(void*,int,char**,char**));
+		int insert(char *table,mediainfo *info);
+		int querymusic(char *where,mediainfo **info);
+		int queryMusicArray(char *where, void* array);
+		int del(char *table,int id);
+		virtual ~mediaprovider(void);
+		int checkfile();
+		int music_exsit_db(char *path);
+	private:
+		sqlite3 * db;
+		
+	};
+	
+extern mediaprovider gmediaprovider;
+
+};

@@ -60,10 +60,3 @@ APP_MODULES += libParticleOmxal-prebuild
 
 APP_MODULES += MangoPlayer 
 
-
-
-
-
-
-
-   

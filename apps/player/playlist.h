@@ -24,6 +24,7 @@ namespace mango
 	public:
 		
 		int setSource(TCHAR* path);
+		int dsetSource(char* path);
 		int prepare();
 		int start();
 		int pause();
@@ -32,6 +33,7 @@ namespace mango
 
 
 		int play(TCHAR* path);
+		int dplay(char* path);
 
 		int next();
 		int prev();

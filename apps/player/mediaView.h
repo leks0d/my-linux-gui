@@ -24,7 +24,7 @@ namespace mango
 		virtual int onCreate();
 		virtual int onDestroy();
 		virtual int onNotify(View* fromView, int code, void* parameter);
-
+		virtual int onPaint(Canvas& canvas);
 		virtual int onKeyDown(int keyCode, int flag);
 		virtual int onKeyUp(int keyCode, int flag); 
 
@@ -33,9 +33,10 @@ namespace mango
 		void fillDirectoryFile(TCHAR*  path);
 		void renewFillViewList();
 
-		void insertFileToListView(int index, TCHAR* name, int iconId, int fileAttributes);
+		void insertFileToListView(UINT mask, TCHAR* name, int iconId, int fileAttributes,int itext = 0);
 		bool isRootDirectory();
 		void backToParentDirectory();
+		void initMainList();
 
 
 

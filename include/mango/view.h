@@ -22,9 +22,9 @@ namespace mango
 #define TOUCH_FLAG_UP    0x0002
 #define TOUCH_FLAG_MOVE  0x0003
 
-#define NM_CLICK     1   
-
-
+#define NM_CLICK     	1   
+#define NM_DISPLAY     2  
+#define NM_DISMISS     3
 
 	class View : public Object
 	{
@@ -87,6 +87,7 @@ namespace mango
 		Rect  mRect;
 		Rect  mInvalidateRect;
 		int   mId;
+		char* 	name;
 
 	protected:
 		LIST_HEAD mZList;
@@ -94,6 +95,7 @@ namespace mango
 	private:
 		MessageQueue* mMessageQueue;
 		TCHAR*    mTitle;
+		
 
 	friend class ViewZAxis;
 

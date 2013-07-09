@@ -93,7 +93,7 @@ namespace mango
 		void close(void);
 
 
-		int loadString(int id,  TCHAR* buffer,  int bufferSize, int language = -1);
+		int loadString(int id,  TCHAR* buffer,  int bufferSize, int language = 1);
 		int loatBitmap(int id,  PRESOURCEIMAGE_HEADER  pResImageHeader,  void* buffer, int bufferBytes); 
 
 

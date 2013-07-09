@@ -45,7 +45,7 @@ namespace mango
 		bool mTouchPressed;
 		bool mKeyPressed;
 		View* mTouchView;
-
+		Point mPoint;
 	public:
 		Screen		mScreen;
 

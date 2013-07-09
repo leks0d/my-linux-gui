@@ -26,7 +26,7 @@ namespace mango
 		bool operator ==(const Rect &rect1) const;
 
 		void inflate(int dx, int dy);
-
+		int getWidth(){int w=right-left;if(w<0) w=0;return w;}
 	public:
 		int left;
 		int top;

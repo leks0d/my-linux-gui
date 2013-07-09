@@ -149,7 +149,7 @@ namespace mango
 
 			ip++;
 		}
-
+		*op='\0';
 		return (op - s);
 	}
 

@@ -8,6 +8,7 @@ namespace mango
 	#define TCC_LCD_FB_IOCTL_DISP_ONOFF				0x10
 	#define TCC_LCD_FB_IOCTL_ALPHA_ONOFF			0x11
 	#define TCC_LCD_FB_IOCTL_ALPHA_SELECTION		0x16
+	static void print_info(struct fb_var_screeninfo *vinfo);
 
 //	const TCHAR contcFontWidthFileName[STOCK_FONT_OBJECT_NUM][56] ; 
 
@@ -83,15 +84,13 @@ namespace mango
 	void Session::updateRoutine()
 	{
 		while (1) {
-			Thread::sleep(30);
+			Thread::sleep(50);
 
 			mViewZAxis.invalidScreenRectToView();
 			if (!mViewZAxis.mExistInvalidateView)
 				continue;
 
-			log_i ("begin sendPainInvalidateWindow");
 			mViewZAxis.sendPainMessageToAllInvalidateView();
-			log_i ("end sendPainInvalidateWindow");
 
 			gSessionLocal.swapScreenFrontBuffer();
 		}
@@ -255,7 +254,7 @@ namespace mango
 #define ABS_MT_POSITION_Y	0x36	/* Center Y ellipse position */
 #define ABS_MT_TRACKING_ID	0x39	/* Unique ID of initiated contact */
 
-				log_i("type = %d, code = %d, value = %d\n", EventBuf[i].type, EventBuf[i].code, EventBuf[i].value);
+				//log_i("type = %d, code = %d, value = %d", EventBuf[i].type, EventBuf[i].code, EventBuf[i].value);
 
 				switch (EventBuf[i].type)
 				{
@@ -304,8 +303,8 @@ namespace mango
 	void Session::dispatchTouch(Point &pt, bool pressed)
 	{
 		Point ptInView;
+		log_i("pt.x=%d pt.y=%d pressed=%d", pt.x, pt.y, pressed);
 
-		log_i("pt.x=%d pt.y=%d pressed=%d\n", pt.x, pt.y, pressed);
 
 		if (!mTouchPressed && pressed)
 			mTouchView = mViewZAxis.getViewFromPoint(pt);
@@ -314,7 +313,7 @@ namespace mango
 			return;
 
 		ptInView = pt;
-
+		
 		ptInView.offset(0 - mTouchView->mRect.left, 0 - mTouchView->mRect.top);
 		if (!mTouchPressed && pressed)
 		{
@@ -322,12 +321,16 @@ namespace mango
 			mTouchPressed = true;
 		}
 		else if (mTouchPressed && pressed)
-			gMessageQueue.post(mTouchView, VM_TOUCHMOVE, ptInView.x | (ptInView.y << 16), 0);
-		else if (!pressed)
+		{
+			if( (pt.x-mPoint.x)>2 || (mPoint.x-pt.x)>2||(pt.y-mPoint.y)>2 || (mPoint.y-pt.y)>2)
+				gMessageQueue.post(mTouchView, VM_TOUCHMOVE, ptInView.x | (ptInView.y << 16), 0);
+		}else if (!pressed)
 		{
 			gMessageQueue.post(mTouchView, VM_TOUCHUP, ptInView.x | (ptInView.y << 16), 0);
 			mTouchPressed = false;
 		}
+		mPoint.x=pt.x;
+		mPoint.y=pt.y;
 	}
 
 
@@ -364,8 +367,9 @@ namespace mango
 
 	int SessionLocal::initialize(Party* party)
 	{
-		int i;
-
+		int i,k;
+		struct fb_var_screeninfo info;
+		
 		mParty = party;
 
 #ifdef WIN32
@@ -392,16 +396,34 @@ namespace mango
 			log_e ("can't open /dev/graphics/fb0 \n") ;
 			return FALSE ;
 		}
+		mfbDevice = ifb ;
+		
+		ioctl(mfbDevice, FBIOGET_VSCREENINFO, &info) ;
+		
+		print_info(&info);
+		info.reserved[0] = 0;
+    	info.reserved[1] = 0;
+    	info.reserved[2] = 0;
+    	info.xoffset = 0;
+    	info.yoffset = 0;
+    	info.activate = 0;
+		info.yres_virtual = 480;
+		info.bits_per_pixel = 32;
+		
+		if(ioctl(mfbDevice, FBIOPUT_VSCREENINFO, &info)==-1)
+			log_e ("FBIOGET_VSCREENINFO set yres_virtual to 480 fail \n") ;
 
-		pAddress = mmap(0, SCREEN_BUFFER_BYTES * 4, PROT_READ | PROT_WRITE, MAP_SHARED, ifb, 0);
+		pAddress = mmap(0, SCREEN_BUFFER_BYTES * 2, PROT_READ | PROT_WRITE, MAP_SHARED, mfbDevice, 0);
 		if (pAddress == MAP_FAILED)
 		{
 			log_e ("mmap /dev/fb0 failed \n") ;
 			return FALSE ;
 		}
-
-		mfbDevice = ifb ;
+		memset((unsigned char*)pAddress, 0, SCREEN_BUFFER_BYTES * 2);
+		ioctl(mfbDevice, FBIOPUT_VSCREENINFO, &info);
+		
 		mfbBuffer = pAddress ;
+
 		log_i ("fb0 buffer address 0x%x \n", pAddress) ;
 #endif
 
@@ -413,11 +435,14 @@ namespace mango
 			mSurface[i].mWidthBytes = ((SCREEN_CX * SCREEN_BITSPERPXIEL + 31) & (~31) ) >> 3;
 
 			mSurface[i].mBits = (unsigned char*)mfbBuffer + SCREEN_BUFFER_BYTES * i;
+			log_i ("address mSurface[%d] = 0x%x \n", i,mSurface[i].mBits) ;
 		}
-
+		
 		initializeFont();
+		gSession.mScreen.mYOffset = 0;
+		mStockGraphic.mBitmap.setBits(mSurface[0].mBits);
 		initializeStockGraphic();
-
+		
 		return 0;
 	}
 
@@ -523,7 +548,7 @@ namespace mango
 #ifndef WIN32
 		struct fb_var_screeninfo vinfo;
 #endif
-
+		int ret=0,k;
 #ifdef WIN32
 		if (gSession.mScreen.mYOffset)
 			mEmFrameBuffer->m_yres = 0 ;
@@ -531,28 +556,56 @@ namespace mango
 			mEmFrameBuffer->m_yres = gSession.mScreen.mHeight;
 #else
 		ioctl(mfbDevice, FBIOGET_VSCREENINFO, &vinfo) ;
-		if (gSession.mScreen.mYOffset)
+
+		if (mfbBuffer == mStockGraphic.mBitmap.getBits())
 			vinfo.yoffset = 0 ;
 		else
-			vinfo.yoffset = gSession.mScreen.mHeight;
+			vinfo.yoffset = 240;
+		
+		ioctl(mfbDevice, FBIOPUT_VSCREENINFO, &vinfo);
+				
+//		log_i("vinfo->yoffset=%d",vinfo.yoffset);
+//		log_i ("address mStockGraphic.mBitmap.getBits() = 0x%x", mStockGraphic.mBitmap.getBits()) ;
+		
+		ret = ioctl(mfbDevice, FBIOPAN_DISPLAY, &vinfo) ;		
 
-		ioctl(mfbDevice, FBIOPAN_DISPLAY, &vinfo) ;
 #endif
 
 		if (gSession.mScreen.mYOffset)
 		{
 			gSession.mScreen.mYOffset = 0;
-			mStockGraphic.mBitmap.setBits(mSurface[1].mBits);
+			mStockGraphic.mBitmap.setBits(mSurface[0].mBits);
 		}
 		else
 		{
-			gSession.mScreen.mYOffset = gSession.mScreen.mHeight;
-			mStockGraphic.mBitmap.setBits(mSurface[0].mBits);
+			gSession.mScreen.mYOffset = 240;
+			mStockGraphic.mBitmap.setBits(mSurface[1].mBits);
+			
 		}
 	}
 
+	static void print_info(struct fb_var_screeninfo *vinfo){
+		FILE *fb;
 
+		fb  = fopen("/etc/fb0info", "rb");
+		if(fread(vinfo,sizeof(fb_var_screeninfo),1,fb)==1)
+			log_i("fb_var_screeninfo read etc/fb0info success\n");
+		fclose(fb);
+
+		log_i("*********************FBIOGET_VSCREENINFO**************************\n");
+		log_i("vinfo->xres=%d\n",vinfo->xres);
+		log_i("vinfo->yres=%d\n",vinfo->yres);
+		log_i("vinfo->xres_virtual=%d\n",vinfo->xres_virtual);
+		log_i("vinfo->yres_virtual=%d\n",vinfo->yres_virtual);
+		log_i("vinfo->xoffset=%d\n",vinfo->xoffset);
+		log_i("vinfo->yoffset=%d\n",vinfo->yoffset);
+		log_i("vinfo->bits_per_pixel=%d\n",vinfo->bits_per_pixel);
+		log_i("vinfo->grayscale=%d\n",vinfo->grayscale);		
+		log_i("******************************END*********************************\n");
+		
+	}
 	Session			gSession;
 	SessionLocal	gSessionLocal;
+	
 }
 

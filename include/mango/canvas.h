@@ -85,6 +85,9 @@ namespace mango
 		COLORREF setTextColor(COLORREF color);
 		COLORREF getTextColor();
 
+		void setTextSize(int size);
+		void setTextBackColor(COLORREF color);
+
 		int  getTextCharacterExtra(void);
 		int  setTextCharacterExtra(int charExtra);
 
@@ -98,8 +101,8 @@ namespace mango
 		Font*   select(Font* font);
 
 		bool drawImageResource(int id, int x, int y, bool alpha = true);
-
-
+		bool drawImageResource(int id, int x, int y,int width, bool alpha = true);
+	
 	public:
 		void renew(class View* view);
 		void swapScreenFrontBuffer();
