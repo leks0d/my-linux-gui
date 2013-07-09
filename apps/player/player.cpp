@@ -26,7 +26,6 @@ namespace mango
 		mPlayinglist = new Playinglist();
 
 		setVolume(150);
-		
 		mMeidaView = new MediaView (TEXT("Media"), NULL, NULL, 0, SW_NORMAL);
 		mMeidaView->onCreate();
 		

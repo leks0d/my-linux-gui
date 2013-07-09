@@ -578,8 +578,8 @@ namespace mango
 		}
 		else
 		{
-			gSession.mScreen.mYOffset = 240;
-			mStockGraphic.mBitmap.setBits(mSurface[1].mBits);
+			//gSession.mScreen.mYOffset = 240;
+			//mStockGraphic.mBitmap.setBits(mSurface[1].mBits);
 			
 		}
 	}

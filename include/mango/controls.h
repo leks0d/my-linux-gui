@@ -234,7 +234,9 @@ namespace mango
 		LPWSTR pszText;
 		int cchTextMax;
 		int iImage;
+		int background;
 		void* lParam;
+		int paramType;
 		int iText ;
 	} ;
 
@@ -245,7 +247,9 @@ namespace mango
 #define LVIF_INDENT             0x00000010
 #define LVIF_ITEXT				0x00001000
 
-
+#define LIST_PARAM_FILE		1
+#define LIST_PARAM_MAIN		2
+#define LIST_PARAM_SETTING	3
 
 	//Item
 	typedef struct tagLISTVIEW_RECORD
@@ -466,6 +470,7 @@ typedef struct tagCTRL_LISTVIEW_LAYOUT
 
 		int	sort(void);
 
+		void setListItemBackground(int res,int press){mItemBackground = res;mPressItemBackground=press;}
 	private:
 		//重画新区
 		int  cartoonRedraw(Canvas& canvas, Rect& redrawRect);
@@ -483,7 +488,7 @@ typedef struct tagCTRL_LISTVIEW_LAYOUT
 		//恢复反白显示项 至正常模式
 		void resumeSelectedRecord(bool update = false);
 
-
+		
 
 	private:
 		LIST_HEAD	mRecordHead; //正序
@@ -508,6 +513,8 @@ typedef struct tagCTRL_LISTVIEW_LAYOUT
 		BOOL		m_bDrage ;
 		//	HIMAGELIST	m_hImagelistDrag ;	
 		COLORREF	mTextColor ;
+		int mItemBackground;
+		int mPressItemBackground;
 	} ;
 
 

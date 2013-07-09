@@ -21,7 +21,7 @@ Notes:
 																
 Revision History:												
 																
-   2013-7-8 17:21:3 Created by Fibo Lu						
+   2013-7-9 19:52:59 Created by Fibo Lu						
 																
 --*/															
 																
@@ -691,17 +691,25 @@ Revision History:
 #define IDP_DEFAULT_ALBUM_ICON		0x0791
 #define IDP_FILE_LIST				0x0792
 #define IDP_FOLDER_ICON				0x0793
-#define IDP_MUSIC_ICON				0x0794
-#define IDP_PLAYING_BACKGROUND		0x0795
-#define IDP_PLAYING_LIST			0x0796
-#define IDP_PLAYING_NEXT_ACTIVE		0x0797
-#define IDP_PLAYING_NEXT_INACTIVE	0x0798
-#define IDP_PLAYING_PLAY_ACTIVE		0x0799
-#define IDP_PLAYING_PREV_ACTIVE		0x079A
-#define IDP_PLAYING_PREV_INACTIVE	0x079B
-#define IDP_SEEKBAR_BKG				0x079C
-#define IDP_SEEKBAR_SEEK			0x079D
-#define IDP_SEEKBAR_THUMB			0x079E
-#define IDP_SYS_FUNCTION			0x079F
+#define IDP_LISTITEM_BGD			0x0794
+#define IDP_LISTITEM_BGD_SEC		0x0795
+#define IDP_MUSIC_HOME				0x0796
+#define IDP_MUSIC_HOME_SEC			0x0797
+#define IDP_MUSIC_ICON				0x0798
+#define IDP_MUSIC_TITLEBAR			0x0799
+#define IDP_PLAYING_BACKGROUND		0x079A
+#define IDP_PLAYING_LIST			0x079B
+#define IDP_PLAYING_NEXT_ACTIVE		0x079C
+#define IDP_PLAYING_NEXT_INACTIVE	0x079D
+#define IDP_PLAYING_PLAY_ACTIVE		0x079E
+#define IDP_PLAYING_PREV_ACTIVE		0x079F
+#define IDP_PLAYING_PREV_INACTIVE	0x07A0
+#define IDP_SEEKBAR_BKG				0x07A1
+#define IDP_SEEKBAR_SEEK			0x07A2
+#define IDP_SEEKBAR_THUMB			0x07A3
+#define IDP_SETTING_BACK			0x07A4
+#define IDP_SETTING_BACK_SEC		0x07A5
+#define IDP_SETTING_BGD				0x07A6
+#define IDP_SYS_FUNCTION			0x07A7
 //--End Png from player
 																

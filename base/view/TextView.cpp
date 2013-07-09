@@ -35,7 +35,7 @@ namespace mango
 	{
 		TCHAR *wt;
 		wt = TEXT("MY MUSIC");
-		
+		log_i("TextView::onPaint");
 		canvas.setTextColor(mColor);
 		canvas.setTextSize(mSize);
 		

@@ -33,7 +33,7 @@ namespace mango
 		void fillDirectoryFile(TCHAR*  path);
 		void renewFillViewList();
 
-		void insertFileToListView(UINT mask, TCHAR* name, int iconId, int fileAttributes,int itext = 0);
+		void insertFileToListView(UINT mask, TCHAR* name, int iconId, void* param,int itext = 0,int paramtype = 1);
 		bool isRootDirectory();
 		void backToParentDirectory();
 		void initMainList();
@@ -42,7 +42,9 @@ namespace mango
 
 	public:
 		MediaListView*  mListView;
-
+		TextView* mTitle;
+		Button* mBack;
+		Button* mHome;
 	private:
 		int		mMode;					//menu菜单 媒体库index 收藏夹 或 浏览路径
 		int		mPath;
