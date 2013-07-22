@@ -101,12 +101,12 @@ namespace mango
 		Font*   select(Font* font);
 
 		bool drawImageResource(int id, int x, int y, bool alpha = true);
-		bool drawImageResource(int id, int x, int y,int width, bool alpha = true);
+		bool drawImageResource(int id, int x, int y,int width,int hight,bool alpha = true);
 	
 	public:
 		void renew(class View* view);
 		void swapScreenFrontBuffer();
-
+		static void charToWCHAR(char *string,WCHAR *des);
 
 	private:
 		bool drawLine32(Rect& clipRect, int xStart, int yStart, int xEnd, int yEnd);

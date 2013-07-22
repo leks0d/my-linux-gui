@@ -550,6 +550,20 @@ namespace mango
 
 		return drawText(wcBuf, -1, x, y);
 	}
+	void Canvas::charToWCHAR(char *string,WCHAR *des){
+		WCHAR  wcBuf[81] ;
+		int    i,count;
+		
+		count = strlen(string);
+
+		for (i = 0 ; i < 80 && (*string) && count ; i++, count--) {
+			wcBuf[i] =  *string ;
+			string++ ;
+		}
+		wcBuf[i] = '\0' ;
+		memcpy(des,wcBuf,81*sizeof(WCHAR));
+
+	}
 
 	int Canvas::getTextCharacterExtra(void)
 	{

@@ -218,5 +218,18 @@ namespace mango
 			return 0 ;
 	}
 
+	int  Charset::WideCharToChar(char*s,WCHAR *d){
+		int    i,count;
+		
+		count = strlen(s);
+		for (i = 0 ; i < 80 && (*s) && count ; i++, count--) {
+			d[i] =  *s ;
+			s++ ;
+		}
+		d[i] = '\0' ;
+
+		return 0;
+	}
+
 }
 

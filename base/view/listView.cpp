@@ -538,7 +538,10 @@ namespace mango
 			dest->mask  |= LVIF_TEXT ;
 			String::copy (dest->pszText, org->pszText) ;
 		}
-
+		if(org->mask & LVIF_ADAPTER)
+			dest->mask  |= LVIF_ADAPTER;
+		dest->paramType = org->paramType;
+		dest->iItem = org->iItem;
 		return true  ;
 	}
 
@@ -574,14 +577,13 @@ namespace mango
 		LISTVIEW_RECORD* record;
 		LISTVIEW_RECORD* newRecord;
 		int				 index = -1;
-
 		if (item->iSubItem != 0)
 			return -1;
 
 		if (item->iItem < 0)
 			return -1;
 
-		if (!(item->mask & (LVIF_IMAGE | LVIF_ITEXT | LVIF_TEXT | LVIF_PARAM)))
+		if (!(item->mask & (LVIF_IMAGE | LVIF_ITEXT | LVIF_TEXT | LVIF_PARAM|LVIF_ADAPTER)))
 			return -1;
 
 		newRecord = (LISTVIEW_RECORD *)malloc(sizeof(LISTVIEW_RECORD));
@@ -815,6 +817,8 @@ namespace mango
 		lvitem = &(record->m_lvItem) ;
 
 		rect.offset(mZonePoint.x, mZonePoint.y);
+
+
 		
 		if (record == mSelectedRecord){
 			if(mPressItemBackground>0)
@@ -824,7 +828,12 @@ namespace mango
 				canvas.drawImageResource(mItemBackground, 5, rect.top);			
 		}
 		canvas.setTextColor(RGB (255, 255, 255)) ;
-		log_i("ListView::paintListRecord left=%d,top=%d",rect.left,rect.top);
+		
+		if (lvitem->mask & LVIF_ADAPTER){
+			if(mListAdapter != NULL)
+				mListAdapter->PaintView(canvas,rect,lvitem,record == mSelectedRecord);
+		}
+//		log_i("ListView::paintListRecord left=%d,top=%d",rect.left,rect.top);
 /*
 		if (record == mSelectedRecord)
 		{
@@ -857,8 +866,10 @@ namespace mango
 			x  = rect.left ;
 			y  = (rect.bottom - rect.top - mLayoutList.m_sizeItemIcon.cy) / 2 ;
 			y += rect.top ;
-
-			canvas.drawImageResource(lvitem->iImage, 90, y);
+			if(lvitem->mask & LVIF_TEXT)
+				canvas.drawImageResource(lvitem->iImage, 10, rect.top+5);
+			else
+				canvas.drawImageResource(lvitem->iImage, 90, y);
 			rect.left += mLayoutList.m_sizeItemIcon.cx ;
 		}
 
@@ -893,12 +904,13 @@ namespace mango
 			Rect it = rect;
 			it.left = 125;
 			it.right = it.left + 80;
-			log_i("it.right =%d; it.left = %d",it.right,it.left);
+			//log_i("it.right =%d; it.left = %d",it.right,it.left);
 			canvas.drawTextResource(lvitem->iText, it, DT_VCENTER);
 		}
 		else if (lvitem->mask & LVIF_TEXT)
 		{
 			rect.right -= 8 ;
+			rect.left = 48;
 			canvas.drawText(lvitem->pszText, -1, rect, DT_VCENTER | DT_END_ELLIPSIS);
 		}
 
@@ -918,6 +930,7 @@ namespace mango
 
 	bool ListView::paintRecord (Canvas& canvas, LISTVIEW_RECORD* record, bool eraseBk)
 	{
+		//log_i("ListView::paintRecord");
 		if (mStyle & (LVS_LIST | LVS_REPORT))
 			return paintListRecord(canvas, record, eraseBk);
 		else
@@ -933,7 +946,7 @@ namespace mango
 
 	int ListView::onPaint(Canvas& canvas)
 	{
-		//log_i("Enter\n");
+		log_i("ListView::onPaint");
 
 		LISTVIEW_RECORD* record;
 		Brush brush(RGB(255, 255, 255));
@@ -949,7 +962,7 @@ namespace mango
 			//需要向下查找
 			if (record->m_rect.top + mZonePoint.y > mRect.bottom)
 				break;
-
+			
 			paintRecord(canvas, record, false);
 			record = getNextRecord(record, false);
 		}
@@ -998,7 +1011,11 @@ namespace mango
 		Point pt(x, y);
 		if (getCapture () != this)
 			return 0 ;
-
+		
+		log_i("ListView::onTouchMove y=%d",y);
+		if(y>1000||y<0)
+			y=0;
+			
 		if (!mTouchMove) {
 			if (mTouchDownPosition.y - y > 16 || mTouchDownPosition.y - y < -16)
 				mTouchMove = true;
@@ -1320,9 +1337,10 @@ namespace mango
 			dy = distance  * 2 / 3 ;
 		else
 			dy = distance ;
-
+		
 		if (cartoonMoveZone(dy))
-			cartoonDisplay();
+			;//cartoonDisplay();
+		invalidateRect();
 
 		return 0 ;
 	}

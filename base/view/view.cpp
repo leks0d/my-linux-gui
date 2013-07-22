@@ -252,7 +252,12 @@ namespace mango
 		return mMessageQueue->post(view, id, parameter1, paramter2);
 	}
 
-
+	int UseEventInterface::onKeyDispatch(int keyCode,int action, int flag){
+		return 0;
+	}
+	int UseEventInterface::onTouchDispatch(int x,int y, int action){
+		return 0;
+	}
 }
 
 

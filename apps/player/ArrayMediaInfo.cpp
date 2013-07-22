@@ -27,7 +27,7 @@ namespace mango
 					memcpy(temp,mplaylist,len*sizeof(mediainfo));
 					
 					delete mplaylist;
-					mplaylist = temp;								
+					mplaylist = temp;
 				}
 
 				memcpy(&mplaylist[len],info,sizeof(mediainfo));
@@ -36,11 +36,37 @@ namespace mango
 		}
 		
 		mediainfo* ArrayMediaInfo::getMediaInfo(int pos){
-				if(pos>=0&&pos<len)
-					return &mplaylist[pos];
-				else
+				
+				if(pos>=0&&pos<len){
+					log_i("ArrayMediaInfo::getMediaInfo len=%d,pos=%d,val=0x%x",len,pos,mplaylist+pos);
+					return mplaylist+pos;
+				}else
 					return NULL;
 		}
 
+		ArrayMediaInfo& ArrayMediaInfo::operator =(ArrayMediaInfo& info){
+			mediainfo *temp;
+			log_i("ArrayMediaInfo::operator = mplaylist=0x%x",mplaylist);
+
+			mMax = info.mMax;
+			len = info.len;
+			
+			temp = new mediainfo[mMax];
+			
+			log_i("new mediainfo[mMax] temp=0x%x",temp);
+			
+			memcpy(temp,info.mplaylist,len*sizeof(mediainfo));
+			delete mplaylist;
+			mplaylist = temp;
+			
+			return *this;
+		}
+			
+		void ArrayMediaInfo::clear(){
+			len = mMax = 0;
+			if(mplaylist!=NULL)
+				delete mplaylist;
+			mplaylist = NULL;
+		}
 	
 }

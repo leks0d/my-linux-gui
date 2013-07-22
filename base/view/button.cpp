@@ -61,6 +61,7 @@ namespace mango
 		mPressed = false;
 		invalidateRect();
 		postMessage(getParent(), VM_COMMAND, mId, (unsigned int)this);
+		getParent()->onNotify(this,NM_CLICK,NULL);
 		return 0;
 	}
 

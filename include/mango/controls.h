@@ -80,10 +80,12 @@ namespace mango
 			~TextView(void);
 			void setTextResoure(int Id);
 			void setTextString(char* text);
-			void setTextColor(COLORREF color);	
+			void setTextColor(COLORREF color);
+			void setTextSelectColor(COLORREF color){mSelectColor = color;}
 			void setTextSize(int size);
 			void setTextLayoutType(int layout);
 			void computeLeft(Canvas *canvas);
+			void getTextString(char *string);
 			void setBackGround(int nor,int sec){mNormalBgdResId=nor,mSelectBgdResId=sec;};
 			virtual int onPaint(Canvas& canvas);
 			virtual int onTouchDown(int x, int y, int flag);
@@ -93,6 +95,7 @@ namespace mango
 			int resId;
 			int ResType;			
 			COLORREF mColor;
+			COLORREF mSelectColor;
 			int mNormalBgdResId;
 			int mSelectBgdResId;
 			int mSize;
@@ -102,6 +105,37 @@ namespace mango
 			int mLayoutType;
 	};
 
+
+class ValueTextView : public View
+{
+	public:
+		ValueTextView(void);
+		ValueTextView(int id, const TCHAR* title, View* parent, Rect* rect, int style, int show = SW_NORMAL);
+		~ValueTextView(void);
+		void setTextResoure(int Id);
+		void setTextString(char* text);
+		void setTextColor(COLORREF color);	
+		void setTextSize(int size);
+		void setTextLayoutType(int layout);
+		void computeLeft(Canvas *canvas);
+		void setBackGround(int nor,int sec){mNormalBgdResId=nor,mSelectBgdResId=sec;};
+		virtual int onPaint(Canvas& canvas);
+		virtual int onTouchDown(int x, int y, int flag);
+		virtual int onTouchUp(int x, int y, int flag);
+	private:
+		char *mText;
+		int resId;
+		int ResType;			
+		COLORREF mColor;
+		int mNormalBgdResId;
+		int mSelectBgdResId;
+		int mSize;
+		int mPress;
+		int mLeft;
+		int mTop;
+		int mLayoutType;
+		int mKeyLen;
+};
 #define SEEKBAR_TOUCH_DOWM 0
 #define SEEKBAR_TOUCH_CHANGE 1
 #define SEEKBAR_TOUCH_UP 2
@@ -113,6 +147,8 @@ namespace mango
 			~SeekBar(void);
 			void setImageResoure(int bkgId,int seekId,int thumbId){mBkgImage=bkgId;mSeekImage=seekId;mThumbImage=thumbId;}
 			void setProgress(int n);
+			int getProgress();
+			void setTouchX(int x);
 			void setMax(int n){mMax=n;}
 			
 			virtual int onPaint(Canvas& canvas);
@@ -132,6 +168,39 @@ namespace mango
 			int mBkgLeft;
 			int mSeekLeft;
 	};
+class VerticalSeekBar : public View
+{
+	public:
+		VerticalSeekBar(void);
+		VerticalSeekBar(int id, const TCHAR* title, View* parent, Rect* rect, int style, int show = SW_NORMAL);
+		~VerticalSeekBar(void);
+		void setImageResoure(int bkgId,int seekId,int thumbId){mBkgImage=bkgId;mSeekImage=seekId;mThumbImage=thumbId;}
+		void setProgress(int n);
+		int getProgress();
+		void setTouchY(int x);
+		void setMax(int n){mMax=n;}
+		
+		virtual int onPaint(Canvas& canvas);
+		virtual int onTouchDown(int x, int y, int flag);
+		virtual int onTouchMove(int x, int y, int flag);
+		virtual int onTouchUp(int x, int y, int flag);
+	private:
+		int mBkgImage;
+		int mSeekImage;
+		int mThumbImage;
+		int mProgress;
+		int mMax;
+		int mWidth;
+		int mHeight;
+		int onTouch;
+		int mSeekWidth;
+		int mThumbX;
+		int mThumbY;
+		int mBkgLeft;
+		int mSeekLeft;
+};
+
+
 
 #define TBS_VERT                0x0002
 #define TBS_HORZ                0x0000
@@ -245,11 +314,13 @@ namespace mango
 #define LVIF_PARAM              0x00000004
 #define LVIF_STATE              0x00000008
 #define LVIF_INDENT             0x00000010
-#define LVIF_ITEXT				0x00001000
+#define LVIF_ITEXT				 0x00001000
+#define LVIF_ADAPTER			 0x00010000
 
 #define LIST_PARAM_FILE		1
 #define LIST_PARAM_MAIN		2
 #define LIST_PARAM_SETTING	3
+#define LIST_PARAM_MUSIC		4
 
 	//Item
 	typedef struct tagLISTVIEW_RECORD
@@ -316,7 +387,17 @@ typedef struct tagCTRL_LISTVIEW_LAYOUT
 #define LVIS_CHECKBOX			0x00020000
 #define LVIS_TRACKBAR			0x00040000
 
+	class BaseAdapter{
+		public:
+		BaseAdapter(void){}
+		~BaseAdapter(void){}
+		virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);
+		virtual int getCount();
+		virtual void* getItem(int index){return NULL;}
+		virtual int getId(){return mId;}
 
+		int mId;
+	};
 
 
 	class ListView : public View
@@ -330,7 +411,7 @@ typedef struct tagCTRL_LISTVIEW_LAYOUT
 		virtual int onCreate();
 		virtual int onDestroy();
 		virtual int onPaint(Canvas& canvas);
-
+		void setListAdapter(BaseAdapter* adapter){ mListAdapter = adapter;}
 		virtual int onKeyDown(int keyCode, int flag);
 		virtual int onKeyUp(int keyCode, int flag); 
 
@@ -515,6 +596,7 @@ typedef struct tagCTRL_LISTVIEW_LAYOUT
 		COLORREF	mTextColor ;
 		int mItemBackground;
 		int mPressItemBackground;
+		BaseAdapter* mListAdapter;
 	} ;
 
 

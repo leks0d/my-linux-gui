@@ -305,7 +305,6 @@ namespace mango
 		Point ptInView;
 		log_i("pt.x=%d pt.y=%d pressed=%d", pt.x, pt.y, pressed);
 
-
 		if (!mTouchPressed && pressed)
 			mTouchView = mViewZAxis.getViewFromPoint(pt);
 
@@ -322,8 +321,7 @@ namespace mango
 		}
 		else if (mTouchPressed && pressed)
 		{
-			if( (pt.x-mPoint.x)>2 || (mPoint.x-pt.x)>2||(pt.y-mPoint.y)>2 || (mPoint.y-pt.y)>2)
-				gMessageQueue.post(mTouchView, VM_TOUCHMOVE, ptInView.x | (ptInView.y << 16), 0);
+			gMessageQueue.post(mTouchView, VM_TOUCHMOVE, ptInView.x | (ptInView.y << 16), 0);
 		}else if (!pressed)
 		{
 			gMessageQueue.post(mTouchView, VM_TOUCHUP, ptInView.x | (ptInView.y << 16), 0);
@@ -340,16 +338,25 @@ namespace mango
 		if (!focusView)
 			return;
 		
+		
+		
 		if (!mKeyPressed && pressed)
 		{
+			log_i("dispatchKeycode code=%d,pressed=%d",keycode,pressed);
+			if(mUseEventInterface->onKeyDispatch(keycode,VM_KEYDOWN,0))
+				return;
 			gMessageQueue.post(focusView, VM_KEYDOWN, keycode, 0);
 			mKeyPressed = true;
 		}
 		else if (mKeyPressed && !pressed)
 		{
+			log_i("dispatchKeycode code=%d,pressed=%d",keycode,pressed);
+			if(mUseEventInterface->onKeyDispatch(keycode,VM_KEYUP,0))
+				return;
 			gMessageQueue.post(focusView, VM_KEYUP, keycode, 0);
 			mKeyPressed = false;
 		}
+		log_i("dispatchKeycode code=%d,pressed=%d",keycode,pressed);
 	}
 
 
@@ -578,8 +585,8 @@ namespace mango
 		}
 		else
 		{
-			//gSession.mScreen.mYOffset = 240;
-			//mStockGraphic.mBitmap.setBits(mSurface[1].mBits);
+			gSession.mScreen.mYOffset = 240;
+			mStockGraphic.mBitmap.setBits(mSurface[1].mBits);
 			
 		}
 	}

@@ -68,6 +68,8 @@ LOCAL_SRC_FILES += view/viewZAxis.cpp
 LOCAL_SRC_FILES += view/TextView.cpp
 LOCAL_SRC_FILES += view/ImageView.cpp
 LOCAL_SRC_FILES += view/SeekBar.cpp
+LOCAL_SRC_FILES += view/ValueTextView.cpp
+LOCAL_SRC_FILES += view/VerticalSeekBar.cpp
 
 #LOCAL_LDLIBS :=  -llog 
 

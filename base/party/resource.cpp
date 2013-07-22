@@ -61,7 +61,7 @@ namespace mango
 				break ;
 			//log_i("Resource::loadString sizeof(RESOURCEDATA_HEADER)=0x%x",sizeof(RESOURCEDATA_HEADER));
 			dwOffset = mHeader.m_dwOffsetOfItem + id * sizeof (RESOURCEDATA_ITEM);
-			log_i("Resource::loadString dwOffset=0x%x",dwOffset);
+			//log_i("Resource::loadString dwOffset=0x%x",dwOffset);
 			fseek(mFile, dwOffset, SEEK_SET);
 			fread(&Item, 1, sizeof (RESOURCEDATA_ITEM), mFile);
 
@@ -71,7 +71,7 @@ namespace mango
 			iResTChars = Item.m_dwBytes / 2 ;
 			if (bufferSize < iResTChars)
 				break ;
-			log_i("Resource::loadString dwOffset=0x%x,len=%d",Item.m_dwOffset + mHeader.m_dwOffsetOfData,Item.m_dwBytes);
+			//log_i("Resource::loadString dwOffset=0x%x,len=%d",Item.m_dwOffset + mHeader.m_dwOffsetOfData,Item.m_dwBytes);
 
 			readbuf = new short[255];
 			fseek (mFile, Item.m_dwOffset + mHeader.m_dwOffsetOfData , SEEK_SET);

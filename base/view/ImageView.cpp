@@ -31,7 +31,7 @@ namespace mango
 		Rect rect;
 		
 		if (resId > 0 && ResType == 1)
-			canvas.drawImageResource(resId, 0, 0);
+			canvas.drawImageResource(resId, 0, 0,true);
 		
 		return 0;
 	}

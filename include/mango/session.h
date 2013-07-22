@@ -38,13 +38,14 @@ namespace mango
 
 		void touchRoutine();
 		static unsigned int touchThreadRoutine(void *parameter);
-
+		void setUseEventInterface(UseEventInterface* i){mUseEventInterface = i;}
 
 		void dispatchTouch(Point &pt, bool pressed);
 		void dispatchKeycode(int keycode, bool pressed);
 		bool mTouchPressed;
 		bool mKeyPressed;
 		View* mTouchView;
+		UseEventInterface* mUseEventInterface;
 		Point mPoint;
 	public:
 		Screen		mScreen;

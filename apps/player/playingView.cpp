@@ -99,15 +99,17 @@ namespace mango
 		mSeekBar->setImageResoure(IDP_SEEKBAR_BKG,IDP_SEEKBAR_SEEK,IDP_SEEKBAR_THUMB);
 		mSeekBar->onCreate();
 		
-		rect.setEx(8, 166, 60, 15);		
+		rect.setEx(15, 166, 60, 15);		
 		mTimeText = new  TextView(-1, TEXT("playtimetext"), this, &rect, 0);
 		mTimeText->setTextColor(RGB(255,255,255));
 		mTimeText->setTextSize(13);
+		mTimeText->setTextLayoutType(TEXT_LAYOUT_LEFT);
 		mTimeText->onCreate();
 		
-		rect.setEx(265, 166, 60, 15);		
+		rect.setEx(270, 166, 50, 15);		
 		mDurtionText = new  TextView(-1, TEXT("mDurtionText"), this, &rect, 0);
 		mDurtionText->setTextColor(RGB(255,255,255));
+		mDurtionText->setTextLayoutType(TEXT_LAYOUT_LEFT);
 		mDurtionText->setTextSize(13);
 		mDurtionText->onCreate();
 
@@ -115,12 +117,16 @@ namespace mango
 		mMyMusicText = new  TextView(PLAYING_IDB_MUSIC, TEXT("mMyMusicText"), this, &rect, 0);
 		mMyMusicText->setTextColor(RGB(209,209,209));
 		mMyMusicText->setTextSize(16);
+		mMyMusicText->setTextResoure(MUSIC_MY_MUSIC);
+		mMyMusicText->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mMyMusicText->onCreate();
 
 		rect.setEx(205, 213, 115, 27);		
 		mSettingText = new  TextView(PLAYING_IDB_SETTING, TEXT("mSettingText"), this, &rect, 0);
 		mSettingText->setTextColor(RGB(209,209,209));
 		mSettingText->setTextSize(16);
+		mSettingText->setTextResoure(MUSIC_MUSIC_FUN);
+		mSettingText->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mSettingText->onCreate();
 		
 		ViewInit();
@@ -132,16 +138,8 @@ namespace mango
 		log_i("PlayingView::ViewInit");	
 		
 		Mstring* mstr;
-		
-		mCurrentInfo = *mPlayinglist->getPlayingItem();
-
-		mAlbumImage->setImageResoure(IDP_DEFAULT_ALBUM_ICON);
-
-		mMusicName->setTextString(mCurrentInfo.name);
-		
-		mArtist->setTextString(mCurrentInfo.artist);
-
-		mAlbum->setTextString(mCurrentInfo.album);
+		mediainfo* currentinfo;
+		currentinfo = mPlayinglist->getPlayingItem();
 		
 		mstr = new Mstring(10);
 		mstr->mSprintf("%d",gPlayer.getVolume());
@@ -150,6 +148,19 @@ namespace mango
 		mstr->clear();
 		mstr->mSprintf("%d%%",35);
 		mBatteryText->setTextString(mstr->mstr);
+
+		if(currentinfo == NULL){
+			mAlbumImage->setImageResoure(IDP_DEFAULT_ALBUM_ICON);
+			mMusicName->setTextString("Not find music.");
+			return;
+		}
+		mCurrentInfo = *currentinfo;
+		
+		mMusicName->setTextString(mCurrentInfo.name);
+		
+		mArtist->setTextString(mCurrentInfo.artist);
+
+		mAlbum->setTextString(mCurrentInfo.album);
 		
 		mSeekBar->setMax(mPlayinglist->getDuration());
 
@@ -160,13 +171,10 @@ namespace mango
 		mstr->clear();
 		mstr->setPlayTime(mPlayinglist->getDuration());
 		mDurtionText->setTextString(mstr->mstr);
+		
+		mstr->clear();
+		mDurtionText->getTextString(mstr->mstr);
 
-		mMyMusicText->setTextResoure(MUSIC_MY_MUSIC);
-		mMyMusicText->setTextLayoutType(TEXT_LAYOUT_CENTER);
-		
-		mSettingText->setTextResoure(MUSIC_MUSIC_FUN);
-		mSettingText->setTextLayoutType(TEXT_LAYOUT_CENTER);
-		
 		mSeekBarUpdateThread.create(PlayingView::SeekBarRunnig, this);
 		isNeedFresh = 1;
 
@@ -176,8 +184,20 @@ namespace mango
 			PlayingView *mplayingview = (PlayingView*)parameter;
 			while(1){
 				Thread::sleep(350);
-				if(mplayingview->isNeedFresh)
-					mplayingview->mSeekBar->setProgress(mPlayinglist->getCurrent());	
+				if(mplayingview->isNeedFresh && mPlayinglist->isPlaying()){
+					Mstring* mstr;
+					mstr = new Mstring(10);
+					mstr->clear();
+					mstr->setPlayTime(mPlayinglist->getCurrent());
+					
+					mplayingview->mTimeText->setTextString(mstr->mstr);
+					/*
+					mstr->clear();
+					mstr->setPlayTime(mPlayinglist->getDuration());
+					mplayingview->mDurtionText->setTextString(mstr->mstr);
+					*/
+					mplayingview->mSeekBar->setProgress(mPlayinglist->getCurrent());
+				}
 			}
 			return 0;
 	}
@@ -207,6 +227,8 @@ namespace mango
 		canvas.drawImageResource(IDP_PLAYING_BACKGROUND, 0, 0, false);
 		canvas.fillRect(rect, brush);
 		canvas.drawImageResource(IDP_BACKGROUND_BOTTOM, 0, 211, false);
+
+		log_i("PlayingView::onPaint complete");
 		
 		return 0;
 	}
@@ -242,7 +264,6 @@ namespace mango
 	{
 		switch(keyCode)	{
 		case KEYCODE_BACK:
-			gPlayer.showMediaView();
 			break;
 		}
 
@@ -275,7 +296,8 @@ namespace mango
 			gPlayer.showMediaView();
 			break;
 		case PLAYING_IDB_SETTING:
-			//gPlayer.showMediaView();
+			isNeedFresh = 0;
+			gPlayer.showSettingsView();
 			break;			
 		}
 		return -1;
@@ -296,6 +318,7 @@ namespace mango
 		sec=time%60;
 		min=time/60;
 		ptr = mstr + pos;
-		pos+=sprintf(ptr,"%d:%d",min,sec);		
+		pos+=sprintf(ptr,"%d:%d",min,sec);
+		log_i("Mstring::setPlayTime n=%d,%s",n,mstr);
 	}
 };

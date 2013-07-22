@@ -34,7 +34,7 @@ namespace mango
 		static int utf8_mbstowcs(WCHAR *pwcs, const BYTE *s, int n);
 		static int utf8_wctomb(BYTE *s, wchar_t wc, int maxlen);
 		static int utf8_wcstombs(BYTE *s, const WCHAR *pwcs, int maxlen);
-
+		static int WideCharToChar(char*s,WCHAR *d);
 		static int multiByteToWideChar(UINT CodePage, LPCSTR lpMultiByteStr, int cchMultiByte, LPWSTR lpWideCharStr, int cchWideChar);
 		static int wideCharToMultiByte(UINT CodePage, LPCWSTR lpWideCharStr, int cchWideChar, LPSTR lpMultiByteStr, int cchMultiByte);
 	};

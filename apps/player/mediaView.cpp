@@ -15,6 +15,27 @@ namespace mango
 		PLAYING_IDB_ALBUM_IMAGE,
 		PLAYING_IDB_MUSIC_NAME
 	};
+	enum
+	{
+		ADAPTER_PLAYING = 0xf0c0,	
+		ADAPTER_FILE = 0xf0c1,
+		ADAPTER_ALBUM = 0xf0c2,
+		ADAPTER_ARTIST = 0xf0c3,
+		ADAPTER_MUSIC = 0xf0c4,
+	};
+
+	static char * getfilename(char *path){
+		int i,len = 0;
+		if(path == 0)
+			return 0;
+		len = strlen(path);
+		for(i = len-1 ; i > 0 ; i--){
+			if(*(path+i) == '/' )
+				return path+i+1;
+		}
+	}
+
+
 	
 	MediaListView::MediaListView(void)
 	{
@@ -59,7 +80,10 @@ namespace mango
 	MediaView::MediaView(const TCHAR* title, View* parent, Rect* rect, int style, int show) 
 		: View(title, parent, rect, style, show)
 	{
-
+		mMusicAdapter = NULL;
+		mPlayingListAdapter = NULL;
+		mAlbumAdapter = NULL;
+		mArtistAdapter = NULL;
 	}
 
 
@@ -73,7 +97,16 @@ namespace mango
 	{	
 		Rect rect;
 
-
+		rect.setEx(0,25,320,215);
+		mListView = new MediaListView(TEXT("Media List"), this, &rect, LVS_LIST);
+		mListView->setListItemBackground(IDP_LISTITEM_BGD,IDP_LISTITEM_BGD_SEC);
+		mListView->setTextColor(RGB(255,255,255));
+		mListView->onCreate();
+		
+		/*rect.setEx(0,0,320,26);
+		mTitleImageView = new ImageView(SETTING_BACK, TEXT("Media List"), this, &rect, LVS_LIST);
+		mTitleImageView->setImageResoure(IDP_MUSIC_TITLEBAR);
+		mTitleImageView->onCreate();*/
 
 		rect.setEx(0, 0, 41, 22);
 		mBack = new Button(SETTING_BACK, TEXT("mBack"), this, &rect, 0);
@@ -93,11 +126,7 @@ namespace mango
 		mHome->setPressedImageId(IDP_MUSIC_HOME_SEC);
 		mHome->onCreate();
 
-		rect.setEx(0,25,320,215);
-		mListView = new MediaListView(TEXT("Media List"), this, &rect, LVS_LIST);
-		mListView->setListItemBackground(IDP_LISTITEM_BGD,IDP_LISTITEM_BGD_SEC);
-		mListView->setTextColor(RGB(255,255,255));
-		mListView->onCreate();
+
 		
 #ifdef WIN32
 		String::copy(mCurrentPath, TEXT("E:"));
@@ -130,6 +159,22 @@ namespace mango
 		return 0;
 	}
 
+	int MediaView::onCommand(int id, int code, View* fromView)
+	{
+			int volume;
+	
+			switch(id)
+			{
+				case SETTING_BACK:
+					backEvent();
+					break;
+				case SETTING_HOME:
+					gPlayer.showPlayingView();
+					break;
+			}
+			return -1;
+	}
+
 
 	void MediaView::insertFileToListView(UINT mask, TCHAR* name, int iconId, void* param,int itext,int paramtype)
 	{
@@ -142,6 +187,7 @@ namespace mango
 		lvItem.iImage   = iconId;
 		lvItem.iText   = itext;
 		lvItem.lParam   = (void *)param;
+		lvItem.paramType = paramtype;
 
 		mListView->insertItem(&lvItem);
 	}
@@ -194,6 +240,11 @@ namespace mango
 		fillDirectoryFile(mCurrentPath);
 		mListView->sort();
 		mListView->invalidateRect();
+		
+		mTitle->setTextResoure(STR_FILE_LIST);
+		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
+		mTitle->invalidateRect();	
+		setMainState(0x1200);
 	}
 
 	void MediaView::initMainList(){
@@ -201,18 +252,119 @@ namespace mango
 		int til[]={STR_PLAYING_LIST,STR_FILE_LIST,STR_MUSIC_LIST,STR_ALBUM_LIST,STR_ARTIST_LIST};
 		int i,count = 5;
 		int mask = LVIF_ITEXT | LVIF_IMAGE | LVIF_PARAM;
+		
 		mListView->deleteAllItems();
-		for(i=count-1;i>0;i--){
-			insertFileToListView(mask, NULL, img[i], NULL,til[i],LIST_PARAM_MAIN);
+		for(i=count-1;i>=0;i--){
+			insertFileToListView(mask, NULL, img[i], (void*)i,til[i],LIST_PARAM_MAIN);
 		}
 		mListView->invalidateRect();
 
 		mTitle->setTextResoure(MUSIC_MY_MUSIC);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mTitle->invalidateRect();
+		setMainState(0x1000);
 	}
 
+	void MediaView::initPlayingList(){
 
+		if(mPlayingListAdapter == NULL){
+			mListView->deleteAllItems();
+			mPlayingListAdapter = new PlayingListAdapter(mListView,ADAPTER_MUSIC); 
+		}
+		mPlayingListAdapter->refresh();
+		
+		mTitle->setTextResoure(STR_PLAYING_LIST);
+		mTitle->setTextLayoutType(STR_PLAYING_LIST);
+		mTitle->invalidateRect();
+		setMainState(0x1100);
+	}
+
+	void MediaView::initMusicList(){
+		
+		if(mMusicAdapter == NULL){
+			mListView->deleteAllItems();
+			mMusicAdapter = new MusicAdapter(mListView,ADAPTER_PLAYING); 
+		}
+		mMusicAdapter->refresh();
+
+		mTitle->setTextResoure(STR_MUSIC_LIST);
+		mTitle->setTextLayoutType(STR_PLAYING_LIST);
+		mTitle->invalidateRect();
+		setMainState(0x1300);
+	}
+
+	void MediaView::initAlbumList(){
+		if(mAlbumAdapter == NULL){
+			mListView->deleteAllItems();
+			mAlbumAdapter = new AlbumAdapter(mListView,ADAPTER_ALBUM); 
+		}
+		mAlbumAdapter->refresh();
+		
+		mTitle->setTextResoure(STR_ALBUM_LIST);
+		mTitle->setTextLayoutType(STR_PLAYING_LIST);
+		mTitle->invalidateRect();
+		setMainState(0x1400);
+	}
+	void MediaView::initArtistList(){
+		if(mArtistAdapter == NULL){
+			mListView->deleteAllItems();
+			mArtistAdapter = new ArtistAdapter(mListView,ADAPTER_ALBUM); 
+		}
+		mArtistAdapter->refresh();
+		
+		mTitle->setTextResoure(STR_ARTIST_LIST);
+		mTitle->setTextLayoutType(STR_PLAYING_LIST);
+		mTitle->invalidateRect();
+		setMainState(0x1500);
+	}
+
+	
+
+	void MediaView::initAlbumMusicList(char* album){
+		int count,i;
+		char *ptr,where[255];
+		ArrayMediaInfo *mediaList;
+
+		ptr = where;
+		mediaList = new ArrayMediaInfo();
+
+		if(mMusicAdapter == NULL){
+			mListView->deleteAllItems();
+			mMusicAdapter = new MusicAdapter(mListView,ADAPTER_PLAYING); 
+		}
+
+		ptr += sprintf(ptr,"where album = '%s' ",album);
+
+		count = gmediaprovider.queryMusicArray(where,mediaList);
+
+		mMusicAdapter->setListData(mediaList);
+
+		setMainState(0x1410);
+		
+	}
+
+	void MediaView::initSpecMusicList(char* key,char* value,int state){
+		int count,i;
+		char *ptr,where[255];
+		ArrayMediaInfo *mediaList;
+
+		ptr = where;
+		mediaList = new ArrayMediaInfo();
+
+		if(mMusicAdapter == NULL){
+			mListView->deleteAllItems();
+			mMusicAdapter = new MusicAdapter(mListView,ADAPTER_PLAYING); 
+		}
+
+		ptr += sprintf(ptr,"where %s = '%s' ",key,value);
+
+		count = gmediaprovider.queryMusicArray(where,mediaList);
+
+		mMusicAdapter->setListData(mediaList);
+
+		setMainState(state);
+	}
+	
 	bool MediaView::isRootDirectory()
 	{
 #ifdef WIN32
@@ -233,26 +385,34 @@ namespace mango
 		File::pathRemoveFileSpec(mCurrentPath);
 		renewFillViewList();
 	}
+	void MediaView::playMediaInfo(mediainfo* info,int display){
+		mPlayinglist->playMediaInfo(info);
+		gPlayer.showPlayingView();
+	}
 
 
 
 	int MediaView::onNotify(View* fromView, int code, void* parameter)
 	{
 		if (fromView == mListView && code == NM_CLICK) {
-			int type;
+			int type,index;
+			
 			LISTVIEW_RECORD* record;
 			record = mListView->getRecord((int)parameter);
 			if (!record)
 				return 0;
-			type = (int)(record->m_lvItem.lParam);
+			type = (int)(record->m_lvItem.paramType);
+			index = (int)(record->m_lvItem.lParam);
+			log_i("MediaView::onNotify m_lvItem.paramType = %d",type);
 			switch(type){
 				case LIST_PARAM_FILE:
-					if (type & FILE_ATTRIBUTE_DIRECTORY)
+					if (index & FILE_ATTRIBUTE_DIRECTORY)
 					{
 						File::pathAddBackslash(mCurrentPath);
 						String::lstrcat(mCurrentPath, record->m_lvItem.pszText);
 						renewFillViewList();
-					} else if(type & FILE_ATTRIBUTE_NORMAL){
+					} else //if(type & FILE_ATTRIBUTE_NORMAL)
+					{
 
 						TCHAR path[MAX_PATH];
 						char utf8Path[300],*where,*ptr;
@@ -267,7 +427,7 @@ namespace mango
 						String::lstrcat(path, record->m_lvItem.pszText);
 
 						Charset::wideCharToMultiByte(CP_UTF8, path, String::lstrlen(path), utf8Path, MAX_PATH * 3);
-						ptr += sprintf(ptr," path = '%s' ",utf8Path);
+						ptr += sprintf(ptr," where path = '%s' ",utf8Path);
 
 						count = gmediaprovider.queryMusicArray(where,pinfo);
 						log_i("MusicArray count=%d",count);
@@ -276,15 +436,66 @@ namespace mango
 							
 							if(mPlayinglist == NULL)
 								mPlayinglist = new Playinglist();
-							mPlayinglist->startPlay(pinfo->getMediaInfo(0));
+							mPlayinglist->playMediaInfo(pinfo->getMediaInfo(0));
 							
-							gPlayer.showPlayingView();
+							
+						}else{
+							mediainfo info;
+							char* name;
+							info.id = -1;
+							info.path = new char[strlen(utf8Path)+1];
+							
+							name = getfilename(utf8Path);
+							info.name = new char[strlen(utf8Path)+1]; 				
+							memcpy(info.name,name,strlen(name)+1);
+							memcpy(info.path,utf8Path,strlen(utf8Path)+1);
+							info.artist = NULL;
+							mPlayinglist->playMediaInfo(&info);
+							
 						}
+						
+						gPlayer.showPlayingView();
 					}
 					break;
 				case LIST_PARAM_MAIN:
-					log_i("MediaView::onNotify LIST_PARAM_MAIN index=%d",parameter);
+					log_i("MediaView::onNotify LIST_PARAM_MAIN index=%d",index);
+					switch(index){
+						case 0:
+							initPlayingList();	break;
+						case 1:
+							renewFillViewList(); break;
+						case 2:
+							initMusicList();	break;
+						case 3:
+							initAlbumList();	break;
+						case 4:
+							initArtistList();	break;
+						default:
+							break;
+					}
 					break;	
+				case LIST_PARAM_MUSIC:
+					switch(getMainState()){
+						case 0x1100:
+							mPlayinglist->moveToPosition(record->m_lvItem.iItem);
+							mPlayinglist->startPlay();
+							mPlayingListAdapter->refresh();
+							//gPlayer.showPlayingView();
+							break;
+						case 0x1300:
+						case 0x1410:
+						case 0x1510:	
+							playMediaInfo(mMusicAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem),1);
+							break;
+						case 0x1400:
+							initAlbumMusicList(mAlbumAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->album);
+							break;
+						case 0x1500:
+							initSpecMusicList("artist",mArtistAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->artist,0x1510);
+							break;
+							
+					}
+					break;
 				}
 		}
 
@@ -309,14 +520,265 @@ namespace mango
 		switch(keyCode)
 		{
 		case KEYCODE_BACK:
-			if (!isRootDirectory())
-				backToParentDirectory();
-
 			break;
 		}
 
 		return 0;
 	}
 
+	void MediaView::backEvent(){
+		switch(getMainState()){
+			case 0x1000:
+				gPlayer.showPlayingView();
+				break;
+			case 0x1200:
+				if (!isRootDirectory())
+					backToParentDirectory();
+				else
+					initMainList();
+					break;
+						case 0x1100:
+						case 0x1300:
+						case 0x1400:
+						case 0x1500:	
+							initMainList();
+							break;
+						case 0x1410:
+							initAlbumList();
+							break;
+						case 0x1510:
+							initArtistList();
+							break;
+		
+					}				
+
+	}
+
 	
+	PlayingListAdapter::PlayingListAdapter(ListView* list,int id){
+		mId = id;
+		mlist = list;
+		
+		
+	}
+	
+	void PlayingListAdapter::refresh(){
+		int count,i;
+		
+		mlist->setListAdapter(this);
+		mlist->deleteAllRecord();
+
+		count = mPlayinglist->getCount();
+		
+		for(i=0;i<count;i++){
+			ListViewItem  lvItem;
+			lvItem.mask     = LVIF_ADAPTER;
+			lvItem.iItem    = i;
+			lvItem.iSubItem = 0;
+			lvItem.paramType = LIST_PARAM_MUSIC;
+			mlist->insertItem(&lvItem);
+			log_i("PlayingListAdapter insertItem i=%d",i);
+		}
+		mlist->invalidateRect();
+	}
+
+	
+	void PlayingListAdapter::PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec){
+		int	 x, y;
+		mediainfo *info;
+		
+		x = rect.left;
+		y = rect.top;
+		info = (mediainfo *)getItem(lvitem->iItem);
+		//log_i("PlayingListAdapter::PaintView lvitem->iItem=%d",lvitem->iItem);
+		canvas.drawImageResource(IDP_LISTICON_MUSIC,10,y+5);
+		if(isSec)
+			canvas.setTextColor(RGB(255,149,0));
+		else
+			canvas.setTextColor(RGB(255,255,255));
+		canvas.setTextSize(16);
+		canvas.drawText(info->name,strlen(info->name),50,y+5);
+		canvas.setTextColor(RGB(255,255,255));
+		canvas.setTextSize(12);
+		if(info->artist!=NULL)
+			canvas.drawText(info->artist,strlen(info->artist),50,y+28);
+		if(lvitem->iItem == mPlayinglist->mCurrent)
+			canvas.drawImageResource(IDP_LISTICON_PLAYING,270,y+13);
+	}
+
+	void* PlayingListAdapter::getItem(int index){
+		return (void*)mPlayinglist->getItem(index);
+	}
+	
+	int PlayingListAdapter::getCount(){
+		return mPlayinglist->getCount();
+	}
+
+	MusicAdapter::MusicAdapter(ListView* list,int id){
+		mId = id;
+		mlist = list;
+		
+		mMusicArrayList = new ArrayMediaInfo();
+	}
+	void MusicAdapter::refresh(){
+		int count,i;
+		
+		log_i("MusicAdapter::refresh");
+		
+		mMusicArrayList->clear();		
+		
+		count = gmediaprovider.queryMusicArray(0,mMusicArrayList);
+		
+		if(count>=0)
+			rePaintList();
+	}
+
+	void MusicAdapter::setListData(ArrayMediaInfo* info){
+		mlist->deleteAllItems();
+		if(info!=NULL){
+			*mMusicArrayList = *info;
+			rePaintList();
+		}
+	}
+
+	void MusicAdapter::rePaintList(){
+		int count,i;
+		
+		mlist->setListAdapter(this);
+		mlist->deleteAllRecord();
+		
+		count = mMusicArrayList->len;
+		for(i=0;i<count;i++){
+			ListViewItem  lvItem;
+			lvItem.mask     = LVIF_ADAPTER;
+			lvItem.iItem    = i;
+			lvItem.iSubItem = 0;
+			lvItem.paramType = LIST_PARAM_MUSIC;
+			mlist->insertItem(&lvItem);
+		}
+		log_i("MusicAdapter::rePaintList count=%d",count);
+		mlist->invalidateRect();
+	}
+	
+	void MusicAdapter::PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec){
+		int	 x, y;
+		mediainfo *info;
+		
+		x = rect.left;
+		y = rect.top;
+		info = mMusicArrayList->getMediaInfo(lvitem->iItem);
+		//log_i("PlayingListAdapter::PaintView lvitem->iItem=%d",lvitem->iItem);
+		canvas.drawImageResource(IDP_LISTICON_MUSIC,10,y+5);
+		if(isSec)
+			canvas.setTextColor(RGB(255,149,0));
+		else
+			canvas.setTextColor(RGB(255,255,255));
+
+		canvas.setTextSize(16);
+		canvas.drawText(info->name,strlen(info->name),50,y+5);
+		canvas.setTextColor(RGB(255,255,255));
+		canvas.setTextSize(12);
+		canvas.drawText(info->artist,strlen(info->artist),50,y+28);
+	}
+
+	AlbumAdapter::AlbumAdapter(ListView* list,int id){
+		mId = id;
+		mlist = list;
+		
+		mMusicArrayList = new ArrayMediaInfo();
+	}
+	void AlbumAdapter::refresh(){
+		int count,i;
+		char *ptr,where[255];
+		ptr = where;
+		sprintf(ptr,"group by album");
+		
+		mlist->setListAdapter(this);
+		mlist->deleteAllRecord();
+		mMusicArrayList->clear();
+		
+		count = gmediaprovider.queryMusicArray(where,mMusicArrayList);
+		
+		for(i=0;i<count;i++){
+			ListViewItem  lvItem;
+			lvItem.mask     = LVIF_ADAPTER;
+			lvItem.iItem    = i;
+			lvItem.iSubItem = 0;
+			lvItem.paramType = LIST_PARAM_MUSIC;
+			mlist->insertItem(&lvItem);
+			log_i("PlayingListAdapter insertItem i=%d",i);
+		}
+		mlist->invalidateRect();
+	}
+	void AlbumAdapter::PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec){
+		int	 x, y;
+		mediainfo *info;
+		
+		x = rect.left;
+		y = rect.top;
+		info = mMusicArrayList->getMediaInfo(lvitem->iItem);
+		//log_i("PlayingListAdapter::PaintView lvitem->iItem=%d",lvitem->iItem);
+		canvas.drawImageResource(IDP_MUSIC_ICON,10,y+5);
+		log_i("AlbumAdapter::PaintView isSec=%d",isSec);
+		if(isSec)
+			canvas.setTextColor(RGB(255,149,0));
+		else
+			canvas.setTextColor(RGB(255,255,255));
+		canvas.setTextSize(16);
+		canvas.drawText(info->album,strlen(info->album),50,y+5);
+		canvas.setTextColor(RGB(255,255,255));
+		canvas.setTextSize(12);
+		canvas.drawText(info->artist,strlen(info->artist),50,y+28);
+	}
+
+	
+	ArtistAdapter::ArtistAdapter(ListView* list,int id){
+		mId = id;
+		mlist = list;
+		
+		mMusicArrayList = new ArrayMediaInfo();
+	}
+	void ArtistAdapter::refresh(){
+		int count,i;
+		char *ptr,where[255];
+		ptr = where;
+		sprintf(ptr,"group by artist");
+		
+		mlist->setListAdapter(this);
+		mlist->deleteAllRecord();
+		mMusicArrayList->clear();
+
+		count = gmediaprovider.queryMusicArray(where,mMusicArrayList);
+
+		for(i=0;i<count;i++){
+			ListViewItem  lvItem;
+			lvItem.mask     = LVIF_ADAPTER;
+			lvItem.iItem    = i;
+			lvItem.iSubItem = 0;
+			lvItem.paramType = LIST_PARAM_MUSIC;
+			mlist->insertItem(&lvItem);
+			log_i("PlayingListAdapter insertItem i=%d",i);
+		}
+		mlist->invalidateRect();
+	}
+	void ArtistAdapter::PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec){
+		int	 x, y;
+		mediainfo *info;
+		
+		x = rect.left;
+		y = rect.top;
+		info = mMusicArrayList->getMediaInfo(lvitem->iItem);
+		//log_i("PlayingListAdapter::PaintView lvitem->iItem=%d",lvitem->iItem);
+		canvas.drawImageResource(IDP_LISTICON_ARTIST,10,y+5);
+		log_i("ArtistAdapter::PaintView isSec=%d",isSec);
+		if(isSec)
+			canvas.setTextColor(RGB(255,149,0));
+		else
+			canvas.setTextColor(RGB(255,255,255));
+		canvas.setTextSize(18);
+		canvas.drawText(info->artist,strlen(info->artist),50,y+10);
+		canvas.setTextColor(RGB(255,255,255));
+		//canvas.setTextSize(12);
+		//canvas.drawText(info->artist,strlen(info->artist),50,y+28);
+	}
 };

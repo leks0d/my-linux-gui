@@ -30,6 +30,23 @@ namespace mango
 		mThumbX = mSeekLeft+mSeekWidth-15;
 		invalidateRect();	
 	}
+	
+	int SeekBar::getProgress(){
+		return mProgress;
+	}
+	
+	void SeekBar::setTouchX(int x){
+		int px = x - mSeekLeft;
+		
+		if(px >= mWidth)
+			px = mWidth;
+		
+		mSeekWidth = px;
+		mProgress = mSeekWidth*mMax/mWidth;
+		mThumbX = mSeekLeft+mSeekWidth-15;
+		
+		invalidateRect();
+	}
 
 	int SeekBar::onPaint(Canvas& canvas)
 	{
@@ -37,24 +54,29 @@ namespace mango
 		Rect rect;
 		if(mBkgImage>0&&mSeekImage>0&&mThumbImage>0){
 			canvas.drawImageResource(mBkgImage, mBkgLeft, 8);
-			canvas.drawImageResource(mSeekImage, mSeekLeft, 14, mSeekWidth);
+			canvas.drawImageResource(mSeekImage, mSeekLeft, 14, mSeekWidth, 4);
 			canvas.drawImageResource(mThumbImage, mThumbX, 0);
-		}		
+		}
 		return 0;
 	}
 	
 	int SeekBar::onTouchDown(int x, int y, int flag){
 			log_i("SeekBar::onTouchDown x=%d,y=%d",x,y);
+			getParent()->onNotify(this,NM_SEEKBAR_DOWM,NULL);
 			return 0;
 	}
 
 	int SeekBar::onTouchMove(int x, int y, int flag){
 			log_i("SeekBar::onTouchMove x=%d,y=%d",x,y);
+			setTouchX(x);
+			getParent()->onNotify(this,NM_SEEKBAR_MOVE,NULL);
 			return 0;
 	}
 	
 	int SeekBar::onTouchUp(int x, int y, int flag){
 			log_i("SeekBar::onTouchUp x=%d,y=%d",x,y);
+			setTouchX(x);
+			getParent()->onNotify(this,NM_SEEKBAR_UP,NULL);
 			return 0;
 	}
 };

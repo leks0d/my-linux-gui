@@ -230,6 +230,7 @@ namespace particle
 	{
 		bool success;
 
+		log_i("MediaPlayerService::stop");
 		mMutex.lock();
 		success = mediaDeinit();
 		mMutex.unlock();
@@ -697,7 +698,7 @@ namespace particle
 		if (gMediaServiceData == NULL)
 			gMediaServiceData = (MediaServiceData *)malloc(sizeof (MediaServiceData));
 
-		MediaPlayerService* player = new MediaPlayerService;
+		MediaPlayerService* player = new MediaPlayerService();
 
 		return (MediaPlayerInterface*)player;
 	}

@@ -174,7 +174,7 @@ namespace mango
 		return success;
 	}
 
-	bool Canvas::drawImageResource(int id, int x, int y,int width, bool alpha){
+	bool Canvas::drawImageResource(int id, int x, int y,int width,int hight,bool alpha){
 		bool success = false;
 		RESOURCEIMAGE_HEADER imageHeader;
 
@@ -195,6 +195,8 @@ namespace mango
 
 			if(width<imageHeader.m_iWidth)
 				imageHeader.m_iWidth = width;
+			if(hight<imageHeader.m_iHeight)
+				imageHeader.m_iHeight = hight;
 			
 			viewToCanvas(x, y);
 			getClipRect(rcClip);

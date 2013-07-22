@@ -22,6 +22,7 @@ namespace mango
 		mColor = ARGB (255 ,0, 0, 0);
 		mSize = 16;
 		mPress = 0;
+		mSelectColor = -1;
 	}
 
 
@@ -36,27 +37,40 @@ namespace mango
 		TCHAR *wt;
 		wt = TEXT("MY MUSIC");
 		log_i("TextView::onPaint");
-		canvas.setTextColor(mColor);
-		canvas.setTextSize(mSize);
-		
-		if (resId > 0 && ResType == 1){
-			computeLeft(&canvas);
-			canvas.drawTextResource(resId, mLeft, 0);
-			//canvas.drawText(wt, String::lstrlen(wt), 0, 0);
-		}
-		if(mText != NULL && ResType == 0)
-			canvas.drawText(mText, strlen(mText), 0, 0);
-		
+
 		if(mNormalBgdResId>0&&mPress==0){
 			canvas.	drawImageResource(mNormalBgdResId,0,0);
 		}else if(mSelectBgdResId>0&&mPress==1){
 			canvas.	drawImageResource(mSelectBgdResId,0,0);
 		}
+		
+		if(mPress==1&&mSelectColor>0)
+			canvas.setTextColor(mSelectColor);
+		else
+			canvas.setTextColor(mColor);
+		
+		canvas.setTextSize(mSize);
+
+		
+		if (resId > 0 && ResType == 1){
+			computeLeft(&canvas);
+			canvas.drawTextResource(resId, mLeft,mTop);
+			//canvas.drawText(wt, String::lstrlen(wt), 0, 0);
+		}
+		if(mText != NULL && ResType == 0){
+			computeLeft(&canvas);
+			log_i("drawText mText mLeft=%d,mTop=%d",mLeft,mTop);
+			canvas.drawText(mText, strlen(mText), mLeft, mTop);
+		}
+
 		return 0;
 	}
 
 	void TextView::setTextString(char* text){
 		int len;
+
+		if(text == NULL)
+			return;
 		
 		len = strlen(text);
 		
@@ -66,7 +80,11 @@ namespace mango
 			ResType = 0;
 			invalidateRect();
 		}
+	}
 
+	void TextView::getTextString(char *string){
+		strcpy(string,mText);
+		log_i("ResType=%d;mText:%s",ResType,mText);
 	}
 	
 	void TextView::setTextResoure(int id){
@@ -95,7 +113,7 @@ namespace mango
 		WCHAR	wStrBuf[256 + 1] ;
 		Size size;
 		Rect rect;
-		int count,width,wpadd,hpadd;
+		int count,width,hight,wpadd,hpadd;
 		char utf8Path[300];
 
 		//test();
@@ -104,39 +122,54 @@ namespace mango
 		
 		getRect(rect);
 		width = rect.getWidth();
+		hight = rect.getHight();
 		//log_i("TextView::setTextType width=%d",width);
+		if(ResType == 1){
+			count = gSessionLocal.mResource.loadString(resId, wStrBuf, 256 + 1,1);
 		
-		count = gSessionLocal.mResource.loadString(resId, wStrBuf, 256 + 1,1);
-		
-		Charset::wideCharToMultiByte(CP_UTF8, wStrBuf, String::lstrlen(wStrBuf), utf8Path, 260 * 3);
+			//Charset::wideCharToMultiByte(CP_UTF8, wStrBuf, String::lstrlen(wStrBuf), utf8Path, 260 * 3);
 		//log_i("TextView::setTextType utf8Path=%s",utf8Path);
-
-		canvas->getTextExtentPoint(wStrBuf,count,size);
-		//log_i("TextView::setTextType size.cx=%d",size.cx);
+		}else{
+			Canvas::charToWCHAR(mText,wStrBuf);
+			count = String::lstrlen(wStrBuf);
+		}
 		
-		wpadd = width-size.cx;
-		if(wpadd<0)
+		canvas->getTextExtentPoint(wStrBuf,count,size);
+		log_i("TextView::setTextType size.cx=%d",size.cx);
+		
+		wpadd = width - size.cx;
+		hpadd = hight - size.cy;
+		
+		if(wpadd < 0)
 			wpadd = 0;
+		if(hpadd < 0)
+			hpadd = 0;
 		
 		switch(mLayoutType){
 			case TEXT_LAYOUT_LEFT:
+				mLeft = 0;
+				mTop = hpadd/2;
 				break;
 			case TEXT_LAYOUT_CENTER:
 				mLeft = wpadd/2;
+				mTop = hpadd/2;
 				break;
 			case TEXT_LAYOUT_RIGHT:
 				mLeft = wpadd-1;
 				break;
 		}
-		//log_i("TextView::setTextType mLeft=%d",mLeft);
+		log_i("TextView::setTextType mLeft=%d",mLeft);
 	}
 
 	 int TextView::onTouchDown(int x, int y, int flag){
-	 	
+	 	mPress = 1;
+		invalidateRect();	
 	 	return 0;
 	 }
 	 int TextView::onTouchUp(int x, int y, int flag){
-	 	postMessage(getParent(), VM_COMMAND, mId, (unsigned int)this);
+	 	mPress = 0;
+		invalidateRect();		 	
+		postMessage(getParent(), VM_COMMAND, mId, (unsigned int)this);
 		return 0;
 	 }
 

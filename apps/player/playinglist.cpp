@@ -10,17 +10,20 @@ namespace mango
 
 
 			Playinglist::Playinglist(){
+				particle::MediaPlayerInterface*  mtemp;
+				
 				len = 0;
 				mCurrent = 0;
 				mMax = 0;
 				playMode = 0;
 				mplaylist = NULL;
-#ifndef WIN32
-				if(mParticleplayer == NULL)
-						mParticleplayer = particle::createMediaPlayer();
-				//mParticleplayer = (particle::MediaPlayerInterface*)new particle::MediaPlayerService();
+				/*
+				mParticleplayer = (particle::MediaPlayerInterface*)malloc(sizeof(particle::MediaPlayerInterface));
+				mtemp = particle::createMediaPlayer();
+				if(mParticleplayer != NULL){
+					memcpy(mParticleplayer,mtemp,sizeof(particle::MediaPlayerInterface));
+				}*/
 				mParticleplayer = NULL;
-#endif
 			}
 			void Playinglist::addItem(mediainfo *item	){
 
@@ -57,7 +60,7 @@ namespace mango
 			}
 
 			void Playinglist::moveToPosition(int pos){
-				if(pos>0&&pos<len)
+				if(pos>=0&&pos<len)
 					mCurrent = pos;
 			}
 			
@@ -68,12 +71,12 @@ namespace mango
 					return mplaylist;
 			}
 
-			int Playinglist::startPlay(mediainfo *info){
+			int Playinglist::playMediaInfo(mediainfo *info){
 				int pos;
 				log_i("Playinglist::startPlay");
 				pos = isItemExsit(info);
 				log_i("Playinglist::isItemExsit=%d",pos);
-				if(pos>0){
+				if(pos>=0){
 					moveToPosition(pos);
 					log_i("Playinglist::moveToPosition");
 				}else{	
@@ -82,27 +85,27 @@ namespace mango
 					moveToLast();
 					log_i("Playinglist::moveToLast");	
 				}
-				//log_i("Playinglist::mParticleplayer->stop()");
-				log_i("Playinglist::mParticleplayer=0x%x",mParticleplayer);
-				//log_i("Playinglist::mParticleplayer->stop=0x%x",*mParticleplayer::stop);
-				if(mParticleplayer!=NULL){
-				
-					if(mParticleplayer->stop()){log_i("stop() success!");}else{log_i("stop() fail!");return -1;}
-
-					if(mParticleplayer->setSource(getPlayingItem()->path)){log_i("setSource() success!");}else{log_i("setSource() fail!");return -1;}
-
-					if(mParticleplayer->prepare()){log_i("prepare() success!");}else{log_i("prepare() fail!");return -1;}
-
-					if(mParticleplayer->start()){log_i("start() success!");}else{log_i("start() fail!");return -1;}
-				}
-
+				startPlay();
 			}
 
+			int Playinglist::startPlay(){
+				if(mParticleplayer == NULL)
+					mParticleplayer = particle::createMediaPlayer();
+				if(mParticleplayer!=NULL){
+					if(mParticleplayer->stop()){log_i("stop() success!");}else{log_i("stop() fail!");return -1;}
+					if(mParticleplayer->setSource(getPlayingItem()->path)){log_i("setSource() success!");}else{log_i("setSource() fail!");return -1;}
+					if(mParticleplayer->prepare()){log_i("prepare() success!");}else{log_i("prepare() fail!");return -1;}
+					if(mParticleplayer->start()){log_i("start() success!");}else{log_i("start() fail!");return -1;}
+				}
+			}
+			
 			int Playinglist::isItemExsit(mediainfo *info){
 				int i;
 				for(i=0;i<len;i++){
-					if(mplaylist[i].id == info->id)
+					
+					if(mplaylist[i].id == info->id && info->id!=-1)
 						return i;
+					
 				}
 				return -1;
 			}
@@ -126,6 +129,29 @@ namespace mango
 					return mParticleplayer->getCurrentPosition();
 				else
 					return 0;
+			}
+
+			int Playinglist::getCount(){
+				return len;
+			}
+
+
+			int Playinglist::isPlaying(){
+				if(mParticleplayer != NULL)
+					return mParticleplayer->isPlaying();
+				else
+					return 0;
+			}
+
+			mediainfo* Playinglist::getItem(int index){
+				if(index<len)
+					return &mplaylist[index];
+				else
+					return NULL;
+			}
+
+			void Playinglist::playerCallback(void* calldata, int evnet, int param0, int param1){
+				
 			}
 			
 		Playinglist *mPlayinglist = NULL;

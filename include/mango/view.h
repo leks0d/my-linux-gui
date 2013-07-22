@@ -16,15 +16,23 @@ namespace mango
 
 #define KEYCODE_POWER		0x0001
 #define KEYCODE_ENTER		0x0002
-#define KEYCODE_BACK		158
+#define KEYCODE_VOLUMEUP		158
+#define KEYCODE_VOLUMEDOWN		159
+#define KEYCODE_PREV		160
+#define KEYCODE_PLAY		161
+#define KEYCODE_NEXT		162
+#define KEYCODE_BACK		188
 
 #define TOUCH_FLAG_DOWN  0x0001
 #define TOUCH_FLAG_UP    0x0002
 #define TOUCH_FLAG_MOVE  0x0003
 
-#define NM_CLICK     	1   
-#define NM_DISPLAY     2  
-#define NM_DISMISS     3
+#define NM_CLICK     		1   
+#define NM_DISPLAY     	2  
+#define NM_DISMISS     	3
+#define NM_SEEKBAR_DOWM   4
+#define NM_SEEKBAR_MOVE   	5
+#define NM_SEEKBAR_UP   	6
 
 	class View : public Object
 	{
@@ -101,6 +109,13 @@ namespace mango
 
 	};
 
+	class UseEventInterface{
+		public:
+		UseEventInterface(){}
+		~UseEventInterface(){}
+		virtual int onKeyDispatch(int keyCode,int action, int flag);
+		virtual int onTouchDispatch(int x,int y, int action);
+	};
 }
 
 #endif

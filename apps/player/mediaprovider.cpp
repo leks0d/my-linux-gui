@@ -21,8 +21,6 @@ namespace mango
 		
 		data->info.id = str_to_int(*argv++);
 		data->info.path = getstr(*(argv++));
-		//log_i("data->info.path=%s,",data->info.path);
-		//log_i("path:argv=%s,",*(argv-1));
 		data->info.name = getstr(*(argv++));
 		data->info.name_key = getstr(*(argv++));
 		data->info.title = getstr(*(argv++));
@@ -36,6 +34,7 @@ namespace mango
 		data->info.track = str_to_int(*(argv++));
 		data->info.img_path = getstr(*(argv++));
 		data->info.add_time = str_to_int(*(argv++));
+		data->info.duration = str_to_int(*(argv++));
 		data->info.extra = getstr(*(argv));
 		data->next = 0;
 		
@@ -438,7 +437,7 @@ namespace mango
 			
 			ptr += sprintf(ptr,"select * from music ");
 			if(where!=0)
-				ptr += sprintf(ptr,"where %s;",where);
+				ptr += sprintf(ptr,"%s;",where);
 			
 			exec(sql,&info,_sql_callback);
 	
