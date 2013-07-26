@@ -55,28 +55,28 @@ namespace mango
 		if(mBkgImage>0&&mSeekImage>0&&mThumbImage>0){
 			canvas.drawImageResource(mBkgImage, mBkgLeft, 8);
 			canvas.drawImageResource(mSeekImage, mSeekLeft, 14, mSeekWidth, 4);
-			canvas.drawImageResource(mThumbImage, mThumbX, 0);
+			//canvas.drawImageResource(mThumbImage, mThumbX, 0);
 		}
 		return 0;
 	}
 	
 	int SeekBar::onTouchDown(int x, int y, int flag){
 			log_i("SeekBar::onTouchDown x=%d,y=%d",x,y);
-			getParent()->onNotify(this,NM_SEEKBAR_DOWM,NULL);
+			postMessage(getParent(),VM_NOTIFY,NM_SEEKBAR_DOWM,(unsigned int)this);
 			return 0;
 	}
 
 	int SeekBar::onTouchMove(int x, int y, int flag){
 			log_i("SeekBar::onTouchMove x=%d,y=%d",x,y);
 			setTouchX(x);
-			getParent()->onNotify(this,NM_SEEKBAR_MOVE,NULL);
+			postMessage(getParent(),VM_NOTIFY,NM_SEEKBAR_MOVE,(unsigned int)this);
 			return 0;
 	}
 	
 	int SeekBar::onTouchUp(int x, int y, int flag){
 			log_i("SeekBar::onTouchUp x=%d,y=%d",x,y);
 			setTouchX(x);
-			getParent()->onNotify(this,NM_SEEKBAR_UP,NULL);
+			postMessage(getParent(),VM_NOTIFY,NM_SEEKBAR_UP,(unsigned int)this);
 			return 0;
 	}
 };

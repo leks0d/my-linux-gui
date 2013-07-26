@@ -2,21 +2,15 @@
 namespace mango
 {
 
-	class EqSettingsView: public View
+	class ShutDownView: public View
 	{
 	public:
-		EqSettingsView(void);
-		EqSettingsView(const TCHAR* title, View* parent, Rect* rect, int style, int show = SW_NORMAL);
-		virtual ~EqSettingsView(void);
+		ShutDownView(void);
+		ShutDownView(const TCHAR* title, View* parent, Rect* rect, int style, int show = SW_NORMAL);
+		virtual ~ShutDownView(void);
 		void initView();
 		void addPoint(int x,int y);
 		void pointClear();
-		void resetEqValue();
-		void setCurrentEqMode(int n);
-		void setCurrentEqValue(int id,int val);
-		void setEqModeToReset();
-		int progressToValue(int n){return 6-n;}
-		int valueToProgress(int n){return 6-n;}
 	public:
 		virtual int onCreate();
 		virtual int onDestroy();
@@ -27,7 +21,7 @@ namespace mango
 		virtual int onTouchDown(int x, int y, int flag);
 		virtual int onTouchMove(int x, int y, int flag);
 		virtual int onTouchUp(int x, int y, int flag);
-		
+
 	private:
 		void setMainState(int state){ mainState = state;log_i("mainState = 0x%x",mainState);}
 		int getMainState(){return mainState;}
@@ -52,15 +46,6 @@ namespace mango
 		int count;
 		int mMax;
 		int isNeedPaint;
-		TextView* mEqMode[6];
-		TextView* mEqFrequency[8];
-		TextView* mEqValue[8];
-		VerticalSeekBar* mVerticalSeekBar[8];
-		TextView*	mControlButton;
-		TextView*	mResetButton;
-		int mCurrentMode;
-		int *mCurrentValue;
-		int mEqOpen;
 	};
 
 };

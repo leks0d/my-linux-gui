@@ -79,6 +79,13 @@ namespace mango
 		return 0;
 	}
 
+	int Button::setImageResId(int normalId,int pressId)
+	{
+		mNormalImageId = normalId;
+		mPressedImageId = pressId;
+		invalidateRect();
+		return 0;
+	}
 };
 
 

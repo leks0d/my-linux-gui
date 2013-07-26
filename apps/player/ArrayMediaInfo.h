@@ -2,15 +2,16 @@ namespace mango
 {	
 	class ArrayMediaInfo{
 
-		public:
+		private:
 			mediainfo *mplaylist;
 			int len;
 			int mMax;
-		
+		public:
 			ArrayMediaInfo();
 			~ArrayMediaInfo();
 			void addMediaInfo(mediainfo *info);
 			mediainfo* getMediaInfo(int pos);
+			int getCount(){return len;}
 			void clear();
 			ArrayMediaInfo& operator =(ArrayMediaInfo& info);
 	};

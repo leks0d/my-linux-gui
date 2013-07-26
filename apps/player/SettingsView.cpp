@@ -4,17 +4,6 @@
 namespace mango
 {
 	
-	enum{
-		SETTING_BACK = 10,
-		SETTING_HOME,
-		SETTING_TITLE,
-		PLAYING_IDB_PLAY,
-		PLAYING_IDB_MUSIC,
-		PLAYING_IDB_SETTING,
-		PLAYING_IDB_VOLUME,
-		PLAYING_IDB_ALBUM_IMAGE,
-		PLAYING_IDB_MUSIC_NAME
-	};
 	enum
 	{
 		ADAPTER_PLAYING = 0xf0c0,	
@@ -34,6 +23,9 @@ namespace mango
 		mSettingListAdapter = NULL;
 		mGaplessListAdapter = NULL;
 		mPlayModeListAdapter = NULL;
+		mAdvanceListAdapter = NULL;
+		mLanguageListAdapter = NULL;
+		mAutoSleepListAdapter = NULL;
 	}
 
 	SettingsView::~SettingsView(void)
@@ -95,18 +87,20 @@ namespace mango
 
 
 	void SettingsView::initAdvanceList(){
-		int img[]={IDP_ADVANCE_LANGUGE,IDP_ADVANCE_DISPLAY,IDP_ADVANCE_BATTARY,IDP_ADVANCE_SYSTEM_INFO,IDP_ADVANCE_DISPLAY};
-		int imgsec[]={IDP_ADVANCE_LANGUGE_S,IDP_ADVANCE_DISPLAY_S,IDP_ADVANCE_BATTARY_S,IDP_ADVANCE_SYSTEM_INFO_S,IDP_ADVANCE_DISPLAY_S};
-		int text[]={STR_ADVANCE_LANGUAGE,STR_ADVANCE_DISPLAY,STR_ADVANCE_POWER,STR_ADVANCE_SYSINFO,STR_ADVANCE_SHOWTOUCH};
-		int i,count = 5;
+		int img[]={IDP_ADVANCE_LANGUGE,IDP_ADVANCE_DISPLAY,IDP_ADVANCE_BATTARY,IDP_ADVANCE_SYSTEM_INFO,IDP_ADVANCE_DISPLAY,IDP_ADVANCE_SYSTEM_INFO};
+		int imgsec[]={IDP_ADVANCE_LANGUGE_S,IDP_ADVANCE_DISPLAY_S,IDP_ADVANCE_BATTARY_S,IDP_ADVANCE_SYSTEM_INFO_S,IDP_ADVANCE_DISPLAY_S,IDP_ADVANCE_SYSTEM_INFO_S};
+		int text[]={STR_ADVANCE_LANGUAGE,STR_ADVANCE_DISPLAY,STR_ADVANCE_POWER,STR_ADVANCE_SYSINFO,STR_ADVANCE_SHOWTOUCH,STR_ADVANCE_SCANNER};
+		int i,count = 6;
 		log_i("SettingsView::initAdvanceList");
-		if(mAdvanceListAdapter== NULL){
+		if(mAdvanceListAdapter == NULL){
+			log_i("SettingsView::mListView->deleteAllItems()");
 			mListView->deleteAllItems();
+			log_i("SettingsView::new SettingListAdapter");
 			mAdvanceListAdapter = new SettingListAdapter(mListView,ADAPTER_PLAYING);
 			mAdvanceListAdapter->setData(img,imgsec,text,count);
-		}else
+		}else{
 			mAdvanceListAdapter->refresh();
-		
+		}
 		mTitle->setTextResoure(STR_SETTING_ADVANCED);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mTitle->invalidateRect();
@@ -256,8 +250,16 @@ namespace mango
 							gPlayer.showSystemInfoView(); break;
 						case 4:
 							gPlayer.showPointDrawView(); break;
+						case 5:
+							gmediaprovider.mediascanner(); 
+							gPlayer.showMediaView();
+							break;
 						}
 					break;
+				case 0x1430:
+					gPowerManager->setAutoSleepTime(index);
+					mAutoSleepListAdapter->refresh();
+					break;					
 			}
 			
 		}
@@ -346,6 +348,7 @@ namespace mango
 	
 	void SettingListAdapter::refresh(){
 		int i;
+		log_i("SettingListAdapter::refresh()");
 		mlist->setListAdapter(this);
 		mlist->deleteAllRecord();
 
@@ -438,7 +441,7 @@ namespace mango
 		canvas.setTextSize(18);
 		canvas.drawTextResource(mTextRes[index],x,y+13);
 		x+=150;
-		if(index == 2)
+		if(index == gPowerManager->getAutoSleepTime())
 			canvas.drawImageResource(IDP_LISTITEM_SEC,x,y+13);
 		else
 			canvas.drawImageResource(IDP_LISTITEM_NO_SEC,x,y+13);

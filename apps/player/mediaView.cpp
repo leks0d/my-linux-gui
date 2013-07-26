@@ -3,18 +3,7 @@
 
 namespace mango
 {
-	enum
-	{
-		SETTING_BACK = 10,
-		SETTING_HOME,
-		SETTING_TITLE,
-		PLAYING_IDB_PLAY,
-		PLAYING_IDB_MUSIC,
-		PLAYING_IDB_SETTING,
-		PLAYING_IDB_VOLUME,
-		PLAYING_IDB_ALBUM_IMAGE,
-		PLAYING_IDB_MUSIC_NAME
-	};
+
 	enum
 	{
 		ADAPTER_PLAYING = 0xf0c0,	
@@ -153,7 +142,8 @@ namespace mango
 	}
 	int MediaView::onPaint(Canvas& canvas)
 	{
-		log_i("MediaView::onPaint");
+		//log_i("MediaView::onPaint");
+		
 		canvas.drawImageResource(IDP_SETTING_BGD,0,0,false);
 		canvas.drawImageResource(IDP_MUSIC_TITLEBAR,0,0,false);
 		return 0;
@@ -647,7 +637,7 @@ namespace mango
 		mlist->setListAdapter(this);
 		mlist->deleteAllRecord();
 		
-		count = mMusicArrayList->len;
+		count = mMusicArrayList->getCount();
 		for(i=0;i<count;i++){
 			ListViewItem  lvItem;
 			lvItem.mask     = LVIF_ADAPTER;

@@ -114,6 +114,8 @@ namespace mango
 		Charset::wideCharToMultiByte(CP_UTF8, newTitle, String::lstrlen(newTitle), name, MAX_PATH * 3);
 		name[29] = '\0';
 
+		log_i("View::setTitle name=%s",name);
+		
 		return newTitleLen;
 	}
 

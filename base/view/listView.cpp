@@ -825,7 +825,7 @@ namespace mango
 				canvas.drawImageResource(mPressItemBackground, 5, rect.top);
 		}else{
 			if(mItemBackground>0)
-				canvas.drawImageResource(mItemBackground, 5, rect.top);			
+				canvas.drawImageResource(mItemBackground, 5, rect.top,false);			
 		}
 		canvas.setTextColor(RGB (255, 255, 255)) ;
 		
@@ -904,7 +904,7 @@ namespace mango
 			Rect it = rect;
 			it.left = 125;
 			it.right = it.left + 80;
-			//log_i("it.right =%d; it.left = %d",it.right,it.left);
+			canvas.setTextSize(16);
 			canvas.drawTextResource(lvitem->iText, it, DT_VCENTER);
 		}
 		else if (lvitem->mask & LVIF_TEXT)
@@ -946,7 +946,7 @@ namespace mango
 
 	int ListView::onPaint(Canvas& canvas)
 	{
-		log_i("ListView::onPaint");
+		//log_i("ListView::onPaint");
 
 		LISTVIEW_RECORD* record;
 		Brush brush(RGB(255, 255, 255));

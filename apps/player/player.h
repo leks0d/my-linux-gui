@@ -1,8 +1,11 @@
-
+#include <sys/time.h>
+#include <signal.h>
 #include "mango.h"
 #include "resource.h"
 #include "mediaprovider.h"
 #include "ArrayMediaInfo.h"
+#include "SettingProvider.h"
+#include "PowerManager.h"
 #include "playinglist.h"
 #include "mediaView.h"
 #include "SettingsView.h"
@@ -14,9 +17,7 @@
 #include "VolumeView.h"
 #include "SystemInfoView.h"
 #include "EqSettingView.h"
-#include "NetlinkListener.h"
-
-
+#include "ShutDownView.h"
 
 namespace mango
 {	
@@ -25,6 +26,25 @@ namespace mango
 		IOCTRL_BRIGTNESS_WRITE
 	};
 
+	enum
+	{
+		SETTING_BACK = 10,
+		SETTING_HOME,
+		SETTING_TITLE,
+		SETTING_EQ_RESET,
+		SETTING_EQ_OPENORCLOSE,
+		PLAYING_IDB_NEXT,
+		PLAYING_IDB_PREV,
+		PLAYING_IDB_PLAY,
+		PLAYING_IDB_PLAY_MODE,
+		PLAYING_IDB_MUSIC,
+		PLAYING_IDB_SETTING,
+		PLAYING_IDB_VOLUME,
+		PLAYING_IDB_ALBUM_IMAGE,
+		PLAYING_IDB_MUSIC_NAME,
+		PLAYING_SHOW_VOLUME,
+		PLAYING_UPDATE_BATTERY
+	};
 
 	class PlayerEventInterface : public UseEventInterface{
 		public:
@@ -43,6 +63,7 @@ namespace mango
 
 	public:
 		int main();
+		int initSettings();
 		int showPlayingView();
 		int showMediaView();
 		int showSettingsView();
@@ -52,8 +73,10 @@ namespace mango
 		int showSystemInfoView();
 		int showVolumeView();
 		int showEqSettingView();
+		int showShutDownView();
 		int  getVolume(void);
 		void setVolume(int volume);
+		void setPowerState();
 		void ioctrlBrightness(int cmd,int* brightness);
 
 	public:
@@ -66,7 +89,9 @@ namespace mango
 		SystemInfoView* mSystemInfoView;
 		VolumeView* mVolumeView;
 		EqSettingsView* mEqSettingsView;
+		ShutDownView* mShutDownView;
 		PlayerEventInterface* mPlayerEventInterface;
+		int powerState;
 		sqlite3 *db; 
 	};
 

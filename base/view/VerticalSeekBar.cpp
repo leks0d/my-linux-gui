@@ -18,15 +18,15 @@ namespace mango
 		mSeekLeft = mBkgLeft+6;
 		mBkgImage = 0;
 		mThumbImage = 0;
+		mId = id;
+		mEnable = 1;
 	}
-
 
 	VerticalSeekBar::~VerticalSeekBar(void)
 	{
 	}
 	
-	void VerticalSeekBar::setProgress(int n){
-		
+	void VerticalSeekBar::setProgress(int n){	
 		mProgress = n;
 		mThumbY = n*mHeight/mMax;
 		invalidateRect();	
@@ -37,13 +37,13 @@ namespace mango
 	}
 	
 	void VerticalSeekBar::setTouchY(int y){
-		
 		mThumbY = y - 8;
 		if(mThumbY < 0)
 			mThumbY = 0;
 		if(mThumbY > mHeight)
 			mThumbY = mHeight;
-		
+		mProgress = mThumbY*mMax/mHeight;
+		log_i("VerticalSeekBar::setTouchY mProgress=%d",mProgress);
 		invalidateRect();
 	}
 
@@ -57,25 +57,35 @@ namespace mango
 		}
 		return 0;
 	}
+
+	void VerticalSeekBar::setEnable(int n){
+		mEnable = n;
+	}
 	
 	int VerticalSeekBar::onTouchDown(int x, int y, int flag){
 			log_i("SeekBar::onTouchDown x=%d,y=%d",x,y);
+			if(mEnable==0)
+				return 0;
 			setTouchY(y);
-			getParent()->onNotify(this,NM_SEEKBAR_DOWM,NULL);
+			getParent()->onNotify(this,VSEEKBAR_TOUCH_DOWM,NULL);
 			return 0;
 	}
 
 	int VerticalSeekBar::onTouchMove(int x, int y, int flag){
 			log_i("SeekBar::onTouchMove x=%d,y=%d",x,y);
+			if(mEnable==0)
+				return 0;
 			setTouchY(y);
-			getParent()->onNotify(this,NM_SEEKBAR_MOVE,NULL);
+			getParent()->onNotify(this,VSEEKBAR_TOUCH_CHANGE,NULL);
 			return 0;
 	}
 	
 	int VerticalSeekBar::onTouchUp(int x, int y, int flag){
 			log_i("SeekBar::onTouchUp x=%d,y=%d",x,y);
+			if(mEnable==0)
+				return 0;
 			setTouchY(y);
-			getParent()->onNotify(this,NM_SEEKBAR_UP,NULL);
+			getParent()->onNotify(this,VSEEKBAR_TOUCH_UP,NULL);
 			return 0;
 	}
 };

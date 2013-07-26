@@ -14,6 +14,7 @@ namespace mango
 			Mstring(int n){mstr = new char[n];pos=0;len=n;}
 			
 			int mSprintf(const char* str,int n);
+			int mfloatSprintf(const char* str,float n);
 			void clear(){delete mstr;mstr = new char[len];pos=0;}
 			void setPlayTime(int n);
 	};
@@ -46,7 +47,7 @@ namespace mango
 	public:
 		int setNormalImageId(int imageId);
 		int setPressedImageId(int imageId);
-
+		int setImageResId(int normalId,int pressId);
 	private:
 		int  mPressedImageId;
 		int  mNormalImageId;
@@ -84,6 +85,8 @@ namespace mango
 			void setTextSelectColor(COLORREF color){mSelectColor = color;}
 			void setTextSize(int size);
 			void setTextLayoutType(int layout);
+			void setTextSelect(int n){ if(n!=mSelect){mSelect=n;invalidateRect();} }
+			void setTextEnable(int n){ if(n!=mEnable){mEnable=n;invalidateRect();} }
 			void computeLeft(Canvas *canvas);
 			void getTextString(char *string);
 			void setBackGround(int nor,int sec){mNormalBgdResId=nor,mSelectBgdResId=sec;};
@@ -98,6 +101,8 @@ namespace mango
 			COLORREF mSelectColor;
 			int mNormalBgdResId;
 			int mSelectBgdResId;
+			int mSelect;
+			int mEnable;
 			int mSize;
 			int mPress;
 			int mLeft;
@@ -168,6 +173,13 @@ class ValueTextView : public View
 			int mBkgLeft;
 			int mSeekLeft;
 	};
+
+#define VSEEKBAR_TOUCH_DOWM 		0xF0000001
+#define VSEEKBAR_TOUCH_CHANGE 	0xF0000002
+#define VSEEKBAR_TOUCH_UP 		0xF0000003
+#define VSEEKBAR_TEXTVIEW_UP 		0xF0000004
+
+
 class VerticalSeekBar : public View
 {
 	public:
@@ -179,7 +191,7 @@ class VerticalSeekBar : public View
 		int getProgress();
 		void setTouchY(int x);
 		void setMax(int n){mMax=n;}
-		
+		void setEnable(int n);
 		virtual int onPaint(Canvas& canvas);
 		virtual int onTouchDown(int x, int y, int flag);
 		virtual int onTouchMove(int x, int y, int flag);
@@ -198,6 +210,7 @@ class VerticalSeekBar : public View
 		int mThumbY;
 		int mBkgLeft;
 		int mSeekLeft;
+		int mEnable;
 };
 
 

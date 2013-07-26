@@ -4,8 +4,10 @@ namespace mango
 {	
 	
 		ArrayMediaInfo::ArrayMediaInfo(){
-			len = mMax = 0;
+			len = 0;
+			mMax = 0;
 			mplaylist = NULL;
+			log_i("ArrayMediaInfo::ArrayMediaInfo %d,len=%d,mMax=%d,",mplaylist,len,mMax);
 		}
 		
 		ArrayMediaInfo::~ArrayMediaInfo(){
@@ -13,6 +15,8 @@ namespace mango
 		}
 			
 		void ArrayMediaInfo::addMediaInfo(mediainfo *info){
+
+				log_i("ArrayMediaInfo::addMediaInfo %d,len=%d,mMax=%d,",info,len,mMax);
 			
 				if(len>=mMax){
 					

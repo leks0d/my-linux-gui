@@ -4,17 +4,6 @@
 namespace mango
 {
 	
-	enum{
-		SETTING_BACK = 10,
-		SETTING_HOME,
-		SETTING_TITLE,
-		PLAYING_IDB_PLAY,
-		PLAYING_IDB_MUSIC,
-		PLAYING_IDB_SETTING,
-		PLAYING_IDB_VOLUME,
-		PLAYING_IDB_ALBUM_IMAGE,
-		PLAYING_IDB_MUSIC_NAME
-	};
 	enum
 	{
 		ADAPTER_PLAYING = 0xf0c0,	
@@ -103,6 +92,7 @@ namespace mango
 		mstr = new Mstring(5);
 		mstr->mSprintf("%d",n);
 		mBrightnessValue->setTextString(mstr->mstr);
+		mstr->clear();
 	}
 	
 	int DisplaySettingView::onDestroy()
@@ -122,7 +112,7 @@ namespace mango
 	{
 		if(fromView == NULL && code == NM_DISPLAY){
 			initView();
-		}else if(fromView == mBrightnessBar){
+		}else if(parameter == mBrightnessBar){
 			int brightness = mBrightnessBar->getProgress();
 			switch(code){
 				case NM_SEEKBAR_DOWM:
@@ -130,6 +120,8 @@ namespace mango
 				case NM_SEEKBAR_UP:
 					gPlayer.ioctrlBrightness(IOCTRL_BRIGTNESS_WRITE,&brightness);
 					setDisplayValue(brightness);
+					if(code == NM_SEEKBAR_UP)
+						gSettingProvider.update(SETTING_BRIGHTNESS_ID,brightness);
 					break;
 			}
 		}else if(fromView == mBack && NM_CLICK){

@@ -14,13 +14,15 @@ namespace mango
 #define SW_MINIMIZE         6
 #endif
 
-#define KEYCODE_POWER		0x0001
 #define KEYCODE_ENTER		0x0002
 #define KEYCODE_VOLUMEUP		158
 #define KEYCODE_VOLUMEDOWN		159
 #define KEYCODE_PREV		160
 #define KEYCODE_PLAY		161
 #define KEYCODE_NEXT		162
+#define KEYCODE_CAPACITY	200
+#define KEYCODE_SHORT_POWER		116
+#define KEYCODE_LONG_POWER		117
 #define KEYCODE_BACK		188
 
 #define TOUCH_FLAG_DOWN  0x0001
@@ -33,6 +35,9 @@ namespace mango
 #define NM_SEEKBAR_DOWM   4
 #define NM_SEEKBAR_MOVE   	5
 #define NM_SEEKBAR_UP   	6
+#define NM_PLAY_COM   		7
+#define NM_SEEK_UPDATE   	8
+#define NM_BATTERY_UPDATE 9
 
 	class View : public Object
 	{

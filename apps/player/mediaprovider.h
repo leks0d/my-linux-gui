@@ -13,37 +13,33 @@ namespace mango
 	#define MUSIC_NAME_KEY "name_key"	
 	#define MUSIC_TITLE "title"
 	#define MUSIC_TITLE_KEY "title_key"
-	#define MUSIC_ART_ID "artist_id"
 	#define MUSIC_ART "artist"
 	#define MUSIC_ART_KEY "artist_key"
-	#define MUSIC_ALBUM_ID "album_id"
 	#define MUSIC_ALBUM "album"
 	#define MUSIC_ALBUM_KEY "album_key"
 	#define MUSIC_TRACK "track"
 	#define MUSIC_ART_IMG "img_path"
 	#define MUSIC_ADD_TIME "add_time"
 	#define MUSIC_DURATION "duration"
-	#define MUSIC_EXTRA "extra"
+	#define MUSIC_IN_PLAY "inplay"
 
 	#define MUSIC_TABLE_CREATE "CREATE TABLE IF NOT EXISTS music(\
-	_id INTEGER PRIMARY KEY autoincrement,\
-	path TEXT,\
-	name TEXT,\
-	name_key TEXT,\
-	title TEXT,\
-	title_key TEXT,\
-	artist_id INTEGER,\
-	artist TEXT,\
-	artist_key TEXT,\
-	album_id INTEGER,\
-	album TEXT,\
-	album_key TEXT,\
-	track TEXT,\
-	img_path TEXT,\
-	add_time INTEGER,\
-	duration INTEGER,\
-	extra TEXT\
-	);"
+									_id INTEGER PRIMARY KEY autoincrement,\
+									path TEXT,\
+									name TEXT,\
+									name_key TEXT,\
+									title TEXT,\
+									title_key TEXT,\
+									artist TEXT,\
+									artist_key TEXT,\
+									album TEXT,\
+									album_key TEXT,\
+									track TEXT,\
+									img_path TEXT,\
+									add_time INTEGER,\
+									duration INTEGER,\
+									inplay INTEGER\
+									);"
 
 
 	typedef struct
@@ -64,7 +60,7 @@ namespace mango
 		char *img_path;
 		int add_time;
 		int duration;
-		char *extra;
+		int inPlay;
 	}mediainfo;
 
 	struct Musicdb{
@@ -90,6 +86,8 @@ namespace mango
 		virtual ~mediaprovider(void);
 		int checkfile();
 		int music_exsit_db(char *path);
+		static int str_to_int(char *arg);
+		static int power_operation(int ary,int th);
 	private:
 		sqlite3 * db;
 		

@@ -34,7 +34,7 @@ namespace mango
 	int Party::messageLoop()
 	{
 		Message msg;
-
+		log_i("Party::messageLoop");
 		while (mMessageQueue->get(msg) > 0)	{
 			dispatchMessage(msg);
 		}
@@ -65,15 +65,15 @@ namespace mango
 			break;
 
 		case VM_TOUCHMOVE:
-			result = view->onTouchMove(msg.getParameter1() & 0x00ffff, (msg.getParameter1() >> 16) & 0x00ffff, msg.getParameter2());
+			result = view->onTouchMove(msg.getParameter1(), msg.getParameter2(),0);
 			break;
 
 		case VM_TOUCHDOWN:
-			result = view->onTouchDown(msg.getParameter1() & 0x00ffff, (msg.getParameter1() >> 16) & 0x00ffff, msg.getParameter2());
+			result = view->onTouchDown(msg.getParameter1(), msg.getParameter2(),0);
 			break;
 
 		case VM_TOUCHUP:
-			result = view->onTouchUp(msg.getParameter1() & 0x00ffff, (msg.getParameter1() >> 16) & 0x00ffff, msg.getParameter2());
+			result = view->onTouchUp(msg.getParameter1(), msg.getParameter2(),0);
 			break;
 
 		case VM_KEYDOWN:
@@ -101,6 +101,9 @@ namespace mango
 
 		case VM_INACTIVATE:
 			result = view->onInactivate();
+			break;
+		case VM_NOTIFY:
+			result = view->onNotify(NULL,msg.getParameter1(),(void*)msg.getParameter2());
 			break;
 		}
 

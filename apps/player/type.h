@@ -29,7 +29,7 @@ namespace mango
 		char *img_path;
 		int add_time;
 		int duration;
-		char *extra;
+		int inPlay;
 	}mediainfo;
 	
 };

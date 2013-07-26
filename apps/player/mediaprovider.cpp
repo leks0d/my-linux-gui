@@ -3,10 +3,8 @@
 namespace mango
 {
 
-	static int str_to_int(char *arg);
 	static void strlwr(char *string);
 	static char * getfiletype(char *file);
-	static int power_operation(int ary,int th);
 	static char* getstr(char *arg);
 	
 	static int _sql_callback(void * use, int argc, char ** argv, char ** szColName)
@@ -19,23 +17,21 @@ namespace mango
 		data = (Musicdbinfo *)malloc(sizeof(Musicdbinfo));
 		log_i("data = %d",data);
 		
-		data->info.id = str_to_int(*argv++);
+		data->info.id = mediaprovider::str_to_int(*argv++);
 		data->info.path = getstr(*(argv++));
 		data->info.name = getstr(*(argv++));
 		data->info.name_key = getstr(*(argv++));
 		data->info.title = getstr(*(argv++));
 		data->info.title_key = getstr(*(argv++));
-		data->info.artist_id = str_to_int(*(argv++));
 		data->info.artist = getstr(*(argv++));
 		data->info.artist_key = getstr(*(argv++));
-		data->info.album_id = str_to_int(*(argv++));
 		data->info.album = getstr(*(argv++));	
 		data->info.album_key = getstr(*(argv++));
-		data->info.track = str_to_int(*(argv++));
+		data->info.track = mediaprovider::str_to_int(*(argv++));
 		data->info.img_path = getstr(*(argv++));
-		data->info.add_time = str_to_int(*(argv++));
-		data->info.duration = str_to_int(*(argv++));
-		data->info.extra = getstr(*(argv));
+		data->info.add_time = mediaprovider::str_to_int(*(argv++));
+		data->info.duration = mediaprovider::str_to_int(*(argv++));
+		data->info.inPlay = mediaprovider::str_to_int(*(argv));
 		data->next = 0;
 		
 		if((*ppt) == 0){
@@ -51,6 +47,7 @@ namespace mango
 
 	static void relese_db(Musicdbinfo *db){
 		Musicdbinfo *pt;
+		log_i("relese_db");
 		pt =  db;
 		while(db != 0){
 			pt = db;
@@ -73,8 +70,8 @@ namespace mango
 		}
 		str[count+1] = '\0';
 	};
-	static int str_to_int(char *arg){
-		int value,len,i;
+	int mediaprovider::str_to_int(char *arg){
+		/*int value,len,i;
 		char ch;
 		value = 0;
 		
@@ -88,8 +85,10 @@ namespace mango
 				//log_e("str_to_int error arg[%d]=%c",i,arg[i]);
 				return -1;
 			}
-		}
-		
+		}*/
+
+		int value;
+		sscanf(arg,"%d\n",&value);
 		return value;		
 	}
 	static char* getstr(char *arg){
@@ -110,7 +109,7 @@ namespace mango
 		log_i("str_cpy:%s",pt);
 	}
 	
-	static int power_operation(int ary,int th){
+	int mediaprovider::power_operation(int ary,int th){
 		int value ,i;
 		value = 1;
 		if(th == 0)
@@ -205,6 +204,7 @@ namespace mango
 		checkfile();
 		log_i("-------------mediascanner filescanner");
 		filescanner("/mnt/sdcard");
+		filescanner("/mnt/external_sd");
 		log_i("-------------mediascanner end");
 	}
 	
@@ -218,6 +218,7 @@ namespace mango
 		memset(info, 0, sizeof(mediainfo));
 		info->path = path;
 		info->name = getfilename(path);
+		info->inPlay = 0;
 
 		memset(value, 0, 256);
 		if (m_id3.GetTags(METADATA_KEY_CD_TRACK_NUMBER, value)){
@@ -360,13 +361,13 @@ namespace mango
 		char *ptr,sql[1024];
 		
 		ptr = sql;
-		ptr += sprintf(ptr,"insert into %s (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ",
-			table,MUSIC_PTAH,MUSIC_NAME,MUSIC_NAME_KEY,MUSIC_TITLE,MUSIC_TITLE_KEY,MUSIC_ART_ID,MUSIC_ART,MUSIC_ART_KEY,
-			MUSIC_ALBUM_ID,MUSIC_ALBUM,MUSIC_ALBUM_KEY,MUSIC_TRACK,MUSIC_ART_IMG,MUSIC_ADD_TIME,MUSIC_DURATION,MUSIC_EXTRA);
+		ptr += sprintf(ptr,"insert into %s (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ",
+			table,MUSIC_PTAH,MUSIC_NAME,MUSIC_NAME_KEY,MUSIC_TITLE,MUSIC_TITLE_KEY,MUSIC_ART,MUSIC_ART_KEY,
+			MUSIC_ALBUM,MUSIC_ALBUM_KEY,MUSIC_TRACK,MUSIC_ART_IMG,MUSIC_ADD_TIME,MUSIC_DURATION,MUSIC_IN_PLAY);
 
-		ptr += sprintf(ptr,"values('%s','%s','%s','%s','%s','%d','%s','%s','%d','%s','%s','%d','%s','%d','%d','%s');",
+		ptr += sprintf(ptr,"values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%d','%s','%d','%d','%d');",
 				info->path,info->name,info->name_key,info->title,info->title_key,info->artist_id,info->artist,
-				info->artist_key,info->album_id,info->album,info->album_key,info->track,info->img_path,info->add_time,info->duration,info->extra);
+				info->artist_key,info->album_id,info->album,info->album_key,info->track,info->img_path,info->add_time,info->duration,info->inPlay);
 
 		exec(sql,0,0);
 
@@ -442,20 +443,19 @@ namespace mango
 			exec(sql,&info,_sql_callback);
 	
 			pt = info;
-			
+
+			log_i("exec complete");
 			if(pt == 0){
 				return 0;
 			}else{
-				
 				arraylist->addMediaInfo(&(pt->info));
-				count++;
-				
+				count++;	
 				while(pt->next!=0){
+					
 					pt = pt->next;
 					arraylist->addMediaInfo(&(pt->info));
 					count++;
-				}
-				
+				}			
 			}
 			
 			relese_db(info);

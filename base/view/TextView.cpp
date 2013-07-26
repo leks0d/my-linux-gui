@@ -23,6 +23,10 @@ namespace mango
 		mSize = 16;
 		mPress = 0;
 		mSelectColor = -1;
+		mLeft = 0;
+		mTop = 0;
+		mLayoutType = 0;
+		mEnable = 1;
 	}
 
 
@@ -36,18 +40,25 @@ namespace mango
 	{
 		TCHAR *wt;
 		wt = TEXT("MY MUSIC");
-		log_i("TextView::onPaint");
+		//log_i("TextView::onPaint");
 
 		if(mNormalBgdResId>0&&mPress==0){
 			canvas.	drawImageResource(mNormalBgdResId,0,0);
 		}else if(mSelectBgdResId>0&&mPress==1){
 			canvas.	drawImageResource(mSelectBgdResId,0,0);
 		}
+
+		
 		
 		if(mPress==1&&mSelectColor>0)
 			canvas.setTextColor(mSelectColor);
 		else
 			canvas.setTextColor(mColor);
+
+		if(mSelect)
+			canvas.	drawImageResource(mSelectBgdResId,0,0);
+		if(!mEnable)
+			canvas.setTextColor(RGB(120,120,120));
 		
 		canvas.setTextSize(mSize);
 
@@ -59,7 +70,7 @@ namespace mango
 		}
 		if(mText != NULL && ResType == 0){
 			computeLeft(&canvas);
-			log_i("drawText mText mLeft=%d,mTop=%d",mLeft,mTop);
+			//log_i("drawText mText mLeft=%d,mTop=%d,%s",mLeft,mTop,mText);
 			canvas.drawText(mText, strlen(mText), mLeft, mTop);
 		}
 
@@ -135,7 +146,7 @@ namespace mango
 		}
 		
 		canvas->getTextExtentPoint(wStrBuf,count,size);
-		log_i("TextView::setTextType size.cx=%d",size.cx);
+		//log_i("TextView::setTextType size.cx=%d",size.cx);
 		
 		wpadd = width - size.cx;
 		hpadd = hight - size.cy;
@@ -158,18 +169,23 @@ namespace mango
 				mLeft = wpadd-1;
 				break;
 		}
-		log_i("TextView::setTextType mLeft=%d",mLeft);
+		//log_i("TextView::setTextType mLeft=%d",mLeft);
 	}
 
 	 int TextView::onTouchDown(int x, int y, int flag){
+	 	if(mEnable == 0)
+			return 0;
 	 	mPress = 1;
 		invalidateRect();	
 	 	return 0;
 	 }
 	 int TextView::onTouchUp(int x, int y, int flag){
+	 	if(mEnable == 0)
+			return 0;
 	 	mPress = 0;
-		invalidateRect();		 	
+		invalidateRect();
 		postMessage(getParent(), VM_COMMAND, mId, (unsigned int)this);
+		postMessage(getParent(), VM_NOTIFY, VSEEKBAR_TEXTVIEW_UP, (unsigned int)this);
 		return 0;
 	 }
 

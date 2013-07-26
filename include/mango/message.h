@@ -28,7 +28,6 @@ namespace mango
 		VM_SHOWWINDOW,                   
 		VM_WININICHANGE,   
 
-
 		VM_KEYDOWN, 
 		VM_KEYUP,
 
@@ -37,6 +36,8 @@ namespace mango
 		VM_TOUCHMOVE, 
 
 		VM_COMMAND,
+		VM_NOTIFY,
+		VM_CAPACITY,
 	} ;
 
 

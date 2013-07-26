@@ -5,18 +5,7 @@
 
 namespace mango
 {
-	
-	enum{
-		SETTING_BACK = 10,
-		SETTING_HOME,
-		SETTING_TITLE,
-		PLAYING_IDB_PLAY,
-		PLAYING_IDB_MUSIC,
-		PLAYING_IDB_SETTING,
-		PLAYING_IDB_VOLUME,
-		PLAYING_IDB_ALBUM_IMAGE,
-		PLAYING_IDB_MUSIC_NAME
-	};
+
 	enum
 	{
 		ADAPTER_PLAYING = 0xf0c0,	
@@ -121,6 +110,7 @@ namespace mango
 			}			
 		}
 		iVolume->isShow = 0;
+		gSettingProvider.update(SETTING_VOLUME_ID,vol);
 		gPlayer.showPlayingView();
 	}
 	

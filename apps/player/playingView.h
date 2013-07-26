@@ -7,6 +7,9 @@ namespace mango
 		PlayingView(const TCHAR* title, View* parent, Rect* rect, int style, int show = SW_NORMAL);
 		void ViewInit(void);
 		static unsigned int SeekBarRunnig(void *parameter);
+		void updatePlayMode();
+		void updatePlayButtonIcon();
+		void updateAudioInfo();
 		virtual ~PlayingView(void);
 		virtual int onCreate();
 		virtual int onDestroy();
@@ -20,6 +23,7 @@ namespace mango
 		Button*  mNextButton;
 		Button*  mPrevButton;
 		Button*  mPlayButton;
+		Button*  mPlayModeButton;
 		ImageView* mAlbumImage;
 		
 		Button*  mVolumeButton;
@@ -31,6 +35,7 @@ namespace mango
 		TextView* mMyMusicText;
 		TextView* mSettingText;
 		
+		TextView* mAudioInfo;
 		TextView* mMusicName;
 		TextView* mArtist;
 		TextView* mAlbum;

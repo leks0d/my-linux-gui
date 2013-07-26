@@ -38,6 +38,12 @@ namespace mango
 
 		void touchRoutine();
 		static unsigned int touchThreadRoutine(void *parameter);
+		
+		void batteryRoutine();
+		static unsigned int batteryThreadRoutine(void *parameter);
+		void powerKeyRoutine();
+		static unsigned int powerKeyThreadRoutine(void *parameter);
+		
 		void setUseEventInterface(UseEventInterface* i){mUseEventInterface = i;}
 
 		void dispatchTouch(Point &pt, bool pressed);
@@ -55,6 +61,9 @@ namespace mango
 		Thread	    mUpdateThread;
 		Thread	    mTouchThread;
 		Thread	    mKeyThread;
+		Thread	    mBatteryThread;		
+		Thread	    mPowerKeyThread;
+		
 		class Party* mParty;
 
 		Mutex		mMutex;  

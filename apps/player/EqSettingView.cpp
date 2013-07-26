@@ -4,17 +4,6 @@
 namespace mango
 {
 	
-	enum{
-		SETTING_BACK = 10,
-		SETTING_HOME,
-		SETTING_TITLE,
-		PLAYING_IDB_PLAY,
-		PLAYING_IDB_MUSIC,
-		PLAYING_IDB_SETTING,
-		PLAYING_IDB_VOLUME,
-		PLAYING_IDB_ALBUM_IMAGE,
-		PLAYING_IDB_MUSIC_NAME
-	};
 	enum
 	{
 		ADAPTER_PLAYING = 0xf0c0,	
@@ -31,9 +20,7 @@ namespace mango
 	EqSettingsView::EqSettingsView(const TCHAR* title, View* parent, Rect* rect, int style, int show) 
 		: View(title, parent, rect, style, show)
 	{
-		mEqMode = new TextView[6];
-		mEqFrequency = new TextView[8];
-		mVerticalSeekBar = new VerticalSeekBar[8];
+		mCurrentValue = new int[8];
 	}
 
 	EqSettingsView::~EqSettingsView(void)
@@ -74,35 +61,41 @@ namespace mango
 
 		for(i=0;i<6;i++){
 			rect.setEx(52*i+5, 28, 52, 20);
-			mEqMode = new TextView(SETTING_TITLE, TEXT("mTitle"), this, &rect, 0);
-			mEqMode->setTextColor(COLOR_GRAY);
-			mEqMode->setTextSelectColor(COLOR_ORANGE);
-			mEqMode->setBackGround(IDP_EQ_MODE_BGD,IDP_EQ_MODE_BGD);
-			mEqMode->setTextSize(14);
-			mEqMode->setTextLayoutType(TEXT_LAYOUT_CENTER);
-			mEqMode->setTextResoure(eqMode[i]);
+			mEqMode[i] = new TextView(i, TEXT("mTitle"), this, &rect, 0);
+			mEqMode[i]->setTextColor(COLOR_GRAY);
+			mEqMode[i]->setTextSelectColor(COLOR_ORANGE);
+			mEqMode[i]->setBackGround(IDP_EQ_MODE_BGD,IDP_EQ_MODE_BGD_S);
+			mEqMode[i]->setTextSize(14);
+			mEqMode[i]->setTextLayoutType(TEXT_LAYOUT_CENTER);
+			mEqMode[i]->setTextResoure(eqMode[i]);
 		}
 
 		for(i=0;i<8;i++){
 			rect.setEx(diver*i+freLeft, 53, diver, 13);
-			mEqFrequency = new TextView(SETTING_TITLE, TEXT("mTitle"), this, &rect, 0);
-			mEqFrequency->setTextColor(COLOR_GRAY);
-			mEqFrequency->setTextSize(13);
-			mEqFrequency->setTextLayoutType(TEXT_LAYOUT_CENTER);
-			mEqFrequency->setTextResoure(eqFrequcy[i]);
+			mEqFrequency[i] = new TextView(SETTING_TITLE, TEXT("mTitle"), this, &rect, 0);
+			mEqFrequency[i]->setTextColor(COLOR_GRAY);
+			mEqFrequency[i]->setTextSize(13);
+			mEqFrequency[i]->setTextLayoutType(TEXT_LAYOUT_CENTER);
+			mEqFrequency[i]->setTextResoure(eqFrequcy[i]);
 		}
-		
+
 		for(i=0;i<8;i++){
-			rect.setEx(diver*i+freLeft+6, 66, 34, 132);
-			mVerticalSeekBar = new VerticalSeekBar(SETTING_TITLE, TEXT("mTitle"), this, &rect, 0);
-			mVerticalSeekBar->setMax(13);
-			mVerticalSeekBar->setProgress(6);
-			mVerticalSeekBar->setImageResoure(IDP_EQ_SEEKBAR,IDP_EQ_SEEKBAR,IDP_EQ_SEEKBAR_THUMB);
-			mVerticalSeekBar->onCreate();
+			rect.setEx(diver*i+freLeft+6, 66, diver, 132);
+			mVerticalSeekBar[i] = new VerticalSeekBar(i, TEXT("mTitle"), this, &rect, 0);
+			mVerticalSeekBar[i]->setMax(12);
+			mVerticalSeekBar[i]->setImageResoure(IDP_EQ_SEEKBAR,IDP_EQ_SEEKBAR,IDP_EQ_SEEKBAR_THUMB);
+		}
+
+		for(i=0;i<8;i++){
+			rect.setEx(diver*i+freLeft, 190, diver, 13);
+			mEqValue[i] = new TextView(SETTING_TITLE, TEXT("mEqValue"), this, &rect, 0);
+			mEqValue[i]->setTextColor(COLOR_GRAY);
+			mEqValue[i]->setTextSize(13);
+			mEqValue[i]->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		}
 
 		rect.setEx(0, 213, 115, 27);		
-		mControlButton = new TextView(SETTING_TITLE, TEXT("mControlButton"), this, &rect, 0);
+		mControlButton = new TextView(SETTING_EQ_OPENORCLOSE, TEXT("mControlButton"), this, &rect, 0);
 		mControlButton->setTextColor(COLOR_GRAY);
 		mControlButton->setTextSelectColor(COLOR_ORANGE);
 		mControlButton->setTextLayoutType(TEXT_LAYOUT_CENTER);
@@ -110,15 +103,15 @@ namespace mango
 		mControlButton->onCreate();
 
 		rect.setEx(205, 213, 115, 27);	
-		mResetButton = new TextView(SETTING_TITLE, TEXT("mResetButton"), this, &rect, 0);
+		mResetButton = new TextView(SETTING_EQ_RESET, TEXT("mResetButton"), this, &rect, 0);
 		mResetButton->setTextColor(COLOR_GRAY);
 		mResetButton->setTextSelectColor(COLOR_ORANGE);
 		mResetButton->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mResetButton->setTextResoure(STR_EQ_RESET);
 		mResetButton->onCreate();	
-		
+
 		initView();
-			
+
 		setFocus(this);
 		invalidateRect();
 		return 0;
@@ -132,21 +125,69 @@ namespace mango
 
 	}
 	void EqSettingsView::initView()
-	{
-		Mstring* mstr;
-		int brightness;
-
-		//mstr = new Mstring(5);
-		//gPlayer.ioctrlBrightness(IOCTRL_BRIGTNESS_READ,&brightness);	
-		//mstr->mSprintf("%d",brightness);
-
-		//mBrightnessValue->setTextString(mstr->mstr);
-
+	{		
+		TextView *text;		
+		
+		gSettingProvider.query(SETTING_EQMODE_ID,&mCurrentMode);
+		gSettingProvider.query(SETTING_EQSTATE_ID,&mEqOpen);
+		gSettingProvider.EqQuery(mCurrentMode,mCurrentValue);
+		
 		mTitle->setTextResoure(STR_SETTING_EQ);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 
+		resetEqValue();
 	}
 
+	void EqSettingsView::resetEqValue(){
+		Mstring* mstr;
+		int i;
+
+		mstr = new Mstring(5);
+
+		for(i=0;i<8;i++){
+			mstr->clear();
+			mstr->mSprintf("%d",mCurrentValue[i]);
+			mEqValue[i]->setTextString(mstr->mstr);
+			mVerticalSeekBar[i]->setProgress(valueToProgress(mCurrentValue[i]));
+		}
+		mstr->clear();
+		
+		for(i=0;i<6;i++){
+			if(mCurrentMode == i)
+				mEqMode[i]->setTextSelect(1);
+			else
+				mEqMode[i]->setTextSelect(0);
+			
+			mEqMode[i]->setTextEnable(mEqOpen);
+		}
+		mResetButton->setTextEnable(mEqOpen);
+		for(i=0;i<8;i++){
+			mVerticalSeekBar[i]->setEnable(mEqOpen);
+		}
+		if(mEqOpen)
+			mControlButton->setTextResoure(STR_EQ_COLSE);
+		else
+			mControlButton->setTextResoure(STR_EQ_OPEN);
+		
+	}
+
+	void EqSettingsView::setCurrentEqMode(int n){
+		if(mCurrentMode!=n){
+			mCurrentMode = n;
+			gSettingProvider.update(SETTING_EQMODE_ID,mCurrentMode);
+			gSettingProvider.EqQuery(mCurrentMode,mCurrentValue);
+		}
+	}
+	void EqSettingsView::setCurrentEqValue(int id,int val){
+		mCurrentValue[id] = val;
+		gSettingProvider.EqUpdate(mCurrentMode,mCurrentValue);
+	}
+	void EqSettingsView::setEqModeToReset(){
+		memcpy(mCurrentValue,EqValue[mCurrentMode],8*sizeof(int));
+		gSettingProvider.EqUpdate(mCurrentMode,mCurrentValue);
+	}
+
+	
 	int EqSettingsView::onDestroy()
 	{
 		return 0;
@@ -163,16 +204,39 @@ namespace mango
 
 	int EqSettingsView::onNotify(View* fromView, int code, void* parameter)
 	{
+		View *view = (View *)parameter;
 		if(fromView == NULL && code == NM_DISPLAY){
 			//initView();
 		}else if(fromView == mBack && code == NM_CLICK){
 			gPlayer.showSettingsView();
 		}else if(fromView == mHome && code == NM_CLICK){
 			gPlayer.showPlayingView();
+		}else if(code == VSEEKBAR_TOUCH_CHANGE){
+			VerticalSeekBar *seekbar = (VerticalSeekBar *)fromView;
+			mCurrentValue[fromView->mId] = progressToValue(seekbar->getProgress());
+			resetEqValue();
+		}else if(code == VSEEKBAR_TOUCH_UP){			
+			VerticalSeekBar *seekbar = (VerticalSeekBar *)fromView;
+			setCurrentEqValue(fromView->mId,progressToValue(seekbar->getProgress()));
+			resetEqValue();
+			mPlayinglist->setEqBandLevel(fromView->mId,mCurrentValue[fromView->mId]);
+		}else if(code == VSEEKBAR_TEXTVIEW_UP&&view->mId<6){
+			setCurrentEqMode(view->mId);
+			resetEqValue();
+			mPlayinglist->setEq(mCurrentValue);
+		}else if(code == VSEEKBAR_TEXTVIEW_UP&&view->mId==SETTING_EQ_RESET){
+			setEqModeToReset();
+			resetEqValue();
+			mPlayinglist->setEq(mCurrentValue);
+		}else if(code == VSEEKBAR_TEXTVIEW_UP&&view->mId==SETTING_EQ_OPENORCLOSE){
+			mEqOpen=!mEqOpen;
+			gSettingProvider.update(SETTING_EQSTATE_ID,mEqOpen);
+			resetEqValue();
+			mPlayinglist->AudioEqualizerEnable(mEqOpen);
 		}
-		
 		return 0;
 	}
+
 
 	int EqSettingsView::onKeyDown(int keyCode, int flag)
 	{

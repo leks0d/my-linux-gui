@@ -12,12 +12,12 @@ namespace mango
 		ADAPTER_ARTIST = 0xf0c3,
 		ADAPTER_MUSIC = 0xf0c4,
 	};
-	PointDrawView::PointDrawView(void)
+	ShutDownView::ShutDownView(void)
 	{
 
 	}
 
-	PointDrawView::PointDrawView(const TCHAR* title, View* parent, Rect* rect, int style, int show) 
+	ShutDownView::ShutDownView(const TCHAR* title, View* parent, Rect* rect, int style, int show) 
 		: View(title, parent, rect, style, show)
 	{
 		count = mMax = 0;
@@ -25,12 +25,12 @@ namespace mango
 		isNeedPaint = 1;
 	}
 
-	PointDrawView::~PointDrawView(void)
+	ShutDownView::~ShutDownView(void)
 	{
 
 	}
 	
-	int PointDrawView::onCreate()
+	int ShutDownView::onCreate()
 	{
 		Rect rect;
 		int firstLeft = 98;
@@ -39,7 +39,7 @@ namespace mango
 		invalidateRect();
 		return 0;
 	}
-	void PointDrawView::addPoint(int x,int y)
+	void ShutDownView::addPoint(int x,int y)
 	{
 		if(count >= mMax){
 			int* xtemp;
@@ -70,7 +70,7 @@ namespace mango
 		log_i("PointDrawView::addPoint count=%d",count);
 	}
 
-	void PointDrawView::pointClear(){
+	void ShutDownView::pointClear(){
 		if(count>0){
 			log_i("PointDrawView::pointClear");
 			count = mMax = 0;
@@ -79,7 +79,7 @@ namespace mango
 			mpx = mpy = NULL;
 		}
 	}
-	void PointDrawView::initView()
+	void ShutDownView::initView()
 	{
 		Mstring* mstr;
 		int brightness;
@@ -93,56 +93,35 @@ namespace mango
 		mTitle->setTextResoure(STR_ADVANCE_SHOWTOUCH);	
 	}
 
-	int PointDrawView::onDestroy()
+	int ShutDownView::onDestroy()
 	{
 		return 0;
 	}
 
-	int PointDrawView::onPaint(Canvas& canvas)
+	int ShutDownView::onPaint(Canvas& canvas)
 	{
-		log_i("MediaView::onPaint");
-		//canvas.drawImageResource(IDP_SETTING_BGD,0,0,false);
-		//canvas.drawImageResource(IDP_MUSIC_TITLEBAR,0,0,false);
-		Rect rect;
-		Brush brush(RGB(0, 0, 0));
-		Brush pbrush(RGB(255, 255, 255));
-		int i;
-		
-		if(isNeedPaint){
-			isNeedPaint = 0;
-			rect.setEx(0, 0, 320, 240);
-			canvas.fillRect(rect, brush);
-			
-		}
-		for(i=0;i<count;i++){
-			rect.setEx(mpx[i], mpy[i], 2, 2);
-			canvas.fillRect(rect, pbrush);
-		}
-		
+		canvas.drawImageResource(IDP_SHUTDOWM_LOGO,0,0,false);
 		return 0;
 	}
 
-	int PointDrawView::onNotify(View* fromView, int code, void* parameter)
+	int ShutDownView::onNotify(View* fromView, int code, void* parameter)
 	{
 		if(fromView == NULL && code == NM_DISPLAY){
-			//initView();
 			mpx=0;
 		}
-		
 		return 0;
 	}
 
-	int PointDrawView::onKeyDown(int keyCode, int flag)
+	int ShutDownView::onKeyDown(int keyCode, int flag)
 	{
 		switch(keyCode){
 			case KEYCODE_BACK:
 				break;
 		}
-
 		return 0;
 	}
 
-	int PointDrawView::onKeyUp(int keyCode, int flag)
+	int ShutDownView::onKeyUp(int keyCode, int flag)
 	{
 		switch(keyCode){
 			case KEYCODE_BACK:
@@ -152,24 +131,15 @@ namespace mango
 		return 0;
 	}
 
-	int PointDrawView::onTouchDown(int x, int y, int flag)
+	int ShutDownView::onTouchDown(int x, int y, int flag)
 	{
-		pointClear();
-		addPoint(x,y);
-		isNeedPaint = 1;
-		invalidateRect();
 		return -1;
 	}
-	int PointDrawView::onTouchMove(int x, int y, int flag){
-		log_i("DisplaySettingView::onTouchMove x=%d,y=%d",x,y);
-		addPoint(x,y);
-		invalidateRect();
+	int ShutDownView::onTouchMove(int x, int y, int flag){
 		return -1;
 
 	}
-	int PointDrawView::onTouchUp(int x, int y, int flag){
-		addPoint(x,y);
-		invalidateRect();
+	int ShutDownView::onTouchUp(int x, int y, int flag){
 		return -1;
 		}
 };

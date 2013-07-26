@@ -2,17 +2,6 @@
 
 namespace mango
 {
-	enum
-	{
-		PLAYING_IDB_NEXT = 10,
-		PLAYING_IDB_PREV,
-		PLAYING_IDB_PLAY,
-		PLAYING_IDB_MUSIC,
-		PLAYING_IDB_SETTING,
-		PLAYING_IDB_VOLUME,
-		PLAYING_IDB_ALBUM_IMAGE,
-		PLAYING_IDB_MUSIC_NAME
-	};
 
 	PlayingView::PlayingView(void)
 	{
@@ -35,6 +24,7 @@ namespace mango
 	{
 
 		Rect rect;
+		log_i("PlayingView::onCreate()");
 		rect.setEx(80, 180, 32, 23);
 		mPrevButton = new Button(PLAYING_IDB_PREV, TEXT("mPrevButton"), this, &rect, 0);
 		mPrevButton->setNormalImageId(IDP_PLAYING_PREV_INACTIVE);
@@ -52,11 +42,18 @@ namespace mango
 		mPlayButton->setNormalImageId(IDP_PLAYING_PLAY_ACTIVE);
 		mPlayButton->setPressedImageId(IDP_PLAYING_PLAY_ACTIVE);
 		mPlayButton->onCreate();
+
+		rect.setEx(127, 32, 100, 20);
+		mAudioInfo = new TextView(PLAYING_IDB_MUSIC_NAME, TEXT("mAudioInfo"), this, &rect, 0);
+		mAudioInfo->setTextColor(COLOR_GRAY);
+		mAudioInfo->setTextSize(15);
+
+		rect.setEx(280, 30, 40, 22);
+		mPlayModeButton = new Button(PLAYING_IDB_PLAY_MODE, TEXT("mPlayModeButton"), this, &rect, 0);
 				
 		rect.setEx(6, 30, 110, 110);
 		mAlbumImage = new ImageView(PLAYING_IDB_ALBUM_IMAGE, TEXT("mAlbumImage"), this, &rect, 0);
 
-		
 		rect.setEx(127, 55, 190, 25);
 		mMusicName = new TextView(PLAYING_IDB_MUSIC_NAME, TEXT("mMusicName"), this, &rect, 0);
 		mMusicName->setTextColor(RGB(248,136,0));
@@ -81,6 +78,7 @@ namespace mango
 		mVolumeText = new  TextView(-1, TEXT("mVolumeText"), this, &rect, 0);
 		mVolumeText->setTextSize(13);
 		mVolumeText->setTextColor(RGB(255,255,255));
+		mVolumeText->setTextLayoutType(TEXT_LAYOUT_LEFT);
 		mVolumeText->onCreate();
 		
 		rect.setEx(255, 0, 28, 19);
@@ -88,10 +86,11 @@ namespace mango
 		mBatteryIcon->setImageResoure(IDP_BATTERY_ICON);
 		mBatteryIcon->onCreate();
 		
-		rect.setEx(283, 2, 35, 16);		
+		rect.setEx(283, 0, 35, 19);		
 		mBatteryText = new  TextView(-1, TEXT("mBatteryText"), this, &rect, 0);
 		mBatteryText->setTextColor(RGB(255,255,255));
 		mBatteryText->setTextSize(13);
+		mBatteryText->setTextLayoutType(TEXT_LAYOUT_LEFT);
 		mBatteryText->onCreate();
 		
 		rect.setEx(0, 140, 307, 20);		
@@ -128,7 +127,7 @@ namespace mango
 		mSettingText->setTextResoure(MUSIC_MUSIC_FUN);
 		mSettingText->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mSettingText->onCreate();
-		
+		isNeedFresh = 1;
 		ViewInit();
 		
 		return -1;
@@ -136,25 +135,25 @@ namespace mango
 
 	void PlayingView::ViewInit(void){
 		log_i("PlayingView::ViewInit");	
-		
 		Mstring* mstr;
 		mediainfo* currentinfo;
+		
 		currentinfo = mPlayinglist->getPlayingItem();
 		
 		mstr = new Mstring(10);
 		mstr->mSprintf("%d",gPlayer.getVolume());
 		mVolumeText->setTextString(mstr->mstr);
 		
-		mstr->clear();
-		mstr->mSprintf("%d%%",35);
-		mBatteryText->setTextString(mstr->mstr);
 
 		if(currentinfo == NULL){
 			mAlbumImage->setImageResoure(IDP_DEFAULT_ALBUM_ICON);
 			mMusicName->setTextString("Not find music.");
 			return;
 		}
+		
 		mCurrentInfo = *currentinfo;
+
+		mAlbumImage->setImageResoure(IDP_DEFAULT_ALBUM_ICON);
 		
 		mMusicName->setTextString(mCurrentInfo.name);
 		
@@ -169,35 +168,64 @@ namespace mango
 		mTimeText->setTextString(mstr->mstr);
 
 		mstr->clear();
-		mstr->setPlayTime(mPlayinglist->getDuration());
+		mstr->setPlayTime(mCurrentInfo.duration);
 		mDurtionText->setTextString(mstr->mstr);
 		
 		mstr->clear();
 		mDurtionText->getTextString(mstr->mstr);
-
+		
+		updatePlayMode();
+		updatePlayButtonIcon();
+		updateAudioInfo();
+		mstr->clear();
 		mSeekBarUpdateThread.create(PlayingView::SeekBarRunnig, this);
-		isNeedFresh = 1;
+	}
 
+	void PlayingView::updatePlayMode(){
+		int playmode;
+		int playModeNormalRes[4] = {IDP_PLAYMODE_0,IDP_PLAYMODE_1,IDP_PLAYMODE_2,IDP_PLAYMODE_3};
+		int playModePressRes[4] = {IDP_PLAYMODE_0_S,IDP_PLAYMODE_1_S,IDP_PLAYMODE_2_S,IDP_PLAYMODE_3_S};
+
+		playmode = mPlayinglist->getPlayMode();
+		if(mPlayModeButton != NULL)
+			mPlayModeButton->setImageResId(playModeNormalRes[playmode],playModePressRes[playmode]);
+	}
+
+	void PlayingView::updatePlayButtonIcon(){
+		int isPlay;
+		isPlay = mPlayinglist->isPlaying();
+		if(isPlay)
+			mPlayButton->setImageResId(IDP_PLAYING_PAUSE,IDP_PLAYING_PAUSE);
+		else
+			mPlayButton->setImageResId(IDP_PLAYING_PLAY_ACTIVE,IDP_PLAYING_PLAY_ACTIVE);
+	}
+	void PlayingView::updateAudioInfo(){
+		int info[6];	
+		Mstring *mstr;
+		float sampleRate;
+		
+		memset(info,0,sizeof(int)*6);
+		mstr = new Mstring(20);
+		
+		mPlayinglist->getAudioInfo(info);
+		
+		log_i("getAudioInfo:%d,%d,%d,%d,%d,%d",info[0],info[1],info[2],info[3],info[4],info[5]);
+		sampleRate = info[1];
+		log_i("getAudioInfo:%.1f",sampleRate);
+		sampleRate = sampleRate/1000.0;
+		log_i("getAudioInfo:%.1f",sampleRate);
+		mstr->mfloatSprintf("%.1fKHz/",sampleRate);
+		mstr->mSprintf("%dKbps",info[2]/1000);
+
+		mAudioInfo->setTextString(mstr->mstr);
+		mstr->clear();
 	}
 	
 	unsigned int PlayingView::SeekBarRunnig(void *parameter){
 			PlayingView *mplayingview = (PlayingView*)parameter;
 			while(1){
 				Thread::sleep(350);
-				if(mplayingview->isNeedFresh && mPlayinglist->isPlaying()){
-					Mstring* mstr;
-					mstr = new Mstring(10);
-					mstr->clear();
-					mstr->setPlayTime(mPlayinglist->getCurrent());
-					
-					mplayingview->mTimeText->setTextString(mstr->mstr);
-					/*
-					mstr->clear();
-					mstr->setPlayTime(mPlayinglist->getDuration());
-					mplayingview->mDurtionText->setTextString(mstr->mstr);
-					*/
-					mplayingview->mSeekBar->setProgress(mPlayinglist->getCurrent());
-				}
+				mplayingview->postMessage(mplayingview,VM_NOTIFY,NM_SEEK_UPDATE,(unsigned int)mplayingview);
 			}
 			return 0;
 	}
@@ -221,18 +249,17 @@ namespace mango
 	{
 		Rect rect;
 		Brush brush(RGB(25, 25, 25));
-		log_i("PlayingView::onPaint");
+		//log_i("PlayingView::onPaint");
 		
 		rect.setEx(0, 0, 320, 21);
 		canvas.drawImageResource(IDP_PLAYING_BACKGROUND, 0, 0, false);
 		canvas.fillRect(rect, brush);
 		canvas.drawImageResource(IDP_BACKGROUND_BOTTOM, 0, 211, false);
 
-		log_i("PlayingView::onPaint complete");
+		//log_i("PlayingView::onPaint complete");
 		
 		return 0;
 	}
-
 
 	int PlayingView::onNotify(View* fromView, int code, void* parameter)
 	{
@@ -243,6 +270,45 @@ namespace mango
 		}else if(fromView == NULL && code == NM_DISMISS){
 			log_i("PlayingView::onNotify NM_DISMISS");
 			isNeedFresh = 0;
+		}else if(fromView == NULL && code == NM_PLAY_COM){
+			Playinglist *list = (Playinglist *)parameter;
+			log_i("PlayingView::onNotify NM_PLAY_COM");
+			list->callbackPlay();
+			ViewInit();
+		}else if(parameter == mSeekBar){
+			switch(code){
+				case NM_SEEKBAR_DOWM:
+					isNeedFresh = 0;
+					break;
+				case NM_SEEKBAR_MOVE:				
+					break;
+				case NM_SEEKBAR_UP:
+					mPlayinglist->seekTo(mSeekBar->getProgress());
+					isNeedFresh = 1;
+					break;
+			}
+		}else if(code == NM_SEEK_UPDATE){
+			//log_i("isNeedFresh=%d,mPlayinglist->isPlaying()=%d",isNeedFresh,mPlayinglist->isPlaying());
+			if(isNeedFresh && mPlayinglist->isPlaying()){
+				Mstring* mstr;
+					
+				mstr = new Mstring(10);
+
+				mstr->setPlayTime(mPlayinglist->getCurrent());
+					
+				mTimeText->setTextString(mstr->mstr);
+
+				mSeekBar->setProgress(mPlayinglist->getCurrent());	
+				mstr->clear();
+			}
+		}else if(code == NM_BATTERY_UPDATE){
+			if(isNeedFresh){
+				Mstring* mstr;	
+				mstr = new Mstring(10);
+				mstr->mSprintf("%d%%",(unsigned int)parameter);
+				mBatteryText->setTextString(mstr->mstr);
+				mstr->clear();
+			}
 		}
 		
 		return 0;
@@ -278,19 +344,16 @@ namespace mango
 		switch(id)
 		{
 		case PLAYING_IDB_NEXT:
-			volume = gPlayer.getVolume();
-			volume += 4;
-			if (volume > 255)
-				volume = 255;
-				gPlayer.setVolume(volume);
+			mPlayinglist->playNext();
+			ViewInit();
 			break;
-
 		case PLAYING_IDB_PREV:
-			volume = gPlayer.getVolume();
-			volume -= 4;
-			if (volume < 0)
-				volume = 0;
-				gPlayer.setVolume(volume);
+			mPlayinglist->playPrev();
+			ViewInit();
+			break;
+		case PLAYING_IDB_PLAY:
+			mPlayinglist->playPauseOrStart();
+			ViewInit();
 			break;
 		case PLAYING_IDB_MUSIC:
 			gPlayer.showMediaView();
@@ -298,7 +361,21 @@ namespace mango
 		case PLAYING_IDB_SETTING:
 			isNeedFresh = 0;
 			gPlayer.showSettingsView();
-			break;			
+			break;
+		case PLAYING_SHOW_VOLUME:
+			gPlayer.showVolumeView();
+			break;
+		case PLAYING_UPDATE_BATTERY:
+			break;
+		case PLAYING_IDB_PLAY_MODE:{
+			int mode = mPlayinglist->getPlayMode();
+			mode ++;
+			if(mode >= 4)
+				mode = 0;
+			mPlayinglist->setPlayMode(mode);
+			updatePlayMode();
+			break;
+			}
 		}
 		return -1;
 	}
@@ -308,6 +385,16 @@ namespace mango
 		char *ptr;
 		ptr = mstr + pos;
 		pos+=sprintf(ptr,str,n);
+		//log_i("mSprintf:mstr=%s",mstr);
+		return pos;
+	}
+
+	int Mstring::mfloatSprintf(const char* str,float n)
+	{
+		char *ptr;
+		ptr = mstr + pos;
+		pos+=sprintf(ptr,str,n);
+		//log_i("mSprintf:mstr=%s",mstr);
 		return pos;
 	}
 
@@ -319,6 +406,6 @@ namespace mango
 		min=time/60;
 		ptr = mstr + pos;
 		pos+=sprintf(ptr,"%d:%d",min,sec);
-		log_i("Mstring::setPlayTime n=%d,%s",n,mstr);
+		//log_i("Mstring::setPlayTime n=%d,%s",n,mstr);
 	}
 };

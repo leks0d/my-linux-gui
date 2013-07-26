@@ -15,6 +15,7 @@ namespace mango
 	Session::Session()
 	{
 		mViewZAxis.mSession = this;
+		mUseEventInterface = NULL;
 	}
 
 	Session::~Session()
@@ -39,6 +40,8 @@ namespace mango
 		mUpdateThread.create(Session::updateThreadRoutine, this);
 		mTouchThread.create(Session::touchThreadRoutine, this); 
 		mKeyThread.create(Session::keyThreadRoutine, this);
+		mBatteryThread.create(Session::batteryThreadRoutine, this);
+		mPowerKeyThread.create(Session::powerKeyThreadRoutine, this);
 	}
 
 	void Session::getScreenInvalidRect(Rect &rect)
@@ -84,7 +87,7 @@ namespace mango
 	void Session::updateRoutine()
 	{
 		while (1) {
-			Thread::sleep(50);
+			Thread::sleep(20);
 
 			mViewZAxis.invalidScreenRectToView();
 			if (!mViewZAxis.mExistInvalidateView)
@@ -303,7 +306,7 @@ namespace mango
 	void Session::dispatchTouch(Point &pt, bool pressed)
 	{
 		Point ptInView;
-		log_i("pt.x=%d pt.y=%d pressed=%d", pt.x, pt.y, pressed);
+		//log_i("pt.x=%d pt.y=%d pressed=%d", pt.x, pt.y, pressed);
 
 		if (!mTouchPressed && pressed)
 			mTouchView = mViewZAxis.getViewFromPoint(pt);
@@ -316,19 +319,21 @@ namespace mango
 		ptInView.offset(0 - mTouchView->mRect.left, 0 - mTouchView->mRect.top);
 		if (!mTouchPressed && pressed)
 		{
-			gMessageQueue.post(mTouchView, VM_TOUCHDOWN, ptInView.x | (ptInView.y << 16), 0);
+			gMessageQueue.post(mTouchView, VM_TOUCHDOWN, ptInView.x,ptInView.y);
 			mTouchPressed = true;
 		}
 		else if (mTouchPressed && pressed)
 		{
-			gMessageQueue.post(mTouchView, VM_TOUCHMOVE, ptInView.x | (ptInView.y << 16), 0);
+			gMessageQueue.post(mTouchView, VM_TOUCHMOVE, ptInView.x ,ptInView.y);
 		}else if (!pressed)
 		{
-			gMessageQueue.post(mTouchView, VM_TOUCHUP, ptInView.x | (ptInView.y << 16), 0);
+			gMessageQueue.post(mTouchView, VM_TOUCHUP, ptInView.x,ptInView.y);
 			mTouchPressed = false;
 		}
 		mPoint.x=pt.x;
 		mPoint.y=pt.y;
+		if(mUseEventInterface!=NULL)
+			mUseEventInterface->onTouchDispatch(pt.x,pt.y,VM_TOUCHUP);
 	}
 
 
@@ -342,7 +347,7 @@ namespace mango
 		
 		if (!mKeyPressed && pressed)
 		{
-			log_i("dispatchKeycode code=%d,pressed=%d",keycode,pressed);
+			//log_i("dispatchKeycode code=%d,pressed=%d",keycode,pressed);
 			if(mUseEventInterface->onKeyDispatch(keycode,VM_KEYDOWN,0))
 				return;
 			gMessageQueue.post(focusView, VM_KEYDOWN, keycode, 0);
@@ -350,16 +355,102 @@ namespace mango
 		}
 		else if (mKeyPressed && !pressed)
 		{
-			log_i("dispatchKeycode code=%d,pressed=%d",keycode,pressed);
+			//log_i("dispatchKeycode code=%d,pressed=%d",keycode,pressed);
 			if(mUseEventInterface->onKeyDispatch(keycode,VM_KEYUP,0))
 				return;
 			gMessageQueue.post(focusView, VM_KEYUP, keycode, 0);
 			mKeyPressed = false;
 		}
-		log_i("dispatchKeycode code=%d,pressed=%d",keycode,pressed);
+		//log_i("dispatchKeycode code=%d,pressed=%d",keycode,pressed);
 	}
 
 
+	unsigned int Session::batteryThreadRoutine(void *parameter)
+	{
+		Session* session = (Session *)parameter;
+		session->batteryRoutine();
+		return 0;
+	}
+
+	void Session::batteryRoutine(){
+		int fd,count,capacity;
+		char *rbuf;
+		
+		rbuf = new char[5];
+		
+		while(1){
+			
+			fd = open("/sys/class/power_supply/battery/capacity", O_RDONLY);
+			
+			if(fd<=0){
+				log_i("open /sys/class/power_supply/battery/capacity fail");
+				break;
+			}
+		
+			count = read(fd,rbuf,5);
+
+			sscanf(rbuf,"%d\n",&capacity);
+			
+			if(mUseEventInterface != NULL)
+				mUseEventInterface->onKeyDispatch(capacity,VM_CAPACITY,0);		
+
+			close(fd);
+			memset(rbuf,0,5);
+			
+			Thread::sleep(1000);
+		}
+
+		close(fd);
+	}
+
+	unsigned int Session::powerKeyThreadRoutine(void *parameter){
+		Session* session = (Session *)parameter;
+		session->powerKeyRoutine();
+		return 0;
+	}
+
+	void Session::powerKeyRoutine()
+	{
+		struct input_event EventBuf[INPUT_EVENT_BUF_SIZE] ;
+		int fd ;
+		int i, evnetCount, readBytes ;
+		int keyCode = -1;
+		bool pressed = false;
+		
+		if ((fd = open("/dev/input/event0", O_RDONLY)) < 0) {
+			log_e("can't open /dev/input/event0 \n") ;
+			return;
+		}
+		
+		log_i("Open /dev/input/event0 \n") ;
+		
+		while (1) 
+		{
+			readBytes = read (fd, EventBuf, sizeof(struct input_event) * INPUT_EVENT_BUF_SIZE) ;
+			if (readBytes < (int) sizeof(struct input_event)) {
+				log_e("reading \n");
+				break ;
+			}
+			
+			evnetCount = readBytes / sizeof(struct input_event);
+			for (i = 0 ; i < evnetCount ; i++)
+			{
+				log_i("type = %d, code = %d, value = %d", EventBuf[i].type, EventBuf[i].code, EventBuf[i].value);
+			
+				switch (EventBuf[i].type)
+				{
+				case EV_KEY:
+					if(mUseEventInterface!=NULL)
+						mUseEventInterface->onKeyDispatch(EventBuf[i].code,EventBuf[i].value?VM_KEYDOWN:VM_KEYUP,0);
+					break ;
+				}
+			}
+		}	
+		return;	
+	}
+
+
+	
 	SessionLocal::SessionLocal()
 	{
 
@@ -426,11 +517,10 @@ namespace mango
 			log_e ("mmap /dev/fb0 failed \n") ;
 			return FALSE ;
 		}
-		memset((unsigned char*)pAddress, 0, SCREEN_BUFFER_BYTES * 2);
+		memset((unsigned char*)pAddress, 0xFF, SCREEN_BUFFER_BYTES * 2);
 		ioctl(mfbDevice, FBIOPUT_VSCREENINFO, &info);
-		
+		ioctl(mfbDevice, FBIOPAN_DISPLAY, &info);
 		mfbBuffer = pAddress ;
-
 		log_i ("fb0 buffer address 0x%x \n", pAddress) ;
 #endif
 
@@ -446,8 +536,8 @@ namespace mango
 		}
 		
 		initializeFont();
-		gSession.mScreen.mYOffset = 0;
-		mStockGraphic.mBitmap.setBits(mSurface[0].mBits);
+		gSession.mScreen.mYOffset = 240;
+		mStockGraphic.mBitmap.setBits(mSurface[1].mBits);
 		initializeStockGraphic();
 		
 		return 0;
@@ -565,15 +655,12 @@ namespace mango
 		ioctl(mfbDevice, FBIOGET_VSCREENINFO, &vinfo) ;
 
 		if (mfbBuffer == mStockGraphic.mBitmap.getBits())
-			vinfo.yoffset = 0 ;
+			vinfo.yoffset = 0;
 		else
 			vinfo.yoffset = 240;
 		
 		ioctl(mfbDevice, FBIOPUT_VSCREENINFO, &vinfo);
 				
-//		log_i("vinfo->yoffset=%d",vinfo.yoffset);
-//		log_i ("address mStockGraphic.mBitmap.getBits() = 0x%x", mStockGraphic.mBitmap.getBits()) ;
-		
 		ret = ioctl(mfbDevice, FBIOPAN_DISPLAY, &vinfo) ;		
 
 #endif
@@ -581,11 +668,13 @@ namespace mango
 		if (gSession.mScreen.mYOffset)
 		{
 			gSession.mScreen.mYOffset = 0;
+			memset((unsigned char*)mSurface[0].mBits, 0x0, SCREEN_BUFFER_BYTES);
 			mStockGraphic.mBitmap.setBits(mSurface[0].mBits);
 		}
 		else
 		{
 			gSession.mScreen.mYOffset = 240;
+			memset((unsigned char*)mSurface[1].mBits, 0x0, SCREEN_BUFFER_BYTES);
 			mStockGraphic.mBitmap.setBits(mSurface[1].mBits);
 			
 		}
