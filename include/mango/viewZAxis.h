@@ -21,12 +21,17 @@ namespace mango
 		int del(View *view);
 		bool isExist(View *view);
 
+		bool bringViewToBottom(View *tager);
 		//将指定窗口移动窗口栈的顶部
 		bool bringViewToTop(View* target);
 
 		//如果指定点有窗口则返回窗口句柄，否则返回NULL。如点位于一个static 类的窗口中，
 		//则返在它下的窗口句柄， 如没有则返回NULL。	
 		View* getViewFromPoint(Point pt);
+
+		View* getDisplayingView();
+
+		bool isViewShowing(View *view);
 
 		//从项层向下查找包含指定矩形区域的窗口
 		View* findViewContainRect (Rect& rect);
@@ -66,6 +71,7 @@ namespace mango
 
 		void moveToToppest(View *item);
 		void moveToTopper(View* baseItem, View* moveItem);
+		void moveToBottommest(View *item);
 		void moveToBottommer(View* baseItem, View* moveItem);
 
 		//获得与指定窗口的关系窗口
@@ -74,6 +80,7 @@ namespace mango
 		//在窗口堆栈中, 只将指定的窗口的子窗口带到该窗口前面, 使子窗口在父窗口上面.
 		//返回移动子窗数目
 		int bringSubToUp(View* parent);
+		int bringSubToDown(View* parent);
 
 		//只将VS_TOPMOST类型窗口带到窗口堆栈顶点.
 		//返回移动VS_TOPMOST窗数目
@@ -83,7 +90,7 @@ namespace mango
 
 		View* _findViewContainRect (Rect& rect);
 
-
+		void sendDmsMsgToShowingView();
 
 		LIST_HEAD mViewHead;
 		Mutex mMutex;

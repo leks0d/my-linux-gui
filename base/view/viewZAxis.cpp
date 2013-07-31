@@ -130,7 +130,11 @@ namespace mango
 	{
 		list_move(&(moveView->mZList), &(baseView->mZList)) ;
 	}
-
+	
+	void ViewZAxis::moveToBottommest(View *item)
+	{
+		list_move(&(item->mZList), &mViewHead) ;
+	}
 
 	void ViewZAxis::moveToBottommer(View* baseView, View* moveView)
 	{
@@ -142,12 +146,15 @@ namespace mango
 	{
 		View* bottommerView = NULL;
 
+		if(!view->getParent())
+			sendDmsMsgToShowingView();//当一个新的view要显示的时候，向正在显示的view发dismiss消息
+
 		if (!(view->mStyle & VS_TOPMOST)) {
 			bottommerView = getToppestItem();
 			while (bottommerView && (bottommerView->mStyle & VS_TOPMOST))
 				bottommerView = getBottommerItem(bottommerView);
 		}
-
+		
 		if (bottommerView) 
 			list_add(&(view->mZList), &(bottommerView->mZList));
 		else 
@@ -194,9 +201,30 @@ namespace mango
 				moveToTopper (parent, view);
 				view = getBottommerItem(parent);
 				bringCount++;
-
 			} else {
 				view = getBottommerItem(view);
+			}
+		}
+
+		return bringCount;
+	}
+	
+	int ViewZAxis::bringSubToDown(View* parent)
+	{
+		View*  view;
+		int	bringCount = 0;
+
+		view = getTopperItem(parent);
+		while (view) {
+			if (view == parent) //没有窗口在父窗口的底下了
+				break ;
+
+			if (view->mParent == parent) {
+				moveToBottommer(parent, view);
+				view = getTopperItem(parent);
+				bringCount++;
+			} else {
+				view = getTopperItem(view);
 			}
 		}
 
@@ -250,15 +278,8 @@ namespace mango
 	{
 		if (!target)
 			return false;
-
-		View *view,*prev;
-		prev = view = getToppestItem();
-		while(view){
-			log_i("view->name=%s,view->mStyle=%d",view->name,view->mStyle);
-			prev = view;
-			view = view->getParent();
-		}
-		prev->onNotify(NULL, NM_DISMISS, NULL);//窗口切换前发消息给正在显示的View
+		
+		sendDmsMsgToShowingView();
 		
 		mMutex.lock();
 
@@ -268,9 +289,52 @@ namespace mango
 		
 		mMutex.unlock();
 		
-		
-		target->onNotify(NULL, NM_DISPLAY, NULL);
+		gMessageQueue.post(target,VM_NOTIFY,NM_DISPLAY,0);
 		return true;
+	}
+
+	bool ViewZAxis::bringViewToBottom(View* target)
+	{
+		View *view;
+		if (!target)
+			return false;
+		
+		mMutex.lock();
+		
+		moveToBottommest(target);
+		bringSubToDown(target);
+		bringTopmostToTop();
+
+		mMutex.unlock();
+		
+		return true;
+	}
+
+	View* ViewZAxis::getDisplayingView(){
+		View *view,*prev;
+		
+		mMutex.lock();
+		
+		prev = view = getToppestItem();
+		while(view){
+			log_i("view->name=%s,view->mStyle=%d",view->name,view->mStyle);
+			prev = view;
+			view = view->getParent();
+		}
+
+		mMutex.unlock();
+		
+		return prev;
+	}
+
+	bool ViewZAxis::isViewShowing(View *view){
+		View *display;
+		display = getDisplayingView();
+		return display == view;
+	}
+
+	void ViewZAxis::sendDmsMsgToShowingView(){
+		gMessageQueue.post(getDisplayingView(),VM_NOTIFY,NM_DISMISS,0);//窗口切换前发消息给正在显示的View
 	}
 
 

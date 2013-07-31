@@ -54,6 +54,8 @@ LOCAL_SRC_FILES += EqSettingView.cpp
 LOCAL_SRC_FILES += SettingProvider.cpp
 LOCAL_SRC_FILES += PowerManager.cpp
 LOCAL_SRC_FILES += ShutDownView.cpp
+LOCAL_SRC_FILES += SocketDetect.cpp
+LOCAL_SRC_FILES += UsmConnectView.cpp
 
 LOCAL_SHARED_LIBRARIES := libParticle-prebuild
 LOCAL_SHARED_LIBRARIES += libParticleOmxil-prebuild

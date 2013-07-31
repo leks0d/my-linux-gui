@@ -79,7 +79,7 @@ namespace mango
 		int vol,closeCount;
 		closeCount = VOLUME_TIME;
 		while (1) {
-			Thread::sleep(100);
+			Thread::sleep(VOLUME_REFRESH);
 			
 			log_i("VolumeView::VolumeRunning isKeyDown=%d,mDownKeyCode=%d",iVolume->isKeyDown,iVolume->mDownKeyCode);
 
@@ -110,48 +110,12 @@ namespace mango
 			}			
 		}
 		iVolume->isShow = 0;
+		
 		gSettingProvider.update(SETTING_VOLUME_ID,vol);
-		gPlayer.showPlayingView();
+		gMessageQueue.post(iVolume,VM_NOTIFY,NM_DISMISS,0);
+		
 	}
 	
-	void VolumeView::addPoint(int x,int y)
-	{
-		if(count >= mMax){
-			int* xtemp;
-			int* ytemp;
-			
-			if(mMax == 0){
-				mMax=32;
-			}else
-				mMax*=2;
-			
-			xtemp = new int[mMax];
-			ytemp = new int[mMax];
-
-			memcpy(xtemp,mpx,count*sizeof(int));
-			memcpy(ytemp,mpy,count*sizeof(int));
-
-			delete mpx;
-			delete mpy;
-
-			mpx = xtemp;
-			mpy = ytemp;
-			
-		}
-
-		mpx[count] = x;
-		mpy[count] = y;
-		count++;
-	}
-
-	void VolumeView::pointClear(){
-		if(count>0){
-			count = mMax = 0;
-			delete mpx;
-			delete mpy;
-			mpx = mpy = NULL;
-		}
-	}
 	void VolumeView::initView()
 	{
 		Mstring* mstr;
@@ -179,7 +143,6 @@ namespace mango
 		canvas.drawImageResource(IDP_VULUME_ICON,(320-204)/2,(240-204)/2,true);
 		Rect rect;
 		Brush brush(RGB(0, 0, 0));
-		
 		return 0;
 	}
 
@@ -187,6 +150,8 @@ namespace mango
 	{
 		if(fromView == NULL && code == NM_DISPLAY){
 			initView();
+		}else if(fromView == NULL && code == NM_DISMISS){
+			gPlayer.dismissView(this);
 		}
 		
 		return 0;
@@ -201,7 +166,6 @@ namespace mango
 				mDownKeyCode = keyCode;
 				break;
 		}
-
 		return 0;
 	}
 
@@ -213,7 +177,6 @@ namespace mango
 				isKeyDown = 0;
 				mDownKeyCode = keyCode;
 				break;
-				
 		}
 		return 0;
 	}
@@ -228,7 +191,6 @@ namespace mango
 
 	}
 	int VolumeView::onTouchUp(int x, int y, int flag){
-
 		return -1;
 		}
 };

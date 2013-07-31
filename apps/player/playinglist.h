@@ -63,6 +63,7 @@ namespace mango
 			void PlayerInit();
 			void AudioEqualizerEnable(int enable);
 			void seekTo(int n){if(mParticleplayer!=NULL)	mParticleplayer->seekTo(n);}
+			void stopPlayer(){if(mParticleplayer!=NULL)	mParticleplayer->stop();}
 			static void playerCallback(void* calldata, int evnet, int param0, int param1);
 	};		
 	extern Playinglist *mPlayinglist;

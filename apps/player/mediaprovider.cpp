@@ -296,7 +296,7 @@ namespace mango
 
 		}
 
-		file.findClose();	
+		closedir(d);	
 		
 	}
 	int mediaprovider::checkfile(){

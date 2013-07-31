@@ -48,6 +48,7 @@ namespace mango
 
 		void dispatchTouch(Point &pt, bool pressed);
 		void dispatchKeycode(int keycode, bool pressed);
+		
 		bool mTouchPressed;
 		bool mKeyPressed;
 		View* mTouchView;
@@ -91,7 +92,7 @@ namespace mango
 		int  initialize(class Party* party);
 		int  initializeStockGraphic();
 		void  initializeFont();
-
+		void showBootLogo(unsigned char* addr);
 		void swapScreenFrontBuffer(); 
 
 	public:

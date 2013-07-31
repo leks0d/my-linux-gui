@@ -9,7 +9,7 @@ namespace mango
 	#define TCC_LCD_FB_IOCTL_ALPHA_ONOFF			0x11
 	#define TCC_LCD_FB_IOCTL_ALPHA_SELECTION		0x16
 	static void print_info(struct fb_var_screeninfo *vinfo);
-
+	static int rgb565To888(int rgb);
 //	const TCHAR contcFontWidthFileName[STOCK_FONT_OBJECT_NUM][56] ; 
 
 	Session::Session()
@@ -508,8 +508,22 @@ namespace mango
 		info.yres_virtual = 480;
 		info.bits_per_pixel = 32;
 		
+//		if(ioctl(mfbDevice, FBIOPUT_VSCREENINFO, &info)==-1)
+//			log_e("FBIOGET_VSCREENINFO set yres_virtual to 480 fail \n") ;
+	
+		pAddress = mmap(0, SCREEN_BUFFER_BYTES * 2, PROT_READ | PROT_WRITE, MAP_SHARED, mfbDevice, 0);
+		if (pAddress == MAP_FAILED)
+		{
+			log_e ("mmap /dev/fb0 failed \n") ;
+			return FALSE ;
+		}
+		memset((unsigned char*)pAddress, 0x0, SCREEN_BUFFER_BYTES);
+
+		if(munmap(pAddress,SCREEN_BUFFER_BYTES * 2)==0)
+			log_i("munmap pAddress sucess.");
+		
 		if(ioctl(mfbDevice, FBIOPUT_VSCREENINFO, &info)==-1)
-			log_e ("FBIOGET_VSCREENINFO set yres_virtual to 480 fail \n") ;
+			log_e("FBIOGET_VSCREENINFO set yres_virtual to 480 fail \n") ;
 
 		pAddress = mmap(0, SCREEN_BUFFER_BYTES * 2, PROT_READ | PROT_WRITE, MAP_SHARED, mfbDevice, 0);
 		if (pAddress == MAP_FAILED)
@@ -517,11 +531,14 @@ namespace mango
 			log_e ("mmap /dev/fb0 failed \n") ;
 			return FALSE ;
 		}
-		memset((unsigned char*)pAddress, 0xFF, SCREEN_BUFFER_BYTES * 2);
+		
+		showBootLogo((unsigned char*)pAddress);
+		
 		ioctl(mfbDevice, FBIOPUT_VSCREENINFO, &info);
+		
 		ioctl(mfbDevice, FBIOPAN_DISPLAY, &info);
-		mfbBuffer = pAddress ;
-		log_i ("fb0 buffer address 0x%x \n", pAddress) ;
+		mfbBuffer = pAddress;
+		log_i("fb0 buffer address 0x%x \n", pAddress) ;
 #endif
 
 		for (i = 0 ; i < SESSION_SURFACE_COUNT ; i++)
@@ -543,7 +560,30 @@ namespace mango
 		return 0;
 	}
 
-
+	void SessionLocal::showBootLogo(unsigned char* addr){
+		unsigned char* logo;
+		logo = (unsigned char*)new char[240*320*2];
+		int i;
+		FILE *fb;
+		fb  = fopen("/system/mango/bootlogo", "rb");
+		if(fread(logo,240*320*2,1,fb)==1){
+			unsigned short int *bmp = (unsigned short int *)logo;
+			unsigned int *buffer = (unsigned int *)(addr);
+			for(i=0;i<240*320;i++){
+				buffer[i]=rgb565To888(bmp[i]);
+			}
+		}
+	}
+	static int rgb565To888(int rgb){
+		int ret;
+		char *pt;
+		pt = (char *)&ret;
+		pt[0] = (rgb&0x001F)*0xFF/0x1F;
+		pt[1] = ((rgb&0x07E0)>>5)*0xFF/0x3F;
+		pt[2] = ((rgb&0xF800)>>11)*0xFF/0x1F;
+		pt[3] = 0x0;
+		return ret;
+	}
 	int  SessionLocal::initializeStockGraphic()
 	{
 		int i;

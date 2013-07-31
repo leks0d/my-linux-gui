@@ -2,6 +2,7 @@
 #include <signal.h>
 #include "mango.h"
 #include "resource.h"
+#include "SocketDetect.h"
 #include "mediaprovider.h"
 #include "ArrayMediaInfo.h"
 #include "SettingProvider.h"
@@ -18,6 +19,7 @@
 #include "SystemInfoView.h"
 #include "EqSettingView.h"
 #include "ShutDownView.h"
+#include "UsmConnectView.h"
 
 namespace mango
 {	
@@ -74,6 +76,8 @@ namespace mango
 		int showVolumeView();
 		int showEqSettingView();
 		int showShutDownView();
+		int showUsmConnectView();
+		void dismissView(View *view);
 		int  getVolume(void);
 		void setVolume(int volume);
 		void setPowerState();
@@ -92,6 +96,8 @@ namespace mango
 		ShutDownView* mShutDownView;
 		PlayerEventInterface* mPlayerEventInterface;
 		int powerState;
+		SocketDetect *mSocketDetect;
+		UsmConnectView *mUsmConnectView;
 		sqlite3 *db; 
 	};
 

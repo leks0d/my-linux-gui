@@ -1,11 +1,14 @@
 #include "player.h"
 #include <sys/reboot.h>
-#include <sys/cdefs.h>
-
+#include <signal.h>
+ 
 namespace mango
 {
 
-
+	void sig_int(int sig)
+	{
+ 		log_i("Catch a termination single = %d/n",sig);   
+	}
 	Player::Player(void)
 	{
 		mMeidaView = NULL;
@@ -23,12 +26,13 @@ namespace mango
 
 	int Player::main()
 	{
+		int i,ret;
 		wakeLock();
 		initialize();
 		gSettingProvider.initialize();
 		initSettings();
 		
-		mango::Thread::sleep(1000 * 2);
+		mango::Thread::sleep(1000 * 3);
 		
 		gmediaprovider.initialize();
 		
@@ -44,6 +48,15 @@ namespace mango
 
 		gPowerManager = new PowerManager();
 		
+		mSocketDetect = new SocketDetect();
+		mSocketDetect->setPlayerEventInterface((UseEventInterface*)mPlayerEventInterface);
+		ret = mSocketDetect->SocketInit();
+		if(ret>0){log_i("mSocketDetect->SocketInit() sucess!");}else{log_i("mSocketDetect->SocketInit() fail.ret=%d",ret);}
+		
+		for(i=0;i<50;i++){
+			signal(i,&sig_int); 
+		}
+		log_i("signal &sig_int");
 		return messageLoop();
 	}
 
@@ -144,7 +157,7 @@ namespace mango
 	}
 	int Player::showPointDrawView(){
 		if (mPointDrawView == NULL) {
-			mPointDrawView = new PointDrawView (TEXT("MusicInfo"), NULL, NULL, 0, SW_NORMAL);
+			mPointDrawView = new PointDrawView (TEXT("PointDraw"), NULL, NULL, 0, SW_NORMAL);
 			mPointDrawView->onCreate();
 		} else {
 			gSession.mViewZAxis.bringViewToTop(mPointDrawView);
@@ -158,7 +171,7 @@ namespace mango
 
 	int Player::showSystemInfoView(){
 		if (mSystemInfoView == NULL) {
-			mSystemInfoView = new SystemInfoView(TEXT("MusicInfo"), NULL, NULL, 0, SW_NORMAL);
+			mSystemInfoView = new SystemInfoView(TEXT("SystemInfo"), NULL, NULL, 0, SW_NORMAL);
 			mSystemInfoView->onCreate();
 			log_i("mSystemInfoView->onCreate();");
 		} else {
@@ -172,7 +185,7 @@ namespace mango
 	}
 	int Player::showEqSettingView(){
 		if (mEqSettingsView == NULL) {
-			mEqSettingsView = new EqSettingsView(TEXT("MusicInfo"), NULL, NULL, 0, SW_NORMAL);
+			mEqSettingsView = new EqSettingsView(TEXT("EqSetting"), NULL, NULL, 0, SW_NORMAL);
 			mEqSettingsView->onCreate();
 		} else {
 			gSession.mViewZAxis.bringViewToTop(mEqSettingsView);
@@ -183,9 +196,22 @@ namespace mango
 			mEqSettingsView->setFocus();
 		}
 	}
+	int Player::showUsmConnectView(){
+		if (mUsmConnectView == NULL) {
+			mUsmConnectView = new UsmConnectView(TEXT("UsmConnect"), NULL, NULL, 0, SW_NORMAL);
+			mUsmConnectView->onCreate();
+		} else {
+			gSession.mViewZAxis.bringViewToTop(mUsmConnectView);
+		}
+		log_i("usb show");
+		if (mUsmConnectView){
+			mUsmConnectView->invalidateRect();
+			mUsmConnectView->setFocus();
+		}
+	}
 	int Player::showVolumeView(){
 		if (mVolumeView == NULL) {
-			mVolumeView = new VolumeView(TEXT("MusicInfo"), NULL, NULL, 0, SW_NORMAL);
+			mVolumeView = new VolumeView(TEXT("Volume"), NULL, NULL, 0, SW_NORMAL);
 			mVolumeView->onCreate();
 		}else if(mVolumeView->isShowing()){
 			return 0;
@@ -201,7 +227,7 @@ namespace mango
 	}
 	int Player::showShutDownView(){
 		if (mShutDownView == NULL) {
-			mShutDownView = new ShutDownView(TEXT("MusicInfo"), NULL, NULL, 0, SW_NORMAL);
+			mShutDownView = new ShutDownView(TEXT("ShutDown"), NULL, NULL, 0, SW_NORMAL);
 			mShutDownView->onCreate();
 		}else {
 			gSession.mViewZAxis.bringViewToTop(mShutDownView);
@@ -212,6 +238,17 @@ namespace mango
 			mango::Thread::sleep(1000 * 3);
 			gPowerManager->setPowerState(2);
 			reboot(RB_POWER_OFF);
+		}
+	}
+	void Player::dismissView(View *view){
+		View *displayView;
+		if(view != NULL&&view == gSession.mViewZAxis.getDisplayingView()){
+			log_i("bringViewToBottom");
+			gSession.mViewZAxis.bringViewToBottom(view);
+			displayView = gSession.mViewZAxis.getDisplayingView();
+			displayView->invalidateRect();
+			displayView->setFocus();
+			gMessageQueue.post(displayView,VM_NOTIFY,NM_DISPLAY,0);
 		}
 	}
 	int  Player::getVolume(void)
@@ -316,7 +353,8 @@ namespace mango
 		
 		close(fd);
 	}
-	int PlayerEventInterface::onKeyDispatch(int keyCode,int action, int flag){	
+	int PlayerEventInterface::onKeyDispatch(int keyCode,int action, int flag){
+		//log_i("PlayerEventInterface::onKeyDispatch keyCode=%d,action=%d",keyCode,action);
 		if((keyCode == KEYCODE_VOLUMEUP||keyCode == KEYCODE_VOLUMEDOWN)&& action == VM_KEYDOWN){
 			gMessageQueue.post(gPlayer.mPlayingView,VM_COMMAND,PLAYING_SHOW_VOLUME,NULL);
 		}else if(keyCode == KEYCODE_PREV&& action == VM_KEYDOWN){
@@ -334,6 +372,8 @@ namespace mango
 				gPowerManager->setPowerState();
 		}else if(keyCode == KEYCODE_LONG_POWER&&action == VM_KEYUP){
 			gPlayer.showShutDownView();
+		}else if(action == VM_MEDIA){
+			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,keyCode,0);
 		}
 		if(action!=VM_CAPACITY&&gPowerManager!=NULL)
 			gPowerManager->resetCount();

@@ -20,7 +20,7 @@ namespace mango
 
 	void PowerManager::PowerManagerCount(){
 		atuoCount++;
-		log_i("PowerManager::resetCount atuoCount=%d",atuoCount);
+		//log_i("PowerManager::resetCount atuoCount=%d",atuoCount);
 		if(atuoCount>=sleepTime&&(!isSleep))
 			setPowerState();
 	}

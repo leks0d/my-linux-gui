@@ -263,6 +263,7 @@ namespace mango
 
 	int PlayingView::onNotify(View* fromView, int code, void* parameter)
 	{
+
 		if(fromView == NULL && code == NM_DISPLAY){
 			log_i("PlayingView::onNotify NM_DISPLAY");
 			ViewInit();
@@ -309,6 +310,15 @@ namespace mango
 				mBatteryText->setTextString(mstr->mstr);
 				mstr->clear();
 			}
+		}else if(code == FLASH_MOUNT){
+			gPlayer.dismissView(gPlayer.mUsmConnectView);
+		}else if(code == FLASH_UNMOUNT){
+			gPlayer.showUsmConnectView();
+			mPlayinglist->stopPlayer();
+		}else if(code == SDCARD_MOUNT){
+
+		}else if(code == SDCARD_UNMOUNT){
+
 		}
 		
 		return 0;

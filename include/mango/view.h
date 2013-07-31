@@ -23,6 +23,7 @@ namespace mango
 #define KEYCODE_CAPACITY	200
 #define KEYCODE_SHORT_POWER		116
 #define KEYCODE_LONG_POWER		117
+#define KEYCODE_MEDIA_CHANGE		117
 #define KEYCODE_BACK		188
 
 #define TOUCH_FLAG_DOWN  0x0001
@@ -38,6 +39,10 @@ namespace mango
 #define NM_PLAY_COM   		7
 #define NM_SEEK_UPDATE   	8
 #define NM_BATTERY_UPDATE 9
+#define FLASH_UNMOUNT 		10
+#define FLASH_MOUNT 		11
+#define SDCARD_UNMOUNT 	12
+#define SDCARD_MOUNT 		13
 
 	class View : public Object
 	{
