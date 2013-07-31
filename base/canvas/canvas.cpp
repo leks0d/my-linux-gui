@@ -58,6 +58,9 @@ namespace mango
 			}
 
 			//窗口裁剪
+			if (!clipRect.intersect(mViewRect))
+				break ;
+
 			//if (pDcObj->m_pWnd)
 			//{
 			//	rect = rcClip ;
@@ -118,17 +121,23 @@ namespace mango
 		mPenPos.set(0, 0);  //当前笔的位置
 		
 		if (view)
+		{
 			mViewPos.set(view->mRect.left, view->mRect.top);  //当前View在画布中的位置
+			mViewRect = view->mRect;
+		}
 		else
+		{
 			mViewPos.set(0, 0);
+			mViewRect.set(0, 0, mBitmap->getWidth(), mBitmap->getHeight());
+		}
 
 		mCharExtra = 0;
 
 		mTextColor = RGB(0, 0, 0);
-		mBkColor = ARGB(255,127, 127, 127);
+		mBkColor = RGB(255, 255, 255);
 
 		mRop2 = 0;		
-		mBkMode = TRANSPARENT; //TRANSPARENT;		
+		mBkMode = OPAQUE; //TRANSPARENT;		
 		mAlpha = 0;		//0 -- 全透明, 255 -- 不透
 	}
 

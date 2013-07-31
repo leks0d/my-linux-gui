@@ -87,7 +87,7 @@ namespace mango
 	void Session::updateRoutine()
 	{
 		while (1) {
-			Thread::sleep(20);
+			Thread::sleep(30);
 
 			mViewZAxis.invalidScreenRectToView();
 			if (!mViewZAxis.mExistInvalidateView)
@@ -119,7 +119,7 @@ namespace mango
 		{
 			if (gSessionLocal.mEmFrameBuffer->mKeyFlag)
 			{
-				dispatchKeycode(gSessionLocal.mEmFrameBuffer->mKeyCode, gSessionLocal.mEmFrameBuffer->mKeyPress);
+				dispatchKeycode(gSessionLocal.mEmFrameBuffer->mKeyCode, (bool)gSessionLocal.mEmFrameBuffer->mKeyPress);
 				gSessionLocal.mEmFrameBuffer->mKeyFlag = 0;
 			}
 			Thread::sleep(10);
@@ -453,7 +453,8 @@ namespace mango
 	
 	SessionLocal::SessionLocal()
 	{
-
+		mLanguageId = LANGID_SIMPLIFIED;
+		mLanguageCodePage = NULL;
 	}
 
 
@@ -557,6 +558,7 @@ namespace mango
 		mStockGraphic.mBitmap.setBits(mSurface[1].mBits);
 		initializeStockGraphic();
 		
+		setLangId(mLanguageId);
 		return 0;
 	}
 
@@ -740,6 +742,89 @@ namespace mango
 		log_i("******************************END*********************************\n");
 		
 	}
+	bool SessionLocal::loadLanguageCodePage(int langid)
+	{
+		const char* path = NULL;
+		FILE* file = NULL;
+		bool success = false;
+
+#define CODEPAGE_FILE_BYTES   (64*1024*2)
+		const char conCodePageFileName[][56] = 
+		{
+#ifdef WIN32
+			"E:\\EmluatorStore\\C\\turnip\\codepage\\c_936.bin",
+			"E:\\EmluatorStore\\C\\turnip\\codepage\\c_950.bin",
+#else
+			MANGO_ROOT"codepage/c_936.bin",
+			MANGO_ROOT"codepage/c_950.bin",
+#endif
+		} ;
+
+
+		switch (langid)
+		{
+		case LANGID_SIMPLIFIED:
+		case LANGID_ENGLISH:
+			path = conCodePageFileName[0] ;
+			break ;
+		case LANGID_TRADITIONAL:
+			path = conCodePageFileName[1] ;
+			break ;
+		}
+
+
+		do
+		{
+			if (!path)
+				break  ;
+
+			file = fopen(path, "rb");
+			if (file == NULL)
+			{
+				log_e ("Can't open id 0x%x codepage file\n", langid) ;
+				break ;
+			}
+
+			if (mLanguageCodePage == NULL)
+			{
+				mLanguageCodePage = (unsigned short *)malloc(CODEPAGE_FILE_BYTES);
+				log_i ("allocate memory for codepage 0x%x\n", mLanguageCodePage);
+			}
+
+			if (mLanguageCodePage == NULL)
+				break ;
+
+			fread(mLanguageCodePage, 1, CODEPAGE_FILE_BYTES, file);
+
+			success = true;
+
+		} while (0) ;
+		
+		if (file != NULL)
+			fclose (file) ;
+
+		return success ;
+
+	}
+
+
+	int  SessionLocal::getLangId()
+	{
+		return mLanguageId;
+	}
+
+
+	bool SessionLocal::setLangId (int langid)
+	{
+		if (!loadLanguageCodePage(langid))
+		{
+			return false;
+		}
+		mLanguageId = langid;
+
+		return true;
+	}
+
 	Session			gSession;
 	SessionLocal	gSessionLocal;
 	

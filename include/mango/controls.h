@@ -281,6 +281,7 @@ class VerticalSeekBar : public View
 	private:
 		int	 getDoneLength (Rect& trackRect);
 		void getThumbDisplayPosition(Point& displayPosition);
+		int  getPosition(Point& thumbCenter);
 
 	private:
 		bool	mOperating;

@@ -19,6 +19,7 @@ namespace mango
 		bool intersect(int x, int y, Rect &rect1, int x1, int y1);
 		int  subIntersect(Rect rcDst[4], const Rect& src2);
 
+		bool subMargin(const Rect& margin);
 		bool unionRect(const Rect*  rect1);
 
 

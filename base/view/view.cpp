@@ -25,6 +25,9 @@ namespace mango
 		else 
 			gSession.getScreenRect(mRect);
 
+		if (mParent)
+			mRect.offset(mParent->mRect.left, mParent->mRect.top);
+
 		setTitle(title);
 
 		gSession.mViewZAxis.add(this);
@@ -69,8 +72,7 @@ namespace mango
 		Brush brush(RGB(255, 0, 0));
 
 		canvas.fillRect(rect, brush);
-
-		canvas.drawText("aaa", 3, 100, 100);
+		canvas.drawText("View", 3, 100, 100);
 
 		return -1;
 	}
@@ -180,7 +182,7 @@ namespace mango
 
 	void  View::getClientRect(Rect& rect)
 	{
-		rect.setEx(0, 0, rect.right - rect.left, rect.bottom - rect.top);
+		rect.setEx(0, 0, mRect.right - mRect.left, mRect.bottom - mRect.top);
 	}
 
 
@@ -231,6 +233,7 @@ namespace mango
 	Canvas* View::getCanvas()
 	{
 		gSessionLocal.mCanvasMutex.lock();
+		gSessionLocal.mStockGraphic.mCanvas.renew(this);
 		return &gSessionLocal.mStockGraphic.mCanvas;
 	}
 

@@ -154,6 +154,15 @@ namespace mango
 	}
 
 
+	bool Rect::subMargin(const Rect& margin)
+	{
+		left   += margin.left;
+		top	   += margin.top;
+		right  -= margin.right;
+		bottom -= margin.bottom;
+
+		return isEmpty();
+	}
 
 	//ºÏ²¢¾ØÐÎ
 	bool Rect::unionRect(const Rect*  rect1)

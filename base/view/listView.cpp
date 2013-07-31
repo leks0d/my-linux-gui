@@ -340,21 +340,23 @@ namespace mango
 	BOOL ListView::ensureVisible (LISTVIEW_RECORD* pItem, BOOL bPartialOK)
 	{
 		int dy = 0 ;
+		Rect  clientRect;
+		getClientRect(clientRect);
 
 		if (bPartialOK && \
-			(pItem->m_rect.top + mZonePoint.y < mRect.bottom) && \
-			(pItem->m_rect.bottom + mZonePoint.y > mRect.top))
+			(pItem->m_rect.top + mZonePoint.y < clientRect.bottom) && \
+			(pItem->m_rect.bottom + mZonePoint.y > clientRect.top))
 		{
 			return TRUE ;
 		}
 
-		if (pItem->m_rect.bottom + mZonePoint.y > mRect.bottom)
+		if (pItem->m_rect.bottom + mZonePoint.y > clientRect.bottom)
 		{
-			dy = mRect.bottom -	(pItem->m_rect.bottom + mZonePoint.y) ;
+			dy = clientRect.bottom -	(pItem->m_rect.bottom + mZonePoint.y) ;
 		}
-		else if (pItem->m_rect.top + mZonePoint.y < mRect.top)
+		else if (pItem->m_rect.top + mZonePoint.y < clientRect.top)
 		{
-			dy = mRect.top - (pItem->m_rect.top + mZonePoint.y) ;
+			dy = clientRect.top - (pItem->m_rect.top + mZonePoint.y) ;
 		}
 
 		mZonePoint.y += dy ;
@@ -459,13 +461,17 @@ namespace mango
 
 	int ListView::onCreate()
 	{
+		Rect  clientRect;
+		getClientRect(clientRect);
+
+
 		INIT_LIST_HEAD (&(mRecordHead)) ;
 
 		mStyle   = mStyle;
 		mTextColor = RGB(0, 0, 0);	
 
 		mLayoutList.m_hInstance   = NULL;
-		mLayoutList.m_sizeItem.cx = mRect.right - mRect.left;
+		mLayoutList.m_sizeItem.cx = clientRect.right - clientRect.left;
 		mLayoutList.m_sizeItem.cy = 47 ;
 		mLayoutList.m_sizeItemIcon.cx = 22 ;
 		mLayoutList.m_sizeItemIcon.cy = 22 ;
@@ -949,6 +955,8 @@ namespace mango
 		//log_i("ListView::onPaint");
 
 		LISTVIEW_RECORD* record;
+		Rect  clientRect;
+		getClientRect(clientRect);
 		Brush brush(RGB(255, 255, 255));
 		Rect rect;
 		rect.setEx(0,0,320,212);
@@ -960,7 +968,7 @@ namespace mango
 		while (record)
 		{
 			//需要向下查找
-			if (record->m_rect.top + mZonePoint.y > mRect.bottom)
+			if (record->m_rect.top + mZonePoint.y > clientRect.bottom)
 				break;
 			
 			paintRecord(canvas, record, false);
@@ -1011,11 +1019,7 @@ namespace mango
 		Point pt(x, y);
 		if (getCapture () != this)
 			return 0 ;
-		
-		log_i("ListView::onTouchMove y=%d",y);
-		if(y>1000||y<0)
-			y=0;
-			
+
 		if (!mTouchMove) {
 			if (mTouchDownPosition.y - y > 16 || mTouchDownPosition.y - y < -16)
 				mTouchMove = true;
@@ -1244,6 +1248,9 @@ namespace mango
 	//动画 重画新区
 	int  ListView::cartoonRedraw(Canvas& canvas, Rect& redrawRect)
 	{
+		Rect  clientRect;
+		getClientRect(clientRect);
+
 		Rect   rect, redrawZoneRect;
 		LISTVIEW_RECORD* record;
 
@@ -1252,7 +1259,7 @@ namespace mango
 		canvas.fillRect(redrawRect, brush);
 
 		redrawZoneRect = redrawRect;
-		redrawZoneRect.offset(0, 0 - (mZonePoint.y + mRect.top));
+		redrawZoneRect.offset(0, 0 - (mZonePoint.y + clientRect.top));
 
 		record = findFirstPainRecord();
 		while (record) {
@@ -1272,6 +1279,8 @@ namespace mango
 	int ListView::cartoonModifyDistance(int dy)
 	{
 		int  sideline ;
+		Rect  clientRect;
+		getClientRect(clientRect);
 
 		if (dy == 0)
 			return 0 ;
@@ -1281,7 +1290,7 @@ namespace mango
 		//
 		if (dy < 0) {
 			//向上滚动
-			sideline = (mRect.bottom - mRect.top) / 3 ;
+			sideline = (clientRect.bottom - clientRect.top) / 3 ;
 			if (mZoneSize.cy >= sideline * 2) {
 				if (mZonePoint.y + dy + mZoneSize.cy < sideline)
 					dy	= sideline - mZoneSize.cy - mZonePoint.y ;
@@ -1293,7 +1302,7 @@ namespace mango
 
 		} else {
 			//向下滚动
-			sideline = (mRect.bottom - mRect.top) * 2 / 3 ;
+			sideline = (clientRect.bottom - clientRect.top) * 2 / 3 ;
 			if (mZonePoint.y + dy > sideline) 
 				dy = sideline - mZonePoint.y ;
 		}
@@ -1314,9 +1323,11 @@ namespace mango
 	int ListView::cartoonDisplay(void)
 	{
 		Canvas* canvas;
+		Rect  clientRect;
+		getClientRect(clientRect);
 
 		canvas = getCanvas();
-		cartoonRedraw(*canvas, mRect);
+		cartoonRedraw(*canvas, clientRect);
 		canvas->swapScreenFrontBuffer();
 		releaseCanvas();
 
@@ -1328,19 +1339,20 @@ namespace mango
 	int ListView::cartoonDrag(int distance)
 	{
 		int	dy ;
+		Rect  clientRect;
+		getClientRect(clientRect);
 
 		resumeSelectedRecord();
 
-		if (distance < 0 && mZoneSize.cy + mZonePoint.y + distance < mRect.bottom)
+		if (distance < 0 && mZoneSize.cy + mZonePoint.y + distance < clientRect.bottom)
 			dy = distance  * 2 / 3 ;
 		else if (mZonePoint.y > 0)
 			dy = distance  * 2 / 3 ;
 		else
 			dy = distance ;
-		
+
 		if (cartoonMoveZone(dy))
-			;//cartoonDisplay();
-		invalidateRect();
+			cartoonDisplay();
 
 		return 0 ;
 	}

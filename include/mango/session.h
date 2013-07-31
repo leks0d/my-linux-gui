@@ -13,6 +13,11 @@ namespace mango
 	//主表面PRIMARYSURFACE(前台front buffer)
 	//离屏OFFSCREENPLAIN表面(后台back buffer) 
 	#define  SESSION_SURFACE_COUNT   2   
+
+	#define LANG_NEUTRAL                     0x00
+	#define LANG_CHINESE                     0x04
+	#define LANG_ENGLISH                     0x09
+	#define LANG_JAPANESE                    0x11
 			
 
 	class Session 
@@ -95,6 +100,10 @@ namespace mango
 		void showBootLogo(unsigned char* addr);
 		void swapScreenFrontBuffer(); 
 
+		bool loadLanguageCodePage(int langid);
+		int  getLangId();
+		bool setLangId (int langid);
+
 	public:
 		Surface	mSurface[SESSION_SURFACE_COUNT];
 		StockGraphic  mStockGraphic;
@@ -115,6 +124,8 @@ namespace mango
 
 		Resource  mResource;
 
+		int			mLanguageId;
+		unsigned short *mLanguageCodePage;
 	public:
 	};
 

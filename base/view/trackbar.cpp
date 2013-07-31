@@ -17,7 +17,7 @@ namespace mango
 		mId = id;
 	}
 
-	Trackbar::~Trackbar(void);
+	Trackbar::~Trackbar(void)
 	{
 
 	}
@@ -49,108 +49,83 @@ namespace mango
 	//根据Trackbar 当前位置获得滑块显示位置 
 	void Trackbar::getThumbDisplayPosition (Point& displayPosition)
 	{
-		int		doneLength  ;
-		RECT	rcTrack ;	
+		int	doneLength;
+		Rect activityArea;	
 
-		SubMarginRect (&rcTrack, lprcClient, &(mLayout.m_rcMarginTrack)) ;
+		activityArea = mRect;
+		activityArea.subMargin(mLayout.m_rcMarginTrack);
 
-		doneLength = getDoneLength (pTrackbar, mStyle, &rcTrack) ;
+		doneLength = getDoneLength (activityArea);
 
 		if (mStyle & TBS_VERT)
 		{
-			displayPosition.x = rcTrack.left ;
+			displayPosition.x = activityArea.left ;
 			if (mStyle & TBS_DOWNISLEFT)
 			{
-				displayPosition.y  = rcTrack.bottom - doneLength ;
+				displayPosition.y  = activityArea.bottom - doneLength ;
 				displayPosition.y -= mLayout.m_sizeThumb.cy ;
 			}
 			else
-				displayPosition.y = rcTrack.top + doneLength ;
+				displayPosition.y = activityArea.top + doneLength ;
 		}
 		else
 		{
-			displayPosition.y = (rcTrack.top + rcTrack.bottom - mLayout.m_sizeThumb.cy) / 2 ;
-			displayPosition.x = rcTrack.left + doneLength ;
+			displayPosition.y = (activityArea.top + activityArea.bottom - mLayout.m_sizeThumb.cy) / 2 ;
+			displayPosition.x = activityArea.left + doneLength ;
 		}	
 	}
 
 
 	//根据滑块显示位置 获得Trackbar 当前位置
-	//ptThumbCenter thumb 中心位置 
-	int ctrlTrackbarPosition (PCTRL_TRACKBAR pTrackbar, POINT ptThumbCenter, DWORD mStyle, Rect& lprcClient)
+	//thumbCenter thumb 中心位置 
+	int Trackbar::getPosition(Point& thumbCenter)
 	{
-		int		doneLength  ;
-		int		trackTotalLength ;
-		RECT	rcTrack ;
-		int		iPos ;
+		int		doneLength;
+		int		trackTotalLength;
+		int		position;
 
-		SubMarginRect (&rcTrack, lprcClient, &(mLayout.m_rcMarginTrack)) ;
+		Rect activityArea;	
 
-		if (mStyle & TBS_VERT)
+		activityArea = mRect;
+		activityArea.subMargin(mLayout.m_rcMarginTrack);
+
+		if (mStyle & TBS_VERT) 
 		{
-			if (mStyle & TBS_DOWNISLEFT)
+			if (mStyle & TBS_DOWNISLEFT) 
 			{
-				doneLength  = rcTrack.bottom - ptThumbCenter.y ;
-			}
-			else
+				doneLength  = activityArea.bottom - thumbCenter.y;
+			} 
+			else 
 			{
-				doneLength  = ptThumbCenter.y - rcTrack.top ;
+				doneLength  = thumbCenter.y - activityArea.top;
 			}
 
-			doneLength -= (mLayout.m_sizeThumb.cy / 2) ;
-			trackTotalLength = rcTrack.bottom - rcTrack.top - mLayout.m_sizeThumb.cy ;
+			doneLength -= (mLayout.m_sizeThumb.cy / 2);
+			trackTotalLength = activityArea.bottom - activityArea.top - mLayout.m_sizeThumb.cy;
 		}
 		else
 		{
-			doneLength  = ptThumbCenter.x  - rcTrack.left ;
-			doneLength -= (mLayout.m_sizeThumb.cx / 2) ;
-
-			trackTotalLength = rcTrack.right - rcTrack.left - mLayout.m_sizeThumb.cx ;
+			doneLength  = thumbCenter.x  - activityArea.left;
+			doneLength -= (mLayout.m_sizeThumb.cx / 2);
+			trackTotalLength = activityArea.right - activityArea.left - mLayout.m_sizeThumb.cx;
 		}
 
 		if (mMinimum >= mMaximum)
-			iPos = mMinimum ;
+			position = mMinimum;
 		else if (trackTotalLength <= 0)
-			iPos = mMinimum ;
+			position = mMinimum;
 		else
 		{
-			iPos  = (doneLength * (mMaximum - mMinimum) + trackTotalLength - 1) / trackTotalLength ;
-			//		iPos  = (doneLength * (mMaximum - mMinimum) + 0) / trackTotalLength ;
-			iPos += mMinimum ;
-
-			iPos = max (iPos, mMinimum) ;
-			iPos = min (iPos, mMaximum) ;
+			position  = (doneLength * (mMaximum - mMinimum) + trackTotalLength - 1) / trackTotalLength;
+			position += mMinimum;
+			position  = max(position, mMinimum);
+			position  = min(position, mMaximum);
 		}
 
-		return iPos ;
+		return position;
 	}
 
-
-	//处理WM_CREATE 消息
-	LRESULT	 ctrlTrackbarCreate (HWND hWnd, WPARAM wParam, LPARAM lParam)
-	{
-		PCTRL_TRACKBAR	pTrackbar ;
-
-		pTrackbar = malloc (sizeof (CTRL_TRACKBAR))   ;
-		memset (pTrackbar, 0, sizeof (CTRL_TRACKBAR)) ;
-		SetWindowLong (hWnd, 0, (LONG)pTrackbar)    ;
-
-		return 0 ;
-	}
-
-
-	//处理WM_DESTORY 消息
-	LRESULT	 ctrlTrackbarDestory (HWND hWnd, WPARAM wParam, LPARAM lParam)
-	{
-		PCTRL_TRACKBAR	pTrackbar ;
-
-		pTrackbar = (PCTRL_TRACKBAR)GetWindowLong (hWnd, 0) ;
-		SAFE_FREE (pTrackbar) ;
-		SetWindowLong (hWnd, 0, (LONG)pTrackbar)    ;
-
-		return 0 ;
-	}
-
+#if 0
 
 	//处理WM_PAINT 消息
 	LRESULT	 ctrlTrackbarPaint (HWND hWnd, WPARAM wParam, LPARAM lParam)
@@ -608,5 +583,5 @@ namespace mango
 
 		return DefWindowProc (hWnd, Msg, wParam, lParam) ;
 	}
-
+#endif
 }

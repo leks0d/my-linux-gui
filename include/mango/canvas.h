@@ -145,6 +145,7 @@ namespace mango
 
 		Point    mPenPos;  //当前笔的位置
 		Point    mViewPos;  //当前View在画布中的位置
+		Rect     mViewRect; //当前View在画布中的区域
 
 		int      mCharExtra;
 

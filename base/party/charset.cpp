@@ -167,12 +167,34 @@ namespace mango
 	}
 
 
+
+//																				
+//以减少代码为目标																
+//																				
+//																				
+//页码表格式说明：																
+//前128*2 (不包含0x00 -- 0x7f，大多数语言的编码都与ASCII 谦容) 或者256*2 个字节，
+//为单字节编码对应的UNICODE 码值， 可以称作“前导码值区”；						
+//后128*256*2 或者256*256*2 个字节, 为双字节编码对应的UNICODE 码值, 为“后码值区”
+//																				
+//查询方式：																	
+//先依照单字节编码查“前码值区” 对应的UNICODE 码值, 如果为0xfffe, 则需结合后面的字节， 查询“后码值区”。
+#define CODEPAGE_SPECIAL_UNICODE  0xfffe										
+																		
+//定义页码表 ID														
+#define CODEPAGE_936		0  //936   (ANSI/OEM - 简体中文 GBK)
+																		
+//定义“前导码值区”字(二个字节)数												
+#define NUMBER_OF_LEAD		256  //0x00 -- 0xff								
+																				
+//定义内码到 “后码值区”的偏移量												
+#define SECOND_CODE_OFFSET(uiPri, uiSec)  ((NUMBER_OF_LEAD + 256 * uiPri + uiSec) * 2)
+
 	int Charset::multiByteToWideChar(UINT CodePage, LPCSTR lpMultiByteStr, int cchMultiByte, LPWSTR lpWideCharStr, int cchWideChar)
 	{
-#if 0
 		unsigned int	uiPrimary, uiSecond ;									
 		unsigned short  uiCode ;		
-#endif
+
 		int				iCharNum = 0 ;	
 
 		if (CodePage == CP_UTF8)
@@ -182,10 +204,10 @@ namespace mango
 
 		for ( ; cchMultiByte > 0 && cchWideChar > 0 ; cchMultiByte--, cchWideChar--, iCharNum++)
 		{
-#if 0
+
 			uiPrimary = (unsigned int)(unsigned short)(unsigned char)(*lpMultiByteStr) ;
 
-			uiCode = gsys_pUserSessionObj->m_pwCodePage[uiPrimary] ;
+			uiCode = gSessionLocal.mLanguageCodePage[uiPrimary] ;
 			if (uiCode == CODEPAGE_SPECIAL_UNICODE)									
 			{																		
 				if (cchMultiByte < 2)												
@@ -193,7 +215,7 @@ namespace mango
 
 				uiSecond = (unsigned int)(unsigned short)(unsigned char)(*(lpMultiByteStr + 1)) ;
 
-				*lpWideCharStr = gsys_pUserSessionObj->m_pwCodePage[SECOND_CODE_OFFSET(uiPrimary, uiSecond)/2] ;
+				*lpWideCharStr = gSessionLocal.mLanguageCodePage[SECOND_CODE_OFFSET(uiPrimary, uiSecond)/2] ;
 
 				lpMultiByteStr += 2	;												
 				lpWideCharStr++     ;												
@@ -203,7 +225,6 @@ namespace mango
 			{																		
 				*lpWideCharStr++ = (WCHAR)(unsigned char)(*lpMultiByteStr++) ;
 			}																		
-#endif
 		}																			
 
 		return iCharNum ;														
