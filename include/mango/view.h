@@ -21,6 +21,8 @@ namespace mango
 #define KEYCODE_PLAY		161
 #define KEYCODE_NEXT		162
 #define KEYCODE_CAPACITY	200
+#define KEYCODE_SPIDF		114
+#define KEYCODE_HOLD		115
 #define KEYCODE_SHORT_POWER		116
 #define KEYCODE_LONG_POWER		117
 #define KEYCODE_MEDIA_CHANGE		117
@@ -43,6 +45,9 @@ namespace mango
 #define FLASH_MOUNT 		11
 #define SDCARD_UNMOUNT 	12
 #define SDCARD_MOUNT 		13
+#define MEDIA_SCANNER_START 		14
+#define MEDIA_SCANNER_END 		15
+#define NM_SPIDF 			16
 
 	class View : public Object
 	{

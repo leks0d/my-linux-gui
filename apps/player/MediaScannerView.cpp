@@ -6,11 +6,8 @@ namespace mango
 	
 	enum
 	{
-		ADAPTER_PLAYING = 0xf0c0,	
-		ADAPTER_FILE = 0xf0c1,
-		ADAPTER_ALBUM = 0xf0c2,
-		ADAPTER_ARTIST = 0xf0c3,
-		ADAPTER_MUSIC = 0xf0c4,
+		BUTTON_SCANNER = 0xf0c0,	
+		BUTTON_BROWSER = 0xf0c1,
 	};
 	MediaScannerView::MediaScannerView(void)
 	{
@@ -23,6 +20,8 @@ namespace mango
 		count = mMax = 0;
 		mpx = mpy = NULL;
 		isNeedPaint = 1;
+		mScannerButton = NULL;
+		mDirectButton = NULL;
 	}
 
 	MediaScannerView::~MediaScannerView(void)
@@ -35,11 +34,12 @@ namespace mango
 		Rect rect;
 		int firstLeft = 98;
 		
-		rect.setEx(0,150,320,25);
-		mUsbState = new TextView(SETTING_BACK, TEXT("mBack"), this, &rect, 0);
-		mUsbState->setTextColor(COLOR_WHITE);
-		mUsbState->setTextSize(25);
-		mUsbState->setTextLayoutType(TEXT_LAYOUT_CENTER);
+		rect.setEx(40,140,280,40);
+		mScannerButton = new TextView(BUTTON_SCANNER, TEXT("mScannerButton"), this, &rect, 0);
+		mScannerButton->setTextColor(COLOR_GRAY);
+		mScannerButton->setTextSize(16);
+		mScannerButton->setTextLayoutType(TEXT_LAYOUT_CENTER);
+		
 		initView();
 		setFocus(this);
 		invalidateRect();
@@ -47,7 +47,7 @@ namespace mango
 	}
 	void MediaScannerView::initView()
 	{
-		mUsbState->setTextResoure(STR_USB_CONECT);
+		mScannerButton->setTextResoure(STR_MEDIA_SCANNING);
 	}
 
 	int MediaScannerView::onDestroy()
@@ -57,6 +57,7 @@ namespace mango
 
 	int MediaScannerView::onPaint(Canvas& canvas)
 	{
+		log_i("MediaScannerView::onPaint");
 		canvas.drawImageResource(IDP_SETTING_BGD,0,0,false);
 		canvas.drawImageResource(IDP_USB_CONECT,115,50,false);
 		return 0;

@@ -90,11 +90,14 @@ namespace mango
 			void computeLeft(Canvas *canvas);
 			void getTextString(char *string);
 			void setBackGround(int nor,int sec){mNormalBgdResId=nor,mSelectBgdResId=sec;};
+			void setLog(int log){mLog = log;}
 			virtual int onPaint(Canvas& canvas);
 			virtual int onTouchDown(int x, int y, int flag);
 			virtual int onTouchUp(int x, int y, int flag);
 		private:
 			char *mText;
+			WCHAR *iText;
+			int iTextLen;
 			int resId;
 			int ResType;			
 			COLORREF mColor;
@@ -108,6 +111,7 @@ namespace mango
 			int mLeft;
 			int mTop;
 			int mLayoutType;
+			int mLog;
 	};
 
 
@@ -129,6 +133,7 @@ class ValueTextView : public View
 		virtual int onTouchUp(int x, int y, int flag);
 	private:
 		char *mText;
+		
 		int resId;
 		int ResType;			
 		COLORREF mColor;

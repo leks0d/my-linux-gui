@@ -37,6 +37,12 @@ namespace mango
 	{
 		Rect rect;
 
+		rect.setEx(0,25,320,215);
+		mListView = new MediaListView(TEXT("Media List"), this, &rect, LVS_LIST);
+		mListView->setListItemBackground(IDP_LISTITEM_BGD,IDP_LISTITEM_BGD_SEC);
+		mListView->setTextColor(RGB(255,255,255));
+		mListView->onCreate();
+
 		rect.setEx(0, 0, 41, 22);
 		mBack = new Button(SETTING_BACK, TEXT("mBack"), this, &rect, 0);
 		mBack->setNormalImageId(IDP_SETTING_BACK);
@@ -49,16 +55,12 @@ namespace mango
 		mTitle->onCreate();
 		
 		rect.setEx(280, 0, 41, 22);
-		mHome = new Button(SETTING_BACK, TEXT("mBack"), this, &rect, 0);
+		mHome = new Button(SETTING_HOME, TEXT("mHome"), this, &rect, 0);
 		mHome->setNormalImageId(IDP_MUSIC_HOME);
 		mHome->setPressedImageId(IDP_MUSIC_HOME_SEC);
 		mHome->onCreate();
 
-		rect.setEx(0,25,320,215);
-		mListView = new MediaListView(TEXT("Media List"), this, &rect, LVS_LIST);
-		mListView->setListItemBackground(IDP_LISTITEM_BGD,IDP_LISTITEM_BGD_SEC);
-		mListView->setTextColor(RGB(255,255,255));
-		mListView->onCreate();
+
 		
 		initMainList();
 
@@ -90,7 +92,7 @@ namespace mango
 		int img[]={IDP_ADVANCE_LANGUGE,IDP_ADVANCE_DISPLAY,IDP_ADVANCE_BATTARY,IDP_ADVANCE_SYSTEM_INFO,IDP_ADVANCE_DISPLAY,IDP_ADVANCE_SYSTEM_INFO};
 		int imgsec[]={IDP_ADVANCE_LANGUGE_S,IDP_ADVANCE_DISPLAY_S,IDP_ADVANCE_BATTARY_S,IDP_ADVANCE_SYSTEM_INFO_S,IDP_ADVANCE_DISPLAY_S,IDP_ADVANCE_SYSTEM_INFO_S};
 		int text[]={STR_ADVANCE_LANGUAGE,STR_ADVANCE_DISPLAY,STR_ADVANCE_POWER,STR_ADVANCE_SYSINFO,STR_ADVANCE_SHOWTOUCH,STR_ADVANCE_SCANNER};
-		int i,count = 6;
+		int i,count = 5;
 		log_i("SettingsView::initAdvanceList");
 		if(mAdvanceListAdapter == NULL){
 			log_i("SettingsView::mListView->deleteAllItems()");
@@ -251,7 +253,6 @@ namespace mango
 						case 4:
 							gPlayer.showPointDrawView(); break;
 						case 5:
-							gmediaprovider.mediascanner(); 
 							gPlayer.showMediaView();
 							break;
 						}

@@ -31,16 +31,13 @@ namespace mango
 		initialize();
 		gSettingProvider.initialize();
 		initSettings();
-		
-		mango::Thread::sleep(1000 * 3);
-		
+		holdKeyProbe();
+		spdifProbe();
 		gmediaprovider.initialize();
-		
-		gmediaprovider.mediascanner();
 
 		mPlayinglist = new Playinglist();
 		mPlayinglist->initPlayintList();
-		
+		mSpdifSwitch = new PlayerSwitch();
 		mPlayerEventInterface = new PlayerEventInterface();
 		gSession.setUseEventInterface((UseEventInterface*)mPlayerEventInterface);
 
@@ -54,7 +51,7 @@ namespace mango
 		if(ret>0){log_i("mSocketDetect->SocketInit() sucess!");}else{log_i("mSocketDetect->SocketInit() fail.ret=%d",ret);}
 		
 		for(i=0;i<50;i++){
-			signal(i,&sig_int); 
+			//signal(i,&sig_int); 
 		}
 		log_i("signal &sig_int");
 		return messageLoop();
@@ -203,12 +200,35 @@ namespace mango
 		} else {
 			gSession.mViewZAxis.bringViewToTop(mUsmConnectView);
 		}
-		log_i("usb show");
 		if (mUsmConnectView){
 			mUsmConnectView->invalidateRect();
 			mUsmConnectView->setFocus();
 		}
 	}
+	int Player::showMediaScannerView(){
+		if (mMediaScannerView == NULL) {
+			mMediaScannerView = new MediaScannerView(TEXT("MediaScannerView"), NULL, NULL, 0, SW_NORMAL);
+			mMediaScannerView->onCreate();
+		} else {
+			gSession.mViewZAxis.bringViewToTop(mMediaScannerView);
+		}
+		if (mMediaScannerView){
+			mMediaScannerView->invalidateRect();
+			mMediaScannerView->setFocus();
+		}
+	}
+	int Player::showSdcardInsertView(){
+		if (mSdcardInsertView == NULL) {
+			mSdcardInsertView = new SdcardInsertView(TEXT("SdcardInsertView"), NULL, NULL, 0, SW_NORMAL);
+			mSdcardInsertView->onCreate();
+		} else {
+			gSession.mViewZAxis.bringViewToTop(mSdcardInsertView);
+		}
+		if (mSdcardInsertView){
+			mSdcardInsertView->invalidateRect();
+			mSdcardInsertView->setFocus();
+		}
+	}	
 	int Player::showVolumeView(){
 		if (mVolumeView == NULL) {
 			mVolumeView = new VolumeView(TEXT("Volume"), NULL, NULL, 0, SW_NORMAL);
@@ -242,8 +262,9 @@ namespace mango
 	}
 	void Player::dismissView(View *view){
 		View *displayView;
+		
 		if(view != NULL&&view == gSession.mViewZAxis.getDisplayingView()){
-			log_i("bringViewToBottom");
+			log_i("dismissView:%s",view->name);
 			gSession.mViewZAxis.bringViewToBottom(view);
 			displayView = gSession.mViewZAxis.getDisplayingView();
 			displayView->invalidateRect();
@@ -251,6 +272,7 @@ namespace mango
 			gMessageQueue.post(displayView,VM_NOTIFY,NM_DISPLAY,0);
 		}
 	}
+	
 	int  Player::getVolume(void)
 	{
 #ifndef WIN32
@@ -353,6 +375,62 @@ namespace mango
 		
 		close(fd);
 	}
+
+	void Player::holdKeyProbe(){
+		int fd=0,state;
+		char* path = "/sys/class/axppower/holdkey";
+		char rbuf;
+		
+		fd = open(path,O_RDWR, 0);
+		read(fd,&rbuf,1);
+		state = rbuf&0x10;
+		close(fd);
+		
+		log_i("/sys/class/axppower/holdkey:0x%x",state);
+		
+		gSession.setHoldKeyState(state);
+	}
+	void Player::spdifProbe(){
+		bool isSpidfIn;
+		isSpidfIn = isSpdifIn();
+		if(isSpidfIn)
+			openCodecPower(!isSpidfIn);
+	}
+	
+	bool Player::isSpdifIn(){
+		int fd=0,state;
+		char* path = "/sys/class/axppower/holdkey";
+		char rbuf;
+		
+		fd = open(path,O_RDWR, 0);
+		
+		read(fd,&rbuf,1);
+		
+		state = rbuf&0x20;
+		
+		close(fd);
+		log_i("spdif Player::isSpdifIn state=%d",state);
+		return state?false:true;
+	}
+	void Player::openCodecPower(bool enable){
+		int fd=0,state,volume;
+		char* path = "/sys/class/codec/power";
+		char rbuf;
+		
+		log_i("spdif openCodecPower enable=%d",enable);
+		
+		fd = open(path,O_RDWR, 0);
+		
+		rbuf = enable?1:0;
+		
+		write(fd,&rbuf,1);
+
+		if(enable){
+			gSettingProvider.query(SETTING_VOLUME_ID,&volume);
+			setVolume(volume);
+		}	
+		close(fd);
+	}
 	int PlayerEventInterface::onKeyDispatch(int keyCode,int action, int flag){
 		//log_i("PlayerEventInterface::onKeyDispatch keyCode=%d,action=%d",keyCode,action);
 		if((keyCode == KEYCODE_VOLUMEUP||keyCode == KEYCODE_VOLUMEDOWN)&& action == VM_KEYDOWN){
@@ -374,7 +452,12 @@ namespace mango
 			gPlayer.showShutDownView();
 		}else if(action == VM_MEDIA){
 			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,keyCode,0);
+		}else if(keyCode == KEYCODE_HOLD&& action == VM_KEYDOWN){
+			gPlayer.holdKeyProbe();
+		}else if(keyCode == KEYCODE_SPIDF&& action == VM_KEYDOWN){
+			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,NM_SPIDF,keyCode);
 		}
+		
 		if(action!=VM_CAPACITY&&gPowerManager!=NULL)
 			gPowerManager->resetCount();
 		return 0;

@@ -59,12 +59,12 @@ namespace mango
 		mMusicName->setTextColor(RGB(248,136,0));
 		mMusicName->setTextSize(23);
 		
-		rect.setEx(127, 85, 190, 15);
+		rect.setEx(127, 85, 190, 20);
 		mArtist = new TextView(PLAYING_IDB_MUSIC_NAME, TEXT("mArtist"), this, &rect, 0);
 		mArtist->setTextColor(RGB(154,154,154));
 		mArtist->setTextSize(16);
 
-		rect.setEx(127, 100, 190, 15);
+		rect.setEx(127, 105, 190, 20);
 		mAlbum = new TextView(PLAYING_IDB_MUSIC_NAME, TEXT("mAlbum"), this, &rect, 0);
 		mAlbum->setTextColor(RGB(154,154,154));
 		mAlbum->setTextSize(16);
@@ -144,7 +144,6 @@ namespace mango
 		mstr->mSprintf("%d",gPlayer.getVolume());
 		mVolumeText->setTextString(mstr->mstr);
 		
-
 		if(currentinfo == NULL){
 			mAlbumImage->setImageResoure(IDP_DEFAULT_ALBUM_ICON);
 			mMusicName->setTextString("Not find music.");
@@ -152,23 +151,24 @@ namespace mango
 		}
 		
 		mCurrentInfo = *currentinfo;
-
+		
 		mAlbumImage->setImageResoure(IDP_DEFAULT_ALBUM_ICON);
 		
-		mMusicName->setTextString(mCurrentInfo.name);
-		
-		mArtist->setTextString(mCurrentInfo.artist);
+		mMusicName->setTextString(currentinfo->name);
 
-		mAlbum->setTextString(mCurrentInfo.album);
+		mArtist->setTextString(currentinfo->artist);
+
+		mAlbum->setTextString(currentinfo->album);
 		
 		mSeekBar->setMax(mPlayinglist->getDuration());
+		mSeekBar->setProgress(0);
 
 		mstr->clear();
-		mstr->setPlayTime(mPlayinglist->getCurrent());
+		mstr->setPlayTime(0);
 		mTimeText->setTextString(mstr->mstr);
 
 		mstr->clear();
-		mstr->setPlayTime(mCurrentInfo.duration);
+		mstr->setPlayTime(mPlayinglist->getDuration());
 		mDurtionText->setTextString(mstr->mstr);
 		
 		mstr->clear();
@@ -303,24 +303,44 @@ namespace mango
 				mstr->clear();
 			}
 		}else if(code == NM_BATTERY_UPDATE){
-			if(isNeedFresh){
+			int val = (unsigned int)parameter;
+			bool isSpdifIn;
+			
+			if(mBattery != val && isNeedFresh){
 				Mstring* mstr;	
 				mstr = new Mstring(10);
 				mstr->mSprintf("%d%%",(unsigned int)parameter);
 				mBatteryText->setTextString(mstr->mstr);
 				mstr->clear();
+				mBattery = val;
+			}
+			if(gPlayer.mSpdifSwitch->isToSwicth()){
+				isSpdifIn = gPlayer.isSpdifIn();
+				
+				gPlayer.openCodecPower(!isSpdifIn);
+				mPlayinglist->setSpdifOut(isSpdifIn);
+				gPlayer.mSpdifSwitch->resetSwicth();
 			}
 		}else if(code == FLASH_MOUNT){
 			gPlayer.dismissView(gPlayer.mUsmConnectView);
+			mPlayinglist->checkPlayintList();
+			gmediaprovider.externVolumeScanner("/mnt/sdcard");	
 		}else if(code == FLASH_UNMOUNT){
 			gPlayer.showUsmConnectView();
 			mPlayinglist->stopPlayer();
 		}else if(code == SDCARD_MOUNT){
-
+			gPlayer.showSdcardInsertView();
 		}else if(code == SDCARD_UNMOUNT){
-
+			gPlayer.dismissView(gPlayer.mSdcardInsertView);
+			mPlayinglist->checkPlayintList();
+			gmediaprovider.checkfile();
+		}else if(code == MEDIA_SCANNER_START){
+			gPlayer.showMediaScannerView();
+		}else if(code == MEDIA_SCANNER_END){
+			gPlayer.dismissView(gPlayer.mMediaScannerView);
+		}else if(code == NM_SPIDF){
+			gPlayer.mSpdifSwitch->setPlayerSwitch();
 		}
-		
 		return 0;
 	}
 

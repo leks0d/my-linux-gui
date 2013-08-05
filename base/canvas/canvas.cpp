@@ -137,7 +137,7 @@ namespace mango
 		mBkColor = RGB(255, 255, 255);
 
 		mRop2 = 0;		
-		mBkMode = OPAQUE; //TRANSPARENT;		
+		mBkMode = TRANSPARENT; //TRANSPARENT;		
 		mAlpha = 0;		//0 -- È«Í¸Ã÷, 255 -- ²»Í¸
 	}
 

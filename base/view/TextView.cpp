@@ -27,6 +27,8 @@ namespace mango
 		mTop = 0;
 		mLayoutType = 0;
 		mEnable = 1;
+		mLog = 0;
+		iText = NULL;
 	}
 
 
@@ -38,17 +40,15 @@ namespace mango
 
 	int TextView::onPaint(Canvas& canvas)
 	{
-		TCHAR *wt;
-		wt = TEXT("MY MUSIC");
-		//log_i("TextView::onPaint");
+		int charCount;
+		
+		//log_i("TextView::onPaint:%s",mText);
 
 		if(mNormalBgdResId>0&&mPress==0){
 			canvas.	drawImageResource(mNormalBgdResId,0,0);
 		}else if(mSelectBgdResId>0&&mPress==1){
 			canvas.	drawImageResource(mSelectBgdResId,0,0);
 		}
-
-		
 		
 		if(mPress==1&&mSelectColor>0)
 			canvas.setTextColor(mSelectColor);
@@ -61,17 +61,17 @@ namespace mango
 			canvas.setTextColor(RGB(120,120,120));
 		
 		canvas.setTextSize(mSize);
-
+		
+		if(mLog)
+			log_i("ResType=%d,mText=%s",ResType,mText);
 		
 		if (resId > 0 && ResType == 1){
 			computeLeft(&canvas);
 			canvas.drawTextResource(resId, mLeft,mTop);
-			//canvas.drawText(wt, String::lstrlen(wt), 0, 0);
 		}
 		if(mText != NULL && ResType == 0){
 			computeLeft(&canvas);
-			//log_i("drawText mText mLeft=%d,mTop=%d,%s",mLeft,mTop,mText);
-			canvas.drawText(mText, strlen(mText), mLeft, mTop);
+			canvas.drawText(iText, iTextLen, mLeft, mTop);
 		}
 
 		return 0;
@@ -79,18 +79,30 @@ namespace mango
 
 	void TextView::setTextString(char* text){
 		int len;
-
+		int charCount;
+		
 		if(text == NULL)
 			return;
-		
-		len = strlen(text);
-		
-		if(len>0){
-			mText = new char[len + 1];
-			memcpy(mText,text,len+1);
-			ResType = 0;
-			invalidateRect();
+		if(iText!=NULL){
+			delete iText;
+			iText = NULL;
 		}
+		
+		iText = new WCHAR[103];
+		
+		if(Charset::isTextUtf8(text)){
+			charCount = Charset::multiByteToWideChar(CP_UTF8, text, strlen(text), iText, 102);
+		}else{
+			charCount = Charset::multiByteToWideChar(CP_ACP, text, strlen(text), iText, 102);
+		}
+		iText[charCount] = '\0';
+		iTextLen = charCount;
+
+		len = strlen(text);
+		mText = new char[len];
+		memcpy(mText,text,len+1);
+		
+		invalidateRect();
 	}
 
 	void TextView::getTextString(char *string){
@@ -126,27 +138,18 @@ namespace mango
 		Rect rect;
 		int count,width,hight,wpadd,hpadd;
 		char utf8Path[300];
-
-		//test();
-		
-		//log_i("TextView::setTextType");
 		
 		getRect(rect);
 		width = rect.getWidth();
 		hight = rect.getHight();
-		//log_i("TextView::setTextType width=%d",width);
+		
 		if(ResType == 1){
 			count = gSessionLocal.mResource.loadString(resId, wStrBuf, 256 + 1,1);
-		
-			//Charset::wideCharToMultiByte(CP_UTF8, wStrBuf, String::lstrlen(wStrBuf), utf8Path, 260 * 3);
-		//log_i("TextView::setTextType utf8Path=%s",utf8Path);
+			canvas->getTextExtentPoint(wStrBuf,count,size);
 		}else{
-			Canvas::charToWCHAR(mText,wStrBuf);
-			count = String::lstrlen(wStrBuf);
+			count = String::lstrlen(iText);
+			canvas->getTextExtentPoint(iText,count,size);
 		}
-		
-		canvas->getTextExtentPoint(wStrBuf,count,size);
-		//log_i("TextView::setTextType size.cx=%d",size.cx);
 		
 		wpadd = width - size.cx;
 		hpadd = hight - size.cy;
@@ -169,7 +172,6 @@ namespace mango
 				mLeft = wpadd-1;
 				break;
 		}
-		//log_i("TextView::setTextType mLeft=%d",mLeft);
 	}
 
 	 int TextView::onTouchDown(int x, int y, int flag){

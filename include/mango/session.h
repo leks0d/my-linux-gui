@@ -53,12 +53,14 @@ namespace mango
 
 		void dispatchTouch(Point &pt, bool pressed);
 		void dispatchKeycode(int keycode, bool pressed);
+		void setHoldKeyState(int n){holdKetState = n;log_i("setHoldKeyState = %d",n);}
 		
 		bool mTouchPressed;
 		bool mKeyPressed;
 		View* mTouchView;
 		UseEventInterface* mUseEventInterface;
 		Point mPoint;
+		int holdKetState;
 	public:
 		Screen		mScreen;
 
@@ -99,7 +101,7 @@ namespace mango
 		void  initializeFont();
 		void showBootLogo(unsigned char* addr);
 		void swapScreenFrontBuffer(); 
-
+		void writeBuffer(void* buf,int len);
 		bool loadLanguageCodePage(int langid);
 		int  getLangId();
 		bool setLangId (int langid);

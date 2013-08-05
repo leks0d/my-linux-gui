@@ -27,7 +27,7 @@ namespace mango
 
 	void PowerManager::resetCount(){
 		atuoCount = 0;
-		log_i("PowerManager::resetCount atuoCount=0");
+		//log_i("PowerManager::resetCount atuoCount=0");
 	}
 
 	void PowerManager::setPowerState(){

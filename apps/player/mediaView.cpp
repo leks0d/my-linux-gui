@@ -110,12 +110,10 @@ namespace mango
 
 		
 		rect.setEx(280, 0, 41, 22);
-		mHome = new Button(SETTING_BACK, TEXT("mBack"), this, &rect, 0);
+		mHome = new Button(SETTING_HOME, TEXT("mBack"), this, &rect, 0);
 		mHome->setNormalImageId(IDP_MUSIC_HOME);
 		mHome->setPressedImageId(IDP_MUSIC_HOME_SEC);
 		mHome->onCreate();
-
-
 		
 #ifdef WIN32
 		String::copy(mCurrentPath, TEXT("E:"));
@@ -426,6 +424,7 @@ namespace mango
 							
 							if(mPlayinglist == NULL)
 								mPlayinglist = new Playinglist();
+							log_i("pinfo->getMediaInfo(0)->artist=%s",pinfo->getMediaInfo(0)->artist);
 							mPlayinglist->playMediaInfo(pinfo->getMediaInfo(0));
 							
 							
@@ -656,8 +655,14 @@ namespace mango
 		
 		x = rect.left;
 		y = rect.top;
+		
+		//log_i("MusicAdapter::PaintView lvitem->iItem=%d",lvitem->iItem);
+		
+		
+	#if 0	
+		canvas.drawText("aaaaa",5,50,y+5);
+	#else
 		info = mMusicArrayList->getMediaInfo(lvitem->iItem);
-		//log_i("PlayingListAdapter::PaintView lvitem->iItem=%d",lvitem->iItem);
 		canvas.drawImageResource(IDP_LISTICON_MUSIC,10,y+5);
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
@@ -669,6 +674,7 @@ namespace mango
 		canvas.setTextColor(RGB(255,255,255));
 		canvas.setTextSize(12);
 		canvas.drawText(info->artist,strlen(info->artist),50,y+28);
+	#endif	
 	}
 
 	AlbumAdapter::AlbumAdapter(ListView* list,int id){

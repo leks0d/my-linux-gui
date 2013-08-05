@@ -41,17 +41,22 @@ namespace mango
 			int moveToPrev();
 			void moveToPosition(int pos);
 			int moveRandom();		
-			int  startPlay();
+			int startPlay();
+			int startPlayPosition(int mesc,bool needstart);
 			void playNext();
 			void playPrev(){if(moveToPrev())startPlay();}
-
+			void checkPlayintList();
+			void savePlayintList();
 			void playPauseOrStart();
 			void callbackPlay();
 			void addItem(mediainfo *item);
+			void removeItem(int n);
 			int getDuration();
 			int getCurrent();
 			int getCount();
 			int isPlaying();
+			bool isSpdifOut();
+			void setSpdifOut(bool isSpdifOut);
 			void setPlayMode(int mode);
 			int getPlayMode(){return playMode;}
 			void setGapless(int gapless);

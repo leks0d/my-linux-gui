@@ -25,14 +25,7 @@ namespace mango
 				playMode = 0;
 				mplaylist = NULL;
 				inPause = 0;
-				/*
-				mParticleplayer = (particle::MediaPlayerInterface*)malloc(sizeof(particle::MediaPlayerInterface));
-				mtemp = particle::createMediaPlayer();
-				if(mParticleplayer != NULL){
-					memcpy(mParticleplayer,mtemp,sizeof(particle::MediaPlayerInterface));
-				}*/
 				mParticleplayer = NULL;
-				
 			}
 
 			void Playinglist::initPlayintList(){
@@ -43,8 +36,36 @@ namespace mango
 				for(i=0;i<count;i++){
 					addItem(pinfo->getMediaInfo(i));
 				}
-
 				gSettingProvider.query(SETTING_PLAYMODE_ID,&playMode);
+			}
+
+			void Playinglist::checkPlayintList(){
+				int i;
+				for(i=0;i<getCount();i++){
+					if(access(getItem(i)->path,F_OK) != 0){
+						removeItem(i);
+						if(mCurrent>i)
+							mCurrent--;
+						else if(mCurrent == i)
+							mCurrent = 0;
+						i--;
+					}
+				}
+			}
+
+			void Playinglist::savePlayintList(){
+				gmediaprovider.updateInPlay(0);
+			}
+			
+			void Playinglist::removeItem(int n){
+				int i;
+				int count = getCount();
+				mediainfo *ptr = mplaylist;
+				for(i=n;i<count-1;i++){
+					memcpy(&ptr[i],&ptr[i+1],sizeof(mediainfo));
+				}
+				memset(&ptr[len-1],0,sizeof(mediainfo));
+				len--;
 			}
 			
 			void Playinglist::addItem(mediainfo *item	){
@@ -160,8 +181,8 @@ namespace mango
 				if(pos>=0){
 					moveToPosition(pos);
 					log_i("Playinglist::moveToPosition");
-				}else{	
-					addItem(info);	
+				}else{
+					addItem(info);
 					log_i("Playinglist::addItem");			
 					moveToLast();
 					log_i("Playinglist::moveToLast");	
@@ -192,6 +213,23 @@ namespace mango
 				}
 				getPlayingItem()->inPlay = 1;
 				log_i("Playinglist::startPlay %d/%d:%s",mCurrent,len,getPlayingItem()->path);
+			}
+			
+			int Playinglist::startPlayPosition(int mesc,bool needstart){
+				if(mParticleplayer == NULL){
+					mParticleplayer = particle::createMediaPlayer();
+					mParticleplayer->setEventCallback(Playinglist::playerCallback,(void *)this);
+					PlayerInit();
+				}
+				if(mParticleplayer!=NULL){
+					if(mParticleplayer->stop()){log_i("stop() success!");}else{log_i("stop() fail!");return -1;}
+					if(mParticleplayer->setSource(getPlayingItem()->path)){log_i("setSource() success!");}else{log_i("setSource() fail!");return -1;}
+					if(mParticleplayer->prepare()){log_i("prepare() success!");}else{log_i("prepare() fail!");return -1;}
+					//if(mParticleplayer->seekTo(mesc)){log_i("seekTo() success!");}else{log_i("seekTo() fail!");return -1;}
+					if(needstart)
+						if(mParticleplayer->start()){log_i("start() success!");}else{log_i("start() fail!");return -1;}
+				}
+				log_i("Playinglist::startPlayPosition start=%d, %d/%d:%s",needstart,mCurrent,len,getPlayingItem()->path);
 			}
 			
 			int Playinglist::isItemExsit(mediainfo *info){
@@ -237,7 +275,25 @@ namespace mango
 				else
 					return 0;
 			}
+			bool Playinglist::isSpdifOut(){
+				if(mParticleplayer != NULL)
+					return mParticleplayer->isSpdifOut();
+				else
+					return false;
+			}
 
+			void Playinglist::setSpdifOut(bool isSpdif){
+				int playPostion;
+				if(mParticleplayer != NULL){
+					if(mParticleplayer->isSpdifOut() != isSpdif){
+						mParticleplayer->enableSpdifOut(isSpdif);
+						if(!isSpdif && (isPlaying()||inPause)){
+							playPostion = mParticleplayer->getCurrentPosition();
+							startPlayPosition(playPostion,inPause?false:true);
+						}
+					}
+				}
+			}
 			mediainfo* Playinglist::getItem(int index){
 				if(index<len)
 					return &mplaylist[index];

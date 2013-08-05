@@ -952,7 +952,7 @@ namespace mango
 
 	int ListView::onPaint(Canvas& canvas)
 	{
-		//log_i("ListView::onPaint");
+		log_i("ListView::onPaint------------------------------------");
 
 		LISTVIEW_RECORD* record;
 		Rect  clientRect;
@@ -974,6 +974,7 @@ namespace mango
 			paintRecord(canvas, record, false);
 			record = getNextRecord(record, false);
 		}
+		log_i("ListView::onPaint---------------------end---------------");
 		return 0 ;
 	}
 
@@ -1254,7 +1255,7 @@ namespace mango
 		Rect   rect, redrawZoneRect;
 		LISTVIEW_RECORD* record;
 
-		Brush brush(RGB(255,255,255));
+		Brush brush(ARGB(255,0,0,0));
 
 		canvas.fillRect(redrawRect, brush);
 
@@ -1352,8 +1353,11 @@ namespace mango
 			dy = distance ;
 
 		if (cartoonMoveZone(dy))
+#if 1			
 			cartoonDisplay();
-
+#else
+			invalidateRect();
+#endif
 		return 0 ;
 	}
 

@@ -1,5 +1,10 @@
 #include <sqlite3.h>
 #include "Id3info.h"
+#if 0
+#include "SkStream.h"
+#include "SkImageDecoder.h"
+#include "SkBitmap.h"
+#endif
 
 namespace mango
 {	
@@ -50,10 +55,8 @@ namespace mango
 		char *name_key;
 		char *title;
 		char *title_key;
-		int artist_id;
 		char *artist;
 		char *artist_key;
-		int album_id;
 		char *album;
 		char *album_key;
 		int track;
@@ -72,16 +75,20 @@ namespace mango
 	{
 	public:
 		mediaprovider(void);
-		int mediascanner();
+		int mediascanner(char *path);
 		int filescanner(char *path);
+		int externVolumeScanner(char *path);
+		int sendMsgStart();
+		int sendMsgEnd();
 		int getmediainfo(char *path,mediainfo *info);
-		
+		static unsigned int FileScannerRunnig(void *parameter);
 //		int ismusic(char *path);
 		int initialize(void);
 		int exec(char *sql,void *arg,int (*callback)(void*,int,char**,char**));
 		int insert(char *table,mediainfo *info);
 		int querymusic(char *where,mediainfo **info);
 		int queryMusicArray(char *where, void* array);
+		int updateInPlay(int value,int id =-1);
 		int del(char *table,int id);
 		virtual ~mediaprovider(void);
 		int checkfile();
@@ -90,9 +97,17 @@ namespace mango
 		static int power_operation(int ary,int th);
 	private:
 		sqlite3 * db;
-		
+		char *scanPath;
+		Thread mScannerThread;
+		Mutex	mMutex;  
 	};
-	
+
+	class ScanInfo{
+		public:
+			mediaprovider* media;
+			char path[255];
+			ScanInfo(){log_i("new ScanInfo")}
+	};
 extern mediaprovider gmediaprovider;
 
 };

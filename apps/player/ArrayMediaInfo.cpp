@@ -42,7 +42,7 @@ namespace mango
 		mediainfo* ArrayMediaInfo::getMediaInfo(int pos){
 				
 				if(pos>=0&&pos<len){
-					log_i("ArrayMediaInfo::getMediaInfo len=%d,pos=%d,val=0x%x",len,pos,mplaylist+pos);
+					//log_i("ArrayMediaInfo::getMediaInfo len=%d,pos=%d,val=0x%x",len,pos,mplaylist+pos);
 					return mplaylist+pos;
 				}else
 					return NULL;

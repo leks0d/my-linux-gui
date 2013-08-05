@@ -135,13 +135,13 @@ namespace mango
 				{
 					/* Ignore character and move on */
 					maxlen--;
-				} 
+				}
 				else 
 				{
 					op += size;
 					maxlen -= size;
 				}
-			} 
+			}
 			else 
 			{
 				*op++ = (BYTE) *ip;
@@ -166,6 +166,112 @@ namespace mango
 
 	}
 
+	static const int utf8_2h_mask = 0xE0;
+	static const int utf8_2h_mask_ret = 0xC0;
+	static const int utf8_3h_mask = 0xF0;
+	static const int utf8_3h_mask_ret = 0xE0;	
+	static const int utf8_l_mask = 0xC0;
+	static const int utf8_l_mask_ret = 0x80;
+	
+#if 0	
+	int Charset::isTextUtf8(char *s){
+	
+		int len = strlen(s);
+		int i,count;
+		int ret = 0;
+
+		log_i("Charset::isTextUtf8 len=%d,%s",len,s);
+		
+		
+		if(len>=2){
+			count = len/2;
+			for(i=0;i<count&&i<3;i++){
+				log_i("s[%d]=0x%x,s[%d]=0x%x",i*2,s[i*2],i*2+1,s[i*2+1]);
+				if((s[i*2]&utf8_2h_mask)==utf8_2h_mask_ret && (s[i*2+1]&utf8_l_mask)==utf8_l_mask_ret){
+					ret = 1;
+				}else{
+					ret = 0;
+					break;
+				}
+			}
+			count = len/3;
+			for(i=0;i<count&&i<2;i++){
+				log_i("s[%d]=0x%x,s[%d]=0x%x,s[%d]=0x%x",i*3,s[i*3],i*3+1,s[i*3+1],i*3+2,s[i*3+2]);
+				if((s[i*3]&utf8_3h_mask)==utf8_3h_mask_ret && 
+					(s[i*3+1]&utf8_l_mask)==utf8_l_mask_ret && 
+					(s[i*3+2]&utf8_l_mask)==utf8_l_mask_ret){
+					ret = 1;
+				}else{
+					ret = 0;
+					break;
+				}
+			}
+			log_i("isTextUtf8 ret = %d",ret);
+			return ret;
+		}else
+			return 0;
+		
+	}
+#else
+int Charset::isTextUtf8(const char * lpstrInputStream){   
+    int   i;   
+    int cOctets;  // octets to go in this UTF-8 encoded character   
+    char chr;   
+    int  bAllAscii = 1;   
+  	int iLen;
+	
+  	iLen = strlen(lpstrInputStream);
+    cOctets= 0;
+	
+	//log_i("Charset::isTextUtf8 len=%d,%s",iLen,lpstrInputStream);
+	
+    for( i=0; i < iLen; i++ ){
+        chr= *(lpstrInputStream+i); 
+		
+  		//log_i("isTextUtf8 chr[%d]=x%x,cOctets=%d",i,chr,cOctets);
+  
+        if( (chr&0x80) != 0 ) bAllAscii = 0;   
+  		
+        if( cOctets == 0 ){
+            //   
+            // 7 bit ascii after 7 bit ascii is just fine.  Handle start of encoding case.   
+            //   
+            if(chr >= 0x80){
+               //   
+               // count of the leading 1 bits is the number of characters encoded   
+               //   
+               do {
+               	  cOctets++; 
+                  chr <<= 1;   
+               }while( (chr&0x80) != 0);
+  
+               cOctets--;                       // count includes this character   
+               if( cOctets == 0 ) return 0;  // must start with 11xxxxxx   
+            }   
+        }else{   
+            // non-leading bytes must start as 10xxxxxx   
+            if( (chr&0xC0) != 0x80){
+                return 0;   
+            }
+            cOctets--;                           // processed another octet in encoding   
+        } 
+    } 
+
+    //   
+    // End of text.  Check for consistency.   
+    //   
+  
+    if( cOctets > 0 ){   // anything left over at the end is an error   
+        return 0;   
+    }   
+  
+    if( bAllAscii ){     // Not utf-8 if all ascii.  Forces caller to use code pages for conversion   
+        return 0;   
+    }   
+  
+    return 1;   
+}  
+#endif	
 
 
 //																				

@@ -31,7 +31,8 @@ namespace mango
 		Button* mHome;
 		ImageView* mDisplayIcon;
 		SeekBar* mBrightnessBar;
-		TextView* mUsbState;
+		TextView* mScannerButton;
+		TextView* mDirectButton;
 	
 	private:
 		int		mMode;					//menu菜单 媒体库index 收藏夹 或 浏览路径

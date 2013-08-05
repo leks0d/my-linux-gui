@@ -342,7 +342,8 @@ namespace mango
 		View* focusView  = mViewZAxis.getFocus();
 		if (!focusView)
 			return;
-		
+		if(!holdKetState)
+			return;
 		
 		
 		if (!mKeyPressed && pressed)
@@ -361,7 +362,7 @@ namespace mango
 			gMessageQueue.post(focusView, VM_KEYUP, keycode, 0);
 			mKeyPressed = false;
 		}
-		//log_i("dispatchKeycode code=%d,pressed=%d",keycode,pressed);
+		log_i("dispatchKeycode code=%d,pressed=%d",keycode,pressed);
 	}
 
 
@@ -435,7 +436,7 @@ namespace mango
 			evnetCount = readBytes / sizeof(struct input_event);
 			for (i = 0 ; i < evnetCount ; i++)
 			{
-				log_i("type = %d, code = %d, value = %d", EventBuf[i].type, EventBuf[i].code, EventBuf[i].value);
+				//log_i("type = %d, code = %d, value = %d", EventBuf[i].type, EventBuf[i].code, EventBuf[i].value);
 			
 				switch (EventBuf[i].type)
 				{
@@ -710,16 +711,38 @@ namespace mango
 		if (gSession.mScreen.mYOffset)
 		{
 			gSession.mScreen.mYOffset = 0;
-			memset((unsigned char*)mSurface[0].mBits, 0x0, SCREEN_BUFFER_BYTES);
+			//memset((unsigned char*)mSurface[0].mBits, 0x0, SCREEN_BUFFER_BYTES);
 			mStockGraphic.mBitmap.setBits(mSurface[0].mBits);
 		}
 		else
 		{
 			gSession.mScreen.mYOffset = 240;
-			memset((unsigned char*)mSurface[1].mBits, 0x0, SCREEN_BUFFER_BYTES);
+			//memset((unsigned char*)mSurface[1].mBits, 0x0, SCREEN_BUFFER_BYTES);
 			mStockGraphic.mBitmap.setBits(mSurface[1].mBits);
 			
 		}
+	}
+	void SessionLocal::writeBuffer(void* buf,int len){
+#ifndef WIN32
+		struct fb_var_screeninfo vinfo;
+#endif
+		int ret=0,k;
+
+		void *mbuf = mStockGraphic.mBitmap.getBits();
+			
+		ioctl(mfbDevice, FBIOGET_VSCREENINFO, &vinfo);
+
+		if (mfbBuffer == mbuf)
+			vinfo.yoffset = 0;
+		else
+			vinfo.yoffset = 240;
+
+		memcpy(mbuf,buf,len);
+
+		ioctl(mfbDevice, FBIOPUT_VSCREENINFO, &vinfo);
+
+		ret = ioctl(mfbDevice, FBIOPAN_DISPLAY, &vinfo);	
+
 	}
 
 	static void print_info(struct fb_var_screeninfo *vinfo){

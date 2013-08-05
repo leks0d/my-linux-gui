@@ -20,6 +20,9 @@
 #include "EqSettingView.h"
 #include "ShutDownView.h"
 #include "UsmConnectView.h"
+#include "SdcardInsertView.h"
+#include "MediaScannerView.h"
+
 
 namespace mango
 {	
@@ -55,7 +58,50 @@ namespace mango
 		virtual int onKeyDispatch(int keyCode,int action, int flag);
 		virtual int onTouchDispatch(int x,int y, int action);
 	};
-
+	class PlayerSwitch{
+		private:	
+			int isSet;
+			Mutex	mMutex;
+			unsigned int lastTime;
+		public:
+			PlayerSwitch(){
+				resetSwicth();
+			}
+			void setPlayerSwitch(){
+				mMutex.lock();
+				isSet = 1;
+				lastTime = (unsigned int)Time::getMillisecond();
+				log_i("setPlayerSwitch lastTime=%d",lastTime);
+				mMutex.unlock();
+			}
+			int isToSwicth(){
+				int ret;
+				unsigned int now;
+				
+				mMutex.lock();
+				
+				if(isSet == 1){
+					now = (unsigned int)Time::getMillisecond() - 350;
+					log_i("setPlayerSwitch lastTime=%d,now=%d",lastTime,now);
+					if(now>=lastTime){
+						ret = 1;
+					}
+				}else{
+					ret = 0;
+				}
+				
+				mMutex.unlock();
+				
+				return ret;
+			}
+			void resetSwicth(){
+				mMutex.lock();
+				log_i("setPlayerSwitch resetSwicth");
+				isSet = 0;
+				lastTime = -1;
+				mMutex.unlock();
+			}
+	};
 
 	class Player: public Party
 	{
@@ -77,11 +123,16 @@ namespace mango
 		int showEqSettingView();
 		int showShutDownView();
 		int showUsmConnectView();
+		int showMediaScannerView();
+		int showSdcardInsertView();
 		void dismissView(View *view);
 		int  getVolume(void);
 		void setVolume(int volume);
 		void setPowerState();
 		void ioctrlBrightness(int cmd,int* brightness);
+		void holdKeyProbe();
+		bool isSpdifIn();
+		void openCodecPower(bool enable);
 
 	public:
 		MediaView*  mMeidaView;
@@ -94,11 +145,13 @@ namespace mango
 		VolumeView* mVolumeView;
 		EqSettingsView* mEqSettingsView;
 		ShutDownView* mShutDownView;
+		MediaScannerView *mMediaScannerView;
+		SdcardInsertView *mSdcardInsertView;
 		PlayerEventInterface* mPlayerEventInterface;
 		int powerState;
 		SocketDetect *mSocketDetect;
 		UsmConnectView *mUsmConnectView;
-		sqlite3 *db; 
+		PlayerSwitch *mSpdifSwitch;
 	};
 
 	extern Player  gPlayer;
