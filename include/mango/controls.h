@@ -4,6 +4,33 @@
 
 namespace mango
 {
+	class MSkBitmap{
+	public:		
+		int* mBits;
+		int width;
+		int height;
+	
+		MSkBitmap(){mBits = NULL;};
+		
+		void create(int *bit,int w,int h){
+			mBits = new int[w*h*4];
+			memcpy(mBits,bit,w*h*4);
+			width = w;
+			height = h;
+		}
+
+		void release(){
+			if(mBits != NULL){
+				delete mBits;
+				mBits = NULL;
+			}
+			width = 0;
+			height = 0;			
+		}
+		bool isVaild(){
+			return width>0&&height>0;
+		}
+	};
 	
 	class Mstring{
 		public:
@@ -61,12 +88,14 @@ namespace mango
 			ImageView(int id, const TCHAR* title, View* parent, Rect* rect, int style, int show = SW_NORMAL);
 			~ImageView(void);
 			void setImageResoure(int Id);
-			void setImagePath(char* path);	
+			void setImagePath(char* path);
+			void setSkBitmap(int *bit,int w,int h);
 			virtual int onPaint(Canvas& canvas);
 		private:
 			char *mImagePath;
 			int resId;
 			int ResType;
+			MSkBitmap *mMSkBitmap;
 	};
 
 #define TEXT_LAYOUT_LEFT		0
@@ -159,7 +188,7 @@ class ValueTextView : public View
 			void setProgress(int n);
 			int getProgress();
 			void setTouchX(int x);
-			void setMax(int n){mMax=n;}
+			void setMax(int n){mMax=n;log_i("SeekBar setMax = %d",mMax);}
 			
 			virtual int onPaint(Canvas& canvas);
 			virtual int onTouchDown(int x, int y, int flag);

@@ -163,7 +163,7 @@ namespace mango
 		bool isSpdifIn();
 		bool isHeadestIn();
 		void openCodecPower(bool enable);
-
+		void setBootWakeLock(int en);
 	public:
 		MediaView*  mMeidaView;
 		PlayingView* mPlayingView;
@@ -179,6 +179,8 @@ namespace mango
 		SdcardInsertView *mSdcardInsertView;
 		PlayerEventInterface* mPlayerEventInterface;
 		int powerState;
+		int isBootLock;
+		int bootLockCount;
 		SocketDetect *mSocketDetect;
 		UsmConnectView *mUsmConnectView;
 		PlayerSwitch *mSpdifSwitch;

@@ -5,6 +5,8 @@
 namespace mango
 {
 
+	static const char *BootUp = "bootup";
+
 	void sig_int(int sig)
 	{
  		log_i("Catch a termination single = %d/n",sig);   
@@ -16,6 +18,7 @@ namespace mango
 		mSettingsView = NULL;
 		mMusicInfoView = NULL;
 		powerState = 0;
+		isBootLock = 0;
 	}
 
 
@@ -27,7 +30,7 @@ namespace mango
 	int Player::main()
 	{
 		int i,ret;
-		//wakeLock();
+		setBootWakeLock(1);
 		initialize();
 		gSettingProvider.initialize();
 		initSettings();
@@ -56,6 +59,18 @@ namespace mango
 		}
 		log_i("signal &sig_int");
 		return messageLoop();
+	}
+	void Player::setBootWakeLock(int en){
+		log_i("Player::setBootWakeLock en=%d,isBootLock=%d",en,isBootLock);
+		if(en && !isBootLock){
+			if(wakeLock(BootUp) == 0){
+				isBootLock = 1;
+				bootLockCount = 20;
+			}
+		}else if(isBootLock){
+			if(wakeUnlock(BootUp) == 0)
+				isBootLock = 0;
+		}
 	}
 
 	int Player::initSettings(){
@@ -256,9 +271,7 @@ namespace mango
 		if (mShutDownView){
 			mShutDownView->invalidateRect();
 			mShutDownView->setFocus();
-			mango::Thread::sleep(1000 * 3);
-			gPowerManager->setPowerState(2);
-			reboot(RB_POWER_OFF);
+			reboot(RB_POWER_OFF);			
 		}
 	}
 	void Player::dismissView(View *view){

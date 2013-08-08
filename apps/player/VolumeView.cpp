@@ -46,7 +46,7 @@ namespace mango
 		mVolumeStr->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mVolumeStr->onCreate();
 		
-		rect.setEx(136,105,60,20);
+		rect.setEx(136,105,60,60);
 		mVolume = new TextView(SETTING_BACK, TEXT("mBack"), this, &rect, 0);
 		mVolume->setTextColor(COLOR_WHITE);
 		mVolume->setTextLayoutType(TEXT_LAYOUT_CENTER);

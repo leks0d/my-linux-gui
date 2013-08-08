@@ -4,6 +4,7 @@
 
 namespace mango
 {
+static const char *PlayerLock = "playerlock";
 	enum 
 		{
 			MEDIA_PLAYER_ERROR = 1,
@@ -14,7 +15,7 @@ namespace mango
 #ifndef WIN32
 	//	particle::MediaPlayerInterface*  mParticleplayer = NULL; // = particle::createMediaPlayer();
 #endif
-
+	
 
 			Playinglist::Playinglist(){
 				particle::MediaPlayerInterface*  mtemp;
@@ -26,6 +27,7 @@ namespace mango
 				mplaylist = NULL;
 				inPause = 0;
 				mParticleplayer = NULL;
+				isWakeLock = 0;
 			}
 
 			void Playinglist::initPlayintList(){
@@ -200,7 +202,7 @@ namespace mango
 				if(mParticleplayer == NULL){
 					mParticleplayer = particle::createMediaPlayer();
 					mParticleplayer->setEventCallback(Playinglist::playerCallback,(void *)this);
-					PlayerInit();
+					PlayerInit();	
 				}
 				if(mGapless>0&&mParticleplayer!=NULL&&mParticleplayer->setNextSongForGapless(getPlayingItem()->path)){
 					if(mParticleplayer->gaplessPlay(getPlayingItem()->path)){log_i("gaplessPlay() success!");}
@@ -212,6 +214,7 @@ namespace mango
 					if(mParticleplayer->start()){log_i("start() success!");}else{log_i("start() fail!");return -1;}
 				}
 				getPlayingItem()->inPlay = 1;
+				setWakeLock();
 				log_i("Playinglist::startPlay %d/%d:%s",mCurrent,len,getPlayingItem()->path);
 			}
 			
@@ -316,7 +319,9 @@ namespace mango
 			switch(playMode){
 				case MODE_PLAY_ORDER:
 					if(len>0&&mCurrent==(len - 1)){
-						mParticleplayer->stop();
+						if(mParticleplayer->stop()){
+							releaseWakeLock();
+						}
 						break;
 					}
 				case MODE_PLAY_LOOP:
@@ -338,6 +343,7 @@ namespace mango
 			}else if(mParticleplayer->isPlaying()){
 				log_i("mParticleplayer->isPlaying");
 				mParticleplayer->pause();
+				releaseWakeLock();
 				inPause = 1;
 			}else if(inPause == 1){
 				log_i("mParticleplayer inPause");
@@ -412,6 +418,21 @@ namespace mango
 			if(mParticleplayer!=NULL&&mParticleplayer->isPlaying()){
 				mParticleplayer->pause();
 				inPause = 1;
+			}
+		}
+		void Playinglist::setWakeLock(){
+			log_i("Playinglist::setWakeLock isWakeLock=%d",isWakeLock);
+			if(!isWakeLock){
+				if(gPlayer.wakeLock(PlayerLock) == 0)
+					isWakeLock = 1;
+			}
+		}
+
+		void Playinglist::releaseWakeLock(){
+			log_i("Playinglist::releaseWakeLock isWakeLock=%d",isWakeLock);
+			if(isWakeLock){
+				if(gPlayer.wakeUnlock(PlayerLock) == 0)
+					isWakeLock = 0;
 			}
 		}
 		

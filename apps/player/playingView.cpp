@@ -330,6 +330,11 @@ namespace mango
 				updatePlayButtonIcon();
 				gPlayer.mHeadestSwitch->resetSwicth();
 			}
+			if(gPlayer.bootLockCount){
+				if(gPlayer.bootLockCount == 1)
+					gPlayer.setBootWakeLock(0);
+				gPlayer.bootLockCount--;
+			}
 		}else if(code == FLASH_MOUNT){
 			gPlayer.dismissView(gPlayer.mUsmConnectView);
 			mPlayinglist->checkPlayintList();

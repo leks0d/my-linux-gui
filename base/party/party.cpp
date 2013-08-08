@@ -118,7 +118,7 @@ namespace mango
 
 #define MANGO_WAKELOCK_NAME  "mango"
 
-	int Party::wakeLock(void) 
+	int Party::wakeLock(const char *name) 
 	{
 #ifndef WIN32
 		FILE* file;
@@ -128,15 +128,15 @@ namespace mango
 			log_e("Can't /sys/power/wake_lock");
 			return -1;
 		}
-
-		fwrite(MANGO_WAKELOCK_NAME, 1, strlen(MANGO_WAKELOCK_NAME) + 1, file);
+		log_i("Party::wakeLock name=%s",name);
+		fwrite(name, 1, strlen(name) + 1, file);
 		fclose(file);
 #endif
 		return 0;
 	}
 
 
-	int Party::wakeUnlock(void) 
+	int Party::wakeUnlock(const char *name) 
 	{
 #ifndef WIN32
 		FILE* file;
@@ -146,8 +146,8 @@ namespace mango
 			log_e("Can't /sys/power/wake_unlock");
 			return -1;
 		}
-
-		fwrite(MANGO_WAKELOCK_NAME, 1, strlen(MANGO_WAKELOCK_NAME) + 1, file);
+		log_i("Party::wakeUnlock name=%s",name);
+		fwrite(name, 1, strlen(name) + 1, file);
 		fclose(file);
 #endif
 		return 0;

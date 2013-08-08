@@ -29,8 +29,12 @@ namespace mango
 			int playMode;
 			int mGapless;
 			int inPause;
+			int isWakeLock;
+			
 			Playinglist();
 			~Playinglist();
+			void setWakeLock();
+			void releaseWakeLock();
 			mediainfo *getPlayingItem();
 			mediainfo *getItem(int index);
 			void initPlayintList();

@@ -16,6 +16,7 @@ namespace mango
 		mImagePath = NULL;
 		resId = 0;
 		ResType = 0;
+		mMSkBitmap = NULL;
 	}
 
 
@@ -32,7 +33,9 @@ namespace mango
 		
 		if (resId > 0 && ResType == 1)
 			canvas.drawImageResource(resId, 0, 0,true);
-		
+		if(mMSkBitmap!=NULL && mMSkBitmap->isVaild()){
+			canvas.drawBitmap(mMSkBitmap->mBits,0,0,mMSkBitmap->width,mMSkBitmap->height);
+		}
 		return 0;
 	}
 
@@ -57,6 +60,14 @@ namespace mango
 		}
 	}
 
+	void ImageView::setSkBitmap(int *bit,int w,int h){
+		if(mMSkBitmap == NULL){
+			mMSkBitmap = new MSkBitmap();
+		}else
+			mMSkBitmap->release();
+		mMSkBitmap->create(bit,w,h);
+	}
+	
 };
 
 

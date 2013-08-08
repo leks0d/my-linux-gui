@@ -226,6 +226,26 @@ namespace mango
 		return success;
 
 	}
+	bool Canvas::drawBitmap(int* colors, int x, int y, int width, int height)
+	{
+		Rect	rcBmp, rcClip ;
+
+		if (colors == NULL)
+			return false;
+
+		viewToCanvas(x, y);
+		getClipRect(rcClip);
+			
+		rcBmp.setEx(x, y, width, height);
+		if (!rcClip.intersect(rcBmp))
+			return true;
+
+		bitBlt_32(mBitmap->getBits(), mBitmap->getWidth(), rcClip.left,  rcClip.top,  rcClip.right - rcClip.left, rcClip.bottom - rcClip.top, \
+				colors, width, rcClip.left - x, rcClip.top - y, \
+				SRCCOPY, 255, NULL);
+
+		return true;
+	}
 
 
 	void Canvas::swapScreenFrontBuffer()

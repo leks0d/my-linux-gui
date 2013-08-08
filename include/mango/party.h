@@ -20,8 +20,8 @@ namespace mango
 		virtual	int dispatchMessage(Message& msg);
 		virtual int processMessage(Message& msg);
 
-		virtual int wakeLock(void);
-		virtual int wakeUnlock(void);
+		virtual int wakeLock(const char *name);
+		virtual int wakeUnlock(const char *name);
 
 
 	public:

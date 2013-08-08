@@ -1,12 +1,5 @@
 #include <sqlite3.h>
 #include "Id3info.h"
-#include "SkStream.h"
-#include "SkImageDecoder.h"
-#include "SkBitmap.h"
-#include "SkGraphics.h"
-#include "SkColor.h"
-#include "SkTypes.h"
-#include "GraphicsJNI.h"
 
 
 namespace mango
