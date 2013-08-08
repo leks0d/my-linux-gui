@@ -510,4 +510,30 @@ namespace mango
 		else
 			canvas.drawImageResource(IDP_LISTITEM_NO_SEC,x,y+13);
 	}
+
+	RootDirectListAdapter::RootDirectListAdapter(ListView* list,int id)
+		: SettingListAdapter(list,id){
+
+	}
+	void RootDirectListAdapter::PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec){
+		int	 x, y,index;
+		
+		x = rect.left;
+		y = rect.top;
+
+		index = lvitem->iItem;
+		x+=50;
+		if(isSec)
+			canvas.drawImageResource(mSecImgRes[index],x,y+10);
+		else
+			canvas.drawImageResource(mImgRes[index],x,y+10);
+		x+=33;
+		if(isSec)
+			canvas.setTextColor(RGB(255,149,0));
+		else
+			canvas.setTextColor(RGB(255,255,255));	
+		canvas.setTextSize(18);
+		canvas.drawTextResource(mTextRes[index],x,y+13);
+
+	}
 };

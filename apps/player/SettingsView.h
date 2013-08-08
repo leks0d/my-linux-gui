@@ -2,24 +2,7 @@
 namespace mango
 {
 
-	class SettingListAdapter : public BaseAdapter
-	{
-	public:
-		SettingListAdapter(void){}
-		~SettingListAdapter(void){}
-		SettingListAdapter(ListView* list,int id);
-		void refresh();
-		void setData(int* img,int*imgsec,int* text,int count);
-		virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);
-		virtual int getCount(){return 0;}
-		virtual void* getItem(int index){return 0;}
-	public:
-		ListView* mlist;
-		int* mImgRes;
-		int* mSecImgRes;
-		int* mTextRes;
-		int mCount;	
-	};
+
 	class PlayModeListAdapter : public SettingListAdapter
 	{
 		public:
@@ -52,6 +35,7 @@ namespace mango
 			LanguageListAdapter(ListView* list,int id);
 			virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);
 	};
+
 
 	class SettingsView: public View
 	{

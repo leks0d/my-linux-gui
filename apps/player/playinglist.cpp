@@ -408,6 +408,12 @@ namespace mango
 				gSettingProvider.update(SETTING_PLAYMODE_ID,playMode);
 			}
 		}
+		void Playinglist::setPlayPause(){
+			if(mParticleplayer!=NULL&&mParticleplayer->isPlaying()){
+				mParticleplayer->pause();
+				inPause = 1;
+			}
+		}
 		
 		Playinglist *mPlayinglist = NULL;
 };

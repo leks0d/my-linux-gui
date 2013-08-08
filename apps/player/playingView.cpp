@@ -305,7 +305,7 @@ namespace mango
 		}else if(code == NM_BATTERY_UPDATE){
 			int val = (unsigned int)parameter;
 			bool isSpdifIn;
-			
+			bool isHeadestIn;
 			if(mBattery != val && isNeedFresh){
 				Mstring* mstr;	
 				mstr = new Mstring(10);
@@ -316,10 +316,19 @@ namespace mango
 			}
 			if(gPlayer.mSpdifSwitch->isToSwicth()){
 				isSpdifIn = gPlayer.isSpdifIn();
-				
 				gPlayer.openCodecPower(!isSpdifIn);
 				mPlayinglist->setSpdifOut(isSpdifIn);
 				gPlayer.mSpdifSwitch->resetSwicth();
+			}
+			if(gPlayer.mHeadestSwitch->isToSwicth()){
+				isHeadestIn = gPlayer.isHeadestIn();
+				if(isHeadestIn){
+					mPlayinglist->setPauseToStart();
+				}else{
+					mPlayinglist->setPlayPause();
+				}
+				updatePlayButtonIcon();
+				gPlayer.mHeadestSwitch->resetSwicth();
 			}
 		}else if(code == FLASH_MOUNT){
 			gPlayer.dismissView(gPlayer.mUsmConnectView);
@@ -340,6 +349,8 @@ namespace mango
 			gPlayer.dismissView(gPlayer.mMediaScannerView);
 		}else if(code == NM_SPIDF){
 			gPlayer.mSpdifSwitch->setPlayerSwitch();
+		}else if(code == NM_HEADEST){
+			gPlayer.mHeadestSwitch->setPlayerSwitch();
 		}
 		return 0;
 	}
@@ -383,7 +394,7 @@ namespace mango
 			break;
 		case PLAYING_IDB_PLAY:
 			mPlayinglist->playPauseOrStart();
-			ViewInit();
+			updatePlayButtonIcon();
 			break;
 		case PLAYING_IDB_MUSIC:
 			gPlayer.showMediaView();

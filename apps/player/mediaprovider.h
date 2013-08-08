@@ -1,10 +1,13 @@
 #include <sqlite3.h>
 #include "Id3info.h"
-#if 0
 #include "SkStream.h"
 #include "SkImageDecoder.h"
 #include "SkBitmap.h"
-#endif
+#include "SkGraphics.h"
+#include "SkColor.h"
+#include "SkTypes.h"
+#include "GraphicsJNI.h"
+
 
 namespace mango
 {	
@@ -45,7 +48,7 @@ namespace mango
 									duration INTEGER,\
 									inplay INTEGER\
 									);"
-
+	#define IMG_PATH "/mnt/sdcard/.album_img"
 
 	typedef struct
 	{
@@ -92,6 +95,7 @@ namespace mango
 		int del(char *table,int id);
 		virtual ~mediaprovider(void);
 		int checkfile();
+		void genImgPath(char *title,char *path);
 		int music_exsit_db(char *path);
 		static int str_to_int(char *arg);
 		static int power_operation(int ary,int th);
@@ -108,6 +112,16 @@ namespace mango
 			char path[255];
 			ScanInfo(){log_i("new ScanInfo")}
 	};
+#if 0
+	class SkiaTest{
+		
+		SkBitmap bp;
+		void decode(){
+			SkImageDecoder::DecodeFile("aa",&bp);
+		}
+		
+	};
+#endif
 extern mediaprovider gmediaprovider;
 
 };

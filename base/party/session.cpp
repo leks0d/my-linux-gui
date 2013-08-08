@@ -568,7 +568,13 @@ namespace mango
 		logo = (unsigned char*)new char[240*320*2];
 		int i;
 		FILE *fb;
-		fb  = fopen("/system/mango/bootlogo", "rb");
+		char *logopath = "/mnt/sdcard/img_12644"; 
+		//fb  = fopen("/system/mango/bootlogo", "rb");
+		fb  = fopen(logopath, "rb");
+		if(fb<=0){
+			memset(addr,0xFF,240*320*4);
+			return;
+		}
 		if(fread(logo,240*320*2,1,fb)==1){
 			unsigned short int *bmp = (unsigned short int *)logo;
 			unsigned int *buffer = (unsigned int *)(addr);
@@ -576,6 +582,7 @@ namespace mango
 				buffer[i]=rgb565To888(bmp[i]);
 			}
 		}
+		fclose(fb);
 	}
 	static int rgb565To888(int rgb){
 		int ret;

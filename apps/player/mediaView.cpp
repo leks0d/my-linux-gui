@@ -187,7 +187,8 @@ namespace mango
 		TCHAR	fileName[MAX_PATH];
 		int     fileAttribute;
 		File    file;
-
+		
+		
 		if (!file.findOpen(mCurrentPath)) {
 			log_e ("findOpen \n") ;
 			return ;
@@ -224,6 +225,10 @@ namespace mango
 
 	void MediaView::renewFillViewList()
 	{
+		if(isRootDirectory()){
+			initRootDirect();
+			return;
+		}
 		mListView->deleteAllItems();
 		fillDirectoryFile(mCurrentPath);
 		mListView->sort();
@@ -232,9 +237,22 @@ namespace mango
 		mTitle->setTextResoure(STR_FILE_LIST);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mTitle->invalidateRect();	
+		setMainState(0x1210);
+	}
+	void MediaView::initRootDirect(){
+		int img[]={IDP_DFLASH_ICON,IDP_DSDCARD_ICON,IDB_DUSBOTG_ICON};
+		int imgsec[]={IDP_DFLASH_ICON,IDP_DSDCARD_ICON,IDB_DUSBOTG_ICON};
+		int text[]={STR_D_FLASH,STR_D_SDCAR,STR_D_USBOTG};
+		int i,count = 3;
+		
+		if(mRootDirectListAdapter == NULL){
+			mListView->deleteAllItems();
+			mRootDirectListAdapter = new RootDirectListAdapter(mListView,ADAPTER_PLAYING);
+			mRootDirectListAdapter->setData(img,imgsec,text,count);
+		}else
+			mRootDirectListAdapter->refresh();
 		setMainState(0x1200);
 	}
-
 	void MediaView::initMainList(){
 		int img[]={IDP_PLAYING_LIST,IDP_FILE_LIST,IDP_ALL_MUSIC,IDP_ALBUM_LIST,IDP_ARTIST_LIST};
 		int til[]={STR_PLAYING_LIST,STR_FILE_LIST,STR_MUSIC_LIST,STR_ALBUM_LIST,STR_ARTIST_LIST};
@@ -452,7 +470,7 @@ namespace mango
 						case 0:
 							initPlayingList();	break;
 						case 1:
-							renewFillViewList(); break;
+							initRootDirect(); break;
 						case 2:
 							initMusicList();	break;
 						case 3:
@@ -482,6 +500,22 @@ namespace mango
 						case 0x1500:
 							initSpecMusicList("artist",mArtistAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->artist,0x1510);
 							break;
+						case 0x1200:{
+							switch(record->m_lvItem.iItem){
+								case 0:
+									String::copy(mCurrentPath, TEXT("/mnt/sdcard"));
+									log_i("lstrcmpi  /mnt/sdcard");
+									break;
+								case 1:
+									String::copy(mCurrentPath, TEXT("/mnt/external_sd"));
+									break;
+								case 2:
+									String::copy(mCurrentPath, TEXT("/mnt/usb_storage"));
+									break;
+							}
+							renewFillViewList();
+							break;
+						}
 							
 					}
 					break;

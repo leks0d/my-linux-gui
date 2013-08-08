@@ -1,6 +1,32 @@
 
 namespace mango
 {
+	class SettingListAdapter : public BaseAdapter
+	{
+	public:
+		SettingListAdapter(void){}
+		~SettingListAdapter(void){}
+		SettingListAdapter(ListView* list,int id);
+		void refresh();
+		void setData(int* img,int*imgsec,int* text,int count);
+		virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);
+		virtual int getCount(){return 0;}
+		virtual void* getItem(int index){return 0;}
+	public:
+		ListView* mlist;
+		int* mImgRes;
+		int* mSecImgRes;
+		int* mTextRes;
+		int mCount;	
+	};
+	class RootDirectListAdapter : public SettingListAdapter
+	{
+		public:
+			RootDirectListAdapter(void){}
+			~RootDirectListAdapter(void){}
+			RootDirectListAdapter(ListView* list,int id);
+			virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);
+	};
 
 	class PlayingListAdapter : public BaseAdapter
 	{
@@ -95,6 +121,7 @@ namespace mango
 		void insertFileToListView(UINT mask, TCHAR* name, int iconId, void* param,int itext = 0,int paramtype = 1);
 		bool isRootDirectory();
 		void backToParentDirectory();
+		void initRootDirect();
 		void initMainList();
 		void initPlayingList();
 		void initMusicList();
@@ -113,6 +140,7 @@ namespace mango
 		Button* mHome;
 		ImageView* mTitleImageView;
 		PlayingListAdapter* mPlayingListAdapter;
+		RootDirectListAdapter* mRootDirectListAdapter;
 		MusicAdapter* mMusicAdapter;
 		AlbumAdapter* mAlbumAdapter;
 		ArtistAdapter* mArtistAdapter;

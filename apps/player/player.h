@@ -81,7 +81,7 @@ namespace mango
 				mMutex.lock();
 				
 				if(isSet == 1){
-					now = (unsigned int)Time::getMillisecond() - 350;
+					now = (unsigned int)Time::getMillisecond() - 500;
 					log_i("setPlayerSwitch lastTime=%d,now=%d",lastTime,now);
 					if(now>=lastTime){
 						ret = 1;
@@ -103,6 +103,34 @@ namespace mango
 			}
 	};
 
+	class FileAttr{
+		public:
+		char *path;
+		
+		FileAttr(){
+			path = NULL;
+		}
+		FileAttr(char *str){
+			int len = strlen(str);
+			path = new char[len+1];
+			memcpy(path,str,len+1);
+		}
+		~FileAttr(){
+			delete path;
+		}
+		int isExist(){
+			if(path == NULL)
+				return 0;			
+			return access(path,F_OK) == 0;
+		}
+		static int FileExist(char *str){
+			if(str == NULL)
+				return 0;
+			return access(str,F_OK) == 0;
+
+		}
+	};
+	
 	class Player: public Party
 	{
 	public:
@@ -131,7 +159,9 @@ namespace mango
 		void setPowerState();
 		void ioctrlBrightness(int cmd,int* brightness);
 		void holdKeyProbe();
+		void spdifProbe();
 		bool isSpdifIn();
+		bool isHeadestIn();
 		void openCodecPower(bool enable);
 
 	public:
@@ -152,6 +182,7 @@ namespace mango
 		SocketDetect *mSocketDetect;
 		UsmConnectView *mUsmConnectView;
 		PlayerSwitch *mSpdifSwitch;
+		PlayerSwitch *mHeadestSwitch;
 	};
 
 	extern Player  gPlayer;

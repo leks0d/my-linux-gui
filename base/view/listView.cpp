@@ -823,15 +823,13 @@ namespace mango
 		lvitem = &(record->m_lvItem) ;
 
 		rect.offset(mZonePoint.x, mZonePoint.y);
-
-
 		
 		if (record == mSelectedRecord){
 			if(mPressItemBackground>0)
-				canvas.drawImageResource(mPressItemBackground, 5, rect.top);
+				canvas.drawImageResource(mPressItemBackground, 12, rect.top);
 		}else{
 			if(mItemBackground>0)
-				canvas.drawImageResource(mItemBackground, 5, rect.top,false);			
+				canvas.drawImageResource(mItemBackground, 12, rect.top,false);			
 		}
 		canvas.setTextColor(RGB (255, 255, 255)) ;
 		
@@ -873,9 +871,9 @@ namespace mango
 			y  = (rect.bottom - rect.top - mLayoutList.m_sizeItemIcon.cy) / 2 ;
 			y += rect.top ;
 			if(lvitem->mask & LVIF_TEXT)
-				canvas.drawImageResource(lvitem->iImage, 10, rect.top+5);
+				canvas.drawImageResource(lvitem->iImage, 17, rect.top+5);
 			else
-				canvas.drawImageResource(lvitem->iImage, 90, y);
+				canvas.drawImageResource(lvitem->iImage, 97, y);
 			rect.left += mLayoutList.m_sizeItemIcon.cx ;
 		}
 
@@ -916,7 +914,7 @@ namespace mango
 		else if (lvitem->mask & LVIF_TEXT)
 		{
 			rect.right -= 8 ;
-			rect.left = 48;
+			rect.left = 55;
 			canvas.drawText(lvitem->pszText, -1, rect, DT_VCENTER | DT_END_ELLIPSIS);
 		}
 

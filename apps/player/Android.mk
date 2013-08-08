@@ -2,6 +2,7 @@
 #
 
 LOCAL_PATH := $(call my-dir)
+MY_ANDROID_SOURCE:=/home/liuwenlong/t80/android
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := libParticle-prebuild
@@ -31,10 +32,7 @@ include $(PREBUILT_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 LOCAL_ARM_MODE := arm
 
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../include\
-										$(LOCAL_PATH)/ffmpeg/include\
-										$(LOCAL_PATH)/skia/include/core\
-										$(LOCAL_PATH)/skia/include/images
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../include
 
 LOCAL_MODULE    := MangoPlayer
 LOCAL_SRC_FILES := player.cpp
@@ -61,13 +59,23 @@ LOCAL_SRC_FILES += UsmConnectView.cpp
 LOCAL_SRC_FILES += SdcardInsertView.cpp
 LOCAL_SRC_FILES += MediaScannerView.cpp
 
+LOCAL_CPPFLAGS:=\
+-I $(MY_ANDROID_SOURCE)/frameworks/base/core/jni/android/graphics\
+-I $(MY_ANDROID_SOURCE)/external/skia/include/core\
+-I $(MY_ANDROID_SOURCE)/external/skia/include/images\
+-I $(MY_ANDROID_SOURCE)/frameworks/base/include\
+-I $(MY_ANDROID_SOURCE)/system/core/include\
+-I $(LOCAL_PATH)/ffmpeg/include
+
 LOCAL_SHARED_LIBRARIES := libParticle-prebuild
 LOCAL_SHARED_LIBRARIES += libParticleOmxil-prebuild
 LOCAL_SHARED_LIBRARIES += libParticleOmxal-prebuild
 LOCAL_SHARED_LIBRARIES += libFFmpegForId3-prebuild
-#LOCAL_SHARED_LIBRARIES += libskia-prebuild
+LOCAL_SHARED_LIBRARIES += libskia-prebuild
 
-LOCAL_LDLIBS :=  -llog -lcutils -licuuc -licui18n -lutils -lsqlite
+LOCAL_LDLIBS :=  -llog -lcutils -licuuc -licui18n -lutils -lsqlite -L/home/liuwenlong/backup/lib
+
+
 LOCAL_STATIC_LIBRARIES := Mango
 
 

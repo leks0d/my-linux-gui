@@ -27,7 +27,7 @@ namespace mango
 	int Player::main()
 	{
 		int i,ret;
-		wakeLock();
+		//wakeLock();
 		initialize();
 		gSettingProvider.initialize();
 		initSettings();
@@ -38,6 +38,7 @@ namespace mango
 		mPlayinglist = new Playinglist();
 		mPlayinglist->initPlayintList();
 		mSpdifSwitch = new PlayerSwitch();
+		mHeadestSwitch = new PlayerSwitch();
 		mPlayerEventInterface = new PlayerEventInterface();
 		gSession.setUseEventInterface((UseEventInterface*)mPlayerEventInterface);
 
@@ -412,6 +413,21 @@ namespace mango
 		log_i("spdif Player::isSpdifIn state=%d",state);
 		return state?false:true;
 	}
+	bool Player::isHeadestIn(){
+		int fd=0,state;
+		char* path = "/sys/class/axppower/holdkey";
+		char rbuf;
+		
+		fd = open(path,O_RDWR, 0);
+		
+		read(fd,&rbuf,1);
+		
+		state = rbuf&0x40;
+		
+		close(fd);
+		log_i("spdif Player::isHeadestIn state=%d",state);
+		return state?false:true;
+	}
 	void Player::openCodecPower(bool enable){
 		int fd=0,state,volume;
 		char* path = "/sys/class/codec/power";
@@ -456,6 +472,8 @@ namespace mango
 			gPlayer.holdKeyProbe();
 		}else if(keyCode == KEYCODE_SPIDF&& action == VM_KEYDOWN){
 			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,NM_SPIDF,keyCode);
+		}else if(keyCode == KEYCODE_HEADEST&& action == VM_KEYDOWN){
+			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,NM_HEADEST,keyCode);
 		}
 		
 		if(action!=VM_CAPACITY&&gPowerManager!=NULL)

@@ -1,5 +1,5 @@
 #include "player.h"
-
+#define DECODE_IMG 0
 
 namespace mango
 {
@@ -160,6 +160,26 @@ namespace mango
 		strlwr(type);
 		return type;
 	}
+	static void getFileTitle(char *file,char *title){
+		char *temp;
+		int i,len;
+		
+		len = strlen(file);
+		temp = new char[len+1];
+		
+		memcpy(temp,file,len+1);
+
+		for(i=len; i>=0; i--){
+			if(temp[i] == '.'){
+				temp[i] = '\0';
+				break;
+			}
+		}
+		memcpy(title,temp,i+1);
+		delete temp;
+		log_i("getFileTitle title=%s",title);
+	}
+	
 	static int ismusic(char *file)
 	{
 		char *type;
@@ -294,23 +314,92 @@ namespace mango
 		if (m_id3.GetTags(METADATA_KEY_DURATION, value)){
 			info->duration = str_to_int(value);
 		}
-#if 0
+#if 1
 		if(m_id3.PicValid() >= 0)//save picture
 		{
+			log_i("m_id3.PicValid() m_id3.piclength=%d",m_id3.piclength);
+			
 			if(m_id3.piclength > 0){
+				char *imgPath,*fileTitle;
+#if DECODE_IMG
 				SkBitmap *skBitmap;
-				skBitmap = new SkBitmap();
-		        char *data = (char *)malloc(m_id3.piclength + 4);
-		        *(int *)data = m_id3.piclength;
-		        memcpy(&data[4], m_id3.picdata, m_id3.piclength);
-				bool ret = SkImageDecoder::DecodeMemory(&data[4],m_id3.piclength,skBitmap);
+				
+				skBitmap = new SkBitmap();	
+				
+				bool ret = SkImageDecoder::DecodeMemory(m_id3.picdata,m_id3.piclength,skBitmap,
+					SkBitmap::kRGB_565_Config,SkImageDecoder::kDecodePixels_Mode);
+			
+				if(ret){		
+					log_i("skBitmap->width()=%d,skBitmap->height()=%d",skBitmap->width(),skBitmap->height());
+					int len = skBitmap->width()*skBitmap->height()*skBitmap->bytesPerPixel();
+#else
+					int len = m_id3.piclength;
+#endif						
+					FILE *fb;
+
+					imgPath = new char[255];
+					fileTitle = new char[strlen(info->name)];
+					
+					getFileTitle(info->name,fileTitle);
+					genImgPath(fileTitle,imgPath);
+					
+					
+					fb = fopen(imgPath, "wb");
+					if(fb>0){
+#if DECODE_IMG							
+						int ret = fwrite((unsigned char *)skBitmap->getPixels(),1,len,fb);
+#else
+						int ret = fwrite((unsigned char *)m_id3.picdata, 1, m_id3.piclength, fb);
+#endif						
+						if(ret == len){
+							int pathlen = strlen(imgPath);
+							info->img_path = new char[pathlen+1];
+							memcpy(info->img_path,imgPath,pathlen+1);
+							log_i("album img save sucess.");
+						}else
+							log_i("fwrite fail,ret=%d",ret);
+						
+						fclose(fb);
+					}else{
+						log_i("fopen %s fail.",imgPath);
+					}
+
+					
+					delete imgPath;
+					delete fileTitle;
+#if DECODE_IMG					
+				}else{
+					log_i("SkImageDecoder::DecodeMemory fail.");
+				}
+#endif				
 			}
+		}else{
+			log_i("m_id3 not PicValid()");
 		}
 #endif
 		return 0;
 	}
 
-	
+	void mediaprovider::genImgPath(char *title,char *path)
+	{	
+		int inf = 0;
+		unsigned int ti;
+		char *ptr;
+		
+		ti = (unsigned int)Time::getMillisecond();
+		ptr = path;
+
+		while(1){
+			sprintf(ptr,"%s/%s_%d_%d",IMG_PATH,title,ti,inf);
+			if(FileAttr::FileExist(path)){
+				inf++;
+				memset(ptr,0,strlen(ptr));
+			}else{
+				log_i("genImgPath:%s",path);
+				break;
+			}
+		}
+	}
 	
 	int mediaprovider::filescanner(char *path)
 	{	
@@ -368,12 +457,29 @@ namespace mango
 			//log_i("checkfile exsit:%s",infolist[i].path);
 			if(access(infolist[i].path,F_OK) != 0){
 				int id = infolist[i].id;
+				
+				int ret = remove(infolist[i].img_path);
+				if(ret == 0){
+					log_i("remove path sucess:%s",infolist[i].img_path);
+				}else{
+					log_i("remove path fail:%s",infolist[i].img_path);
+				}
+				
 				del("music",id);
 				log_i("del file in db:%s",infolist[i].path);				
 			}
 		}
 		if(count>0)
 			free(infolist);
+
+		if(!FileAttr::FileExist(IMG_PATH)){
+			
+			if(mkdir(IMG_PATH,0777)){
+				log_i("Create file fail:%s",IMG_PATH);
+			}else
+				log_i("Create file sucess:%s",IMG_PATH);
+		}else
+			log_i("FileExist:%s",IMG_PATH);
 		
 		return 0;
 	}
