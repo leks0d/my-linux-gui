@@ -554,26 +554,23 @@ namespace mango
 			case 0x1000:
 				gPlayer.showPlayingView();
 				break;
-			case 0x1200:
-				if (!isRootDirectory())
-					backToParentDirectory();
-				else
-					initMainList();
-					break;
-						case 0x1100:
-						case 0x1300:
-						case 0x1400:
-						case 0x1500:	
-							initMainList();
-							break;
-						case 0x1410:
-							initAlbumList();
-							break;
-						case 0x1510:
-							initArtistList();
-							break;
-		
-					}				
+			case 0x1210:
+				backToParentDirectory();
+				break;
+			case 0x1200:	
+			case 0x1100:
+			case 0x1300:
+			case 0x1400:
+			case 0x1500:	
+				initMainList();
+				break;
+			case 0x1410:
+				initAlbumList();
+				break;
+			case 0x1510:
+				initArtistList();
+				break;
+		}				
 
 	}
 

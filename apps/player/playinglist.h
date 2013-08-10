@@ -46,9 +46,9 @@ namespace mango
 			void moveToPosition(int pos);
 			int moveRandom();		
 			int startPlay();
-			int startPlayPosition(int mesc,bool needstart);
+			int startPlayPosition(int mesc,bool needStart,bool needGapless);
 			void playNext();
-			void playPrev(){if(moveToPrev())startPlay();}
+			void playPrev();
 			void checkPlayintList();
 			void savePlayintList();
 			void playPauseOrStart();

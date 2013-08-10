@@ -131,6 +131,11 @@ namespace mango
 	{
 		rect = mRect;
 	}
+	
+	void View::setRect(Rect &rect)
+	{
+		mRect = rect;
+	}
 
 
 	int View::onKeyDown(int keyCode, int flag)

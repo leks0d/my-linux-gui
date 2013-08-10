@@ -718,13 +718,13 @@ namespace mango
 		if (gSession.mScreen.mYOffset)
 		{
 			gSession.mScreen.mYOffset = 0;
-			//memset((unsigned char*)mSurface[0].mBits, 0x0, SCREEN_BUFFER_BYTES);
+			memset((unsigned char*)mSurface[0].mBits, 0x0, SCREEN_BUFFER_BYTES);
 			mStockGraphic.mBitmap.setBits(mSurface[0].mBits);
 		}
 		else
 		{
 			gSession.mScreen.mYOffset = 240;
-			//memset((unsigned char*)mSurface[1].mBits, 0x0, SCREEN_BUFFER_BYTES);
+			memset((unsigned char*)mSurface[1].mBits, 0x0, SCREEN_BUFFER_BYTES);
 			mStockGraphic.mBitmap.setBits(mSurface[1].mBits);
 			
 		}

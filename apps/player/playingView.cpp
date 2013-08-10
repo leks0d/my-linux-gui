@@ -1,5 +1,6 @@
 #include "player.h"
 
+
 namespace mango
 {
 
@@ -10,7 +11,8 @@ namespace mango
 
 	PlayingView::PlayingView(const TCHAR* title, View* parent, Rect* rect, int style, int show)
 		: View(title, parent, rect, style, show)
-	{
+	{	
+		mMSkBitmap = new MSkBitmap();
 	}
 
 
@@ -43,16 +45,18 @@ namespace mango
 		mPlayButton->setPressedImageId(IDP_PLAYING_PLAY_ACTIVE);
 		mPlayButton->onCreate();
 
-		rect.setEx(127, 32, 100, 20);
-		mAudioInfo = new TextView(PLAYING_IDB_MUSIC_NAME, TEXT("mAudioInfo"), this, &rect, 0);
-		mAudioInfo->setTextColor(COLOR_GRAY);
-		mAudioInfo->setTextSize(15);
+
 
 		rect.setEx(280, 30, 40, 22);
 		mPlayModeButton = new Button(PLAYING_IDB_PLAY_MODE, TEXT("mPlayModeButton"), this, &rect, 0);
 				
-		rect.setEx(6, 30, 110, 110);
+		rect.setEx(6, 30, 109, 109);
 		mAlbumImage = new ImageView(PLAYING_IDB_ALBUM_IMAGE, TEXT("mAlbumImage"), this, &rect, 0);
+
+		rect.setEx(127, 32, 100, 20);
+		mAudioInfo = new TextView(PLAYING_IDB_MUSIC_NAME, TEXT("mAudioInfo"), this, &rect, 0);
+		mAudioInfo->setTextColor(COLOR_GRAY);
+		mAudioInfo->setTextSize(15);
 
 		rect.setEx(127, 55, 190, 25);
 		mMusicName = new TextView(PLAYING_IDB_MUSIC_NAME, TEXT("mMusicName"), this, &rect, 0);
@@ -81,17 +85,17 @@ namespace mango
 		mVolumeText->setTextLayoutType(TEXT_LAYOUT_LEFT);
 		mVolumeText->onCreate();
 		
-		rect.setEx(255, 0, 28, 19);
+		rect.setEx(280, 2, 320-285, 19);
 		mBatteryIcon = new  ImageView(-1, TEXT("mBatteryIcon"), this, &rect, 0);
-		mBatteryIcon->setImageResoure(IDP_BATTERY_ICON);
+		mBatteryIcon->setImageResoure(IDP_BATTERY_0);
 		mBatteryIcon->onCreate();
-		
+		/*
 		rect.setEx(283, 0, 35, 19);		
 		mBatteryText = new  TextView(-1, TEXT("mBatteryText"), this, &rect, 0);
 		mBatteryText->setTextColor(RGB(255,255,255));
 		mBatteryText->setTextSize(13);
 		mBatteryText->setTextLayoutType(TEXT_LAYOUT_LEFT);
-		mBatteryText->onCreate();
+		mBatteryText->onCreate();*/
 		
 		rect.setEx(0, 140, 307, 20);		
 		mSeekBar = new  SeekBar(-1, TEXT("mSeekBar"), this, &rect, 0);
@@ -139,7 +143,7 @@ namespace mango
 		mediainfo* currentinfo;
 		
 		currentinfo = mPlayinglist->getPlayingItem();
-		
+	//	currentinfo = mPlayinglist->getItem(8);
 		mstr = new Mstring(10);
 		mstr->mSprintf("%d",gPlayer.getVolume());
 		mVolumeText->setTextString(mstr->mstr);
@@ -151,8 +155,77 @@ namespace mango
 		}
 		
 		mCurrentInfo = *currentinfo;
-		
-		mAlbumImage->setImageResoure(IDP_DEFAULT_ALBUM_ICON);
+		if(strcmp(currentinfo->img_path,"(null)") == 0){
+			mMSkBitmap->release();
+		}else{
+			SkBitmap skBitmap,*pskBitmap;
+			SkCanvas *skCanvas;
+		    pskBitmap = new SkBitmap();
+		    pskBitmap->setConfig(SkBitmap::kARGB_8888_Config,129,129);
+		    pskBitmap->allocPixels();//分配位图所占空间			
+			bool ret = SkImageDecoder::DecodeFile(currentinfo->img_path,&skBitmap,SkBitmap::kARGB_8888_Config,SkImageDecoder::kDecodePixels_Mode);			
+			if(ret){
+				log_i("skBitmap->width()=%d,skBitmap->height()=%d",skBitmap.width(),skBitmap.height());
+				skCanvas = new SkCanvas(*pskBitmap);
+				
+				SkIRect srcRect;
+				SkRect dstRect;
+				srcRect.set(0,0,skBitmap.width(),skBitmap.height());
+				CalculateSize(skBitmap.width(),skBitmap.height(),109,109,dstRect);
+
+				log_i("dstRect:L=%f,T=%f,R=%f,B=%f",dstRect.left(),dstRect.top(),dstRect.right(),dstRect.bottom());
+
+				skCanvas->drawBitmapRect(skBitmap,&srcRect,dstRect);
+				/*
+				SkPaint paint;
+				paint.setColor(ARGB(255,255,0,0));
+				skCanvas->drawLine(0,0,0,109,paint);
+				paint.setColor(ARGB(255,0,255,0));
+				skCanvas->drawLine(10,0,10,109,paint);
+				paint.setColor(ARGB(255,0,0,255));
+				skCanvas->drawLine(20,0,20,109,paint);
+				*/
+				skCanvas->restore();
+				mMSkBitmap->create((int *)pskBitmap->getPixels(),pskBitmap->width(),pskBitmap->height());
+			}else{
+				log_i("DecodeFile fail path=%s",currentinfo->img_path);
+				mMSkBitmap->release();
+			}
+		}
+
+		mAlbumImage->setMSkBitmap(mMSkBitmap);
+
+		if(mMSkBitmap->isVaild()){
+			Rect rect;
+			int left = 127;
+			
+			rect.setEx(left, 32, 100, 20);
+			mAudioInfo->setRect(rect);
+			
+			rect.setEx(left, 55, 190, 25);
+			mMusicName->setRect(rect);
+
+			rect.setEx(left, 85, 190, 20);
+			mArtist->setRect(rect);
+
+			rect.setEx(left, 105, 190, 20);
+			mAlbum->setRect(rect);
+		}else{
+			Rect rect;
+			int left = 10;
+			
+			rect.setEx(left, 32, 100, 20);
+			mAudioInfo->setRect(rect);
+			
+			rect.setEx(left, 55, 320-left, 25);
+			mMusicName->setRect(rect);
+
+			rect.setEx(left, 85, 320-left, 20);
+			mArtist->setRect(rect);
+
+			rect.setEx(left, 105, 320-left, 20);
+			mAlbum->setRect(rect);
+		}
 		
 		mMusicName->setTextString(currentinfo->name);
 
@@ -181,6 +254,36 @@ namespace mango
 		mSeekBarUpdateThread.create(PlayingView::SeekBarRunnig, this);
 	}
 
+	void PlayingView::CalculateSize(float srcw,float srch,float dstw,float dsth,SkRect &rect){
+		float scaleX,scaleY,scale;
+		float w,h,l,t;
+		
+		scaleX = dstw/srcw;
+		//log_i("dstw=%f,srcw=%f,scaleX=%f",dstw,srcw,scaleX);
+		
+		scaleY = dsth/srch;
+		//log_i("dsth=%f,srch=%f,scaleY=%f",dsth,srch,scaleY);
+		
+		scale = min(scaleX,scaleY);
+		//log_i("scaleX=%f,scaleY=%f,scale=%f",scaleX,scaleY,scale);
+		
+		w = srcw*scale;
+		h = srch*scale;
+
+		//log_i("scaleX=%f,scaleY=%f,scale=%f",scaleX,scaleY,scale);
+
+		
+		if(w<dstw)
+			l = (dstw - w)/2;
+		else
+			l = 0;
+		
+		if(h<dsth)
+			t = (dsth - h)/2;
+		else
+			t = 0;
+		rect.set(l,t,l+w,t+h);
+	}
 	void PlayingView::updatePlayMode(){
 		int playmode;
 		int playModeNormalRes[4] = {IDP_PLAYMODE_0,IDP_PLAYMODE_1,IDP_PLAYMODE_2,IDP_PLAYMODE_3};
@@ -304,14 +407,33 @@ namespace mango
 			}
 		}else if(code == NM_BATTERY_UPDATE){
 			int val = (unsigned int)parameter;
+			int batteryIcon = IDP_BATTERY_0;
 			bool isSpdifIn;
 			bool isHeadestIn;
 			if(mBattery != val && isNeedFresh){
+				/*
 				Mstring* mstr;	
 				mstr = new Mstring(10);
 				mstr->mSprintf("%d%%",(unsigned int)parameter);
 				mBatteryText->setTextString(mstr->mstr);
 				mstr->clear();
+				*/
+				if(val<5)
+					batteryIcon = IDP_BATTERY_0;
+				else if(val<15)
+					batteryIcon = IDP_BATTERY_10;
+				else if(val<30)
+					batteryIcon = IDP_BATTERY_20;
+				else if(val<50)
+					batteryIcon = IDP_BATTERY_40;
+				else if(val<70)
+					batteryIcon = IDP_BATTERY_60;
+				else if(val<95)
+					batteryIcon = IDP_BATTERY_80;
+				else
+					batteryIcon = IDP_BATTERY_100;
+				
+				mBatteryIcon->setImageResoure(batteryIcon);
 				mBattery = val;
 			}
 			if(gPlayer.mSpdifSwitch->isToSwicth()){

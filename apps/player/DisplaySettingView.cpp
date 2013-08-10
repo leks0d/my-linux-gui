@@ -55,7 +55,7 @@ namespace mango
 		mDisplayIcon->setImageResoure(IDP_ADVANCE_DISPLAY);
 		mDisplayIcon->onCreate();
 
-		rect.setEx(165, 100, 22, 22);
+		rect.setEx(165, 100, 30, 22);
 		mBrightnessValue = new TextView(SETTING_TITLE, TEXT("mTitle"), this, &rect, 0);
 		mBrightnessValue->setTextColor(RGB(255,255,255));
 		mBrightnessValue->onCreate();

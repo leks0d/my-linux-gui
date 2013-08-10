@@ -67,7 +67,10 @@ namespace mango
 			mMSkBitmap->release();
 		mMSkBitmap->create(bit,w,h);
 	}
-	
+
+	void ImageView::setMSkBitmap(MSkBitmap *bitmap){
+		mMSkBitmap = bitmap;
+	}
 };
 
 

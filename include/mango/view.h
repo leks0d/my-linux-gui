@@ -72,6 +72,7 @@ namespace mango
 		virtual TCHAR* getTitle();
 
 		virtual void  getRect(Rect &rect);
+		virtual void  setRect(Rect &rect);
 
 		virtual int onKeyDown(int keyCode, int flag);
 		virtual int onKeyUp(int keyCode, int flag); 

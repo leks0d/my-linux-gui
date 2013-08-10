@@ -1,3 +1,11 @@
+#include "SkStream.h"
+#include "SkImageDecoder.h"
+#include "SkBitmap.h"
+#include "SkCanvas.h"
+#include "SkDevice.h"
+#include "SkPaint.h"
+#include "SkRect.h"
+
 namespace mango
 {
 	class PlayingView: public View
@@ -10,6 +18,7 @@ namespace mango
 		void updatePlayMode();
 		void updatePlayButtonIcon();
 		void updateAudioInfo();
+		void CalculateSize(float srcw,float srch,float dstw,float dsth,SkRect &rect);
 		virtual ~PlayingView(void);
 		virtual int onCreate();
 		virtual int onDestroy();
@@ -41,7 +50,7 @@ namespace mango
 		TextView* mAlbum;
 		
 		SeekBar* mSeekBar;
-		
+		MSkBitmap *mMSkBitmap;
 		Thread mSeekBarUpdateThread;
 		int isNeedFresh;
 		int mVolume;

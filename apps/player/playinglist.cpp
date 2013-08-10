@@ -116,7 +116,7 @@ static const char *PlayerLock = "playerlock";
 				else if(p<0)
 					mCurrent = len - 1;
 				else
-					mCurrent = 0;
+					mCurrent = p;
 
 				return 1;
 			}
@@ -167,7 +167,11 @@ static const char *PlayerLock = "playerlock";
 				if(ret)
 					startPlay();
 			}
-			
+			void Playinglist::playPrev(){
+				int ret;
+				if(moveToPrev())
+				startPlay();
+			}			
 			mediainfo* Playinglist::getPlayingItem(){
 				if(mCurrent<len)
 					return &mplaylist[mCurrent];
@@ -199,40 +203,35 @@ static const char *PlayerLock = "playerlock";
 			}
 
 			int Playinglist::startPlay(){
-				if(mParticleplayer == NULL){
-					mParticleplayer = particle::createMediaPlayer();
-					mParticleplayer->setEventCallback(Playinglist::playerCallback,(void *)this);
-					PlayerInit();	
-				}
-				if(mGapless>0&&mParticleplayer!=NULL&&mParticleplayer->setNextSongForGapless(getPlayingItem()->path)){
-					if(mParticleplayer->gaplessPlay(getPlayingItem()->path)){log_i("gaplessPlay() success!");}
-					else{log_i("gaplessPlay() fail!");}
-				}else if(mParticleplayer!=NULL){
-					if(mParticleplayer->stop()){log_i("stop() success!");}else{log_i("stop() fail!");return -1;}
-					if(mParticleplayer->setSource(getPlayingItem()->path)){log_i("setSource() success!");}else{log_i("setSource() fail!");return -1;}
-					if(mParticleplayer->prepare()){log_i("prepare() success!");}else{log_i("prepare() fail!");return -1;}
-					if(mParticleplayer->start()){log_i("start() success!");}else{log_i("start() fail!");return -1;}
-				}
-				getPlayingItem()->inPlay = 1;
-				setWakeLock();
-				log_i("Playinglist::startPlay %d/%d:%s",mCurrent,len,getPlayingItem()->path);
+				startPlayPosition(0,true,true);
 			}
 			
-			int Playinglist::startPlayPosition(int mesc,bool needstart){
+			int Playinglist::startPlayPosition(int mesc,bool needStart,bool needGapless){
 				if(mParticleplayer == NULL){
 					mParticleplayer = particle::createMediaPlayer();
 					mParticleplayer->setEventCallback(Playinglist::playerCallback,(void *)this);
 					PlayerInit();
 				}
-				if(mParticleplayer!=NULL){
+				
+				char *playPath = getPlayingItem()->path;
+				
+				log_i("Playinglist::startPlayPosition needStart=%d, %d/%d:%s",needStart,mCurrent,len,playPath);
+				
+				if(needGapless&&mGapless>0&&mParticleplayer!=NULL&&mParticleplayer->setNextSongForGapless(playPath)){
+					
+					if(mParticleplayer->gaplessPlay(playPath)){log_i("gaplessPlay() success!");}
+					else{log_i("gaplessPlay() fail!");}
+					
+				}else if(mParticleplayer!=NULL){
+				
 					if(mParticleplayer->stop()){log_i("stop() success!");}else{log_i("stop() fail!");return -1;}
-					if(mParticleplayer->setSource(getPlayingItem()->path)){log_i("setSource() success!");}else{log_i("setSource() fail!");return -1;}
+					if(mParticleplayer->setSource(playPath)){log_i("setSource() success!");}else{log_i("setSource() fail!");return -1;}
 					if(mParticleplayer->prepare()){log_i("prepare() success!");}else{log_i("prepare() fail!");return -1;}
 					//if(mParticleplayer->seekTo(mesc)){log_i("seekTo() success!");}else{log_i("seekTo() fail!");return -1;}
-					if(needstart)
+					if(needStart)
 						if(mParticleplayer->start()){log_i("start() success!");}else{log_i("start() fail!");return -1;}
 				}
-				log_i("Playinglist::startPlayPosition start=%d, %d/%d:%s",needstart,mCurrent,len,getPlayingItem()->path);
+				
 			}
 			
 			int Playinglist::isItemExsit(mediainfo *info){
@@ -292,7 +291,7 @@ static const char *PlayerLock = "playerlock";
 						mParticleplayer->enableSpdifOut(isSpdif);
 						if(!isSpdif && (isPlaying()||inPause)){
 							playPostion = mParticleplayer->getCurrentPosition();
-							startPlayPosition(playPostion,inPause?false:true);
+							startPlayPosition(playPostion,inPause?false:true,false);
 						}
 					}
 				}

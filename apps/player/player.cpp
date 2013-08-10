@@ -51,6 +51,7 @@ namespace mango
 		
 		mSocketDetect = new SocketDetect();
 		mSocketDetect->setPlayerEventInterface((UseEventInterface*)mPlayerEventInterface);
+		
 		ret = mSocketDetect->SocketInit();
 		if(ret>0){log_i("mSocketDetect->SocketInit() sucess!");}else{log_i("mSocketDetect->SocketInit() fail.ret=%d",ret);}
 		

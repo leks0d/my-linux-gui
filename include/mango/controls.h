@@ -90,6 +90,7 @@ namespace mango
 			void setImageResoure(int Id);
 			void setImagePath(char* path);
 			void setSkBitmap(int *bit,int w,int h);
+			void setMSkBitmap(MSkBitmap *bitmap);
 			virtual int onPaint(Canvas& canvas);
 		private:
 			char *mImagePath;
