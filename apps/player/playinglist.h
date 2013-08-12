@@ -73,6 +73,7 @@ namespace mango
 			void AudioEqualizerEnable(int enable);
 			void seekTo(int n){if(mParticleplayer!=NULL)	mParticleplayer->seekTo(n);}
 			void stopPlayer(){if(mParticleplayer!=NULL)	mParticleplayer->stop();}
+			void stopForSdcardEject();
 			void setPauseToStart(){ if(inPause&&mParticleplayer != NULL){mParticleplayer->start();inPause = 0;} }
 			void setPlayPause();
 			static void playerCallback(void* calldata, int evnet, int param0, int param1);

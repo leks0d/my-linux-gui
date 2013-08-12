@@ -38,6 +38,7 @@ namespace mango
 		VM_COMMAND,
 		VM_NOTIFY,
 		VM_CAPACITY,
+		VM_CHAGER,
 		VM_MEDIA,
 	} ;
 

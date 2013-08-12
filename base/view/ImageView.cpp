@@ -57,6 +57,8 @@ namespace mango
 			resId = id;
 			ResType = 1;
 			invalidateRect();
+		}else{
+			ResType = -1;
 		}
 	}
 

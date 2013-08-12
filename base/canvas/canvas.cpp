@@ -226,6 +226,20 @@ namespace mango
 		return success;
 
 	}
+	bool Canvas::drawBitmapRGB(int* colors, int x, int y, int width, int height)
+	{
+		int i,count;
+		count = width*height;
+		for(i = 0;i<count;i++){
+			int r = colors[i]&0x00FF0000;
+			int b = colors[i]&0x000000FF;
+			
+			colors[i] = (colors[i]&0xFF00FF00) | (r>>16) | (b<<16);
+		}
+		drawBitmap(colors,x,y,width,height);
+		return true;
+	}
+
 	bool Canvas::drawBitmap(int* colors, int x, int y, int width, int height)
 	{
 		Rect	rcBmp, rcClip ;

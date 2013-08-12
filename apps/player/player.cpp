@@ -37,9 +37,12 @@ namespace mango
 		holdKeyProbe();
 		spdifProbe();
 		gmediaprovider.initialize();
-
+		
 		mPlayinglist = new Playinglist();
 		mPlayinglist->initPlayintList();
+
+		mango::Thread::sleep(1000 * 3);
+		
 		mSpdifSwitch = new PlayerSwitch();
 		mHeadestSwitch = new PlayerSwitch();
 		mPlayerEventInterface = new PlayerEventInterface();
@@ -271,9 +274,12 @@ namespace mango
 		}
 		if (mShutDownView){
 			mShutDownView->invalidateRect();
-			mShutDownView->setFocus();
-			reboot(RB_POWER_OFF);			
+			mShutDownView->setFocus();		
 		}
+		mPlayinglist->stopPlayer();
+		mPlayinglist->savePlayintList();
+		mango::Thread::sleep(1000 * 6);
+		reboot(RB_POWER_OFF);		
 	}
 	void Player::dismissView(View *view){
 		View *displayView;
@@ -464,7 +470,7 @@ namespace mango
 	int PlayerEventInterface::onKeyDispatch(int keyCode,int action, int flag){
 		//log_i("PlayerEventInterface::onKeyDispatch keyCode=%d,action=%d",keyCode,action);
 		if((keyCode == KEYCODE_VOLUMEUP||keyCode == KEYCODE_VOLUMEDOWN)&& action == VM_KEYDOWN){
-			gMessageQueue.post(gPlayer.mPlayingView,VM_COMMAND,PLAYING_SHOW_VOLUME,NULL);
+			gMessageQueue.post(gPlayer.mPlayingView,VM_COMMAND,PLAYING_SHOW_VOLUME,keyCode);
 		}else if(keyCode == KEYCODE_PREV&& action == VM_KEYDOWN){
 			gMessageQueue.post(gPlayer.mPlayingView,VM_COMMAND,PLAYING_IDB_PREV,NULL);
 		}else if(keyCode == KEYCODE_NEXT&& action == VM_KEYDOWN)
@@ -478,7 +484,7 @@ namespace mango
 		}else if(keyCode == KEYCODE_SHORT_POWER&&action == VM_KEYUP){
 			if(gPowerManager!=NULL)
 				gPowerManager->setPowerState();
-		}else if(keyCode == KEYCODE_LONG_POWER&&action == VM_KEYUP){
+		}else if(keyCode == KEYCODE_LONG_POWER&&action == VM_KEYDOWN){
 			gPlayer.showShutDownView();
 		}else if(action == VM_MEDIA){
 			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,keyCode,0);
@@ -509,7 +515,7 @@ namespace mango
 int main (int argc, char* argv[])
 {
 #ifndef WIN32
-	//mango::Thread::sleep(1000 * 6);
+	//mango::Thread::sleep(1000 * 3);
 #endif
 	return mango::gPlayer.main();
 }

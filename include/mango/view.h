@@ -46,10 +46,12 @@ namespace mango
 #define FLASH_MOUNT 		11
 #define SDCARD_UNMOUNT 	12
 #define SDCARD_MOUNT 		13
+#define SDCARD_START_UNMOUNT 		18
 #define MEDIA_SCANNER_START 		14
 #define MEDIA_SCANNER_END 		15
 #define NM_SPIDF 			16
 #define NM_HEADEST 			17
+#define POWER_STATUS_CHANGE 		19
 
 	class View : public Object
 	{

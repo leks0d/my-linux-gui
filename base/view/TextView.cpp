@@ -69,7 +69,7 @@ namespace mango
 			computeLeft(&canvas);
 			canvas.drawTextResource(resId, mLeft,mTop);
 		}
-		if(mText != NULL && ResType == 0){
+		if(iText != NULL && ResType == 0){
 			computeLeft(&canvas);
 			canvas.drawText(iText, iTextLen, mLeft, mTop);
 		}
@@ -80,13 +80,15 @@ namespace mango
 	void TextView::setTextString(char* text){
 		int len;
 		int charCount;
-		
-		if(text == NULL)
-			return;
+			
 		if(iText!=NULL){
 			delete iText;
 			iText = NULL;
+			iTextLen = 0;
 		}
+		
+		if(text == NULL)
+			return;
 		
 		iText = new WCHAR[103];
 		

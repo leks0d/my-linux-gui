@@ -55,5 +55,6 @@ namespace mango
 		int isNeedFresh;
 		int mVolume;
 		int mBattery;
+		int isCharge;
 	};
 }

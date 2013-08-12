@@ -92,7 +92,7 @@ namespace mango
 		int img[]={IDP_ADVANCE_LANGUGE,IDP_ADVANCE_DISPLAY,IDP_ADVANCE_BATTARY,IDP_ADVANCE_SYSTEM_INFO,IDP_ADVANCE_DISPLAY,IDP_ADVANCE_SYSTEM_INFO};
 		int imgsec[]={IDP_ADVANCE_LANGUGE_S,IDP_ADVANCE_DISPLAY_S,IDP_ADVANCE_BATTARY_S,IDP_ADVANCE_SYSTEM_INFO_S,IDP_ADVANCE_DISPLAY_S,IDP_ADVANCE_SYSTEM_INFO_S};
 		int text[]={STR_ADVANCE_LANGUAGE,STR_ADVANCE_DISPLAY,STR_ADVANCE_POWER,STR_ADVANCE_SYSINFO,STR_ADVANCE_SHOWTOUCH,STR_ADVANCE_SCANNER};
-		int i,count = 5;
+		int i,count = 6;
 		log_i("SettingsView::initAdvanceList");
 		if(mAdvanceListAdapter == NULL){
 			log_i("SettingsView::mListView->deleteAllItems()");
@@ -253,6 +253,7 @@ namespace mango
 						case 4:
 							gPlayer.showPointDrawView(); break;
 						case 5:
+							gmediaprovider.mediascanner("/mnt/sdcard");
 							gPlayer.showMediaView();
 							break;
 						}
@@ -351,7 +352,7 @@ namespace mango
 		int i;
 		log_i("SettingListAdapter::refresh()");
 		mlist->setListAdapter(this);
-		mlist->deleteAllRecord();
+		mlist->deleteAllItems();
 
 		for(i=0;i<mCount;i++){
 			ListViewItem  lvItem;

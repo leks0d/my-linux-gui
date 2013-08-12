@@ -9,7 +9,7 @@
 #define UNIX_MSG_FLASH_MOUNT   "Volume flash /mnt/sdcard state changed from 3 (Checking) to 4 (Mounted)"
 #define UNIX_MSG_SDCARD_UNMOUNT   "Volume sdcard /mnt/external_sd state changed from 1 (Idle-Unmounted) to 0 (No-Media)"
 #define UNIX_MSG_SDCARD_MOUNT   "Volume sdcard /mnt/external_sd state changed from 3 (Checking) to 4 (Mounted)"
-
+#define UNIX_MSG_SDCARD_START_UMOUNT "Volume sdcard /mnt/external_sd state changed from 4 (Mounted) to 5 (Unmounting)"
 
 namespace mango
 {
@@ -193,6 +193,9 @@ void SocketDetect::DetectRun(void){
 			}else if(strcmp(recv,UNIX_MSG_FLASH_MOUNT)==0){
 				log_i("usb close");
 				result = FLASH_MOUNT;
+			}else if(strcmp(recv,UNIX_MSG_SDCARD_START_UMOUNT)==0){
+				log_i("sdcard start unmounting");
+				result = SDCARD_START_UNMOUNT;
 			}else
 				log_i("usb unknow");
 			if(mPlayerEventInterface != NULL)

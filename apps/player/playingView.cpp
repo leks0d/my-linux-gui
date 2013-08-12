@@ -24,7 +24,7 @@ namespace mango
 
 	int PlayingView::onCreate()
 	{
-
+		int left = 20;
 		Rect rect;
 		log_i("PlayingView::onCreate()");
 		rect.setEx(80, 180, 32, 23);
@@ -45,30 +45,28 @@ namespace mango
 		mPlayButton->setPressedImageId(IDP_PLAYING_PLAY_ACTIVE);
 		mPlayButton->onCreate();
 
-
-
 		rect.setEx(280, 30, 40, 22);
 		mPlayModeButton = new Button(PLAYING_IDB_PLAY_MODE, TEXT("mPlayModeButton"), this, &rect, 0);
 				
 		rect.setEx(6, 30, 109, 109);
 		mAlbumImage = new ImageView(PLAYING_IDB_ALBUM_IMAGE, TEXT("mAlbumImage"), this, &rect, 0);
 
-		rect.setEx(127, 32, 100, 20);
+		rect.setEx(left, 32, 100, 20);
 		mAudioInfo = new TextView(PLAYING_IDB_MUSIC_NAME, TEXT("mAudioInfo"), this, &rect, 0);
 		mAudioInfo->setTextColor(COLOR_GRAY);
 		mAudioInfo->setTextSize(15);
 
-		rect.setEx(127, 55, 190, 25);
+		rect.setEx(left, 55, 190, 25);
 		mMusicName = new TextView(PLAYING_IDB_MUSIC_NAME, TEXT("mMusicName"), this, &rect, 0);
 		mMusicName->setTextColor(RGB(248,136,0));
 		mMusicName->setTextSize(23);
 		
-		rect.setEx(127, 85, 190, 20);
+		rect.setEx(left, 85, 190, 20);
 		mArtist = new TextView(PLAYING_IDB_MUSIC_NAME, TEXT("mArtist"), this, &rect, 0);
 		mArtist->setTextColor(RGB(154,154,154));
 		mArtist->setTextSize(16);
 
-		rect.setEx(127, 105, 190, 20);
+		rect.setEx(left, 105, 190, 20);
 		mAlbum = new TextView(PLAYING_IDB_MUSIC_NAME, TEXT("mAlbum"), this, &rect, 0);
 		mAlbum->setTextColor(RGB(154,154,154));
 		mAlbum->setTextSize(16);
@@ -133,7 +131,7 @@ namespace mango
 		mSettingText->onCreate();
 		isNeedFresh = 1;
 		ViewInit();
-		
+		mSeekBarUpdateThread.create(PlayingView::SeekBarRunnig, this);
 		return -1;
 	}
 
@@ -143,33 +141,42 @@ namespace mango
 		mediainfo* currentinfo;
 		
 		currentinfo = mPlayinglist->getPlayingItem();
-	//	currentinfo = mPlayinglist->getItem(8);
+
 		mstr = new Mstring(10);
 		mstr->mSprintf("%d",gPlayer.getVolume());
 		mVolumeText->setTextString(mstr->mstr);
-		
-		if(currentinfo == NULL){
-			mAlbumImage->setImageResoure(IDP_DEFAULT_ALBUM_ICON);
+
+		if(currentinfo == NULL){	
 			mMusicName->setTextString("Not find music.");
+			mAudioInfo->setTextString(NULL);
+			mAlbum->setTextString(NULL);
+			mArtist->setTextString(NULL);
+			updatePlayMode();
+			updatePlayButtonIcon();		
 			return;
 		}
-		
+
 		mCurrentInfo = *currentinfo;
-		if(strcmp(currentinfo->img_path,"(null)") == 0){
+
+		if( (currentinfo->img_path == NULL) || (strcmp(currentinfo->img_path,"(null)") == 0)){
 			mMSkBitmap->release();
 		}else{
 			SkBitmap skBitmap,*pskBitmap;
 			SkCanvas *skCanvas;
+			
 		    pskBitmap = new SkBitmap();
 		    pskBitmap->setConfig(SkBitmap::kARGB_8888_Config,129,129);
-		    pskBitmap->allocPixels();//分配位图所占空间			
+		    pskBitmap->allocPixels();//分配位图所占空间
+		    
 			bool ret = SkImageDecoder::DecodeFile(currentinfo->img_path,&skBitmap,SkBitmap::kARGB_8888_Config,SkImageDecoder::kDecodePixels_Mode);			
+
 			if(ret){
 				log_i("skBitmap->width()=%d,skBitmap->height()=%d",skBitmap.width(),skBitmap.height());
+
 				skCanvas = new SkCanvas(*pskBitmap);
-				
 				SkIRect srcRect;
 				SkRect dstRect;
+				
 				srcRect.set(0,0,skBitmap.width(),skBitmap.height());
 				CalculateSize(skBitmap.width(),skBitmap.height(),109,109,dstRect);
 
@@ -188,7 +195,7 @@ namespace mango
 				skCanvas->restore();
 				mMSkBitmap->create((int *)pskBitmap->getPixels(),pskBitmap->width(),pskBitmap->height());
 			}else{
-				log_i("DecodeFile fail path=%s",currentinfo->img_path);
+				log_i("DecodeFile fail path=%s\n",currentinfo->img_path);
 				mMSkBitmap->release();
 			}
 		}
@@ -212,7 +219,7 @@ namespace mango
 			mAlbum->setRect(rect);
 		}else{
 			Rect rect;
-			int left = 10;
+			int left = 20;
 			
 			rect.setEx(left, 32, 100, 20);
 			mAudioInfo->setRect(rect);
@@ -244,14 +251,11 @@ namespace mango
 		mstr->setPlayTime(mPlayinglist->getDuration());
 		mDurtionText->setTextString(mstr->mstr);
 		
-		mstr->clear();
-		mDurtionText->getTextString(mstr->mstr);
-		
 		updatePlayMode();
 		updatePlayButtonIcon();
 		updateAudioInfo();
 		mstr->clear();
-		mSeekBarUpdateThread.create(PlayingView::SeekBarRunnig, this);
+		
 	}
 
 	void PlayingView::CalculateSize(float srcw,float srch,float dstw,float dsth,SkRect &rect){
@@ -406,11 +410,13 @@ namespace mango
 				mstr->clear();
 			}
 		}else if(code == NM_BATTERY_UPDATE){
-			int val = (unsigned int)parameter;
+			int val = (unsigned int)parameter&0xFF;
+			int charge = ((unsigned int)parameter&0xF00)>>8;
 			int batteryIcon = IDP_BATTERY_0;
 			bool isSpdifIn;
 			bool isHeadestIn;
-			if(mBattery != val && isNeedFresh){
+			
+			if((mBattery != val || isCharge!=charge) && isNeedFresh){
 				/*
 				Mstring* mstr;	
 				mstr = new Mstring(10);
@@ -418,22 +424,27 @@ namespace mango
 				mBatteryText->setTextString(mstr->mstr);
 				mstr->clear();
 				*/
-				if(val<5)
-					batteryIcon = IDP_BATTERY_0;
-				else if(val<15)
-					batteryIcon = IDP_BATTERY_10;
-				else if(val<30)
-					batteryIcon = IDP_BATTERY_20;
-				else if(val<50)
-					batteryIcon = IDP_BATTERY_40;
-				else if(val<70)
-					batteryIcon = IDP_BATTERY_60;
-				else if(val<95)
-					batteryIcon = IDP_BATTERY_80;
-				else
-					batteryIcon = IDP_BATTERY_100;
+				if(charge==1 && val!=100){
+					batteryIcon=IDP_BATTERY_CHAGER;
+				}else{
+					if(val<5)
+						batteryIcon = IDP_BATTERY_0;
+					else if(val<15)
+						batteryIcon = IDP_BATTERY_10;
+					else if(val<30)
+						batteryIcon = IDP_BATTERY_20;
+					else if(val<50)
+						batteryIcon = IDP_BATTERY_40;
+					else if(val<70)
+						batteryIcon = IDP_BATTERY_60;
+					else if(val<95)
+						batteryIcon = IDP_BATTERY_80;
+					else
+						batteryIcon = IDP_BATTERY_100;
+				}
 				
 				mBatteryIcon->setImageResoure(batteryIcon);
+				isCharge = charge;
 				mBattery = val;
 			}
 			if(gPlayer.mSpdifSwitch->isToSwicth()){
@@ -466,9 +477,12 @@ namespace mango
 			mPlayinglist->stopPlayer();
 		}else if(code == SDCARD_MOUNT){
 			gPlayer.showSdcardInsertView();
+		}else if(code == SDCARD_START_UNMOUNT){
+			mPlayinglist->stopForSdcardEject();
 		}else if(code == SDCARD_UNMOUNT){
 			gPlayer.dismissView(gPlayer.mSdcardInsertView);
 			mPlayinglist->checkPlayintList();
+			ViewInit();
 			gmediaprovider.checkfile();
 		}else if(code == MEDIA_SCANNER_START){
 			gPlayer.showMediaScannerView();
@@ -478,6 +492,16 @@ namespace mango
 			gPlayer.mSpdifSwitch->setPlayerSwitch();
 		}else if(code == NM_HEADEST){
 			gPlayer.mHeadestSwitch->setPlayerSwitch();
+		}else if(code == POWER_STATUS_CHANGE){
+			log_i("VM_NOTIFY : POWER_STATUS_CHANGE");
+			int powerState = (unsigned int)parameter;
+			log_i("powerState = %d",powerState);
+			if(powerState == 0){
+				isNeedFresh = 1;
+			}else if(powerState == 2){
+				isNeedFresh = 0;
+			}
+			log_i("isNeedFresh = %d",isNeedFresh);
 		}
 		return 0;
 	}

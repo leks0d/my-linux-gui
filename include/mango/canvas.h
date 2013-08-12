@@ -103,7 +103,7 @@ namespace mango
 		bool drawImageResource(int id, int x, int y, bool alpha = true);
 		bool drawImageResource(int id, int x, int y,int width,int hight,bool alpha = true);
 		bool drawBitmap(int* colors, int x, int y, int width, int height); 
-	
+		bool drawBitmapRGB(int* colors, int x, int y, int width, int height);
 	public:
 		void renew(class View* view);
 		void swapScreenFrontBuffer();

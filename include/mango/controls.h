@@ -13,8 +13,17 @@ namespace mango
 		MSkBitmap(){mBits = NULL;};
 		
 		void create(int *bit,int w,int h){
-			mBits = new int[w*h*4];
-			memcpy(mBits,bit,w*h*4);
+			int i,count;
+			
+			mBits = new int[w*h];
+			count = w*h;
+			
+			for(i = 0;i<count;i++){
+				int r = bit[i]&0x00FF0000;
+				int b = bit[i]&0x000000FF;			
+				mBits[i] = (bit[i]&0xFF00FF00) | (r>>16) | (b<<16);
+			}		
+			
 			width = w;
 			height = h;
 		}
@@ -189,7 +198,7 @@ class ValueTextView : public View
 			void setProgress(int n);
 			int getProgress();
 			void setTouchX(int x);
-			void setMax(int n){mMax=n;log_i("SeekBar setMax = %d",mMax);}
+			void setMax(int n){mMax=n; if(mMax == 0) mMax = 1;log_i("SeekBar setMax = %d",mMax);}
 			
 			virtual int onPaint(Canvas& canvas);
 			virtual int onTouchDown(int x, int y, int flag);

@@ -8,6 +8,9 @@ namespace mango
 	#define TCC_LCD_FB_IOCTL_DISP_ONOFF				0x10
 	#define TCC_LCD_FB_IOCTL_ALPHA_ONOFF			0x11
 	#define TCC_LCD_FB_IOCTL_ALPHA_SELECTION		0x16
+	#define CHARGE "Charging\n"
+	#define DISCHARGE "Discharging\n"
+	
 	static void print_info(struct fb_var_screeninfo *vinfo);
 	static int rgb565To888(int rgb);
 //	const TCHAR contcFontWidthFileName[STOCK_FONT_OBJECT_NUM][56] ; 
@@ -374,10 +377,12 @@ namespace mango
 	}
 
 	void Session::batteryRoutine(){
-		int fd,count,capacity;
+		int fd,count,capacity,charge;
 		char *rbuf;
+		char *chagerbuf;
 		
 		rbuf = new char[5];
+		chagerbuf = new char[20];
 		
 		while(1){
 			
@@ -390,17 +395,42 @@ namespace mango
 		
 			count = read(fd,rbuf,5);
 
-			sscanf(rbuf,"%d\n",&capacity);
+			sscanf(rbuf,"%d\n",&capacity);	
 			
-			if(mUseEventInterface != NULL)
-				mUseEventInterface->onKeyDispatch(capacity,VM_CAPACITY,0);		
-
 			close(fd);
 			memset(rbuf,0,5);
+
+			fd = open("/sys/class/power_supply/battery/status", O_RDONLY);
+			
+			if(fd<=0){
+				log_i("open /sys/class/power_supply/battery/status fail");
+				break;
+			}
+		
+			count = read(fd,chagerbuf,20);
+
+			//log_i("batteryRoutine chagerbuf='%s'",chagerbuf);
+
+			if(strcmp(chagerbuf,CHARGE)==0){
+				charge = 1;
+			}else if(strcmp(chagerbuf,DISCHARGE)==0){
+				charge = 0;
+			}else{
+				charge = 2;
+			}
+			capacity = (capacity&0xFF)|charge<<8;
+			
+			close(fd);
+			memset(chagerbuf,0,20);
+
+			if(mUseEventInterface != NULL)
+				mUseEventInterface->onKeyDispatch(capacity,VM_CAPACITY,0);				
+
+			//log_i("batteryRoutine chagerbuf=0x%x",capacity);
 			
 			Thread::sleep(1000);
 		}
-
+			
 		close(fd);
 	}
 
@@ -436,7 +466,7 @@ namespace mango
 			evnetCount = readBytes / sizeof(struct input_event);
 			for (i = 0 ; i < evnetCount ; i++)
 			{
-				//log_i("type = %d, code = %d, value = %d", EventBuf[i].type, EventBuf[i].code, EventBuf[i].value);
+				log_i("type = %d, code = %d, value = %d", EventBuf[i].type, EventBuf[i].code, EventBuf[i].value);
 			
 				switch (EventBuf[i].type)
 				{
@@ -568,8 +598,8 @@ namespace mango
 		logo = (unsigned char*)new char[240*320*2];
 		int i;
 		FILE *fb;
-		char *logopath = "/mnt/sdcard/img_12644"; 
-		//fb  = fopen("/system/mango/bootlogo", "rb");
+		//char *logopath = "/mnt/sdcard/img_12644"; 
+		char *logopath = "/system/mango/bootlogo";
 		fb  = fopen(logopath, "rb");
 		if(fb<=0){
 			memset(addr,0xFF,240*320*4);

@@ -55,7 +55,10 @@ namespace mango
 			log_i("setPowerState write fail.");
 		}else
 			log_i("setPowerState write sucess.");
-		
+		if(isSleep == 0){
+			gSession.invalidateScreen(NULL);
+		}
+		gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,POWER_STATUS_CHANGE,isSleep);
 		close(fd);
 	}
 
@@ -73,7 +76,6 @@ namespace mango
 
 		isSleep = n;
 
-		
 		fd = open(path,O_RDWR, 0);
 		if(fd==-1)
 			return;

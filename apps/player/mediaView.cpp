@@ -449,18 +449,21 @@ namespace mango
 						}else{
 							mediainfo info;
 							char* name;
-							info.id = -1;
-							info.path = new char[strlen(utf8Path)+1];
 							
+							
+							memset(&info,0,sizeof(mediainfo));
+							
+							info.path = new char[strlen(utf8Path)+1];
+							info.id = -1;
 							name = getfilename(utf8Path);
-							info.name = new char[strlen(utf8Path)+1]; 				
+							
+							info.name = new char[strlen(utf8Path)+1]; 
+							
 							memcpy(info.name,name,strlen(name)+1);
 							memcpy(info.path,utf8Path,strlen(utf8Path)+1);
-							info.artist = NULL;
-							mPlayinglist->playMediaInfo(&info);
 							
+							mPlayinglist->playMediaInfo(&info);
 						}
-						
 						gPlayer.showPlayingView();
 					}
 					break;
@@ -586,7 +589,7 @@ namespace mango
 		int count,i;
 		
 		mlist->setListAdapter(this);
-		mlist->deleteAllRecord();
+		mlist->deleteAllItems();
 
 		count = mPlayinglist->getCount();
 		
@@ -665,7 +668,7 @@ namespace mango
 		int count,i;
 		
 		mlist->setListAdapter(this);
-		mlist->deleteAllRecord();
+		mlist->deleteAllItems();
 		
 		count = mMusicArrayList->getCount();
 		for(i=0;i<count;i++){
@@ -721,7 +724,7 @@ namespace mango
 		sprintf(ptr,"group by album");
 		
 		mlist->setListAdapter(this);
-		mlist->deleteAllRecord();
+		mlist->deleteAllItems();
 		mMusicArrayList->clear();
 		
 		count = gmediaprovider.queryMusicArray(where,mMusicArrayList);
@@ -772,7 +775,7 @@ namespace mango
 		sprintf(ptr,"group by artist");
 		
 		mlist->setListAdapter(this);
-		mlist->deleteAllRecord();
+		mlist->deleteAllItems();
 		mMusicArrayList->clear();
 
 		count = gmediaprovider.queryMusicArray(where,mMusicArrayList);
@@ -803,7 +806,16 @@ namespace mango
 		else
 			canvas.setTextColor(RGB(255,255,255));
 		canvas.setTextSize(18);
+#if 0
+		log_i("info->artist=%s,len=%d",info->artist,strlen(info->artist));
+		if(Charset::isTextUtf8(info->artist)){
+			log_i("isTextUtf8 true");
+		}else{
+			log_i("isTextUtf8 false");
+		}
+#endif		
 		canvas.drawText(info->artist,strlen(info->artist),50,y+10);
+		
 		canvas.setTextColor(RGB(255,255,255));
 		//canvas.setTextSize(12);
 		//canvas.drawText(info->artist,strlen(info->artist),50,y+28);

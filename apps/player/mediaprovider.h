@@ -59,7 +59,9 @@ namespace mango
 		char *img_path;
 		int add_time;
 		int duration;
+		int isInPlayList;
 		int inPlay;
+		int isPlayed;
 	}mediainfo;
 
 	struct Musicdb{

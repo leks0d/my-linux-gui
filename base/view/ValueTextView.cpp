@@ -56,6 +56,14 @@ namespace mango
 
 	void ValueTextView::setTextString(char* text){
 		int len;
+
+		if(mText != NULL){
+			delete mText;
+			mText = NULL;
+		}
+
+		if(text == NULL)
+			return;
 		
 		len = strlen(text);
 		

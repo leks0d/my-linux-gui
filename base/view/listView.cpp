@@ -834,8 +834,11 @@ namespace mango
 		canvas.setTextColor(RGB (255, 255, 255)) ;
 		
 		if (lvitem->mask & LVIF_ADAPTER){
-			if(mListAdapter != NULL)
+			if(mListAdapter != NULL){
+				log_i("mListAdapter->PaintView lvitem->iItem=%d",lvitem->iItem);
 				mListAdapter->PaintView(canvas,rect,lvitem,record == mSelectedRecord);
+				return true;
+			}
 		}
 //		log_i("ListView::paintListRecord left=%d,top=%d",rect.left,rect.top);
 /*

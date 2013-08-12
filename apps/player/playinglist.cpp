@@ -31,14 +31,25 @@ static const char *PlayerLock = "playerlock";
 			}
 
 			void Playinglist::initPlayintList(){
-				int count,i;
+				int count,i,playpost;
 				ArrayMediaInfo *pinfo;
+				mediainfo *info;
+				
 				pinfo = new ArrayMediaInfo();
+				
 				count = gmediaprovider.queryMusicArray(NULL,pinfo);
+				
 				for(i=0;i<count;i++){
-					addItem(pinfo->getMediaInfo(i));
+					info = pinfo->getMediaInfo(i);
+					if(info->inPlay){
+						addItem(pinfo->getMediaInfo(i));
+					}
 				}
+				checkPlayintList();
 				gSettingProvider.query(SETTING_PLAYMODE_ID,&playMode);
+				gSettingProvider.query(SETTING_PLAYPOS_ID,&playpost);
+				
+				moveToPosition(playpost);
 			}
 
 			void Playinglist::checkPlayintList(){
@@ -56,7 +67,17 @@ static const char *PlayerLock = "playerlock";
 			}
 
 			void Playinglist::savePlayintList(){
+				int i,count = getCount();
+				mediainfo *info;
+				log_i("--------------------savePlayintList-----------");
 				gmediaprovider.updateInPlay(0);
+				
+				for(i=0;i<count;i++){
+					info = getItem(i);
+					log_i("updateInPlay id=%d",info->id);
+					gmediaprovider.updateInPlay(1,info->id);
+				}
+				gSettingProvider.update(SETTING_PLAYPOS_ID,mCurrent);
 			}
 			
 			void Playinglist::removeItem(int n){
@@ -87,7 +108,7 @@ static const char *PlayerLock = "playerlock";
 				}
 
 				memcpy(&mplaylist[len],item,sizeof(mediainfo));
-				mplaylist[len].inPlay = 0;
+				mplaylist[len].isPlayed = 0;
 				len++;
 			}
 
@@ -131,19 +152,24 @@ static const char *PlayerLock = "playerlock";
 				array = new IntegerArray();
 				
 				for(i=0;i<len;i++){
-					if(getItem(i)->inPlay == 0)
+					if(getItem(i)->isPlayed == 0){
 						array->addItem(i);
+						log_i("array->addItem(%d)",i);
+					}
 				}
-				
+				log_i("moveRandom : array->getCount()=%d",array->getCount());
 				if(array->getCount() == 0){
+					log_i("moveRandom getCount() reset");
 					for(i=0;i<len;i++){
-						getItem(i)->inPlay = 0;
+						getItem(i)->isPlayed = 0;
 						array->addItem(i);
 					}
 				}
 				
 				random = randomInt(array->getCount());
 				moveToPosition(array->getItem(random));
+
+				delete array;
 				
 				return 1;
 			}
@@ -173,10 +199,13 @@ static const char *PlayerLock = "playerlock";
 				startPlay();
 			}			
 			mediainfo* Playinglist::getPlayingItem(){
+				if(len == 0)
+					return NULL;
+				log_i("mCurrent=%d,len=%d",mCurrent,len);
 				if(mCurrent<len)
 					return &mplaylist[mCurrent];
 				else
-					return mplaylist;
+					return NULL;
 			}
 
 			int Playinglist::playMediaInfo(mediainfo *info){
@@ -212,17 +241,22 @@ static const char *PlayerLock = "playerlock";
 					mParticleplayer->setEventCallback(Playinglist::playerCallback,(void *)this);
 					PlayerInit();
 				}
+				if(mParticleplayer == NULL)
+					return -1;
 				
 				char *playPath = getPlayingItem()->path;
+
+				if(playPath == NULL)
+					return -1;
 				
 				log_i("Playinglist::startPlayPosition needStart=%d, %d/%d:%s",needStart,mCurrent,len,playPath);
 				
-				if(needGapless&&mGapless>0&&mParticleplayer!=NULL&&mParticleplayer->setNextSongForGapless(playPath)){
+				if(needGapless&&mGapless>0&&mParticleplayer->setNextSongForGapless(playPath)){
 					
 					if(mParticleplayer->gaplessPlay(playPath)){log_i("gaplessPlay() success!");}
-					else{log_i("gaplessPlay() fail!");}
+					else{log_i("gaplessPlay() fail!");return -1;}
 					
-				}else if(mParticleplayer!=NULL){
+				}else{
 				
 					if(mParticleplayer->stop()){log_i("stop() success!");}else{log_i("stop() fail!");return -1;}
 					if(mParticleplayer->setSource(playPath)){log_i("setSource() success!");}else{log_i("setSource() fail!");return -1;}
@@ -231,7 +265,8 @@ static const char *PlayerLock = "playerlock";
 					if(needStart)
 						if(mParticleplayer->start()){log_i("start() success!");}else{log_i("start() fail!");return -1;}
 				}
-				
+				getPlayingItem()->isPlayed = 1;
+				setWakeLock();
 			}
 			
 			int Playinglist::isItemExsit(mediainfo *info){
@@ -432,6 +467,24 @@ static const char *PlayerLock = "playerlock";
 			if(isWakeLock){
 				if(gPlayer.wakeUnlock(PlayerLock) == 0)
 					isWakeLock = 0;
+			}
+		}
+		void Playinglist::stopForSdcardEject(){
+			log_i("------------------Playinglist::stopForSdcardEject");
+			if((mParticleplayer != NULL) && (mParticleplayer->isPlaying() || inPause)){
+				log_i("-----mParticleplayer isplayong or pause");
+				mediainfo *info = getPlayingItem();
+				log_i("-----mParticleplayer getPlayingItem()");
+				if(info == NULL)
+					return;
+				
+				log_i("info->path = %s",info->path);
+				
+				char *ret = strstr(info->path,"/mnt/external_sd");
+				if(ret){
+					log_i("strstr ret = %s",ret);
+					stopPlayer();
+				}
 			}
 		}
 		

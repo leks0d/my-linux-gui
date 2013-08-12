@@ -16,7 +16,7 @@ namespace mango
 		ppt = (Musicdbinfo **)use;
 		pt = *ppt;
 		data = (Musicdbinfo *)malloc(sizeof(Musicdbinfo));
-		log_i("data = %d",data);
+		//log_i("data = %d",data);
 		
 		data->info.id = mediaprovider::str_to_int(*argv++);*szColName++;
 		data->info.path = getstr(*(argv++));*szColName++;
@@ -24,7 +24,7 @@ namespace mango
 		data->info.name_key = getstr(*(argv++));*szColName++;
 		data->info.title = getstr(*(argv++));*szColName++;
 		data->info.title_key = getstr(*(argv++));*szColName++;
-		log_i("artist argv = %s,szColName=%s",*argv,*szColName);
+		//log_i("artist argv = %s,szColName=%s",*argv,*szColName);
 		data->info.artist = getstr(*(argv++));
 		data->info.artist_key = getstr(*(argv++));
 		data->info.album = getstr(*(argv++));	
