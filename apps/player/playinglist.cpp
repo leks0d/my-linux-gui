@@ -45,7 +45,7 @@ static const char *PlayerLock = "playerlock";
 						addItem(pinfo->getMediaInfo(i));
 					}
 				}
-				checkPlayintList();
+				//checkPlayintList();
 				gSettingProvider.query(SETTING_PLAYMODE_ID,&playMode);
 				gSettingProvider.query(SETTING_PLAYPOS_ID,&playpost);
 				
