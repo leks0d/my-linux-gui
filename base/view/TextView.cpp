@@ -41,7 +41,9 @@ namespace mango
 	int TextView::onPaint(Canvas& canvas)
 	{
 		int charCount;
-		
+		Rect rect;
+
+		getRect(rect);
 		//log_i("TextView::onPaint:%s",mText);
 
 		if(mNormalBgdResId>0&&mPress==0){
@@ -188,6 +190,7 @@ namespace mango
 			return 0;
 	 	mPress = 0;
 		invalidateRect();
+		//log_i("onTouchUp VM_COMMAND:mId=%d",mId);
 		postMessage(getParent(), VM_COMMAND, mId, (unsigned int)this);
 		postMessage(getParent(), VM_NOTIFY, VSEEKBAR_TEXTVIEW_UP, (unsigned int)this);
 		return 0;

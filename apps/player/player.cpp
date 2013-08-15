@@ -29,6 +29,7 @@ namespace mango
 
 	int Player::main()
 	{
+#if 1	
 		int i,ret;
 		setBootWakeLock(1);
 		initialize();
@@ -39,8 +40,8 @@ namespace mango
 		gmediaprovider.initialize();
 		
 		mPlayinglist = new Playinglist();
-		mPlayinglist->initPlayintList();
-
+		mPlayinglist->initPlayintList();		
+		
 		mango::Thread::sleep(1000 * 3);
 		
 		mSpdifSwitch = new PlayerSwitch();
@@ -62,6 +63,12 @@ namespace mango
 			//signal(i,&sig_int); 
 		}
 		log_i("signal &sig_int");
+#else
+		gAlarmManager = new AlarmManager();
+		gAlarmManager->initialize();
+		gAlarmManager->setAlarmWakeup(6);
+#endif
+
 		return messageLoop();
 	}
 	void Player::setBootWakeLock(int en){
@@ -85,6 +92,9 @@ namespace mango
 		
 		if(gSettingProvider.query(SETTING_BRIGHTNESS_ID,&value))
 			ioctrlBrightness(IOCTRL_BRIGTNESS_WRITE,&value);
+
+		if(gSettingProvider.query(SETTING_LANGUAGE_ID,&value))
+			gSessionLocal.mStockGraphic.mCanvas.setTextLanguage(value);
 	}
 	
 	int Player::showPlayingView()
@@ -154,6 +164,16 @@ namespace mango
 			mMusicInfoView->setFocus();
 		}
 
+		return 0;
+	}
+
+	int Player::showMusicInfoView(mediainfo* info){
+		if (mMusicInfoView == NULL) {
+			mMusicInfoView = new MusicInfoView (TEXT("MusicInfo"), NULL, NULL, 0, SW_NORMAL);
+			mMusicInfoView->onCreate();
+		}			
+		mMusicInfoView->setMusicInfo(info);
+		showMusicInfoView();
 		return 0;
 	}
 	int Player::showDisplaySettingView()
@@ -278,9 +298,25 @@ namespace mango
 		}
 		mPlayinglist->stopPlayer();
 		mPlayinglist->savePlayintList();
-		mango::Thread::sleep(1000 * 6);
+		mango::Thread::sleep(1000 * 3);
 		reboot(RB_POWER_OFF);		
 	}
+
+	int Player::showMusicOperateView(mediainfo& info){
+		if(mMusicOperateView == NULL){
+			mMusicOperateView = new MusicOperateView(TEXT("ShutDown"), NULL, NULL, 0, SW_NORMAL);
+			mMusicOperateView->onCreate();
+		}else{
+			gSession.mViewZAxis.bringViewToTop(mMusicOperateView);
+		}
+
+		if (mMusicOperateView){
+			mMusicOperateView->setMusicInfo(info);
+			mMusicOperateView->invalidateRect();
+			mMusicOperateView->setFocus();
+		}
+	}
+	
 	void Player::dismissView(View *view){
 		View *displayView;
 		
@@ -475,9 +511,10 @@ namespace mango
 			gMessageQueue.post(gPlayer.mPlayingView,VM_COMMAND,PLAYING_IDB_PREV,NULL);
 		}else if(keyCode == KEYCODE_NEXT&& action == VM_KEYDOWN)
 			gMessageQueue.post(gPlayer.mPlayingView,VM_COMMAND,PLAYING_IDB_NEXT,NULL);
-		else if(keyCode == KEYCODE_PLAY&& action == VM_KEYDOWN)
+		else if(keyCode == KEYCODE_PLAY&& action == VM_KEYDOWN){
 			gMessageQueue.post(gPlayer.mPlayingView,VM_COMMAND,PLAYING_IDB_PLAY,NULL);
-		else if(action == VM_CAPACITY){
+			log_i("gMessageQueue.post PLAYING_IDB_PLAY"); 
+		}else if(action == VM_CAPACITY){
 			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,NM_BATTERY_UPDATE,keyCode);
 			if(gPowerManager!=NULL)
 				gPowerManager->PowerManagerCount();

@@ -206,8 +206,5 @@ void SocketDetect::DetectRun(void){
 	log_i("SocketDetect::DetectRun Exit");
 }
 
-
-
-
 #endif
 };

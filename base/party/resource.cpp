@@ -66,7 +66,7 @@ namespace mango
 			fread(&Item, 1, sizeof (RESOURCEDATA_ITEM), mFile);
 
 			if (Item.m_dwType != (DWORD)RT_STRING)
-				break ;
+				break;
 
 			iResTChars = Item.m_dwBytes / 2 ;
 			if (bufferSize < iResTChars)

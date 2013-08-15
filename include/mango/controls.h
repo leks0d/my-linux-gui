@@ -450,6 +450,7 @@ typedef struct tagCTRL_LISTVIEW_LAYOUT
 		BaseAdapter(void){}
 		~BaseAdapter(void){}
 		virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);
+		virtual void refresh(){return;}
 		virtual int getCount();
 		virtual void* getItem(int index){return NULL;}
 		virtual int getId(){return mId;}
@@ -489,7 +490,9 @@ typedef struct tagCTRL_LISTVIEW_LAYOUT
 		virtual	int	setZoneY(int y, bool update);
 		virtual	int	setItemState (int index, ListViewItem* lvitem);
 		virtual ListViewItem*  getSelectedItem(void);
-
+		virtual Point& getTouchPrevPosition(void);
+		virtual void refresh(void);
+		
 		//record1 < reocrd2  return < 0;
 		//record1 = reocrd2  return  0;
 		//record1 > reocrd2  return  1;

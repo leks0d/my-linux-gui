@@ -84,7 +84,8 @@ namespace mango
 
 		mBrightnessValue->setTextString(mstr->mstr);
 
-		mTitle->setTextResoure(STR_ADVANCE_DISPLAY);	
+		mTitle->setTextResoure(STR_ADVANCE_DISPLAY);
+		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 	}
 
 	void DisplaySettingView::setDisplayValue(int n){

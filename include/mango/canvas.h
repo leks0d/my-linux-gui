@@ -87,6 +87,9 @@ namespace mango
 
 		void setTextSize(int size);
 		void setTextBackColor(COLORREF color);
+		
+		void setTextLanguage(int lanId);
+		int getTextLanguage();
 
 		int  getTextCharacterExtra(void);
 		int  setTextCharacterExtra(int charExtra);
@@ -157,7 +160,7 @@ namespace mango
 		int		mBkMode;		//
 		int		mAlpha;		//0 -- È«Í¸Ã÷, 255 -- ²»Í¸
 
-
+		int 	mLanguageId;
 	};
 }
 

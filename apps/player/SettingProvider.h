@@ -13,6 +13,7 @@ namespace mango
 	#define SETTING_EQSTATE_ID		6
 	#define SETTING_PLAYPOS_ID		7
 	#define SETTING_AUTOSLEEP_ID		8
+	#define SETTING_LANGUAGE_ID		9
 
 	#define EQ_CUSTOM_ID		0
 	#define EQ_POP_ID			1

@@ -84,9 +84,14 @@ static const char *PlayerLock = "playerlock";
 				int i;
 				int count = getCount();
 				mediainfo *ptr = mplaylist;
+
+				if(count <= 0 || n<0)
+					return;
+
 				for(i=n;i<count-1;i++){
 					memcpy(&ptr[i],&ptr[i+1],sizeof(mediainfo));
 				}
+				
 				memset(&ptr[len-1],0,sizeof(mediainfo));
 				len--;
 			}
@@ -352,10 +357,8 @@ static const char *PlayerLock = "playerlock";
 		void Playinglist::callbackPlay(){
 			switch(playMode){
 				case MODE_PLAY_ORDER:
-					if(len>0&&mCurrent==(len - 1)){
-						if(mParticleplayer->stop()){
-							releaseWakeLock();
-						}
+					if(len>0 && mCurrent==(len - 1)){
+						stopPlayer();		
 						break;
 					}
 				case MODE_PLAY_LOOP:
@@ -486,6 +489,13 @@ static const char *PlayerLock = "playerlock";
 					stopPlayer();
 				}
 			}
+		}
+
+		void Playinglist::stopPlayer(){
+			if(mParticleplayer != NULL){
+				mParticleplayer->stop();
+			}
+			releaseWakeLock();
 		}
 		
 		Playinglist *mPlayinglist = NULL;

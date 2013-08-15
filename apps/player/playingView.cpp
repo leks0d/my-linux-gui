@@ -13,6 +13,7 @@ namespace mango
 		: View(title, parent, rect, style, show)
 	{	
 		mMSkBitmap = new MSkBitmap();
+		isNeedFreshOld = 0;
 	}
 
 
@@ -157,7 +158,7 @@ namespace mango
 		}
 
 		mCurrentInfo = *currentinfo;
-
+#if 0
 		if( (currentinfo->img_path == NULL) || (strcmp(currentinfo->img_path,"(null)") == 0)){
 			mMSkBitmap->release();
 		}else{
@@ -167,6 +168,7 @@ namespace mango
 		    pskBitmap = new SkBitmap();
 		    pskBitmap->setConfig(SkBitmap::kARGB_8888_Config,129,129);
 		    pskBitmap->allocPixels();//分配位图所占空间
+		    memset((char *)pskBitmap->getPixels(),0,129*129*4);
 		    
 			bool ret = SkImageDecoder::DecodeFile(currentinfo->img_path,&skBitmap,SkBitmap::kARGB_8888_Config,SkImageDecoder::kDecodePixels_Mode);			
 
@@ -180,18 +182,8 @@ namespace mango
 				srcRect.set(0,0,skBitmap.width(),skBitmap.height());
 				CalculateSize(skBitmap.width(),skBitmap.height(),109,109,dstRect);
 
-				log_i("dstRect:L=%f,T=%f,R=%f,B=%f",dstRect.left(),dstRect.top(),dstRect.right(),dstRect.bottom());
-
 				skCanvas->drawBitmapRect(skBitmap,&srcRect,dstRect);
-				/*
-				SkPaint paint;
-				paint.setColor(ARGB(255,255,0,0));
-				skCanvas->drawLine(0,0,0,109,paint);
-				paint.setColor(ARGB(255,0,255,0));
-				skCanvas->drawLine(10,0,10,109,paint);
-				paint.setColor(ARGB(255,0,0,255));
-				skCanvas->drawLine(20,0,20,109,paint);
-				*/
+
 				skCanvas->restore();
 				mMSkBitmap->create((int *)pskBitmap->getPixels(),pskBitmap->width(),pskBitmap->height());
 			}else{
@@ -199,6 +191,9 @@ namespace mango
 				mMSkBitmap->release();
 			}
 		}
+#else
+		BitmapFactory::decodeFile(mMSkBitmap,currentinfo->img_path,109,109);
+#endif
 
 		mAlbumImage->setMSkBitmap(mMSkBitmap);
 
@@ -292,8 +287,9 @@ namespace mango
 		int playmode;
 		int playModeNormalRes[4] = {IDP_PLAYMODE_0,IDP_PLAYMODE_1,IDP_PLAYMODE_2,IDP_PLAYMODE_3};
 		int playModePressRes[4] = {IDP_PLAYMODE_0_S,IDP_PLAYMODE_1_S,IDP_PLAYMODE_2_S,IDP_PLAYMODE_3_S};
-
+		
 		playmode = mPlayinglist->getPlayMode();
+		log_i("playmode=%d",playmode);
 		if(mPlayModeButton != NULL)
 			mPlayModeButton->setImageResId(playModeNormalRes[playmode],playModePressRes[playmode]);
 	}
@@ -301,6 +297,7 @@ namespace mango
 	void PlayingView::updatePlayButtonIcon(){
 		int isPlay;
 		isPlay = mPlayinglist->isPlaying();
+		log_i("mPlayinglist->isPlaying()=%d",isPlay);
 		if(isPlay)
 			mPlayButton->setImageResId(IDP_PLAYING_PAUSE,IDP_PLAYING_PAUSE);
 		else
@@ -497,8 +494,9 @@ namespace mango
 			int powerState = (unsigned int)parameter;
 			log_i("powerState = %d",powerState);
 			if(powerState == 0){
-				isNeedFresh = 1;
+				isNeedFresh = isNeedFreshOld;
 			}else if(powerState == 2){
+				isNeedFreshOld = isNeedFresh;
 				isNeedFresh = 0;
 			}
 			log_i("isNeedFresh = %d",isNeedFresh);
@@ -532,7 +530,7 @@ namespace mango
 	int PlayingView::onCommand(int id, int code, View* fromView)
 	{
 		int volume;
-
+		log_i("onCommand id = %d",id);
 		switch(id)
 		{
 		case PLAYING_IDB_NEXT:

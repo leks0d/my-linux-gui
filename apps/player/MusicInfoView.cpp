@@ -20,7 +20,9 @@ namespace mango
 	MusicInfoView::MusicInfoView(const TCHAR* title, View* parent, Rect* rect, int style, int show) 
 		: View(title, parent, rect, style, show)
 	{
-
+		mMSkBitmap = new MSkBitmap();
+		mCurrentInfo = new mediainfo;
+		memset(mCurrentInfo,0,sizeof(mediainfo));
 	}
 
 	MusicInfoView::~MusicInfoView(void)
@@ -41,6 +43,8 @@ namespace mango
 		rect.setEx(45, 0, 230, 20);
 		mTitle = new TextView(SETTING_TITLE, TEXT("mTitle"), this, &rect, 0);
 		mTitle->setTextColor(RGB(255,255,255));
+		mTitle->setTextResoure(STR_SETTING_MUSICINFO);
+		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mTitle->onCreate();
 
 		
@@ -50,7 +54,7 @@ namespace mango
 		mHome->setPressedImageId(IDP_MUSIC_HOME_SEC);
 		mHome->onCreate();
 
-		rect.setEx(16, 36, 110, 110);
+		rect.setEx(16, 36, 76, 76);
 		mAlbumImage = new ImageView(PLAYING_IDB_ALBUM_IMAGE, TEXT("mAlbumImage"), this, &rect, 0);
 
 //===============music info=======================
@@ -117,29 +121,52 @@ namespace mango
 	{
 		Mstring* mstr;
 		mediainfo *info;
-		info = mPlayinglist->getPlayingItem();
-		if(info==NULL)
-			return;
-		mCurrentInfo = *info;
+		Rect rect;
+		int firstLeft,infoWidth;
+		
+		log_i("setPlayTime mCurrentInfo.duration");
 		
 		mstr = new Mstring(10);
-		mstr->setPlayTime(mCurrentInfo.duration);
+		mstr->setPlayTime(mCurrentInfo->duration);
 		
-		log_i("setPlayTime mCurrentInfo.duration=%d",mCurrentInfo.duration);
-		
-		mAlbumImage->setImageResoure(IDP_MUSICINFO_ICON);
-		
-		mMusicPath->setTextString(mCurrentInfo.path);
+		BitmapFactory::decodeFile(mMSkBitmap,mCurrentInfo->img_path,76,76);
 
-		mFilename->setTextString(mCurrentInfo.name);
-		mMusicTitle->setTextString(mCurrentInfo.title);
-		mAlbum->setTextString(mCurrentInfo.album);
-		mArtist->setTextString(mCurrentInfo.artist);
+		if(mMSkBitmap->isVaild()){
+			firstLeft = 98;
+		}else{
+			firstLeft = 20;
+		}
+		infoWidth = 320 - firstLeft;
+		
+		rect.setEx(firstLeft, 36, infoWidth, 20);
+		mFilename->setRect(rect);
+		rect.setEx(firstLeft, 56, infoWidth, 20);
+		mMusicTitle->setRect(rect);
+		rect.setEx(firstLeft, 76, infoWidth, 20);
+		mAlbum->setRect(rect);
+		rect.setEx(firstLeft, 96, infoWidth, 20);
+		mArtist->setRect(rect);
+		
+		mAlbumImage->setMSkBitmap(mMSkBitmap);
+		
+		mMusicPath->setTextString(mCurrentInfo->path);
+
+		mFilename->setTextString(mCurrentInfo->name);
+		mMusicTitle->setTextString(mCurrentInfo->title);
+		mAlbum->setTextString(mCurrentInfo->album);
+		mArtist->setTextString(mCurrentInfo->artist);
 		mDuration->setTextString(mstr->mstr);
 
 		mstr->clear();
 	}
 
+	void MusicInfoView::setMusicInfo(mediainfo* info){
+		if(info == NULL){
+			memset(mCurrentInfo,0,sizeof(mediainfo));
+		}else{
+			memcpy(mCurrentInfo,info,sizeof(mediainfo));
+		}
+	}
 
 	int MusicInfoView::onDestroy()
 	{
@@ -161,7 +188,7 @@ namespace mango
 		if(fromView == NULL && code == NM_DISPLAY){
 			initView();
 		}else if(fromView == mBack && NM_CLICK){
-			gPlayer.showSettingsView();
+			gPlayer.dismissView(this);
 		}else if(fromView == mHome && NM_CLICK){
 			gPlayer.showPlayingView();
 		}
@@ -175,7 +202,6 @@ namespace mango
 			case KEYCODE_BACK:
 				break;
 		}
-
 		return 0;
 	}
 

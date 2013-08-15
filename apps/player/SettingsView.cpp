@@ -140,7 +140,7 @@ namespace mango
 		}else
 			mPlayModeListAdapter->refresh();
 		
-		mTitle->setTextResoure(MUSIC_MUSIC_FUN);
+		mTitle->setTextResoure(STR_SETTING_PLAYOODER);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mTitle->invalidateRect();
 		setMainState(0x1200);
@@ -159,7 +159,7 @@ namespace mango
 		}else
 			mAutoSleepListAdapter->refresh();
 		
-		mTitle->setTextResoure(STR_SETTING_GAPLESS);
+		mTitle->setTextResoure(STR_ADVANCE_POWER);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mTitle->invalidateRect();
 		setMainState(0x1430);
@@ -177,7 +177,7 @@ namespace mango
 		}else
 			mLanguageListAdapter->refresh();
 		
-		mTitle->setTextResoure(STR_SETTING_GAPLESS);
+		mTitle->setTextResoure(STR_ADVANCE_LANGUAGE);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mTitle->invalidateRect();
 		setMainState(0x1410);
@@ -227,7 +227,7 @@ namespace mango
 						case 2:
 							initGaplessList();		break;
 						case 3:
-							gPlayer.showMusicInfoView();	break;
+							gPlayer.showMusicInfoView(mPlayinglist->getPlayingItem());	break;
 						case 4:
 							initAdvanceList();	break;
 					}
@@ -257,6 +257,11 @@ namespace mango
 							gPlayer.showMediaView();
 							break;
 						}
+					break;
+				case 0x1410:
+					gSessionLocal.mStockGraphic.mCanvas.setTextLanguage(index+1);
+					gSettingProvider.update(SETTING_LANGUAGE_ID,index+1);
+					mLanguageListAdapter->refresh();
 					break;
 				case 0x1430:
 					gPowerManager->setAutoSleepTime(index);
@@ -344,7 +349,7 @@ namespace mango
 			mSecImgRes = new int[count];
 			memcpy(mSecImgRes,imgsec,count*sizeof(int));
 		}
-
+		log_i("SettingListAdapter::setData refresh.");
 		refresh();	
 	}
 	
@@ -352,14 +357,18 @@ namespace mango
 		int i;
 		log_i("SettingListAdapter::refresh()");
 		mlist->setListAdapter(this);
+		log_i("mlist->setListAdapter(this)");
 		mlist->deleteAllItems();
+		log_i("mlist->deleteAllItems(this)");
 
 		for(i=0;i<mCount;i++){
 			ListViewItem  lvItem;
+			
 			lvItem.mask     = LVIF_ADAPTER;
 			lvItem.iItem    = i;
 			lvItem.iSubItem = 0;
 			lvItem.paramType = LIST_PARAM_MUSIC;
+			
 			mlist->insertItem(&lvItem);
 			log_i("PlayingListAdapter insertItem i=%d",i);
 		}
@@ -506,7 +515,7 @@ namespace mango
 		canvas.setTextSize(18);
 		canvas.drawTextResource(mTextRes[index],x,y+13);
 		x+=150;
-		if(index == 2)
+		if(index == canvas.getTextLanguage()-1)
 			canvas.drawImageResource(IDP_LISTITEM_SEC,x,y+13);
 		else
 			canvas.drawImageResource(IDP_LISTITEM_NO_SEC,x,y+13);

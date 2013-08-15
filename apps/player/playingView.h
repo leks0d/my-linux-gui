@@ -18,7 +18,7 @@ namespace mango
 		void updatePlayMode();
 		void updatePlayButtonIcon();
 		void updateAudioInfo();
-		void CalculateSize(float srcw,float srch,float dstw,float dsth,SkRect &rect);
+		static void CalculateSize(float srcw,float srch,float dstw,float dsth,SkRect &rect);
 		virtual ~PlayingView(void);
 		virtual int onCreate();
 		virtual int onDestroy();
@@ -53,6 +53,7 @@ namespace mango
 		MSkBitmap *mMSkBitmap;
 		Thread mSeekBarUpdateThread;
 		int isNeedFresh;
+		int isNeedFreshOld; //backup when sleep in and sleep out
 		int mVolume;
 		int mBattery;
 		int isCharge;

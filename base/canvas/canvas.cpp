@@ -7,6 +7,7 @@ namespace mango
 	Canvas::Canvas(void)
 	{
 		mCharExtra = 0;
+		mLanguageId = 1;
 	}
 
 

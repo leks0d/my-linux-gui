@@ -111,7 +111,7 @@ namespace mango
 		width = rect.getWidth();
 		//log_i("TextView::setTextType width=%d",width);
 		
-		count = gSessionLocal.mResource.loadString(resId, wStrBuf, 256 + 1,1);
+		count = gSessionLocal.mResource.loadString(resId, wStrBuf, 256 + 1,gSessionLocal.mStockGraphic.mCanvas.getTextLanguage());
 		
 		Charset::wideCharToMultiByte(CP_UTF8, wStrBuf, String::lstrlen(wStrBuf), utf8Path, 260 * 3);
 		//log_i("TextView::setTextType utf8Path=%s",utf8Path);
@@ -130,6 +130,7 @@ namespace mango
 	 }
 
 	 int ValueTextView::onTouchUp(int x, int y, int flag){
+	 	log_i("onTouchUp VM_COMMAND = %d",mId);
 	 	postMessage(getParent(), VM_COMMAND, mId, (unsigned int)this);
 		return 0;
 	 }

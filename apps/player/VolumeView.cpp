@@ -38,7 +38,7 @@ namespace mango
 		Rect rect;
 		int firstLeft = 98;
 		
-		rect.setEx(136,95,60,15);
+		rect.setEx((320-60)/2,95,60,15);
 		mVolumeStr = new TextView(SETTING_BACK, TEXT("mBack"), this, &rect, 0);
 		mVolumeStr->setTextColor(COLOR_WHITE);
 		mVolumeStr->setTextResoure(STR_VOLUME);
@@ -46,7 +46,7 @@ namespace mango
 		mVolumeStr->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mVolumeStr->onCreate();
 		
-		rect.setEx(136,105,60,60);
+		rect.setEx((320-60)/2,105,60,60);
 		mVolume = new TextView(SETTING_BACK, TEXT("mBack"), this, &rect, 0);
 		mVolume->setTextColor(COLOR_WHITE);
 		mVolume->setTextLayoutType(TEXT_LAYOUT_CENTER);

@@ -60,6 +60,7 @@ namespace mango
 	{
 		mPressed = false;
 		invalidateRect();
+		//log_i("onTouchUp postMessage VM_COMMAND:%d",mId);
 		postMessage(getParent(), VM_COMMAND, mId, (unsigned int)this);
 		getParent()->onNotify(this,NM_CLICK,NULL);
 		return 0;

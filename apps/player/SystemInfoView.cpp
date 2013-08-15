@@ -78,7 +78,23 @@ namespace mango
 		mStorageSpace->setTextSize(size);
 		mStorageSpace->setTextColor(RGB(color,color,color));
 		mStorageSpace->onCreate();
-
+		top+=dinner;
+		
+		rect.setEx(left, top, 320-left, 20);
+		mUesedSpace = new ValueTextView(SETTING_BACK, TEXT("mFilename"), this, &rect, 0);
+		mUesedSpace->setTextResoure(STR_SYSTEM_INFO_USESPACE);
+		mUesedSpace->setTextSize(size);
+		mUesedSpace->setTextColor(RGB(color,color,color));
+		mUesedSpace->onCreate();
+		top+=dinner;
+		
+		rect.setEx(left, top, 320-left, 20);
+		mAvailSpace = new ValueTextView(SETTING_BACK, TEXT("mFilename"), this, &rect, 0);
+		mAvailSpace->setTextResoure(STR_SYSTEM_INFO_FREEPACE);
+		mAvailSpace->setTextSize(size);
+		mAvailSpace->setTextColor(RGB(color,color,color));
+		mAvailSpace->onCreate();
+		
 		initView();
 			
 		setFocus(this);
@@ -108,7 +124,23 @@ namespace mango
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mModelNumber->setTextString("DX50");
 		mFirmwareVersion->setTextString("V1.00");
-		mStorageSpace->setTextString("15.6G");
+		
+		updateTotalMem();
+	}
+	void SystemInfoView::updateTotalMem(){
+		int total,avail,free;
+		char spaceAll[10],usedSpace[10],availSpace[10];
+		char *path = "/mnt/sdcard";
+			
+		Environment::space_info(path,total,avail,free);
+		Environment::memSizeToStr(total,spaceAll);
+		Environment::memSizeToStr(total-avail,usedSpace);
+		Environment::memSizeToStr(avail,availSpace);
+		
+		mStorageSpace->setTextString(spaceAll);
+		mUesedSpace->setTextString(usedSpace);
+		mAvailSpace->setTextString(availSpace);
+		
 	}
 
 	int SystemInfoView::onDestroy()

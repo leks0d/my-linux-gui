@@ -7,6 +7,7 @@ namespace mango
 	public:
 		MusicInfoView(void);
 		MusicInfoView(const TCHAR* title, View* parent, Rect* rect, int style, int show = SW_NORMAL);
+		void setMusicInfo(mediainfo* info);
 		virtual ~MusicInfoView(void);
 		void initView();
 	public:
@@ -26,7 +27,7 @@ namespace mango
 		int getMainState(){return mainState;}
 	public:
 		MediaListView*  mListView;
-		mediainfo mCurrentInfo;
+		mediainfo* mCurrentInfo;
 		TextView* mTitle;
 		Button* mBack;
 		Button* mHome;
@@ -47,6 +48,7 @@ namespace mango
 		int		mSubindex;
 		TCHAR	mCurrentPath[MAX_PATH];
 		int 	mainState;
+		MSkBitmap *mMSkBitmap;
 	};
 
 };

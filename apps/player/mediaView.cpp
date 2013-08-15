@@ -73,6 +73,7 @@ namespace mango
 		mPlayingListAdapter = NULL;
 		mAlbumAdapter = NULL;
 		mArtistAdapter = NULL;
+		mMainListAdapter = NULL;
 	}
 
 
@@ -249,22 +250,34 @@ namespace mango
 			mListView->deleteAllItems();
 			mRootDirectListAdapter = new RootDirectListAdapter(mListView,ADAPTER_PLAYING);
 			mRootDirectListAdapter->setData(img,imgsec,text,count);
-		}else
+		}else{
+			log_i("mRootDirectListAdapter->refresh()");
 			mRootDirectListAdapter->refresh();
+		}
 		setMainState(0x1200);
 	}
 	void MediaView::initMainList(){
+		
 		int img[]={IDP_PLAYING_LIST,IDP_FILE_LIST,IDP_ALL_MUSIC,IDP_ALBUM_LIST,IDP_ARTIST_LIST};
 		int til[]={STR_PLAYING_LIST,STR_FILE_LIST,STR_MUSIC_LIST,STR_ALBUM_LIST,STR_ARTIST_LIST};
 		int i,count = 5;
 		int mask = LVIF_ITEXT | LVIF_IMAGE | LVIF_PARAM;
-		
+#if 0		
 		mListView->deleteAllItems();
 		for(i=count-1;i>=0;i--){
 			insertFileToListView(mask, NULL, img[i], (void*)i,til[i],LIST_PARAM_MAIN);
 		}
 		mListView->invalidateRect();
-
+#else
+		if(mMainListAdapter == NULL){
+			mListView->deleteAllItems();
+			mMainListAdapter = new MainListAdapter(mListView,ADAPTER_PLAYING);
+			mMainListAdapter->setData(img,img,til,count);
+		}else{
+			log_i("mMainListAdapter->refresh()");
+			mMainListAdapter->refresh();
+		}
+#endif
 		mTitle->setTextResoure(MUSIC_MY_MUSIC);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mTitle->invalidateRect();
@@ -486,6 +499,22 @@ namespace mango
 					break;	
 				case LIST_PARAM_MUSIC:
 					switch(getMainState()){
+						case 0x1000:
+							switch(record->m_lvItem.iItem){
+								case 0:
+									initPlayingList();	break;
+								case 1:
+									initRootDirect(); 	break;
+								case 2:
+									initMusicList();	break;
+								case 3:
+									initAlbumList();	break;
+								case 4:
+									initArtistList();	break;
+								default:
+									break;
+							}
+							break;
 						case 0x1100:
 							mPlayinglist->moveToPosition(record->m_lvItem.iItem);
 							mPlayinglist->startPlay();
@@ -494,9 +523,16 @@ namespace mango
 							break;
 						case 0x1300:
 						case 0x1410:
-						case 0x1510:	
-							playMediaInfo(mMusicAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem),1);
-							break;
+						case 0x1510:{
+								Point pt =  mListView->getTouchPrevPosition();
+								log_i("getTouchPrevPosition pt.x=%d",pt.x);
+								if(pt.x>46){
+									playMediaInfo(mMusicAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem),1);
+								}else{
+									gPlayer.showMusicOperateView( *(mMusicAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)) );
+								}
+								break;
+							}
 						case 0x1400:
 							initAlbumMusicList(mAlbumAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->album);
 							break;
@@ -523,6 +559,10 @@ namespace mango
 					}
 					break;
 				}
+		}
+		else if(fromView == NULL && code == NM_DISPLAY){
+			if(getMainState() != 0x1210)
+				mListView->refresh();
 		}
 
 		return 0;
@@ -819,5 +859,26 @@ namespace mango
 		canvas.setTextColor(RGB(255,255,255));
 		//canvas.setTextSize(12);
 		//canvas.drawText(info->artist,strlen(info->artist),50,y+28);
+	}
+	void MainListAdapter::PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec){
+		int	 x, y,index;
+		
+		x = rect.left;
+		y = rect.top;
+
+		index = lvitem->iItem;
+		x+=100;
+		if(isSec)
+			canvas.drawImageResource(mSecImgRes[index],x,y+10);
+		else
+			canvas.drawImageResource(mImgRes[index],x,y+10);
+		x+=33;
+		if(isSec)
+			canvas.setTextColor(RGB(255,149,0));
+		else
+			canvas.setTextColor(RGB(255,255,255));	
+		canvas.setTextSize(18);
+		canvas.drawTextResource(mTextRes[index],x,y+13);
+
 	}
 };

@@ -28,6 +28,16 @@ namespace mango
 			virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);
 	};
 
+	class MainListAdapter : public SettingListAdapter
+	{
+		public:
+			MainListAdapter(void){}
+			~MainListAdapter(void){}
+			MainListAdapter(ListView* list,int id): SettingListAdapter(list,id){}
+			virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);
+	};
+
+
 	class PlayingListAdapter : public BaseAdapter
 	{
 	public:
@@ -144,6 +154,7 @@ namespace mango
 		MusicAdapter* mMusicAdapter;
 		AlbumAdapter* mAlbumAdapter;
 		ArtistAdapter* mArtistAdapter;
+		MainListAdapter* mMainListAdapter;
 	private:
 		int		mMode;					//menu菜单 媒体库index 收藏夹 或 浏览路径
 		int		mPath;

@@ -651,7 +651,7 @@ namespace mango
 	{
 		WCHAR	wStrBuf[RESOURCE_TEXT_MAX_CHARS + 1] ;
 
-		if (gSessionLocal.mResource.loadString(id, wStrBuf, RESOURCE_STRING_MAX_CHARS + 1) > 0)
+		if (gSessionLocal.mResource.loadString(id, wStrBuf, RESOURCE_STRING_MAX_CHARS + 1) > 0,mLanguageId)
 			drawText((WCHAR*)wStrBuf, -1, x, y);
 
 	}
@@ -661,7 +661,7 @@ namespace mango
 	{
 		WCHAR	wStrBuf[RESOURCE_TEXT_MAX_CHARS + 1] ;
 
-		if (gSessionLocal.mResource.loadString(id, wStrBuf, RESOURCE_STRING_MAX_CHARS + 1) > 0)
+		if (gSessionLocal.mResource.loadString(id, wStrBuf, RESOURCE_STRING_MAX_CHARS + 1) > 0,mLanguageId)
 			drawText((WCHAR*)wStrBuf, -1, rect, format);
 	}
 
@@ -689,6 +689,13 @@ namespace mango
 		mBkColor = color;
 	}
 
+	void Canvas::setTextLanguage(int lanId){
+		mLanguageId = lanId;
+	}
+	
+	int Canvas::getTextLanguage(){
+		return mLanguageId;
+	}
 
 }
 

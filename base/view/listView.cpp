@@ -835,7 +835,7 @@ namespace mango
 		
 		if (lvitem->mask & LVIF_ADAPTER){
 			if(mListAdapter != NULL){
-				log_i("mListAdapter->PaintView lvitem->iItem=%d",lvitem->iItem);
+				//log_i("mListAdapter->PaintView lvitem->iItem=%d",lvitem->iItem);
 				mListAdapter->PaintView(canvas,rect,lvitem,record == mSelectedRecord);
 				return true;
 			}
@@ -953,7 +953,7 @@ namespace mango
 
 	int ListView::onPaint(Canvas& canvas)
 	{
-		log_i("ListView::onPaint------------------------------------");
+		//log_i("ListView::onPaint------------------------------------");
 
 		LISTVIEW_RECORD* record;
 		Rect  clientRect;
@@ -975,7 +975,7 @@ namespace mango
 			paintRecord(canvas, record, false);
 			record = getNextRecord(record, false);
 		}
-		log_i("ListView::onPaint---------------------end---------------");
+		//log_i("ListView::onPaint---------------------end---------------");
 		return 0 ;
 	}
 
@@ -1045,7 +1045,9 @@ namespace mango
 			return 0 ;
 
 		releaseCapture () ;
-
+		
+		mTouchPrevPosition.set(x, y);
+		
 		index =  getIndex(mFocusedRecord);
 		if (index >= 0)
 		{
@@ -1059,6 +1061,14 @@ namespace mango
 		return 0 ;
 	}
 
+	Point& ListView::getTouchPrevPosition(void){
+		return mTouchPrevPosition;
+	}
+	void ListView::refresh(void){
+		if(mListAdapter != NULL){
+			mListAdapter->refresh();
+		}
+	}
 
 	//处理WM_LAYOUT 消息
 	int	ListView::setLayout(PCTRL_LISTVIEW_LAYOUT layout)

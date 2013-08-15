@@ -1,13 +1,16 @@
 #include <sys/time.h>
 #include <signal.h>
+#include <sys/vfs.h>
 #include "mango.h"
 #include "resource.h"
 #include "SocketDetect.h"
+#include "AlarmManager.h"
 #include "mediaprovider.h"
 #include "ArrayMediaInfo.h"
 #include "SettingProvider.h"
 #include "PowerManager.h"
 #include "playinglist.h"
+#include "BitmapFactory.h"
 #include "mediaView.h"
 #include "SettingsView.h"
 #include "playlist.h"
@@ -22,6 +25,7 @@
 #include "UsmConnectView.h"
 #include "SdcardInsertView.h"
 #include "MediaScannerView.h"
+#include "MusicOperateView.h"
 
 
 namespace mango
@@ -144,6 +148,7 @@ namespace mango
 		int showMediaView();
 		int showSettingsView();
 		int showMusicInfoView();
+		int showMusicInfoView(mediainfo* info);
 		int showDisplaySettingView();
 		int showPointDrawView();
 		int showSystemInfoView();
@@ -153,6 +158,7 @@ namespace mango
 		int showUsmConnectView();
 		int showMediaScannerView();
 		int showSdcardInsertView();
+		int showMusicOperateView(mediainfo& info);
 		void dismissView(View *view);
 		int  getVolume(void);
 		void setVolume(int volume);
@@ -177,6 +183,7 @@ namespace mango
 		ShutDownView* mShutDownView;
 		MediaScannerView *mMediaScannerView;
 		SdcardInsertView *mSdcardInsertView;
+		MusicOperateView *mMusicOperateView;
 		PlayerEventInterface* mPlayerEventInterface;
 		int powerState;
 		int isBootLock;
