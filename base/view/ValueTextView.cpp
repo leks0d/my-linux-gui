@@ -19,7 +19,8 @@ namespace mango
 		mText = NULL;
 		resId = 0;
 		ResType = 0;
-		mColor = ARGB (255 ,255, 255,255);
+		mValueColor = ARGB (255,255,255,255);
+		mContextColor = RGB(180,180,180);
 		mSize = 16;
 		mPress = 0;
 	}
@@ -34,7 +35,7 @@ namespace mango
 		TCHAR *wt;
 		wt = TEXT("MY MUSIC");
 		log_i("TextView::onPaint");
-		canvas.setTextColor(mColor);
+		canvas.setTextColor(mValueColor);
 		canvas.setTextSize(mSize);
 		
 		if (resId > 0){
@@ -42,6 +43,8 @@ namespace mango
 			canvas.drawTextResource(resId, 0, 0);
 		}
 		
+		canvas.setTextColor(mContextColor);
+		log_i("mContextColor = 0x%x",mContextColor);
 		if(mText != NULL)
 			canvas.drawText(mText, strlen(mText), mKeyLen+3, 0);
 
@@ -82,11 +85,13 @@ namespace mango
 			//invalidateRect();
 		}
 	}
-
-	void ValueTextView::setTextColor(COLORREF color){
-		mColor = color;
+	void ValueTextView::setTextColor(COLORREF value,COLORREF context){
+		mValueColor = value;
+		mContextColor = context;
+		log_i("ValueTextView::setTextColor context=0x%x",context);
 		invalidateRect();
 	}
+
 
 	void ValueTextView::setTextSize(int size){
 		mSize = size;

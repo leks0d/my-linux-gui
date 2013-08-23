@@ -6,6 +6,8 @@ namespace mango
 	{	
 		int sleepTime;
 		int atuoCount;
+		int poweroffTime;
+		int atuoPoweroffCount;
 		int isSleep;
 	public:
 		PowerManager();
@@ -14,7 +16,9 @@ namespace mango
 		void setPowerState();
 		void setPowerState(int n);
 		void setAutoSleepTime(int time);
+		void setAutoPoweroffTime(int index);
 		int getAutoSleepTime();
+		int getPoweroffTime();
 	};
 	extern PowerManager *gPowerManager;
 };

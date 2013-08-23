@@ -59,13 +59,16 @@ namespace mango
 		~MusicAdapter(void){}
 		MusicAdapter(ListView* list,int id);
 		void refresh();
+		void setMusicOrderby(int order);
 		void rePaintList();
 		void setListData(ArrayMediaInfo* info);
+		void setWhere(char* wh);
 		virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);
 		virtual int getCount(){return 0;}
 		virtual void* getItem(int index){return 0;}
 		ListView* mlist;
-		ArrayMediaInfo *mMusicArrayList;	
+		ArrayMediaInfo *mMusicArrayList;
+		char *mWhere;
 	};
 
 	class AlbumAdapter : public BaseAdapter
@@ -113,8 +116,9 @@ namespace mango
 	public:
 		MediaView(void);
 		MediaView(const TCHAR* title, View* parent, Rect* rect, int style, int show = SW_NORMAL);
+		static int getMusicIcon(char* name);
 		virtual ~MediaView(void);
-
+		int onTouchDispatch(int x,int y, int action);
 	public:
 		virtual int onCreate();
 		virtual int onDestroy();
@@ -139,10 +143,15 @@ namespace mango
 		void initArtistList();
 		void initAlbumMusicList(char* album);
 		void initSpecMusicList(char* key,char* value,int state);
-		void setMainState(int state){ mainState = state;log_i("mainState = 0x%x",mainState);}
+		void setMainState(int state){ mainState = state;log_i("mainState = 0x%x",mainState);onMainStateChange(mainState);}
+		void onMainStateChange(int mainState);
 		int getMainState(){return mainState;}
 		void playMediaInfo(mediainfo* info,int display);
-		void backEvent()	;	
+		void backEvent()	;
+		void showOrderByMenu();
+		void dismissOrderByMenu();
+		bool menuIsShow();
+		static int getArrayInfoFromFile(char *file,ArrayMediaInfo& array);
 	public:
 		MediaListView*  mListView;
 		TextView* mTitle;
@@ -151,17 +160,25 @@ namespace mango
 		ImageView* mTitleImageView;
 		PlayingListAdapter* mPlayingListAdapter;
 		RootDirectListAdapter* mRootDirectListAdapter;
+		
 		MusicAdapter* mMusicAdapter;
+		MusicAdapter* mAlbumMusicAdapter;
+		MusicAdapter* mArtistMusicAdapter;
 		AlbumAdapter* mAlbumAdapter;
 		ArtistAdapter* mArtistAdapter;
 		MainListAdapter* mMainListAdapter;
+		ImageView* mOrderMenuBk;
+		TextView* mOrderByTitle;
+		TextView* mOrderByAlbum;
+		TextView* mOrderByArtist;
+		TextView* mOrderByTime;
 	private:
 		int		mMode;					//menu²Ëµ¥ Ã½Ìå¿âindex ÊÕ²Ø¼Ð »ò ä¯ÀÀÂ·¾¶
 		int		mPath;
 		int		mSubindex;
 		TCHAR	mCurrentPath[MAX_PATH];
 		int 	mainState;
-
+		int     mOrderMenuShow;
 
 	};
 

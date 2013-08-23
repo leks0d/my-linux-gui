@@ -16,7 +16,7 @@ namespace mango
 			
 		void ArrayMediaInfo::addMediaInfo(mediainfo *info){
 
-				log_i("ArrayMediaInfo::addMediaInfo %d,len=%d,mMax=%d,",info,len,mMax);
+				//log_i("ArrayMediaInfo::addMediaInfo %d,len=%d,mMax=%d,",info,len,mMax);
 			
 				if(len>=mMax){
 					

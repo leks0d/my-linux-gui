@@ -58,8 +58,17 @@ namespace mango
 		insert(SETTING_PLAYPOS_ID,0);
 		insert(SETTING_AUTOSLEEP_ID,30);
 		insert(SETTING_LANGUAGE_ID,1);
+		insert(SETTING_AUTOPOWEROFF_ID,60*5);
+		insert(100,100);
 	}
-	
+	void SettingProvider::dbclose(){
+		int value;
+		update(100,101);
+		
+		log_i("------------------SettingProvider close-----value=%d",value);
+		
+		sqlite3_close(db);
+	}
 	int SettingProvider::insert(int id,int value){
 		int ret = 0;
 		char *pErrMsg = 0;
@@ -188,7 +197,7 @@ namespace mango
 
 		for(i=0;i<argc;i++,argv++){
 			array->addItem(mediaprovider::str_to_int(*argv));
-			log_i("------->sql_callback:%d,%s",mediaprovider::str_to_int(*argv),*argv);
+			//log_i("------->sql_callback:%d,%s",mediaprovider::str_to_int(*argv),*argv);
 		}
 		return 0;
 	}

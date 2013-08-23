@@ -28,6 +28,7 @@ namespace mango
 		VM_SHOWWINDOW,                   
 		VM_WININICHANGE,   
 
+
 		VM_KEYDOWN, 
 		VM_KEYUP,
 
@@ -111,6 +112,8 @@ namespace mango
 		int peek(Message& msg, bool remove = true);
 
 		void setResult(int result);
+		void deleteMoreTouchMove(void);
+		bool isExistInput(void);
 
 		unsigned int mCustomerThreadId;
 

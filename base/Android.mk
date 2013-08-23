@@ -58,6 +58,7 @@ LOCAL_SRC_FILES += party/semaphore.cpp
 LOCAL_SRC_FILES += party/session.cpp
 LOCAL_SRC_FILES += party/thread.cpp
 LOCAL_SRC_FILES += party/time.cpp
+LOCAL_SRC_FILES += party/gestureDetector.cpp
 
 LOCAL_SRC_FILES += view/button.cpp
 LOCAL_SRC_FILES += view/listView.cpp
@@ -70,6 +71,7 @@ LOCAL_SRC_FILES += view/ImageView.cpp
 LOCAL_SRC_FILES += view/SeekBar.cpp
 LOCAL_SRC_FILES += view/ValueTextView.cpp
 LOCAL_SRC_FILES += view/VerticalSeekBar.cpp
+LOCAL_SRC_FILES += view/cartoon.cpp
 
 #LOCAL_LDLIBS :=  -llog 
 

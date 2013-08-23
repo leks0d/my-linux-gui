@@ -102,16 +102,18 @@ namespace mango
 		Pen*    select(Pen* pen);
 		Brush*  select(Brush* brush);
 		Font*   select(Font* font);
+		Region* select(Region* region);
 
 		bool drawImageResource(int id, int x, int y, bool alpha = true);
 		bool drawImageResource(int id, int x, int y,int width,int hight,bool alpha = true);
-		bool drawBitmap(int* colors, int x, int y, int width, int height); 
+		bool drawBitmap(int* colors, int x, int y, int width, int height, bool alpha = true); 
 		bool drawBitmapRGB(int* colors, int x, int y, int width, int height);
 	public:
 		void renew(class View* view);
 		void swapScreenFrontBuffer();
 		static void charToWCHAR(char *string,WCHAR *des);
-
+		void copyScreenFrontToBack();
+		Point& getViewPos(){return mViewPos;}
 	private:
 		bool drawLine32(Rect& clipRect, int xStart, int yStart, int xEnd, int yEnd);
 		bool drawLine(Rect& clipRect, int xStart, int yStart, int xEnd, int yEnd);
@@ -136,8 +138,7 @@ namespace mango
 		bool bitBlt_32(void *pDestBits,	int iDestWidth, int nXDest,  int nYDest,  int nWidth,  int nHeight, \
 				void *pSrcBits,  int iSrcWidth,  int nXSrc,   int nYSrc,  \
 				DWORD dwRop, DWORD dwAlpha, Region* rgn);
-
-	
+		
 
 	private:
 		Region*  mInitRegion;

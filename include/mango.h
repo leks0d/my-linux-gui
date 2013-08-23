@@ -83,8 +83,8 @@ extern "C" {
 #include "mango/viewZAxis.h"
 #include "mango/session.h"
 
-#include "mango/controls.h"
 #include "mango/gestureDetector.h"
+#include "mango/controls.h"
 
 #endif
 

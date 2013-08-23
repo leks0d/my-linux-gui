@@ -14,8 +14,14 @@ namespace mango
 		mMax = 100;
 		mProgress = 38;
 		mWidth = 295;
+		
 		mBkgLeft = 6;
 		mSeekLeft = mBkgLeft+6;
+		
+		mBkgX = 6;
+		mBkgY = 8;
+		mSeekX = 12;
+		mSeekY = 14;
 	}
 
 
@@ -24,10 +30,13 @@ namespace mango
 	}
 	
 	void SeekBar::setProgress(int n){
-		
+		if(mMax <= 0){
+			log_i("error invail mMax.");
+			return;
+		}
 		mProgress = n;
 		mSeekWidth = n*mWidth/mMax;
-		mThumbX = mSeekLeft+mSeekWidth-15;
+		mThumbX = mSeekX+mSeekWidth-15;
 		invalidateRect();	
 	}
 	
@@ -36,27 +45,45 @@ namespace mango
 	}
 	
 	void SeekBar::setTouchX(int x){
-		int px = x - mSeekLeft;
+		int px = x - mSeekX;
 		
 		if(px >= mWidth)
 			px = mWidth;
 		
 		mSeekWidth = px;
 		mProgress = mSeekWidth*mMax/mWidth;
-		mThumbX = mSeekLeft+mSeekWidth-15;
+		mThumbX = mSeekX+mSeekWidth-15;
 		
 		invalidateRect();
+	}
+
+	void SeekBar::setBackgroundRes(int resId,int x,int y){
+		mBkgImage = resId;
+		mBkgX = x;
+		mBkgY = y;
+	}
+	void SeekBar::setSeekgroundRes(int resId,int x,int y){
+		mSeekImage = resId;
+		mSeekX = x;
+		mSeekY = y;
 	}
 
 	int SeekBar::onPaint(Canvas& canvas)
 	{
 		int imageId = 0;
 		Rect rect;
+#if 0		
 		if(mBkgImage>0&&mSeekImage>0&&mThumbImage>0){
 			canvas.drawImageResource(mBkgImage, mBkgLeft, 8);
 			canvas.drawImageResource(mSeekImage, mSeekLeft, 14, mSeekWidth, 4);
 			//canvas.drawImageResource(mThumbImage, mThumbX, 0);
 		}
+#else		
+		if(mBkgImage>0)
+			canvas.drawImageResource(mBkgImage, mBkgX, mBkgY);
+		if(mSeekImage>0)
+			canvas.drawImageResource(mSeekImage, mSeekX, mSeekY,mSeekWidth,10);
+#endif		
 		return 0;
 	}
 	

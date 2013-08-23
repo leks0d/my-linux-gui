@@ -42,13 +42,14 @@ namespace mango
 	void Environment::space_info(char *path,int& toatl,int& avail,int& free)
 	{
 		struct statfs sfs;
-		
+
+		memset(&sfs,0,sizeof(struct statfs));
 		statfs(path,&sfs);
 
-		log_i("sfs.f_blocks=%lu,sfs.f_bsize=%u",sfs.f_blocks,sfs.f_bsize);
-		toatl = sfs.f_blocks * 8;
-		avail = sfs.f_bavail * 8;
-		free = sfs.f_bfree * 8;
+		log_i("sfs.f_blocks=%lu,sfs.f_bsize=0x%x",sfs.f_blocks,sfs.f_bsize);
+		toatl = sfs.f_blocks * sfs.f_bsize/1024;
+		avail = sfs.f_bavail * sfs.f_bsize/1024;
+		free = sfs.f_bfree * sfs.f_bsize/1024;
 		log_i("toatl=%d,avail=%d,free=%d",toatl,avail,free);
 	}
 
@@ -59,5 +60,58 @@ namespace mango
 		sprintf(space,"%.2fG",sizeG);
 	}
 
+	void Environment::recovery(){
+		char *COMMAND_FILE = "/cache/recovery/command";
+		char *cmd_data = "--wipe_data";
+		char *cmd_cache = "--wipe_cache";
+		char *cmd_all = "--wipe_all";
+		char *reboot = "reboot recovery";
+		FILE* file;
+		int ret;
+		
+		file  = fopen(COMMAND_FILE, "w");
+		if (file == NULL) {
+			log_e("fopen error:%s",COMMAND_FILE);
+			return ;
+		}
+
+		ret = fwrite(cmd_all,strlen(cmd_data),1,file);
+		
+		if(ret == -1){
+			log_i("recovery write fail.");
+		}else
+			log_i("recovery write sucess.");
+		
+		fclose(file);
+		
+		system(reboot);
+	}
+	void Environment::install(){
+		char *COMMAND_FILE = "/cache/recovery/command";
+		char *cmd_data = "--wipe_data";
+		char *cmd_cache = "--wipe_cache";
+		char *cmd_all = "--wipe_all";
+		char *cmd_update = "--update_rkimage=/mnt/sdcard/update.img";
+		char *reboot = "reboot recovery";
+		FILE* file;
+		int ret;
+		
+		file  = fopen(COMMAND_FILE, "w");
+		if (file == NULL) {
+			log_e("fopen error:%s",COMMAND_FILE);
+			return ;
+		}
+
+		ret = fwrite(cmd_update,strlen(cmd_update),1,file);
+		
+		if(ret == -1){
+			log_i("recovery write fail.");
+		}else
+			log_i("recovery write sucess.");
+		
+		fclose(file);
+		
+		system(reboot);
+	}
 
 };

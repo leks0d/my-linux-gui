@@ -29,6 +29,8 @@ namespace mango
 		void inflate(int dx, int dy);
 		int getWidth(){int w=right-left;if(w<0) w=0;return w;}
 		int getHight(){int h=bottom-top;if(h<0) h=0;return h;}
+		int width(void);
+		int height(void);
 	public:
 		int left;
 		int top;

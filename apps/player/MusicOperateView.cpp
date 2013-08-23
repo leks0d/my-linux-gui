@@ -21,6 +21,7 @@ namespace mango
 		: View(title, parent, rect, style, show)
 	{
 		mOperateMuiscListAdapter = NULL;
+		memset(&mCurrentInfo,0,sizeof(mCurrentInfo));
 	}
 
 	MusicOperateView::~MusicOperateView(void)
@@ -33,10 +34,11 @@ namespace mango
 		Rect rect;
 		int firstLeft = 98;
 
-		rect.setEx(0,25,320,215);
+		rect.setEx(0,21,320,219);
 		mListView = new MediaListView(TEXT("operate List"), this, &rect, LVS_LIST);
 		mListView->setListItemBackground(IDP_LISTITEM_BGD,IDP_LISTITEM_BGD_SEC);
 		mListView->setTextColor(RGB(255,255,255));
+		mListView->setListViewBackground(IDP_PLAYING_LIST_BACK);
 		mListView->onCreate();
 
 		rect.setEx(0, 0, 41, 22);
@@ -89,9 +91,6 @@ namespace mango
 			log_i("initOperateMuiscList mOperateMuiscListAdapter refresh");
 			mOperateMuiscListAdapter->refresh();
 		}
-		mTitle->setTextResoure(STR_SETTING_PLAYOODER);
-		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
-		mTitle->invalidateRect();
 		setMainState(0x1200);		
 	}
 	

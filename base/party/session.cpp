@@ -10,6 +10,7 @@ namespace mango
 	#define TCC_LCD_FB_IOCTL_ALPHA_SELECTION		0x16
 	#define CHARGE "Charging\n"
 	#define DISCHARGE "Discharging\n"
+	#define APP_START_LOGO		1
 	
 	static void print_info(struct fb_var_screeninfo *vinfo);
 	static int rgb565To888(int rgb);
@@ -140,7 +141,7 @@ namespace mango
 		return ;
 	}
 
-	log_i("Open /dev/input/event1 \n") ;
+	log_i("Open /dev/input/event1") ;
 
 	while (1) 
 	{
@@ -232,7 +233,7 @@ namespace mango
 			return ;
 		}
 
-		log_i ("Open /dev/input/event2 \n") ;
+		log_i ("Open /dev/input/event2") ;
 
 		pt.x = 0 ;
 		pt.y = 0 ;
@@ -327,6 +328,7 @@ namespace mango
 		}
 		else if (mTouchPressed && pressed)
 		{
+			gMessageQueue.deleteMoreTouchMove();
 			gMessageQueue.post(mTouchView, VM_TOUCHMOVE, ptInView.x ,ptInView.y);
 		}else if (!pressed)
 		{
@@ -453,7 +455,7 @@ namespace mango
 			return;
 		}
 		
-		log_i("Open /dev/input/event0 \n") ;
+		log_i("Open /dev/input/event0") ;
 		
 		while (1) 
 		{
@@ -563,14 +565,14 @@ namespace mango
 			log_e ("mmap /dev/fb0 failed \n") ;
 			return FALSE ;
 		}
-		
+#if APP_START_LOGO		
 		showBootLogo((unsigned char*)pAddress);
-		
+#endif		
 		ioctl(mfbDevice, FBIOPUT_VSCREENINFO, &info);
 		
 		ioctl(mfbDevice, FBIOPAN_DISPLAY, &info);
 		mfbBuffer = pAddress;
-		log_i("fb0 buffer address 0x%x \n", pAddress) ;
+		log_i("fb0 buffer address 0x%x", pAddress) ;
 #endif
 
 		for (i = 0 ; i < SESSION_SURFACE_COUNT ; i++)
@@ -581,7 +583,7 @@ namespace mango
 			mSurface[i].mWidthBytes = ((SCREEN_CX * SCREEN_BITSPERPXIEL + 31) & (~31) ) >> 3;
 
 			mSurface[i].mBits = (unsigned char*)mfbBuffer + SCREEN_BUFFER_BYTES * i;
-			log_i ("address mSurface[%d] = 0x%x \n", i,mSurface[i].mBits) ;
+			log_i ("address mSurface[%d] = 0x%x", i,mSurface[i].mBits) ;
 		}
 		
 		initializeFont();
@@ -748,13 +750,13 @@ namespace mango
 		if (gSession.mScreen.mYOffset)
 		{
 			gSession.mScreen.mYOffset = 0;
-			memset((unsigned char*)mSurface[0].mBits, 0x0, SCREEN_BUFFER_BYTES);
+			//memset((unsigned char*)mSurface[0].mBits, 0x0, SCREEN_BUFFER_BYTES);
 			mStockGraphic.mBitmap.setBits(mSurface[0].mBits);
 		}
 		else
 		{
 			gSession.mScreen.mYOffset = 240;
-			memset((unsigned char*)mSurface[1].mBits, 0x0, SCREEN_BUFFER_BYTES);
+			//memset((unsigned char*)mSurface[1].mBits, 0x0, SCREEN_BUFFER_BYTES);
 			mStockGraphic.mBitmap.setBits(mSurface[1].mBits);
 			
 		}
@@ -791,7 +793,7 @@ namespace mango
 		fclose(fb);
 
 		log_i("*********************FBIOGET_VSCREENINFO**************************\n");
-		log_i("vinfo->xres=%d\n",vinfo->xres);
+/*		log_i("vinfo->xres=%d\n",vinfo->xres);
 		log_i("vinfo->yres=%d\n",vinfo->yres);
 		log_i("vinfo->xres_virtual=%d\n",vinfo->xres_virtual);
 		log_i("vinfo->yres_virtual=%d\n",vinfo->yres_virtual);
@@ -800,7 +802,14 @@ namespace mango
 		log_i("vinfo->bits_per_pixel=%d\n",vinfo->bits_per_pixel);
 		log_i("vinfo->grayscale=%d\n",vinfo->grayscale);		
 		log_i("******************************END*********************************\n");
-		
+*/		
+	}
+	void SessionLocal::copyScreenFrontToBack()
+	{
+		if (mStockGraphic.mBitmap.getBits() == mSurface[0].mBits)
+			memcpy(mSurface[0].mBits, mSurface[1].mBits, SCREEN_BUFFER_BYTES);
+		else
+			memcpy(mSurface[1].mBits, mSurface[0].mBits, SCREEN_BUFFER_BYTES);
 	}
 	bool SessionLocal::loadLanguageCodePage(int langid)
 	{

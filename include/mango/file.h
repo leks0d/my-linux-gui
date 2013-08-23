@@ -20,7 +20,7 @@ namespace mango
 		bool findOpen(TCHAR* path);
 		bool findClose();
 		bool findNext(TCHAR* path, int *attribute);
-
+		bool findNext(TCHAR* path, int *attribute,char *cName);
 		static TCHAR* pathAddBackslash(TCHAR* path);
 		static bool  pathMatchSpec(LPCTSTR pszFile, LPCTSTR pszSpec,DWORD dwFlags);
 		static TCHAR* pathFindFileName(TCHAR* path);

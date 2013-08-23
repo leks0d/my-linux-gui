@@ -34,10 +34,11 @@ static const char *PlayerLock = "playerlock";
 				int count,i,playpost;
 				ArrayMediaInfo *pinfo;
 				mediainfo *info;
-				
+
+				log_i("-------------Playinglist::initPlayintList");
 				pinfo = new ArrayMediaInfo();
 				
-				count = gmediaprovider.queryMusicArray(NULL,pinfo);
+				count = gmediaprovider.queryMusicArray("order by inplay",pinfo);
 				
 				for(i=0;i<count;i++){
 					info = pinfo->getMediaInfo(i);
@@ -48,7 +49,8 @@ static const char *PlayerLock = "playerlock";
 				//checkPlayintList();
 				gSettingProvider.query(SETTING_PLAYMODE_ID,&playMode);
 				gSettingProvider.query(SETTING_PLAYPOS_ID,&playpost);
-				
+
+				log_i("playpost = %d",playpost);
 				moveToPosition(playpost);
 			}
 
@@ -74,12 +76,17 @@ static const char *PlayerLock = "playerlock";
 				
 				for(i=0;i<count;i++){
 					info = getItem(i);
-					log_i("updateInPlay id=%d",info->id);
-					gmediaprovider.updateInPlay(1,info->id);
+					log_i("updateInPlay mplayinglist[%d].id=%d",i,info->id);
+					gmediaprovider.updateInPlay(i+1,info->id);
 				}
-				gSettingProvider.update(SETTING_PLAYPOS_ID,mCurrent);
+				if(getCount()>0){
+					/*mediainfo* item = getPlayingItem();
+					if(item != NULL){
+						gSettingProvider.update(SETTING_PLAYPOS_ID,item->id);
+					}*/
+					gSettingProvider.update(SETTING_PLAYPOS_ID,mCurrent);
+				}
 			}
-			
 			void Playinglist::removeItem(int n){
 				int i;
 				int count = getCount();
@@ -95,7 +102,14 @@ static const char *PlayerLock = "playerlock";
 				memset(&ptr[len-1],0,sizeof(mediainfo));
 				len--;
 			}
-			
+			void Playinglist::addArrayItem(ArrayMediaInfo& array){
+				int count = array.getCount();
+				int i;
+				for(i=0;i<count;i++){
+					if(isItemExsit(array.getMediaInfo(i))<0)
+						addItem(array.getMediaInfo(i));
+				}
+			}
 			void Playinglist::addItem(mediainfo *item	){
 
 				if(len>=mMax){
@@ -116,6 +130,7 @@ static const char *PlayerLock = "playerlock";
 				mplaylist[len].isPlayed = 0;
 				len++;
 			}
+
 
 			int Playinglist::moveToNext(){
 				int p = mCurrent;
@@ -278,9 +293,12 @@ static const char *PlayerLock = "playerlock";
 				int i;
 				for(i=0;i<len;i++){
 					
-					if(mplaylist[i].id == info->id && info->id!=-1)
+					if(mplaylist[i].id == info->id && info->id!=-1){
 						return i;
-					
+					}else if(info->id == -1 || mplaylist[i].id == -1){
+						if(strcmp(mplaylist[i].path,info->path) == 0)
+							return i;
+					}
 				}
 				return -1;
 			}

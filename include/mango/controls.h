@@ -51,8 +51,10 @@ namespace mango
 			
 			int mSprintf(const char* str,int n);
 			int mfloatSprintf(const char* str,float n);
-			void clear(){delete mstr;mstr = new char[len];pos=0;}
+			int mStringSprintf(const char* str,char* s);
+			void clear(){	memset(mstr,0,len);		pos=0;}
 			void setPlayTime(int n);
+			~Mstring(void){if(mstr!=NULL)delete mstr;mstr=NULL;}
 	};
 
 	class StaticView : public View
@@ -60,11 +62,39 @@ namespace mango
 	public:
 		StaticView(void);
 		StaticView(const TCHAR* title, View* parent, Rect* rect, int style, int show = SW_NORMAL);
-
 		virtual ~StaticView(void);
 
 	public:
+		virtual int setTitle(const TCHAR* title);
+		virtual int setTextString(const char* title);
+		virtual int setTextResoure(int res);
+		virtual int setTextSize(int size);
+		virtual int setTextColor(int color);
+		virtual int setTextBkRes(int res);
 		virtual int onPaint(Canvas& canvas);
+		virtual int onTouchDown(int x, int y, int flag);
+		virtual int onTouchMove(int x, int y, int flag);
+		virtual int onTouchUp(int x, int y, int flag);
+
+	public:
+		virtual int getTitlePaintStartX();
+		virtual int setTitlePaintStartX(int x);
+
+	private:
+		void updateTextPaintExtent(const TCHAR* title);
+		int  cartoonDrag(int distance);
+		void cartoonDisplay(void);
+		void paint(Canvas& canvas);
+
+
+
+	private:
+		int		mTitlePaintStartX;
+		Size    mTitlePaintExtent;
+		Point   mTouchPrevPosition;
+		int 	mColor;
+		int 	mTextSize;
+		int 	mBkRes;
 	};
 
 	class Button : public View
@@ -100,12 +130,20 @@ namespace mango
 			void setImagePath(char* path);
 			void setSkBitmap(int *bit,int w,int h);
 			void setMSkBitmap(MSkBitmap *bitmap);
+			void setBitmapAlps(bool alps){mAlps = alps;}
+			void setBitmapStart(int x,int y){mStartX = x;mStartY = y;}
+			void setVisiable(bool visiable);
+			bool getVisiable(){return mVisiable;}
 			virtual int onPaint(Canvas& canvas);
 		private:
 			char *mImagePath;
 			int resId;
 			int ResType;
 			MSkBitmap *mMSkBitmap;
+			bool mAlps;
+			int mStartX;
+			int mStartY;
+			bool mVisiable;
 	};
 
 #define TEXT_LAYOUT_LEFT		0
@@ -130,6 +168,9 @@ namespace mango
 			void getTextString(char *string);
 			void setBackGround(int nor,int sec){mNormalBgdResId=nor,mSelectBgdResId=sec;};
 			void setLog(int log){mLog = log;}
+			void setVisiable(bool visiable);
+			void setIconRes(int res){mIconRes = res;}
+			void setShowIcon(bool show){showIcon = show;invalidateRect();}
 			virtual int onPaint(Canvas& canvas);
 			virtual int onTouchDown(int x, int y, int flag);
 			virtual int onTouchUp(int x, int y, int flag);
@@ -151,6 +192,11 @@ namespace mango
 			int mTop;
 			int mLayoutType;
 			int mLog;
+			bool mVisiable;
+			int mIconRes;
+			bool showIcon;
+			int mIconX;
+			int mIconY;
 	};
 
 
@@ -162,7 +208,7 @@ class ValueTextView : public View
 		~ValueTextView(void);
 		void setTextResoure(int Id);
 		void setTextString(char* text);
-		void setTextColor(COLORREF color);	
+		void setTextColor(COLORREF value,COLORREF context = RGB(180,180,180));	
 		void setTextSize(int size);
 		void setTextLayoutType(int layout);
 		void computeLeft(Canvas *canvas);
@@ -175,7 +221,8 @@ class ValueTextView : public View
 		
 		int resId;
 		int ResType;			
-		COLORREF mColor;
+		COLORREF mValueColor;
+		COLORREF mContextColor;
 		int mNormalBgdResId;
 		int mSelectBgdResId;
 		int mSize;
@@ -199,14 +246,19 @@ class ValueTextView : public View
 			int getProgress();
 			void setTouchX(int x);
 			void setMax(int n){mMax=n; if(mMax == 0) mMax = 1;log_i("SeekBar setMax = %d",mMax);}
-			
+			void setBackgroundRes(int resId,int x,int y);
+			void setSeekgroundRes(int resId,int x,int y);
 			virtual int onPaint(Canvas& canvas);
 			virtual int onTouchDown(int x, int y, int flag);
 			virtual int onTouchMove(int x, int y, int flag);
 			virtual int onTouchUp(int x, int y, int flag);
 		private:
 			int mBkgImage;
+			int mBkgX;
+			int mBkgY;
 			int mSeekImage;
+			int mSeekX;
+			int mSeekY;	
 			int mThumbImage;
 			int mProgress;
 			int mMax;
@@ -447,15 +499,23 @@ typedef struct tagCTRL_LISTVIEW_LAYOUT
 
 	class BaseAdapter{
 		public:
-		BaseAdapter(void){}
+		BaseAdapter(void){mYoffset = 0;}
 		~BaseAdapter(void){}
 		virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);
 		virtual void refresh(){return;}
 		virtual int getCount();
 		virtual void* getItem(int index){return NULL;}
 		virtual int getId(){return mId;}
-
+		virtual int setYoffset(int y){
+			//log_i("mYoffset = %d",mYoffset);
+			mYoffset = y;
+		}
+		virtual int getYoffset(){
+			//log_i("mYoffset = %d",mYoffset);
+			return mYoffset;
+		}
 		int mId;
+		int mYoffset;
 	};
 
 
@@ -470,7 +530,11 @@ typedef struct tagCTRL_LISTVIEW_LAYOUT
 		virtual int onCreate();
 		virtual int onDestroy();
 		virtual int onPaint(Canvas& canvas);
-		void setListAdapter(BaseAdapter* adapter){ mListAdapter = adapter;}
+		void setListAdapter(BaseAdapter* adapter){
+			mListAdapter = adapter; 
+			//mZonePoint.y = mListAdapter->getYoffset();mZonePoint.x=0;
+		}
+		BaseAdapter* getListAdapter(){ return mListAdapter;}
 		virtual int onKeyDown(int keyCode, int flag);
 		virtual int onKeyUp(int keyCode, int flag); 
 
@@ -491,7 +555,7 @@ typedef struct tagCTRL_LISTVIEW_LAYOUT
 		virtual	int	setItemState (int index, ListViewItem* lvitem);
 		virtual ListViewItem*  getSelectedItem(void);
 		virtual Point& getTouchPrevPosition(void);
-		virtual void refresh(void);
+		virtual void refresh();
 		
 		//record1 < reocrd2  return < 0;
 		//record1 = reocrd2  return  0;
@@ -613,6 +677,8 @@ typedef struct tagCTRL_LISTVIEW_LAYOUT
 		int	sort(void);
 
 		void setListItemBackground(int res,int press){mItemBackground = res;mPressItemBackground=press;}
+		void setListViewBackground(int res){mListViewBackgound = res;}
+		static bool gearshiftProcess(View* view, unsigned int evenID, int shift, VOID *parameter);
 	private:
 		//重画新区
 		int  cartoonRedraw(Canvas& canvas, Rect& redrawRect);
@@ -626,6 +692,10 @@ typedef struct tagCTRL_LISTVIEW_LAYOUT
 		int cartoonDisplay(void);
 
 		int cartoonDrag(int dy);
+		int cartoonRiffle (int ySpeed);
+		
+		//回归移动动画
+		int cartoonTropic(void);
 
 		//恢复反白显示项 至正常模式
 		void resumeSelectedRecord(bool update = false);
@@ -657,12 +727,29 @@ typedef struct tagCTRL_LISTVIEW_LAYOUT
 		COLORREF	mTextColor ;
 		int mItemBackground;
 		int mPressItemBackground;
+		int mListViewBackgound;
 		BaseAdapter* mListAdapter;
+		GestureDetector mGestureDetector;
 	} ;
 
 
 
+	//Cartoon
+	typedef bool (*PGEARSHIFTPROCESS)(View* view, unsigned int evenID, int shift, VOID *parameter);
 
+
+	class Cartoon : public Object
+	{
+	public:
+		Cartoon(void);
+		~Cartoon(void);
+
+	public:
+		static void gearshift(View* view, int destShift, int viewSize, PGEARSHIFTPROCESS pfnGearshiftProcess, void* parameter);
+
+	private:
+		static int getGearshift(int destShift, int viewSize);
+	};
 } ;
 
 #endif

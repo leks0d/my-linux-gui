@@ -54,6 +54,7 @@ namespace mango
 			void playPauseOrStart();
 			void callbackPlay();
 			void addItem(mediainfo *item);
+			void addArrayItem(ArrayMediaInfo& array);
 			void removeItem(int n);
 			int getDuration();
 			int getCurrent();

@@ -37,7 +37,7 @@ namespace mango
 		int top = 60;
 		int dinner = 33;
 		int size = 17;
-		int color = 180;
+		int color = 255;
 		rect.setEx(0, 0, 41, 22);
 		mBack = new Button(SETTING_BACK, TEXT("mBack"), this, &rect, 0);
 		mBack->setNormalImageId(IDP_SETTING_BACK);
@@ -74,7 +74,7 @@ namespace mango
 		
 		rect.setEx(left, top, 320-left, 20);
 		mStorageSpace = new ValueTextView(SETTING_BACK, TEXT("mFilename"), this, &rect, 0);
-		mStorageSpace->setTextResoure(STR_SYSTEM_INFO_STORAGE);
+		mStorageSpace->setTextResoure(STR_SYSTEM_INFO_INTERNAL);
 		mStorageSpace->setTextSize(size);
 		mStorageSpace->setTextColor(RGB(color,color,color));
 		mStorageSpace->onCreate();
@@ -82,21 +82,29 @@ namespace mango
 		
 		rect.setEx(left, top, 320-left, 20);
 		mUesedSpace = new ValueTextView(SETTING_BACK, TEXT("mFilename"), this, &rect, 0);
-		mUesedSpace->setTextResoure(STR_SYSTEM_INFO_USESPACE);
+		mUesedSpace->setTextResoure(STR_SYSTEM_INFO_EXTERNAL);
 		mUesedSpace->setTextSize(size);
 		mUesedSpace->setTextColor(RGB(color,color,color));
 		mUesedSpace->onCreate();
 		top+=dinner;
-		
+/*		
 		rect.setEx(left, top, 320-left, 20);
 		mAvailSpace = new ValueTextView(SETTING_BACK, TEXT("mFilename"), this, &rect, 0);
 		mAvailSpace->setTextResoure(STR_SYSTEM_INFO_FREEPACE);
 		mAvailSpace->setTextSize(size);
 		mAvailSpace->setTextColor(RGB(color,color,color));
 		mAvailSpace->onCreate();
-		
+	
+		rect.setEx(0, 150, 320, 22);
+		mStorageSeekBar = new SeekBar(SETTING_BACK, TEXT("mStorageSeekBar"), this, &rect, 0);
+		mStorageSeekBar->setBackgroundRes(IDP_STORAGE_SPACE,0,0);
+		mStorageSeekBar->setSeekgroundRes(IDP_STORAGE_USE,5,5);
+		mStorageSeekBar->setMax(100);
+		mStorageSeekBar->setProgress(38);
+		mStorageSeekBar->onCreate();
+*/
 		initView();
-			
+
 		setFocus(this);
 		invalidateRect();
 		return 0;
@@ -111,15 +119,6 @@ namespace mango
 	}
 	void SystemInfoView::initView()
 	{
-		Mstring* mstr;
-		int brightness;
-
-		//mstr = new Mstring(5);
-		//gPlayer.ioctrlBrightness(IOCTRL_BRIGTNESS_READ,&brightness);	
-		//mstr->mSprintf("%d",brightness);
-
-		//mBrightnessValue->setTextString(mstr->mstr);
-
 		mTitle->setTextResoure(STR_ADVANCE_SYSINFO);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mModelNumber->setTextString("DX50");
@@ -129,18 +128,29 @@ namespace mango
 	}
 	void SystemInfoView::updateTotalMem(){
 		int total,avail,free;
-		char spaceAll[10],usedSpace[10],availSpace[10];
-		char *path = "/mnt/sdcard";
-			
-		Environment::space_info(path,total,avail,free);
-		Environment::memSizeToStr(total,spaceAll);
-		Environment::memSizeToStr(total-avail,usedSpace);
-		Environment::memSizeToStr(avail,availSpace);
+		char iSpaceAll[10],iSpaceAvail[10],espaceAll[10],eSpaceAvail[10];
+		char external[20],internal[20],*ptr;
+		char *ipath = "/mnt/sdcard";
+		char *epath = "/mnt/external_sd";
+		Mstring *mstr;
+		mstr = new Mstring(20);
 		
-		mStorageSpace->setTextString(spaceAll);
-		mUesedSpace->setTextString(usedSpace);
-		mAvailSpace->setTextString(availSpace);
+		Environment::space_info(ipath,total,avail,free);
+		Environment::memSizeToStr(total,iSpaceAll);
+		Environment::memSizeToStr(avail,iSpaceAvail);
+		mstr->mStringSprintf("%s left/",iSpaceAvail);
+		mstr->mStringSprintf("%s",iSpaceAll);
+		mStorageSpace->setTextString(mstr->mstr);
+
+		mstr->clear();
+		Environment::space_info(epath,total,avail,free);
+		Environment::memSizeToStr(total,espaceAll);
+		Environment::memSizeToStr(avail,eSpaceAvail);
+		mstr->mStringSprintf("%s left/",eSpaceAvail);
+		mstr->mStringSprintf("%s",espaceAll);
 		
+		mUesedSpace->setTextString(mstr->mstr);
+		delete mstr;
 	}
 
 	int SystemInfoView::onDestroy()
@@ -151,7 +161,7 @@ namespace mango
 	int SystemInfoView::onPaint(Canvas& canvas)
 	{
 		log_i("MediaView::onPaint");
-		canvas.drawImageResource(IDP_SETTING_BGD,0,0,false);
+		canvas.drawImageResource(IDP_PLAYING_BACKGROUND,0,0,false);
 		canvas.drawImageResource(IDP_MUSIC_TITLEBAR,0,0,false);	
 		
 		return 0;
@@ -160,7 +170,7 @@ namespace mango
 	int SystemInfoView::onNotify(View* fromView, int code, void* parameter)
 	{
 		if(fromView == NULL && code == NM_DISPLAY){
-			//initView();
+			initView();
 		}else if(fromView == mBack && NM_CLICK){
 			gPlayer.showSettingsView();
 		}else if(fromView == mHome && NM_CLICK){
@@ -195,8 +205,8 @@ namespace mango
 
 		return -1;
 	}
-	int SystemInfoView::onTouchMove(int x, int y, int flag){
-
+	int SystemInfoView::onTouchMove(int x, int y, int flag)
+	{
 		return -1;
 
 	}

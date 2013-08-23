@@ -26,6 +26,8 @@ namespace mango
 		mAdvanceListAdapter = NULL;
 		mLanguageListAdapter = NULL;
 		mAutoSleepListAdapter = NULL;
+		mPowerListAdapter = NULL;
+		mPoweroffListAdapter = NULL;
 	}
 
 	SettingsView::~SettingsView(void)
@@ -37,10 +39,11 @@ namespace mango
 	{
 		Rect rect;
 
-		rect.setEx(0,25,320,215);
+		rect.setEx(0,21,320,219);
 		mListView = new MediaListView(TEXT("Media List"), this, &rect, LVS_LIST);
 		mListView->setListItemBackground(IDP_LISTITEM_BGD,IDP_LISTITEM_BGD_SEC);
 		mListView->setTextColor(RGB(255,255,255));
+		mListView->setListViewBackground(IDP_PLAYING_LIST_BACK);
 		mListView->onCreate();
 
 		rect.setEx(0, 0, 41, 22);
@@ -82,27 +85,33 @@ namespace mango
 	int SettingsView::onPaint(Canvas& canvas)
 	{
 		log_i("MediaView::onPaint");
-		canvas.drawImageResource(IDP_SETTING_BGD,0,0,false);
+		canvas.drawImageResource(IDP_PLAYING_BACKGROUND,0,0,false);
 		canvas.drawImageResource(IDP_MUSIC_TITLEBAR,0,0,false);
 		return 0;
 	}
 
 
 	void SettingsView::initAdvanceList(){
-		int img[]={IDP_ADVANCE_LANGUGE,IDP_ADVANCE_DISPLAY,IDP_ADVANCE_BATTARY,IDP_ADVANCE_SYSTEM_INFO,IDP_ADVANCE_DISPLAY,IDP_ADVANCE_SYSTEM_INFO};
-		int imgsec[]={IDP_ADVANCE_LANGUGE_S,IDP_ADVANCE_DISPLAY_S,IDP_ADVANCE_BATTARY_S,IDP_ADVANCE_SYSTEM_INFO_S,IDP_ADVANCE_DISPLAY_S,IDP_ADVANCE_SYSTEM_INFO_S};
-		int text[]={STR_ADVANCE_LANGUAGE,STR_ADVANCE_DISPLAY,STR_ADVANCE_POWER,STR_ADVANCE_SYSINFO,STR_ADVANCE_SHOWTOUCH,STR_ADVANCE_SCANNER};
+		int img[]={IDP_ADVANCE_LANGUGE,IDP_ADVANCE_DISPLAY,IDP_ADVANCE_BATTARY,IDP_ADVANCE_SYSTEM_INFO,IDP_SYSTEM_RESET,IDP_ADVANCE_SYSTEM_INFO};
+		int imgsec[]={IDP_ADVANCE_LANGUGE_S,IDP_ADVANCE_DISPLAY_S,IDP_ADVANCE_BATTARY_S,IDP_ADVANCE_SYSTEM_INFO_S,IDP_SYSTEM_RESET_S,IDP_ADVANCE_SYSTEM_INFO_S};
+		int text[]={STR_ADVANCE_LANGUAGE,STR_ADVANCE_DISPLAY,STR_ADVANCE_POWER,STR_ADVANCE_SYSINFO,STR_SYSTEM_RESTET,STR_SYSTEM_UPDATE};
+
 		int i,count = 6;
-		log_i("SettingsView::initAdvanceList");
-		if(mAdvanceListAdapter == NULL){
-			log_i("SettingsView::mListView->deleteAllItems()");
-			mListView->deleteAllItems();
-			log_i("SettingsView::new SettingListAdapter");
-			mAdvanceListAdapter = new SettingListAdapter(mListView,ADAPTER_PLAYING);
-			mAdvanceListAdapter->setData(img,imgsec,text,count);
+		
+		if(FileAttr::FileExist("/mnt/sdcard/update.img")){
+			count = 6;
 		}else{
-			mAdvanceListAdapter->refresh();
+			count = 5;
 		}
+		
+		log_i("SettingsView::initAdvanceList");
+		
+		if(mAdvanceListAdapter == NULL){
+			mListView->deleteAllItems();
+			mAdvanceListAdapter = new SettingListAdapter(mListView,ADAPTER_PLAYING);
+		}
+		mAdvanceListAdapter->setData(img,imgsec,text,count);
+
 		mTitle->setTextResoure(STR_SETTING_ADVANCED);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mTitle->invalidateRect();
@@ -114,8 +123,9 @@ namespace mango
 		int text[]={STR_SETTING_EQ,STR_SETTING_PLAYOODER,STR_SETTING_GAPLESS,STR_SETTING_MUSICINFO,STR_SETTING_ADVANCED};
 		int i,count = 5;
 		
+		mListView->deleteAllItems();
+		
 		if(mSettingListAdapter == NULL){
-			mListView->deleteAllItems();
 			mSettingListAdapter = new SettingListAdapter(mListView,ADAPTER_PLAYING);
 			mSettingListAdapter->setData(img,imgsec,text,count);
 		}else
@@ -126,7 +136,24 @@ namespace mango
 		mTitle->invalidateRect();
 		setMainState(0x1000);
 	}
-
+	void SettingsView::initPowerList(){
+		int img[]={0,0};
+		int imgsec[]={0,0};
+		int text[]={STR_POWER_SCREEN_OFF,STR_POWER_POWER_OFF};
+		int i,count = 2;
+		
+		if(mPowerListAdapter == NULL){
+			mListView->deleteAllItems();
+			mPowerListAdapter = new SettingListAdapter(mListView,ADAPTER_PLAYING);
+			mPowerListAdapter->setData(img,imgsec,text,count);
+		}else
+			mPowerListAdapter->refresh();
+		
+		mTitle->setTextResoure(STR_ADVANCE_POWER);
+		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
+		mTitle->invalidateRect();
+		setMainState(0x1430);		
+	}
 	void  SettingsView::initPlayOrderList(){
 		int img[]={IDP_PLAYMODE_0,IDP_PLAYMODE_1,IDP_PLAYMODE_2,IDP_PLAYMODE_3};
 		int imgsec[]={IDP_PLAYMODE_0_S,IDP_PLAYMODE_1_S,IDP_PLAYMODE_2_S,IDP_PLAYMODE_3_S};
@@ -159,10 +186,28 @@ namespace mango
 		}else
 			mAutoSleepListAdapter->refresh();
 		
-		mTitle->setTextResoure(STR_ADVANCE_POWER);
+		mTitle->setTextResoure(STR_POWER_SCREEN_OFF);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mTitle->invalidateRect();
-		setMainState(0x1430);
+		setMainState(0x1431);
+	}
+	void SettingsView::initAutoPoweroffList(){
+		int img[]={0,0,0,0};
+		int imgsec[]={0,0,0,0};
+		int text[]={STR_POWEROFF_5M,STR_POWEROFF_10M,STR_POWEROFF_20M,STR_POWEROFF_30M};
+		int i,count = 4;
+		
+		if(mPoweroffListAdapter == NULL){
+			mListView->deleteAllItems();
+			mPoweroffListAdapter = new PoweroffListAdapter(mListView,ADAPTER_PLAYING);
+			mPoweroffListAdapter->setData(img,imgsec,text,count);
+		}else
+			mPoweroffListAdapter->refresh();
+		
+		mTitle->setTextResoure(STR_POWER_POWER_OFF);
+		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
+		mTitle->invalidateRect();
+		setMainState(0x1432);
 	}
 	void SettingsView::initLanguageList(){
 		int img[]={0,0,0,0,0};
@@ -247,14 +292,19 @@ namespace mango
 						case 1:
 							gPlayer.showDisplaySettingView();	break;
 						case 2:
-							initAutoSleepList(); break;
+							//initAutoSleepList(); 
+							initPowerList();
+							break;
 						case 3:
 							gPlayer.showSystemInfoView(); break;
 						case 4:
-							gPlayer.showPointDrawView(); break;
+							//gPlayer.showPointDrawView(); 
+							Environment::recovery();
+							break;
 						case 5:
-							gmediaprovider.mediascanner("/mnt/sdcard");
-							gPlayer.showMediaView();
+							//gmediaprovider.mediascanner("/mnt/sdcard");
+							//gPlayer.showMediaView();
+							Environment::install();
 							break;
 						}
 					break;
@@ -263,15 +313,30 @@ namespace mango
 					gSettingProvider.update(SETTING_LANGUAGE_ID,index+1);
 					mLanguageListAdapter->refresh();
 					break;
-				case 0x1430:
-					gPowerManager->setAutoSleepTime(index);
-					mAutoSleepListAdapter->refresh();
-					break;					
+				case 0x1430:{
+					switch(index){
+						case 0:
+							initAutoSleepList();
+							break;
+						case 1:
+							initAutoPoweroffList();
+							break;
+					}
+					break;
+				case 0x1431:
+						gPowerManager->setAutoSleepTime(index);
+						mAutoSleepListAdapter->refresh();
+						break;
+				case 0x1432:
+						gPowerManager->setAutoPoweroffTime(index);
+						mPoweroffListAdapter->refresh();
+						break;
+				}
 			}
 			
 		}
 		else if(fromView == mBack && code == NM_CLICK){
-			backEvent();	
+			backEvent();
 		}else if(fromView == mHome && code == NM_CLICK){
 			gPlayer.showPlayingView();
 		}
@@ -313,12 +378,16 @@ namespace mango
 				break;
 			case 0x1410:	
 			case 0x1430:
-				initAdvanceList();	
+				initAdvanceList();
+				break;
+			case 0x1431:
+			case 0x1432:
+				initPowerList();
 				break;
 		}
 	}
 	
-	SettingListAdapter::SettingListAdapter(ListView* list,int id){
+	SettingListAdapter::SettingListAdapter(ListView* list,int id):BaseAdapter(){
 		mId = id;
 		mlist = list;	
 		mImgRes = NULL;
@@ -358,6 +427,7 @@ namespace mango
 		log_i("SettingListAdapter::refresh()");
 		mlist->setListAdapter(this);
 		log_i("mlist->setListAdapter(this)");
+		//mlist->deleteAllRecord();
 		mlist->deleteAllItems();
 		log_i("mlist->deleteAllItems(this)");
 
@@ -516,6 +586,36 @@ namespace mango
 		canvas.drawTextResource(mTextRes[index],x,y+13);
 		x+=150;
 		if(index == canvas.getTextLanguage()-1)
+			canvas.drawImageResource(IDP_LISTITEM_SEC,x,y+13);
+		else
+			canvas.drawImageResource(IDP_LISTITEM_NO_SEC,x,y+13);
+	}
+	
+	PoweroffListAdapter::PoweroffListAdapter(ListView* list,int id)
+		: SettingListAdapter(list,id){
+
+	}
+	void PoweroffListAdapter::PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec){
+		int	 x, y,index;
+		
+		x = rect.left;
+		y = rect.top;
+
+		index = lvitem->iItem;
+		x+=50;
+		if(isSec)
+			canvas.drawImageResource(mSecImgRes[index],x,y+10);
+		else
+			canvas.drawImageResource(mImgRes[index],x,y+10);
+		x+=33;
+		if(isSec)
+			canvas.setTextColor(RGB(255,149,0));
+		else
+			canvas.setTextColor(RGB(255,255,255));	
+		canvas.setTextSize(18);
+		canvas.drawTextResource(mTextRes[index],x,y+13);
+		x+=150;
+		if(index == gPowerManager->getPoweroffTime())
 			canvas.drawImageResource(IDP_LISTITEM_SEC,x,y+13);
 		else
 			canvas.drawImageResource(IDP_LISTITEM_NO_SEC,x,y+13);

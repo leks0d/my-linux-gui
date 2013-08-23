@@ -5,11 +5,15 @@ namespace mango
 
 	int time[]={30,60,2*60,5*60,10*60};
 	int len = 5;
+	int power[]={60*5,60*10,60*20,60*30};
+	int plen = 4;
 	
 	PowerManager::PowerManager(){
 		isSleep = 0;
 		gSettingProvider.query(SETTING_AUTOSLEEP_ID,&sleepTime);
+		gSettingProvider.query(SETTING_AUTOPOWEROFF_ID,&poweroffTime);
 		atuoCount = 0;
+		atuoPoweroffCount = 0;
 		setPowerState(0);
 	}
 
@@ -17,16 +21,29 @@ namespace mango
 		sleepTime = time[index];
 		gSettingProvider.update(SETTING_AUTOSLEEP_ID,sleepTime);
 	}
+	void PowerManager::setAutoPoweroffTime(int index){
+		if(index>=0&&index<=3){
+			poweroffTime = power[index];
+			gSettingProvider.update(SETTING_AUTOPOWEROFF_ID,poweroffTime);
+		}
+	}
 
 	void PowerManager::PowerManagerCount(){
 		atuoCount++;
-		//log_i("PowerManager::resetCount atuoCount=%d",atuoCount);
 		if(atuoCount>=sleepTime&&(!isSleep))
 			setPowerState();
+		
+		atuoPoweroffCount++;
+		if(mPlayinglist->isPlaying()){
+			atuoPoweroffCount = 0;
+		}
+		if(atuoPoweroffCount>=poweroffTime)
+			reboot(RB_POWER_OFF);
 	}
 
 	void PowerManager::resetCount(){
 		atuoCount = 0;
+		atuoPoweroffCount = 0;
 		//log_i("PowerManager::resetCount atuoCount=0");
 	}
 
@@ -92,6 +109,14 @@ namespace mango
 		int i;
 		for(i = 0;i<len;i++){
 			if(sleepTime == time[i])
+				break;
+		}
+		return i;
+	}
+	int PowerManager::getPoweroffTime(){
+		int i;
+		for(i = 0;i<plen;i++){
+			if(poweroffTime == power[i])
 				break;
 		}
 		return i;

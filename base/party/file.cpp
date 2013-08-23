@@ -134,6 +134,43 @@ namespace mango
 #endif
 	}
 
+		bool File::findNext(TCHAR* path, int *attribute,char *cName)
+		{
+			struct	 dirent   *s_dir;	
+			char   szFile[MAX_PATH] ;
+			struct stat64 statbuf ;
+			int charCount;
+	
+			s_dir = readdir(mDir) ;
+			if (s_dir == NULL)
+				return false;
+	
+			//log_i ("name %s \n", s_dir->d_name) ;
+	
+			strcpy(szFile, mPath) ;
+			strcat(szFile, "/") ;
+			strcat(szFile, s_dir->d_name) ;
+
+			strcpy(cName,s_dir->d_name);
+			//log_i ("fulll name %s \n", s_dir->d_name) ;
+	
+			if (stat64 (szFile, &statbuf) == -1)
+			{
+				log_e("Get stat Error:%s\n",  s_dir->d_name) ;
+				return false;
+			}
+	
+			charCount = Charset::multiByteToWideChar(CP_UTF8, s_dir->d_name, strlen(s_dir->d_name), path, MAX_PATH);
+			if (charCount >= 0)
+				path[charCount] = '\0';
+	
+			if (S_ISDIR(statbuf.st_mode))
+				*attribute = FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_NORMAL ;
+			else
+				*attribute = FILE_ATTRIBUTE_NORMAL ;
+
+			return true;
+		}
 
 	TCHAR* File::pathAddBackslash(TCHAR* path)
 	{

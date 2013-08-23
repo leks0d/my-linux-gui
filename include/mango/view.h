@@ -7,6 +7,7 @@ namespace mango
 
 #define VS_TOPMOST      0x00000008
 #define VS_CHILD        0x40000000
+#define VS_TRANSPARENT  0x20000000
 
 #ifndef WIN323
 #define SW_HIDE             0
@@ -14,6 +15,7 @@ namespace mango
 #define SW_MINIMIZE         6
 #endif
 
+#define KEYCODE_POWER		0x0001
 #define KEYCODE_ENTER		0x0002
 #define KEYCODE_VOLUMEUP		158
 #define KEYCODE_VOLUMEDOWN		159
@@ -106,7 +108,9 @@ namespace mango
 		int sendMessage(class View* view, unsigned int id, unsigned int parameter1 = 0, unsigned int paramter2 = 0);
 		int postMessage(class View* view, unsigned int id, unsigned int parameter1 = 0, unsigned int paramter2 = 0);
 
-
+		void setShowState(int state);
+		int getShowState(){return mShowState;}
+		
 	public:
 		int mStyle;
 		View* mParent;

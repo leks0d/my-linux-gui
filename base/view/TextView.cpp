@@ -3,7 +3,7 @@
 
 namespace mango
 {
-
+#define VOLUME_IMAGE_MAX_BYTES 50*50*4+32
 	static void test();
 	
 	TextView::TextView(void)
@@ -29,6 +29,9 @@ namespace mango
 		mEnable = 1;
 		mLog = 0;
 		iText = NULL;
+		mVisiable = true;
+		showIcon = false;
+		mIconRes = 0;
 	}
 
 
@@ -43,6 +46,9 @@ namespace mango
 		int charCount;
 		Rect rect;
 
+		if(!mVisiable)
+			return 0;
+		
 		getRect(rect);
 		//log_i("TextView::onPaint:%s",mText);
 
@@ -75,7 +81,10 @@ namespace mango
 			computeLeft(&canvas);
 			canvas.drawText(iText, iTextLen, mLeft, mTop);
 		}
-
+		if(showIcon && mIconRes > 0){
+			canvas.drawImageResource(mIconRes,mIconX,mIconY,true);
+		}
+		
 		return 0;
 	}
 
@@ -88,7 +97,7 @@ namespace mango
 			iText = NULL;
 			iTextLen = 0;
 		}
-		
+		ResType = 0;
 		if(text == NULL)
 			return;
 		
@@ -140,8 +149,10 @@ namespace mango
 		WCHAR	wStrBuf[256 + 1] ;
 		Size size;
 		Rect rect;
-		int count,width,hight,wpadd,hpadd;
+		int count,width,hight,wpadd,hpadd,iconYpadd;
 		char utf8Path[300];
+		RESOURCEIMAGE_HEADER mImageHeader;
+		void*	mImageBuffer;
 		
 		getRect(rect);
 		width = rect.getWidth();
@@ -154,8 +165,24 @@ namespace mango
 			count = String::lstrlen(iText);
 			canvas->getTextExtentPoint(iText,count,size);
 		}
+		if(showIcon){
+			
+			mImageBuffer = malloc(VOLUME_IMAGE_MAX_BYTES);
+			if (mImageBuffer == NULL){
+				return;
+			}
+
+			if (gSessionLocal.mResource.loatBitmap(mIconRes, &mImageHeader, mImageBuffer, VOLUME_IMAGE_MAX_BYTES) <= 0)
+				return;
+			
+			wpadd = width - size.cx - mImageHeader.m_iWidth;	
+			
+			safeFree(mImageBuffer);
+
+		}else{
+			wpadd = width - size.cx;
+		}
 		
-		wpadd = width - size.cx;
 		hpadd = hight - size.cy;
 		
 		if(wpadd < 0)
@@ -174,7 +201,16 @@ namespace mango
 				break;
 			case TEXT_LAYOUT_RIGHT:
 				mLeft = wpadd-1;
+				mTop = hpadd/2;
 				break;
+		}
+
+		if(showIcon){
+			mIconX = mLeft + size.cx + 1;
+			iconYpadd =  hight - mImageHeader.m_iHeight;
+			if(iconYpadd < 0)
+				iconYpadd = 0;
+			mIconY = iconYpadd/2;
 		}
 	}
 
@@ -182,7 +218,7 @@ namespace mango
 	 	if(mEnable == 0)
 			return 0;
 	 	mPress = 1;
-		invalidateRect();	
+		invalidateRect();
 	 	return 0;
 	 }
 	 int TextView::onTouchUp(int x, int y, int flag){
@@ -229,7 +265,13 @@ namespace mango
 		log_i("buf=%x %x %x %x",buf[0],buf[1],buf[2],buf[3]);
 		fclose(fb);	
 	}
-	
+	void TextView::setVisiable(bool visiable){
+		if(visiable != mVisiable){
+			mVisiable = visiable;
+			invalidateRect();
+		}
+	}
+
 };
 
 

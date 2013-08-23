@@ -26,10 +26,21 @@ namespace mango
 		int getMainState(){return mainState;}
 		static unsigned int VolumeRunning(void* p);
 		void setVolume(int vol);
+	private:
+		RESOURCEIMAGE_HEADER mVolumeImageHeader;
+		void*				 mVolumeImageBuffer;
+		int 				 mVolume;
+		int volumeToGuage(int volume);	
+		void loadVolumeImage(void);
+		void releaseVolumeImage(void);
+		int  getAngleFromVolume(int volume);
+		void drawVolumeImage(Canvas& canvas, int x, int y, int volume);
+		inline int getQuadrant(int angle);
+		inline int getQuadrant(int x, int y);
 	public:
 		MediaListView*  mListView;
 		mediainfo mCurrentInfo;
-		TextView* mVolume;
+		TextView* mVolumeText;
 		TextView* mVolumeStr;
 		Button* mBack;
 		Button* mHome;

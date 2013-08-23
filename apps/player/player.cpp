@@ -1,7 +1,5 @@
 #include "player.h"
-#include <sys/reboot.h>
-#include <signal.h>
- 
+ #include "cutils/android_reboot.h"
 namespace mango
 {
 
@@ -17,6 +15,18 @@ namespace mango
 		mPlayingView = NULL;
 		mSettingsView = NULL;
 		mMusicInfoView = NULL;
+		mDisplaySettingView = NULL;
+		mPointDrawView = NULL;
+		mSystemInfoView = NULL;
+		mVolumeView = NULL;
+		mEqSettingsView = NULL;
+		mShutDownView = NULL;
+		mMediaScannerView = NULL;
+		mSdcardInsertView = NULL;
+		mMusicOperateView = NULL;
+		mUsmConnectView = NULL;
+		mKeyLockView = NULL;
+		
 		powerState = 0;
 		isBootLock = 0;
 	}
@@ -35,14 +45,14 @@ namespace mango
 		initialize();
 		gSettingProvider.initialize();
 		initSettings();
-		holdKeyProbe();
+		
 		spdifProbe();
 		gmediaprovider.initialize();
-		
+
 		mPlayinglist = new Playinglist();
 		mPlayinglist->initPlayintList();		
 		
-		mango::Thread::sleep(1000 * 3);
+		//mango::Thread::sleep(1000 * 3);
 		
 		mSpdifSwitch = new PlayerSwitch();
 		mHeadestSwitch = new PlayerSwitch();
@@ -62,13 +72,12 @@ namespace mango
 		for(i=0;i<50;i++){
 			//signal(i,&sig_int); 
 		}
-		log_i("signal &sig_int");
 #else
 		gAlarmManager = new AlarmManager();
 		gAlarmManager->initialize();
 		gAlarmManager->setAlarmWakeup(6);
 #endif
-
+		holdKeyProbe();
 		return messageLoop();
 	}
 	void Player::setBootWakeLock(int en){
@@ -78,10 +87,11 @@ namespace mango
 				isBootLock = 1;
 				bootLockCount = 20;
 			}
-		}else if(isBootLock){
+		}
+		/*else if(isBootLock){
 			if(wakeUnlock(BootUp) == 0)
 				isBootLock = 0;
-		}
+		}*/
 	}
 
 	int Player::initSettings(){
@@ -268,6 +278,7 @@ namespace mango
 			mSdcardInsertView->invalidateRect();
 			mSdcardInsertView->setFocus();
 		}
+		holdKeyProbe();
 	}	
 	int Player::showVolumeView(){
 		if (mVolumeView == NULL) {
@@ -296,15 +307,25 @@ namespace mango
 			mShutDownView->invalidateRect();
 			mShutDownView->setFocus();		
 		}
+		shutDown();
+	}
+	void Player::shutDown(){
+		int sleepCount;
+		
 		mPlayinglist->stopPlayer();
 		mPlayinglist->savePlayintList();
-		mango::Thread::sleep(1000 * 3);
-		reboot(RB_POWER_OFF);		
-	}
+		gSettingProvider.dbclose();
 
+		sleepCount = 30;
+		while(sleepCount--){
+			mango::Thread::sleep(100);
+		}
+		
+		reboot(RB_POWER_OFF);
+	}
 	int Player::showMusicOperateView(mediainfo& info){
 		if(mMusicOperateView == NULL){
-			mMusicOperateView = new MusicOperateView(TEXT("ShutDown"), NULL, NULL, 0, SW_NORMAL);
+			mMusicOperateView = new MusicOperateView(TEXT("MusicOperate"), NULL, NULL, 0, SW_NORMAL);
 			mMusicOperateView->onCreate();
 		}else{
 			gSession.mViewZAxis.bringViewToTop(mMusicOperateView);
@@ -316,7 +337,19 @@ namespace mango
 			mMusicOperateView->setFocus();
 		}
 	}
-	
+	int Player::showKeyLockView(){
+		if(mKeyLockView == NULL){
+			mKeyLockView = new KeyLockView(TEXT("MusicOperate"), NULL, NULL, 0, SW_NORMAL);
+			mKeyLockView->onCreate();
+		}else{
+			gSession.mViewZAxis.bringViewToTop(mKeyLockView);
+		}
+
+		if (mKeyLockView){
+			mKeyLockView->invalidateRect();
+			mKeyLockView->setFocus();
+		}
+	}	
 	void Player::dismissView(View *view){
 		View *displayView;
 		
@@ -433,7 +466,7 @@ namespace mango
 		close(fd);
 	}
 
-	void Player::holdKeyProbe(){
+	int Player::holdKeyProbe(){
 		int fd=0,state;
 		char* path = "/sys/class/axppower/holdkey";
 		char rbuf;
@@ -446,6 +479,14 @@ namespace mango
 		log_i("/sys/class/axppower/holdkey:0x%x",state);
 		
 		gSession.setHoldKeyState(state);
+
+		if(state){
+			gPlayer.dismissView(gPlayer.mKeyLockView);
+		}else{
+			gPlayer.showKeyLockView();	
+		}		
+		
+		return state;
 	}
 	void Player::spdifProbe(){
 		bool isSpidfIn;
@@ -468,6 +509,7 @@ namespace mango
 		close(fd);
 		log_i("spdif Player::isSpdifIn state=%d",state);
 		return state?false:true;
+		//return true; //同轴关codec 设计有问题，这里屏蔽掉
 	}
 	bool Player::isHeadestIn(){
 		int fd=0,state;
@@ -498,9 +540,10 @@ namespace mango
 		write(fd,&rbuf,1);
 
 		if(enable){
+			mango::Thread::sleep(200);
 			gSettingProvider.query(SETTING_VOLUME_ID,&volume);
 			setVolume(volume);
-		}	
+		}
 		close(fd);
 	}
 	int PlayerEventInterface::onKeyDispatch(int keyCode,int action, int flag){
@@ -539,8 +582,11 @@ namespace mango
 	}
 
 	int PlayerEventInterface::onTouchDispatch(int x,int y, int action){
+		//log_i("PlayerEventInterface x=%d,y=%d,action=%d",x,y,action);
 		if(gPowerManager!=NULL)
 			gPowerManager->resetCount();
+		if(gPlayer.mMeidaView != NULL)
+			gPlayer.mMeidaView->onTouchDispatch(x,y,action);
 		return 0;
 	}
 	

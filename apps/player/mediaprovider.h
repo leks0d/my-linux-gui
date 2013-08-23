@@ -23,6 +23,7 @@ namespace mango
 	#define MUSIC_ADD_TIME "add_time"
 	#define MUSIC_DURATION "duration"
 	#define MUSIC_IN_PLAY "inplay"
+	#define MUSIC_TIMES "times"
 
 	#define MUSIC_TABLE_CREATE "CREATE TABLE IF NOT EXISTS music(\
 									_id INTEGER PRIMARY KEY autoincrement,\
@@ -39,9 +40,25 @@ namespace mango
 									img_path TEXT,\
 									add_time INTEGER,\
 									duration INTEGER,\
-									inplay INTEGER\
+									inplay INTEGER,\
+									times INTEGER\
 									);"
 	#define IMG_PATH "/mnt/sdcard/.album_img"
+
+	#define TABLE_PLAYLIST "playlist"
+	
+	#define PLAYLIST_TABLE_CREATE "CREATE TABLE IF NOT EXISTS playlist(\
+									_id INTEGER PRIMARY KEY autoincrement,\
+									name TEXT,\
+									remak TEXT\
+									);"
+	#define TABLE_PLAYLIST_MEM "playlistmem"
+	
+	#define PLAYLISTMEM_TABLE_CREATE "CREATE TABLE IF NOT EXISTS playlistmem(\
+									_id INTEGER PRIMARY KEY autoincrement,\
+									playlist_id INTEGER,\
+									audio_id INTEGER\
+									);"	
 
 	typedef struct
 	{
@@ -62,6 +79,7 @@ namespace mango
 		int isInPlayList;
 		int inPlay;
 		int isPlayed;
+		int times;
 	}mediainfo;
 
 	struct Musicdb{
@@ -94,11 +112,13 @@ namespace mango
 		int music_exsit_db(char *path);
 		static int str_to_int(char *arg);
 		static int power_operation(int ary,int th);
+		static int FilePathToInfo(char *path,mediainfo& info);
 	private:
 		sqlite3 * db;
 		char *scanPath;
+		int mCurrentTimes;
 		Thread mScannerThread;
-		Mutex	mMutex;  
+		Mutex	mMutex;
 	};
 
 	class ScanInfo{

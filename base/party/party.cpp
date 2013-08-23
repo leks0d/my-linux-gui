@@ -34,8 +34,8 @@ namespace mango
 	int Party::messageLoop()
 	{
 		Message msg;
-		log_i("Party::messageLoop");
 		while (mMessageQueue->get(msg) > 0)	{
+			mProcessingMsg = &msg;
 			dispatchMessage(msg);
 		}
 

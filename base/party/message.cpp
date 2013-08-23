@@ -75,6 +75,7 @@ namespace mango
 		msg.setId(id);
 		msg.setParameter1(parameter1);
 		msg.setParameter2(paramter2);
+		msg.setTime(Time::getMillisecond());
 		
 		return post(msg);
 	}
@@ -124,30 +125,36 @@ namespace mango
 	{
 		Message *item ;
 
-		if (mCurrentMsg != NULL) {
-			mCurrentMsg->mResult = mCurrentResult;
+		while(1)
+		{
+			if (mCurrentMsg != NULL) {
+				mCurrentMsg->mResult = mCurrentResult;
 
-			if (mCurrentMsg->mSemaphore)
-				mCurrentMsg->mSemaphore->release();
+				if (mCurrentMsg->mSemaphore)
+					mCurrentMsg->mSemaphore->release();
 
-			mCurrentMsg = NULL;
-		}
+				mCurrentMsg = NULL;
+			}
 
-		mMessageCountSemphore.wait();
+			mMessageCountSemphore.wait();
 
-		item = getFirst(true);
-		_ASSERT(item);
+			item = getFirst(true);
+			if (!item)
+				continue;
 
-		msg.setId(item->getId());
-		msg.setView(item->getView());
-		msg.setParameter1(item->getParameter1());
-		msg.setParameter2(item->getParameter2());
-		msg.setTime(item->getTime());
+			msg.setId(item->getId());
+			msg.setView(item->getView());
+			msg.setParameter1(item->getParameter1());
+			msg.setParameter2(item->getParameter2());
+			msg.setTime(item->getTime());
 
-		if (item->mSemaphore == NULL) {
-			safeDelete(item);
-		} else {
-			mCurrentMsg = item;
+			if (item->mSemaphore == NULL) {
+				safeDelete(item);
+			} else {
+				mCurrentMsg = item;
+			}
+
+			break;
 		}
 
 		return 1;
@@ -195,9 +202,67 @@ namespace mango
 	}
 
 
+	void MessageQueue::deleteMoreTouchMove(void)
+	{
+		int touchMoveMsgCount = 0;
+
+		LIST_HEAD* pos;
+		Message* msg;
+
+		mMutex.lock();
+
+		for (pos = (&mMessageHead)->prev; prefetch(pos->prev), pos != (&mMessageHead);)
+		{
+			msg = list_entry(pos, Message, mList);
+			pos = pos->prev;
+
+			if (msg->mId == VM_TOUCHDOWN || msg->mId == VM_TOUCHUP)
+				break;
+
+			if (msg->mId == VM_TOUCHMOVE)
+			{
+				if (msg->mSemaphore)
+					break;
+
+				if (touchMoveMsgCount > 0)
+				{
+					list_del(&msg->mList);
+					safeDelete(msg);
+				}
+				else
+					touchMoveMsgCount++;
+			}
+		}
+
+		mMutex.unlock();
+	}
 
 
+	bool MessageQueue::isExistInput(void)
+	{
+		bool exist = false;
 
+		LIST_HEAD* pos;
+		Message* msg;
+
+		mMutex.lock();
+
+		for (pos = (&mMessageHead)->prev; prefetch(pos->prev), pos != (&mMessageHead);)
+		{
+			msg = list_entry(pos, Message, mList);
+			pos = pos->prev;
+
+			if (msg->mId == VM_TOUCHDOWN || msg->mId == VM_TOUCHUP || msg->mId == VM_TOUCHMOVE \
+				|| msg->mId == VM_KEYDOWN || msg->mId == VM_KEYUP)
+			{
+				exist = true;
+				break;
+			}
+		}
+
+		mMutex.unlock();
+		return exist;
+	}
 
 	MessageQueue gMessageQueue;
 }

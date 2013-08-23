@@ -145,7 +145,10 @@ namespace mango
 	int ViewZAxis::add(View *view)
 	{
 		View* bottommerView = NULL;
-
+		if(view == NULL)
+			return 0;
+		
+		log_i("ViewZAxis::add View:%s",view->name);
 		if(!view->getParent())
 			sendDmsMsgToShowingView();//当一个新的view要显示的时候，向正在显示的view发dismiss消息
 
@@ -316,12 +319,15 @@ namespace mango
 		mMutex.lock();
 		
 		prev = view = getToppestItem();
-		while(view){
-			log_i("view->name=%s,view->mStyle=%d",view->name,view->mStyle);
+		while(view){		
 			prev = view;
 			view = view->getParent();
 		}
-
+		if(prev != NULL){
+			log_i("ViewZAxis::getDisplayingView() view->name=%s",prev->name);
+		}else{
+			log_i("ViewZAxis::getDisplayingView() prev = NULL.");
+		}
 		mMutex.unlock();
 		
 		return prev;

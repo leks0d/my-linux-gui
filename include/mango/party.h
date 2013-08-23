@@ -31,6 +31,7 @@ namespace mango
 
 	public:
 		MessageQueue*  mMessageQueue;
+		Message*       mProcessingMsg;
 	};
 
 }

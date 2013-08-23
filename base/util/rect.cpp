@@ -230,4 +230,14 @@ namespace mango
 	}
 
 
+	int Rect::width(void)
+	{
+		return right - left;
+	}
+
+
+	int Rect::height(void)
+	{
+		return bottom - top;
+	}
 }

@@ -3,6 +3,7 @@
 
 namespace mango
 {
+#define LIST_MUSIC_ICON_LEFT 20
 
 	enum
 	{
@@ -13,6 +14,15 @@ namespace mango
 		ADAPTER_MUSIC = 0xf0c4,
 	};
 
+	static void strlwr(char *string){
+		int wid = 'a' - 'A';
+		while( (*string) != '\0'){
+			if(*string <= 'Z' && *string >= 'A')
+				*string += wid;
+			string++;
+		}
+			
+	}
 	static char * getfilename(char *path){
 		int i,len = 0;
 		if(path == 0)
@@ -23,9 +33,57 @@ namespace mango
 				return path+i+1;
 		}
 	}
-
-
-	
+	static char * getparent(char *path,char *parent){
+		int i,len = 0;
+		if(path == 0)
+			return 0;
+		len = strlen(path);
+		memset(parent,0,len);
+		for(i = len-1 ; i > 0 ; i--){
+			if(*(path+i) == '/' ){
+				memcpy(parent,path,i);
+				break;
+			}
+		}
+		//*(parent+i) = '\0';
+	}
+	static char * getfiletype(char *file){
+		int i,len = 0;
+		char type[10];
+		if(file == 0)
+			return 0;
+		len = strlen(file);
+		i = len-1;
+		while(*(file+i) != '.'){
+			//log_i("*(file+i)=%c\n",*(file+i))
+			i--;
+			if(i==0)
+				break;
+		}
+		if(len-i>5||i == 0)
+			return 0;
+		strcpy(type,file+i+1);
+		strlwr(type);
+		return type;
+	}
+	static int ismusic(char *file)
+	{
+		char *type;
+		char *music_type[] = {"mp3","wav","flac","aac","ogg","ape","m4a","wma","\0"};
+		char **mtype;
+		mtype = music_type;
+		//log_i("getfiletype filename:%s\n",file);
+		type = getfiletype(file);
+		//log_i("getfiletype :%s\n",type);
+		if(type == 0)
+			return 0;
+		while(*mtype!="\0"){
+			if(strcmp(*mtype,type) == 0)
+				return 1;
+			mtype++;
+		}
+		return 0;
+	}
 	MediaListView::MediaListView(void)
 	{
 
@@ -74,6 +132,8 @@ namespace mango
 		mAlbumAdapter = NULL;
 		mArtistAdapter = NULL;
 		mMainListAdapter = NULL;
+		mRootDirectListAdapter = NULL;
+		mOrderMenuShow = 0;
 	}
 
 
@@ -86,17 +146,21 @@ namespace mango
 	int MediaView::onCreate()
 	{	
 		Rect rect;
+		int menuBkX = 5,orderTextX = menuBkX+3,orderDiv = 78,orderTextY = 21;
 
-		rect.setEx(0,25,320,215);
+		rect.setEx(0,21,320,219);
 		mListView = new MediaListView(TEXT("Media List"), this, &rect, LVS_LIST);
 		mListView->setListItemBackground(IDP_LISTITEM_BGD,IDP_LISTITEM_BGD_SEC);
 		mListView->setTextColor(RGB(255,255,255));
+		mListView->setListViewBackground(IDP_PLAYING_LIST_BACK);
 		mListView->onCreate();
 		
-		/*rect.setEx(0,0,320,26);
-		mTitleImageView = new ImageView(SETTING_BACK, TEXT("Media List"), this, &rect, LVS_LIST);
-		mTitleImageView->setImageResoure(IDP_MUSIC_TITLEBAR);
-		mTitleImageView->onCreate();*/
+		rect.setEx(menuBkX,21,315,43);
+		mOrderMenuBk = new ImageView(50, TEXT("Media List"), this, &rect, LVS_LIST,SW_HIDE);
+		mOrderMenuBk->setImageResoure(IDP_MUSIC_ORDERBY);
+		mOrderMenuBk->setBitmapStart(0,-2);
+		mOrderMenuBk->setBitmapAlps(true);
+		mOrderMenuBk->onCreate();
 
 		rect.setEx(0, 0, 41, 22);
 		mBack = new Button(SETTING_BACK, TEXT("mBack"), this, &rect, 0);
@@ -107,8 +171,40 @@ namespace mango
 		rect.setEx(45, 0, 230, 20);
 		mTitle = new TextView(SETTING_TITLE, TEXT("mTitle"), this, &rect, 0);
 		mTitle->setTextColor(RGB(255,255,255));
+		mTitle->setIconRes(IDP_ORDER_SEC);
 		mTitle->onCreate();
 
+		rect.setEx(orderTextX, orderTextY, orderDiv, 40);
+		mOrderByTitle = new TextView(MEDIA_ORDER_TILE, TEXT("mOrderByTitle"), this, &rect,0,SW_HIDE);
+		mOrderByTitle->setTextColor(RGB(255,255,255));
+		mOrderByTitle->setTextSelectColor(RGB(255,148,0));
+		mOrderByTitle->setTextResoure(STR_ORDERBY_TITLE);
+		mOrderByTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
+		mOrderByTitle->onCreate();
+		orderTextX+=78;
+		rect.setEx(orderTextX, orderTextY, orderDiv, 40);
+		mOrderByAlbum = new TextView(MEDIA_ORDER_ALBUM, TEXT("mOrderByAlbum"), this, &rect,0,SW_HIDE);
+		mOrderByAlbum->setTextColor(RGB(255,255,255));
+		mOrderByAlbum->setTextSelectColor(RGB(255,148,0));
+		mOrderByAlbum->setTextResoure(STR_ORDERBY_ALBUM);
+		mOrderByAlbum->setTextLayoutType(TEXT_LAYOUT_CENTER);
+		mOrderByAlbum->onCreate();
+		orderTextX+=78;
+		rect.setEx(orderTextX, orderTextY, orderDiv, 40);
+		mOrderByArtist = new TextView(MEDIA_ORDER_ARTIST, TEXT("mOrderByArtist"), this, &rect,0,SW_HIDE);
+		mOrderByArtist->setTextColor(RGB(255,255,255));
+		mOrderByArtist->setTextSelectColor(RGB(255,148,0));
+		mOrderByArtist->setTextResoure(STR_ORDERBY_ARTIST);
+		mOrderByArtist->setTextLayoutType(TEXT_LAYOUT_CENTER);
+		mOrderByArtist->onCreate();
+		orderTextX+=78;
+		rect.setEx(orderTextX, orderTextY, orderDiv, 40);
+		mOrderByTime = new TextView(MEDIA_ORDER_TIME, TEXT("mOrderByTime"), this, &rect,0,SW_HIDE);
+		mOrderByTime->setTextColor(RGB(255,255,255));
+		mOrderByTime->setTextSelectColor(RGB(255,148,0));
+		mOrderByTime->setTextResoure(STR_ORDERBY_TIME);
+		mOrderByTime->setTextLayoutType(TEXT_LAYOUT_CENTER);
+		mOrderByTime->onCreate();
 		
 		rect.setEx(280, 0, 41, 22);
 		mHome = new Button(SETTING_HOME, TEXT("mBack"), this, &rect, 0);
@@ -129,8 +225,29 @@ namespace mango
 		log_i("leave\n");
 		return 0;
 	}
-
-
+	void MediaView::showOrderByMenu(){
+		int state = SW_NORMAL;
+		if(state!= mOrderMenuBk->getShowState()){
+			mOrderMenuBk->setShowState(state);
+			mOrderByTitle->setShowState(state);
+			mOrderByArtist->setShowState(state);
+			mOrderByAlbum->setShowState(state);
+			mOrderByTime->setShowState(state);
+		}
+	}
+	void MediaView::dismissOrderByMenu(){
+		int state = SW_HIDE;
+		if(state != mOrderMenuBk->getShowState()){
+			mOrderMenuBk->setShowState(state);
+			mOrderByTitle->setShowState(state);
+			mOrderByArtist->setShowState(state);
+			mOrderByAlbum->setShowState(state);
+			mOrderByTime->setShowState(state);
+		}
+	}	
+	bool MediaView::menuIsShow(){
+		return mOrderMenuBk->getShowState()==1?true:false;
+	}
 	int MediaView::onDestroy()
 	{
 		if (mListView)
@@ -143,7 +260,7 @@ namespace mango
 	{
 		//log_i("MediaView::onPaint");
 		
-		canvas.drawImageResource(IDP_SETTING_BGD,0,0,false);
+		canvas.drawImageResource(IDP_PLAYING_BACKGROUND,0,0,false);		
 		canvas.drawImageResource(IDP_MUSIC_TITLEBAR,0,0,false);
 		return 0;
 	}
@@ -159,6 +276,25 @@ namespace mango
 					break;
 				case SETTING_HOME:
 					gPlayer.showPlayingView();
+					break;
+				case SETTING_TITLE:{
+						switch(getMainState()){
+							case 0x1300:
+								if(menuIsShow())
+									dismissOrderByMenu();
+								else
+									showOrderByMenu();
+								break;
+						}			
+						break;
+					}
+				case MEDIA_ORDER_TILE:
+				case MEDIA_ORDER_ALBUM:
+				case MEDIA_ORDER_ARTIST:
+				case MEDIA_ORDER_TIME:
+					dismissOrderByMenu();
+					mListView->deleteAllItems();
+					mMusicAdapter->setMusicOrderby(id);
 					break;
 			}
 			return -1;
@@ -188,33 +324,37 @@ namespace mango
 		TCHAR	fileName[MAX_PATH];
 		int     fileAttribute;
 		File    file;
-		
+		char    cName[255];
 		
 		if (!file.findOpen(mCurrentPath)) {
-			log_e ("findOpen \n") ;
+			log_e ("findOpen") ;
 			return ;
 		}
 
-		while(file.findNext(fileName, &fileAttribute))
+		while(file.findNext(fileName, &fileAttribute,cName))
 		{
+			log_i("cName = %s",cName);
 			if (fileAttribute & FILE_ATTRIBUTE_HIDDEN)
-				continue ;
+				continue;
 
 			if (fileAttribute & FILE_ATTRIBUTE_DIRECTORY)
 			{
+				if(cName[0] == '.')
+					continue;
+			
 				if (String::lstrcmp (fileName, TEXT (".")) == 0)
-					continue ;
+					continue;
 
 				if (String::lstrcmp (fileName, TEXT ("..")) == 0)
-					continue ;
+					continue;
 
 				insertFileToListView(LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM, fileName, IDP_FOLDER_ICON, (void*)FILE_ATTRIBUTE_DIRECTORY);
 				count++;
 			}
-			else if (1) //PathMatchSpecEx (FindFileData.cFileName, pctl->lpofn->lpstrFilter, PMSF_MULTIPLE))
+			else if (ismusic(cName)) //PathMatchSpecEx (FindFileData.cFileName, pctl->lpofn->lpstrFilter, PMSF_MULTIPLE))
 			{
 			//	mListView->insertString(0, fileName);
-				insertFileToListView(LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM, fileName, IDP_MUSIC_ICON, (void*)FILE_ATTRIBUTE_NORMAL);
+				insertFileToListView(LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM, fileName, getMusicIcon(cName), (void*)FILE_ATTRIBUTE_NORMAL);
 				count++;
 			}
 
@@ -270,11 +410,12 @@ namespace mango
 		mListView->invalidateRect();
 #else
 		if(mMainListAdapter == NULL){
-			mListView->deleteAllItems();
+			
 			mMainListAdapter = new MainListAdapter(mListView,ADAPTER_PLAYING);
 			mMainListAdapter->setData(img,img,til,count);
 		}else{
 			log_i("mMainListAdapter->refresh()");
+			mListView->deleteAllItems();
 			mMainListAdapter->refresh();
 		}
 #endif
@@ -285,9 +426,10 @@ namespace mango
 	}
 
 	void MediaView::initPlayingList(){
+		mListView->deleteAllItems();
 
 		if(mPlayingListAdapter == NULL){
-			mListView->deleteAllItems();
+			
 			mPlayingListAdapter = new PlayingListAdapter(mListView,ADAPTER_MUSIC); 
 		}
 		mPlayingListAdapter->refresh();
@@ -300,9 +442,10 @@ namespace mango
 
 	void MediaView::initMusicList(){
 		
+		mListView->deleteAllItems();
+		
 		if(mMusicAdapter == NULL){
-			mListView->deleteAllItems();
-			mMusicAdapter = new MusicAdapter(mListView,ADAPTER_PLAYING); 
+			mMusicAdapter = new MusicAdapter(mListView,ADAPTER_PLAYING);
 		}
 		mMusicAdapter->refresh();
 
@@ -313,8 +456,9 @@ namespace mango
 	}
 
 	void MediaView::initAlbumList(){
+		mListView->deleteAllItems();
 		if(mAlbumAdapter == NULL){
-			mListView->deleteAllItems();
+			
 			mAlbumAdapter = new AlbumAdapter(mListView,ADAPTER_ALBUM); 
 		}
 		mAlbumAdapter->refresh();
@@ -325,8 +469,11 @@ namespace mango
 		setMainState(0x1400);
 	}
 	void MediaView::initArtistList(){
+		
+		mListView->deleteAllItems();
+		
 		if(mArtistAdapter == NULL){
-			mListView->deleteAllItems();
+
 			mArtistAdapter = new ArtistAdapter(mListView,ADAPTER_ALBUM); 
 		}
 		mArtistAdapter->refresh();
@@ -346,17 +493,20 @@ namespace mango
 
 		ptr = where;
 		mediaList = new ArrayMediaInfo();
+		
+		mListView->deleteAllItems();
 
-		if(mMusicAdapter == NULL){
-			mListView->deleteAllItems();
-			mMusicAdapter = new MusicAdapter(mListView,ADAPTER_PLAYING); 
+		if(mAlbumMusicAdapter == NULL){
+			
+			mAlbumMusicAdapter = new MusicAdapter(mListView,ADAPTER_PLAYING); 
 		}
 
 		ptr += sprintf(ptr,"where album = '%s' ",album);
 
-		count = gmediaprovider.queryMusicArray(where,mediaList);
-
-		mMusicAdapter->setListData(mediaList);
+		//count = gmediaprovider.queryMusicArray(where,mediaList);
+		mAlbumMusicAdapter->setWhere(where);
+		//mAlbumMusicAdapter->refresh();
+		//mAlbumMusicAdapter->setListData(mediaList);
 
 		setMainState(0x1410);
 		
@@ -369,17 +519,21 @@ namespace mango
 
 		ptr = where;
 		mediaList = new ArrayMediaInfo();
+		
+		mListView->deleteAllItems();
 
-		if(mMusicAdapter == NULL){
-			mListView->deleteAllItems();
-			mMusicAdapter = new MusicAdapter(mListView,ADAPTER_PLAYING); 
+		if(mArtistMusicAdapter == NULL){
+			
+			mArtistMusicAdapter = new MusicAdapter(mListView,ADAPTER_PLAYING); 
 		}
 
 		ptr += sprintf(ptr,"where %s = '%s' ",key,value);
 
-		count = gmediaprovider.queryMusicArray(where,mediaList);
+//		count = gmediaprovider.queryMusicArray(where,mediaList);
+//		mArtistMusicAdapter->setListData(mediaList);
 
-		mMusicAdapter->setListData(mediaList);
+		mArtistMusicAdapter->setWhere(where);
+		//mAlbumMusicAdapter->refresh();
 
 		setMainState(state);
 	}
@@ -399,8 +553,6 @@ namespace mango
 
 	void MediaView::backToParentDirectory()
 	{
-	//	TCHAR*  fileName;
-
 		File::pathRemoveFileSpec(mCurrentPath);
 		renewFillViewList();
 	}
@@ -408,8 +560,6 @@ namespace mango
 		mPlayinglist->playMediaInfo(info);
 		gPlayer.showPlayingView();
 	}
-
-
 
 	int MediaView::onNotify(View* fromView, int code, void* parameter)
 	{
@@ -449,23 +599,31 @@ namespace mango
 						ptr += sprintf(ptr," where path = '%s' ",utf8Path);
 
 						count = gmediaprovider.queryMusicArray(where,pinfo);
-						log_i("MusicArray count=%d",count);
+						
+						delete where;
 						
 						if(count>0){
+							char* name,parent[255];
+							ArrayMediaInfo arrayInfo;
+							
+							getparent(utf8Path,parent);
 							
 							if(mPlayinglist == NULL)
 								mPlayinglist = new Playinglist();
-							log_i("pinfo->getMediaInfo(0)->artist=%s",pinfo->getMediaInfo(0)->artist);
-							mPlayinglist->playMediaInfo(pinfo->getMediaInfo(0));
 							
+							mPlayinglist->playMediaInfo(pinfo->getMediaInfo(0));	
+
+							ptr = where = new char[300];
+							ptr += sprintf(ptr," where path like '%s/%%' ",parent);
+							count = gmediaprovider.queryMusicArray(where,&arrayInfo);					
+							mPlayinglist->addArrayItem(arrayInfo);
 							
 						}else{
 							mediainfo info;
-							char* name;
-							
-							
+							char* name,parent[255];					
+							ArrayMediaInfo arrayInfo;
 							memset(&info,0,sizeof(mediainfo));
-							
+							/*
 							info.path = new char[strlen(utf8Path)+1];
 							info.id = -1;
 							name = getfilename(utf8Path);
@@ -474,9 +632,20 @@ namespace mango
 							
 							memcpy(info.name,name,strlen(name)+1);
 							memcpy(info.path,utf8Path,strlen(utf8Path)+1);
+							*/
+							getparent(utf8Path,parent);
 							
+							log_i("getparent parent=%s",parent);
+							
+							getArrayInfoFromFile(parent,arrayInfo);
+							
+							mPlayinglist->addArrayItem(arrayInfo);
+							
+							mediaprovider::FilePathToInfo(utf8Path,info);
 							mPlayinglist->playMediaInfo(&info);
 						}
+
+						delete pinfo;
 						gPlayer.showPlayingView();
 					}
 					break;
@@ -525,10 +694,19 @@ namespace mango
 						case 0x1410:
 						case 0x1510:{
 								Point pt =  mListView->getTouchPrevPosition();
-								log_i("getTouchPrevPosition pt.x=%d",pt.x);
-								if(pt.x>46){
-									playMediaInfo(mMusicAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem),1);
-								}else{
+								int iconRight = LIST_MUSIC_ICON_LEFT+40;
+								
+								if(pt.x>iconRight){
+									MusicAdapter *adapter;
+									
+									adapter = (MusicAdapter *)mListView->getListAdapter();
+									
+									if(adapter != NULL){
+										if(getMainState() != 0x1300)
+											mPlayinglist->addArrayItem(*(adapter->mMusicArrayList));
+										playMediaInfo(adapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem),1);
+									}
+								}else if(pt.x>LIST_MUSIC_ICON_LEFT){
 									gPlayer.showMusicOperateView( *(mMusicAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)) );
 								}
 								break;
@@ -568,6 +746,44 @@ namespace mango
 		return 0;
 	}
 
+	int MediaView::getArrayInfoFromFile(char *path,ArrayMediaInfo& array){
+		char direct[255];
+		int     fileAttribute;
+		File    file;
+		mediainfo info;
+		String str;
+		DIR* d;
+		struct dirent* de;
+		
+		if(path == NULL)
+			return 0;
+
+		array.clear();
+		
+		d = opendir(path);
+
+		while((de = readdir(d)) != NULL)
+		{
+			int name_len = strlen(de->d_name);
+			
+			strcpy(direct,path);
+			strcat(direct,"/");
+			strcat(direct,de->d_name);
+			log_i("opendir DT_DIR :%s\n",direct);
+
+			if (de->d_type == DT_DIR) {
+				;
+			}else if( ismusic(de->d_name) ){
+				mediaprovider::FilePathToInfo(direct,info);
+				array.addMediaInfo(&info);
+			}
+
+		}
+
+		closedir(d);
+
+		return array.getCount();
+	}
 
 	int MediaView::onKeyDown(int keyCode, int flag)
 	{
@@ -616,20 +832,36 @@ namespace mango
 		}				
 
 	}
+	int MediaView::onTouchDispatch(int x,int y, int action){
+		//log_i("MediaViewx=%d,y=%d,action=%d",x,y,action);
+		switch(action){
+			case VM_TOUCHUP:
+				if(mTitle->mRect.ptIn(x, y))
+					break;
+				if(!mOrderMenuBk->mRect.ptIn(x, y)){
+					dismissOrderByMenu();
+				}
+				break;
+		}
+	}
 
-	
-	PlayingListAdapter::PlayingListAdapter(ListView* list,int id){
+	void MediaView::onMainStateChange(int mainState){
+		if(mainState == 0x1300){
+			mTitle->setShowIcon(true);
+		}else{
+			mTitle->setShowIcon(false);
+		}
+	}
+	PlayingListAdapter::PlayingListAdapter(ListView* list,int id):BaseAdapter(){
 		mId = id;
 		mlist = list;
-		
-		
 	}
 	
 	void PlayingListAdapter::refresh(){
 		int count,i;
 		
 		mlist->setListAdapter(this);
-		mlist->deleteAllItems();
+		mlist->deleteAllRecord();
 
 		count = mPlayinglist->getCount();
 		
@@ -653,20 +885,24 @@ namespace mango
 		x = rect.left;
 		y = rect.top;
 		info = (mediainfo *)getItem(lvitem->iItem);
-		//log_i("PlayingListAdapter::PaintView lvitem->iItem=%d",lvitem->iItem);
-		canvas.drawImageResource(IDP_LISTICON_MUSIC,10,y+5);
+		if(info == NULL)
+			return;
+		x = LIST_MUSIC_ICON_LEFT;
+		canvas.drawImageResource(IDP_LISTICON_MUSIC,x,y+5);
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else
 			canvas.setTextColor(RGB(255,255,255));
 		canvas.setTextSize(16);
-		canvas.drawText(info->name,strlen(info->name),50,y+5);
+		x = x+40;
+		canvas.drawText(info->name,strlen(info->name),x,y+5);
 		canvas.setTextColor(RGB(255,255,255));
 		canvas.setTextSize(12);
 		if(info->artist!=NULL)
-			canvas.drawText(info->artist,strlen(info->artist),50,y+28);
+			canvas.drawText(info->artist,strlen(info->artist),x,y+28);
+		x = x+220;
 		if(lvitem->iItem == mPlayinglist->mCurrent)
-			canvas.drawImageResource(IDP_LISTICON_PLAYING,270,y+13);
+			canvas.drawImageResource(IDP_LISTICON_PLAYING,x,y+13);
 	}
 
 	void* PlayingListAdapter::getItem(int index){
@@ -677,11 +913,38 @@ namespace mango
 		return mPlayinglist->getCount();
 	}
 
-	MusicAdapter::MusicAdapter(ListView* list,int id){
+	MusicAdapter::MusicAdapter(ListView* list,int id):BaseAdapter(){
 		mId = id;
 		mlist = list;
-		
+		mWhere = NULL;
 		mMusicArrayList = new ArrayMediaInfo();
+	}
+	void MusicAdapter::setMusicOrderby(int order){
+		char *ptr,where[255];
+		char *orderby;
+		int count,i;
+		
+		ptr = where;
+
+		switch(order){
+			case MEDIA_ORDER_TILE:
+				orderby = MUSIC_NAME_KEY;
+				break;
+			case MEDIA_ORDER_ALBUM:
+				orderby = MUSIC_ALBUM_KEY;
+				break;
+			case MEDIA_ORDER_ARTIST:
+				orderby = MUSIC_ART_KEY;
+				break;
+			case MEDIA_ORDER_TIME:
+				orderby = MUSIC_TIMES;
+				break;
+		}
+		
+		ptr += sprintf(ptr," order by %s ",orderby);
+		
+		setWhere(where);
+		
 	}
 	void MusicAdapter::refresh(){
 		int count,i;
@@ -690,25 +953,32 @@ namespace mango
 		
 		mMusicArrayList->clear();		
 		
-		count = gmediaprovider.queryMusicArray(0,mMusicArrayList);
+		count = gmediaprovider.queryMusicArray(mWhere,mMusicArrayList);
 		
 		if(count>=0)
 			rePaintList();
 	}
 
 	void MusicAdapter::setListData(ArrayMediaInfo* info){
-		mlist->deleteAllItems();
 		if(info!=NULL){
 			*mMusicArrayList = *info;
 			rePaintList();
 		}
+	}
+	void MusicAdapter::setWhere(char* wh){
+		int len = strlen(wh);
+		if(mWhere!=NULL)
+			delete mWhere;
+		mWhere = new char[len+1];
+		strcpy(mWhere,wh);
+		refresh();
 	}
 
 	void MusicAdapter::rePaintList(){
 		int count,i;
 		
 		mlist->setListAdapter(this);
-		mlist->deleteAllItems();
+		mlist->deleteAllRecord();
 		
 		count = mMusicArrayList->getCount();
 		for(i=0;i<count;i++){
@@ -730,28 +1000,22 @@ namespace mango
 		x = rect.left;
 		y = rect.top;
 		
-		//log_i("MusicAdapter::PaintView lvitem->iItem=%d",lvitem->iItem);
-		
-		
-	#if 0	
-		canvas.drawText("aaaaa",5,50,y+5);
-	#else
 		info = mMusicArrayList->getMediaInfo(lvitem->iItem);
-		canvas.drawImageResource(IDP_LISTICON_MUSIC,10,y+5);
+		x = LIST_MUSIC_ICON_LEFT;
+		canvas.drawImageResource(MediaView::getMusicIcon(info->name),x,y+5);
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else
 			canvas.setTextColor(RGB(255,255,255));
-
+		x= x+40;
 		canvas.setTextSize(16);
-		canvas.drawText(info->name,strlen(info->name),50,y+5);
+		canvas.drawText(info->name,strlen(info->name),x,y+5);
 		canvas.setTextColor(RGB(255,255,255));
 		canvas.setTextSize(12);
-		canvas.drawText(info->artist,strlen(info->artist),50,y+28);
-	#endif	
+		canvas.drawText(info->artist,strlen(info->artist),x,y+28);
 	}
 
-	AlbumAdapter::AlbumAdapter(ListView* list,int id){
+	AlbumAdapter::AlbumAdapter(ListView* list,int id):BaseAdapter(){
 		mId = id;
 		mlist = list;
 		
@@ -764,7 +1028,7 @@ namespace mango
 		sprintf(ptr,"group by album");
 		
 		mlist->setListAdapter(this);
-		mlist->deleteAllItems();
+		mlist->deleteAllRecord();
 		mMusicArrayList->clear();
 		
 		count = gmediaprovider.queryMusicArray(where,mMusicArrayList);
@@ -787,22 +1051,23 @@ namespace mango
 		x = rect.left;
 		y = rect.top;
 		info = mMusicArrayList->getMediaInfo(lvitem->iItem);
-		//log_i("PlayingListAdapter::PaintView lvitem->iItem=%d",lvitem->iItem);
-		canvas.drawImageResource(IDP_MUSIC_ICON,10,y+5);
+		x = LIST_MUSIC_ICON_LEFT;
+		canvas.drawImageResource(IDP_MUSIC_ICON,x,y+5);
 		log_i("AlbumAdapter::PaintView isSec=%d",isSec);
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else
 			canvas.setTextColor(RGB(255,255,255));
 		canvas.setTextSize(16);
-		canvas.drawText(info->album,strlen(info->album),50,y+5);
+		x = x+40;
+		canvas.drawText(info->album,strlen(info->album),x,y+5);
 		canvas.setTextColor(RGB(255,255,255));
 		canvas.setTextSize(12);
-		canvas.drawText(info->artist,strlen(info->artist),50,y+28);
+		canvas.drawText(info->artist,strlen(info->artist),x,y+28);
 	}
 
 	
-	ArtistAdapter::ArtistAdapter(ListView* list,int id){
+	ArtistAdapter::ArtistAdapter(ListView* list,int id):BaseAdapter(){
 		mId = id;
 		mlist = list;
 		
@@ -815,7 +1080,7 @@ namespace mango
 		sprintf(ptr,"group by artist");
 		
 		mlist->setListAdapter(this);
-		mlist->deleteAllItems();
+		mlist->deleteAllRecord();
 		mMusicArrayList->clear();
 
 		count = gmediaprovider.queryMusicArray(where,mMusicArrayList);
@@ -838,8 +1103,8 @@ namespace mango
 		x = rect.left;
 		y = rect.top;
 		info = mMusicArrayList->getMediaInfo(lvitem->iItem);
-		//log_i("PlayingListAdapter::PaintView lvitem->iItem=%d",lvitem->iItem);
-		canvas.drawImageResource(IDP_LISTICON_ARTIST,10,y+5);
+		x = LIST_MUSIC_ICON_LEFT;
+		canvas.drawImageResource(IDP_LISTICON_ARTIST,x,y+5);
 		log_i("ArtistAdapter::PaintView isSec=%d",isSec);
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
@@ -853,13 +1118,15 @@ namespace mango
 		}else{
 			log_i("isTextUtf8 false");
 		}
-#endif		
-		canvas.drawText(info->artist,strlen(info->artist),50,y+10);
+#endif	
+		x+=40;
+		canvas.drawText(info->artist,strlen(info->artist),x,y+10);
 		
 		canvas.setTextColor(RGB(255,255,255));
 		//canvas.setTextSize(12);
 		//canvas.drawText(info->artist,strlen(info->artist),50,y+28);
 	}
+
 	void MainListAdapter::PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec){
 		int	 x, y,index;
 		
@@ -880,5 +1147,32 @@ namespace mango
 		canvas.setTextSize(18);
 		canvas.drawTextResource(mTextRes[index],x,y+13);
 
+	}
+	int MediaView::getMusicIcon(char* name){
+		char *type = getfiletype(name);
+		if(strcmp(type,"mp3") == 0){
+			return IDP_LISTICON_MUSIC;
+		}else if(strcmp(type,"aac") == 0){
+			return IDP_MUSIC_AAC;
+		}else if(strcmp(type,"aif") == 0){
+			return IDP_MUSIC_AIF;
+		}else if(strcmp(type,"aiff") == 0){
+			return IDP_MUSIC_AIFF;
+		}else if(strcmp(type,"ape") == 0){
+			return IDP_MUSIC_APE;
+		}else if(strcmp(type,"flac") == 0){
+			return IDP_MUSIC_FLAC;
+		}else if(strcmp(type,"m4a") == 0){
+			return IDP_MUSIC_M4A;
+		}else if(strcmp(type,"ogg") == 0){
+			return IDP_MUSIC_OGG;
+		}else if(strcmp(type,"wav") == 0){
+			return IDP_MUSIC_WAV;
+		}else if(strcmp(type,"wma") == 0){
+			return IDP_MUSIC_WMA;
+		}else if(strcmp(type,"aac") == 0){
+			return IDP_MUSIC_AAC;
+		}else
+			return IDP_MUSIC_ICON;
 	}
 };

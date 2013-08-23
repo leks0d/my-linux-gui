@@ -239,9 +239,16 @@ namespace mango
 	{
 		gSessionLocal.mCanvasMutex.lock();
 		gSessionLocal.mStockGraphic.mCanvas.renew(this);
+		gSessionLocal.mStockGraphic.mCanvas.copyScreenFrontToBack();
 		return &gSessionLocal.mStockGraphic.mCanvas;
 	}
 
+	void View::setShowState(int state){
+		if(mShowState != state){
+			mShowState = state;
+			invalidateRect();
+		}
+	}
 
 	void View::releaseCanvas()
 	{

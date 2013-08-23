@@ -1,6 +1,7 @@
 #include <sys/time.h>
 #include <signal.h>
 #include <sys/vfs.h>
+#include <sys/reboot.h>
 #include "mango.h"
 #include "resource.h"
 #include "SocketDetect.h"
@@ -26,6 +27,7 @@
 #include "SdcardInsertView.h"
 #include "MediaScannerView.h"
 #include "MusicOperateView.h"
+#include "KeyLockView.h"
 
 
 namespace mango
@@ -52,7 +54,11 @@ namespace mango
 		PLAYING_IDB_ALBUM_IMAGE,
 		PLAYING_IDB_MUSIC_NAME,
 		PLAYING_SHOW_VOLUME,
-		PLAYING_UPDATE_BATTERY
+		PLAYING_UPDATE_BATTERY,
+		MEDIA_ORDER_TILE,
+		MEDIA_ORDER_ALBUM,
+		MEDIA_ORDER_ARTIST,
+		MEDIA_ORDER_TIME,
 	};
 
 	class PlayerEventInterface : public UseEventInterface{
@@ -159,17 +165,19 @@ namespace mango
 		int showMediaScannerView();
 		int showSdcardInsertView();
 		int showMusicOperateView(mediainfo& info);
+		int showKeyLockView();
 		void dismissView(View *view);
 		int  getVolume(void);
 		void setVolume(int volume);
 		void setPowerState();
 		void ioctrlBrightness(int cmd,int* brightness);
-		void holdKeyProbe();
+		int holdKeyProbe();
 		void spdifProbe();
 		bool isSpdifIn();
 		bool isHeadestIn();
 		void openCodecPower(bool enable);
 		void setBootWakeLock(int en);
+		void shutDown();
 	public:
 		MediaView*  mMeidaView;
 		PlayingView* mPlayingView;
@@ -184,15 +192,17 @@ namespace mango
 		MediaScannerView *mMediaScannerView;
 		SdcardInsertView *mSdcardInsertView;
 		MusicOperateView *mMusicOperateView;
+		UsmConnectView *mUsmConnectView;
+		KeyLockView *mKeyLockView;
+		
 		PlayerEventInterface* mPlayerEventInterface;
 		int powerState;
 		int isBootLock;
 		int bootLockCount;
 		SocketDetect *mSocketDetect;
-		UsmConnectView *mUsmConnectView;
 		PlayerSwitch *mSpdifSwitch;
 		PlayerSwitch *mHeadestSwitch;
 	};
-
+	
 	extern Player  gPlayer;
 };

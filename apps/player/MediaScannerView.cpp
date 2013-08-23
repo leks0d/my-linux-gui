@@ -34,7 +34,7 @@ namespace mango
 		Rect rect;
 		int firstLeft = 98;
 		
-		rect.setEx(40,140,280,40);
+		rect.setEx(0,140,320,40);
 		mScannerButton = new TextView(BUTTON_SCANNER, TEXT("mScannerButton"), this, &rect, 0);
 		mScannerButton->setTextColor(COLOR_GRAY);
 		mScannerButton->setTextSize(16);
@@ -59,7 +59,7 @@ namespace mango
 	{
 		log_i("MediaScannerView::onPaint");
 		canvas.drawImageResource(IDP_SETTING_BGD,0,0,false);
-		canvas.drawImageResource(IDP_USB_CONECT,115,50,false);
+		canvas.drawImageResource(IDP_USB_CONECT,115,50,true);
 		return 0;
 	}
 

@@ -50,7 +50,7 @@ namespace mango
 		mHome->setPressedImageId(IDP_MUSIC_HOME_SEC);
 		mHome->onCreate();
 
-		rect.setEx(140, 100, 22, 22);
+		rect.setEx(135, 100, 22, 22);
 		mDisplayIcon = new ImageView(PLAYING_IDB_ALBUM_IMAGE, TEXT("mAlbumImage"), this, &rect, 0);
 		mDisplayIcon->setImageResoure(IDP_ADVANCE_DISPLAY);
 		mDisplayIcon->onCreate();
@@ -104,7 +104,7 @@ namespace mango
 	int DisplaySettingView::onPaint(Canvas& canvas)
 	{
 		log_i("MediaView::onPaint");
-		canvas.drawImageResource(IDP_SETTING_BGD,0,0,false);
+		canvas.drawImageResource(IDP_PLAYING_BACKGROUND,0,0,false);
 		canvas.drawImageResource(IDP_MUSIC_TITLEBAR,0,0,false);
 		return 0;
 	}

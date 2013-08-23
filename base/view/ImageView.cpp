@@ -17,6 +17,10 @@ namespace mango
 		resId = 0;
 		ResType = 0;
 		mMSkBitmap = NULL;
+		mAlps = true;
+		mStartX = 0;
+		mStartY = 0;
+		mVisiable = true;
 	}
 
 
@@ -30,12 +34,15 @@ namespace mango
 	{
 		int imageId = 0;
 		Rect rect;
+
+		if(!mVisiable)
+			return 0;
 		
-		if (resId > 0 && ResType == 1)
-			canvas.drawImageResource(resId, 0, 0,true);
 		if(mMSkBitmap!=NULL && mMSkBitmap->isVaild()){
-			canvas.drawBitmap(mMSkBitmap->mBits,0,0,mMSkBitmap->width,mMSkBitmap->height);
-		}
+			canvas.drawBitmap(mMSkBitmap->mBits,mStartX,mStartY,mMSkBitmap->width,mMSkBitmap->height);
+  		}else if (resId > 0 && ResType == 1){
+			canvas.drawImageResource(resId, mStartX, mStartY,mAlps);
+		} 
 		return 0;
 	}
 
@@ -72,6 +79,13 @@ namespace mango
 
 	void ImageView::setMSkBitmap(MSkBitmap *bitmap){
 		mMSkBitmap = bitmap;
+	}
+
+	void ImageView::setVisiable(bool visiable){
+		if(visiable != mVisiable){
+			mVisiable = visiable;
+			invalidateRect();
+		}
 	}
 };
 

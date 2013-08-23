@@ -1,5 +1,5 @@
 #include "mango.h"
-
+//#define PRINT_TIME
 namespace mango
 {
 
@@ -265,8 +265,8 @@ namespace mango
 		if (mStyle & (LVS_LIST | LVS_REPORT))
 		{
 			pLayout = &(mLayoutList) ;
-			x = pLayout->m_rcMargin.top ;
-			y = pLayout->m_rcMargin.left;
+			x = pLayout->m_rcMargin.left ;
+			y = pLayout->m_rcMargin.top;
 
 			pItem = getFirsetRecord() ;
 			while (pItem)
@@ -476,7 +476,7 @@ namespace mango
 		mLayoutList.m_sizeItemIcon.cx = 22 ;
 		mLayoutList.m_sizeItemIcon.cy = 22 ;
 
-		mLayoutList.m_rcMargin.set(0, 0, 0, 0);
+		mLayoutList.m_rcMargin.set(0, 5, 0, 0);
 
 		mLayoutIcon.m_hInstance  = NULL;
 		mLayoutIcon.m_sizeItem.cx = 64 ;
@@ -826,10 +826,10 @@ namespace mango
 		
 		if (record == mSelectedRecord){
 			if(mPressItemBackground>0)
-				canvas.drawImageResource(mPressItemBackground, 12, rect.top);
+				canvas.drawImageResource(mPressItemBackground, 12, rect.top,true);
 		}else{
 			if(mItemBackground>0)
-				canvas.drawImageResource(mItemBackground, 12, rect.top,false);			
+				canvas.drawImageResource(mItemBackground, 12, rect.top,true);			
 		}
 		canvas.setTextColor(RGB (255, 255, 255)) ;
 		
@@ -837,6 +837,7 @@ namespace mango
 			if(mListAdapter != NULL){
 				//log_i("mListAdapter->PaintView lvitem->iItem=%d",lvitem->iItem);
 				mListAdapter->PaintView(canvas,rect,lvitem,record == mSelectedRecord);
+				mListAdapter->setYoffset(mZonePoint.y);
 				return true;
 			}
 		}
@@ -996,9 +997,14 @@ namespace mango
 	int ListView::onTouchDown(int x, int y, int flag)
 	{
 		Point pt(x, y);
+		int	 ySpeed, yShift ;
+		bool validateGesture;
+
 
 		layout();
 		setCapture(this);
+
+		validateGesture = mGestureDetector.onMsg(&ySpeed, &yShift, TSMM_YDIRECTION);
 
 		mFocusedRecord = getRecordFromPoint (pt);
 		if (mFocusedRecord)
@@ -1019,8 +1025,16 @@ namespace mango
 	int ListView::onTouchMove(int x, int y, int flag)
 	{
 		Point pt(x, y);
+		int	 ySpeed, yShift ;
+		bool validateGesture;
+
 		if (getCapture () != this)
 			return 0 ;
+
+//		Thread::sleep(300);
+
+		validateGesture = mGestureDetector.onMsg(&ySpeed, &yShift, TSMM_YDIRECTION);
+#if 0
 
 		if (!mTouchMove) {
 			if (mTouchDownPosition.y - y > 16 || mTouchDownPosition.y - y < -16)
@@ -1032,7 +1046,10 @@ namespace mango
 			cartoonDrag(y - mTouchPrevPosition.y);
 			mTouchPrevPosition.set(x, y);
 		}
-
+#else
+		if (validateGesture)
+			cartoonDrag(yShift);
+#endif
 		return 0 ;
 	}
 
@@ -1040,14 +1057,17 @@ namespace mango
 	int ListView::onTouchUp(int x, int y, int flag)
 	{
 		int	 index ;
+		int	 ySpeed, yShift ;
+		bool validateGesture;
 
 		if (getCapture() != this)
 			return 0 ;
 
+		validateGesture = mGestureDetector.onMsg(&ySpeed, &yShift, TSMM_YDIRECTION);
 		releaseCapture () ;
-		
+
 		mTouchPrevPosition.set(x, y);
-		
+#if 0
 		index =  getIndex(mFocusedRecord);
 		if (index >= 0)
 		{
@@ -1058,13 +1078,35 @@ namespace mango
 
 		mFocusedRecord = NULL ;
 		mSelectedIndex = -1 ;
+#else
+		if (validateGesture)
+		{
+			if (ySpeed)
+				cartoonRiffle(ySpeed) ;
+			else
+				cartoonDrag(yShift) ;
+		}
+		else if (!mGestureDetector.isMove())
+		{
+			index =  getIndex(mFocusedRecord);
+			if (index >= 0)
+			{
+				mSelectedIndex = index ;
+				getParent()->onNotify(this, NM_CLICK, (void*)index);
+			}
+		}
+
+#endif
+		cartoonTropic() ;
+
+		mFocusedRecord = NULL ;
+		mSelectedIndex = -1 ;
 		return 0 ;
 	}
-
 	Point& ListView::getTouchPrevPosition(void){
 		return mTouchPrevPosition;
 	}
-	void ListView::refresh(void){
+	void ListView::refresh(){
 		if(mListAdapter != NULL){
 			mListAdapter->refresh();
 		}
@@ -1265,11 +1307,13 @@ namespace mango
 
 		Rect   rect, redrawZoneRect;
 		LISTVIEW_RECORD* record;
-
-		Brush brush(ARGB(255,0,0,0));
-
+#if 0
+		Brush brush(ARGB(255,255,255,255));
 		canvas.fillRect(redrawRect, brush);
-
+#else		
+		canvas.drawImageResource(mListViewBackgound,0,0);
+		//log_i("canvas.mViewPos.y=%d",canvas.getViewPos().y);
+#endif
 		redrawZoneRect = redrawRect;
 		redrawZoneRect.offset(0, 0 - (mZonePoint.y + clientRect.top));
 
@@ -1336,13 +1380,21 @@ namespace mango
 	{
 		Canvas* canvas;
 		Rect  clientRect;
+#ifdef	PRINT_TIME
+		ULONGLONG startTime,duration; 
+		
+		startTime = Time::getMicrosecond();
+#endif			
 		getClientRect(clientRect);
 
 		canvas = getCanvas();
 		cartoonRedraw(*canvas, clientRect);
 		canvas->swapScreenFrontBuffer();
 		releaseCanvas();
-
+#ifdef PRINT_TIME
+		duration = Time::getMicrosecond()-startTime;
+		log_i("duration = %ld",duration);
+#endif
 		return 0;
 	}
 
@@ -1364,14 +1416,88 @@ namespace mango
 			dy = distance ;
 
 		if (cartoonMoveZone(dy))
-#if 1			
 			cartoonDisplay();
-#else
-			invalidateRect();
-#endif
 		return 0 ;
 	}
 
+	int ListView::cartoonRiffle(int ySpeed)
+	{
+		int	  yShift ;
+		Rect  clientRect;
+		getClientRect(clientRect);
+
+		resumeSelectedRecord();
+
+		if (mZoneSize.cy >= clientRect.bottom - clientRect.top)
+			yShift = mZoneSize.cy * ySpeed / TS_FASTMOVE_SPEED_MAX; 
+		else
+			yShift = clientRect.height() * ySpeed / TS_FASTMOVE_SPEED_MAX; 
+
+
+		Cartoon::gearshift(this, yShift, clientRect.height(), ListView::gearshiftProcess, NULL);
+
+		return 0 ;
+	}
+
+
+	
+	int ListView::cartoonTropic()
+	{
+		int	  ySpace = 0;
+		Rect  clientRect;
+		getClientRect(clientRect);
+
+		if (mZonePoint.y > 0)
+			ySpace = 0 - mZonePoint.y;
+		else if (mZonePoint.y < 0)
+		{
+			if (mZoneSize.cy <= clientRect.height())
+				ySpace = 0 - mZonePoint.y ;
+			else if (mZonePoint.y + mZoneSize.cy < clientRect.height())
+				ySpace = clientRect.height() - (mZonePoint.y + mZoneSize.cy) ;
+		}
+
+		if (ySpace == 0)
+		{
+			resumeSelectedRecord(true);
+		}
+		else
+		{
+			Cartoon::gearshift(this, ySpace, clientRect.height(), ListView::gearshiftProcess, NULL);
+		}
+
+		return 0 ;
+	}
+
+
+	
+	//重构 Gearshift shortcut 一帧
+	bool  ListView::gearshiftProcess(View* view, unsigned int evenID, int shift, VOID *parameter)
+	{
+		ListView* listView = (ListView*)view;
+		//INPUT	Input ;
+		//RECT	rect ;
+		if (gMessageQueue.isExistInput()) //; CheckNextInput (&Input))
+		{
+			//可能， 没有点击窗口， 先点其它区域， 出现不能停止的问题
+			//	if (Input.type == INPUT_TOUCH)
+			//	{
+			//		GetWindowRect (hWnd, &rect) ;
+			//		if (PtInRect (&rect, Input.ti.m_pt[0]))
+			//			return FALSE ;
+			//	}
+			return false;
+		}
+
+		if (listView->cartoonMoveZone(shift))
+		{
+			listView->cartoonDisplay();
+			return true;
+		}
+		else
+			return false;
+
+	}
 
 
 };

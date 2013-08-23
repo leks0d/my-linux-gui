@@ -46,6 +46,7 @@ namespace mango
 		
 		TextView* mAudioInfo;
 		TextView* mMusicName;
+		StaticView* mMusicNameStatic;
 		TextView* mArtist;
 		TextView* mAlbum;
 		

@@ -2,16 +2,13 @@
 namespace mango
 {
 
-	class SystemInfoView: public View
+	class KeyLockView: public View
 	{
 	public:
-		SystemInfoView(void);
-		SystemInfoView(const TCHAR* title, View* parent, Rect* rect, int style, int show = SW_NORMAL);
-		virtual ~SystemInfoView(void);
+		KeyLockView(void);
+		KeyLockView(const TCHAR* title, View* parent, Rect* rect, int style, int show = SW_NORMAL);
+		virtual ~KeyLockView(void);
 		void initView();
-		void updateTotalMem();
-		void addPoint(int x,int y);
-		void pointClear();
 	public:
 		virtual int onCreate();
 		virtual int onDestroy();
@@ -34,7 +31,7 @@ namespace mango
 		Button* mHome;
 		ImageView* mDisplayIcon;
 		SeekBar* mBrightnessBar;
-		TextView* mBrightnessValue;
+		TextView* mUsbState;
 	
 	private:
 		int		mMode;					//menu菜单 媒体库index 收藏夹 或 浏览路径
@@ -47,12 +44,7 @@ namespace mango
 		int count;
 		int mMax;
 		int isNeedPaint;
-		ValueTextView* mModelNumber;
-		ValueTextView* mFirmwareVersion;
-		ValueTextView* mStorageSpace;
-		ValueTextView* mUesedSpace;
-		ValueTextView* mAvailSpace;
-		SeekBar *mStorageSeekBar;
+		
 	};
 
 };

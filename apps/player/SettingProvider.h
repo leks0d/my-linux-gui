@@ -14,6 +14,7 @@ namespace mango
 	#define SETTING_PLAYPOS_ID		7
 	#define SETTING_AUTOSLEEP_ID		8
 	#define SETTING_LANGUAGE_ID		9
+	#define SETTING_AUTOPOWEROFF_ID	10
 
 	#define EQ_CUSTOM_ID		0
 	#define EQ_POP_ID			1
@@ -42,6 +43,7 @@ namespace mango
 			SettingProvider(void);
 			~SettingProvider(void);
 			void initialize(void);
+			void dbclose();
 			void dataBaseInit(void);
 			int insert(int id,int value);
 			int update(int id,int value);

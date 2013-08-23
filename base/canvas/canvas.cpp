@@ -109,6 +109,14 @@ namespace mango
 	}
 
 
+	Region* Canvas::select(Region* region)
+	{
+		Region* r = mRegion;
+		mRegion = region;
+		return r; 
+	}
+
+
 	void Canvas::renew(class View* view)
 	{
 		mInitRegion = NULL;
@@ -241,7 +249,7 @@ namespace mango
 		return true;
 	}
 
-	bool Canvas::drawBitmap(int* colors, int x, int y, int width, int height)
+	bool Canvas::drawBitmap(int* colors, int x, int y, int width, int height, bool alpha)
 	{
 		Rect	rcBmp, rcClip ;
 
@@ -257,7 +265,7 @@ namespace mango
 
 		bitBlt_32(mBitmap->getBits(), mBitmap->getWidth(), rcClip.left,  rcClip.top,  rcClip.right - rcClip.left, rcClip.bottom - rcClip.top, \
 				colors, width, rcClip.left - x, rcClip.top - y, \
-				SRCCOPY, 255, NULL);
+				alpha ? SRCALPHADSTALPHA : SRCCOPY, 255, NULL);
 
 		return true;
 	}
@@ -267,6 +275,12 @@ namespace mango
 	{
 		gSessionLocal.swapScreenFrontBuffer();
 	}
+
+	void Canvas::copyScreenFrontToBack()
+	{
+		gSessionLocal.copyScreenFrontToBack();
+	}
+	
 
 }
 
