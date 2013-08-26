@@ -53,7 +53,7 @@ namespace mango
 
 			id  = (id - mHeader.m_dwStringStartItem) * (mHeader.m_dwLanguages) ;
 			id += mHeader.m_dwStringStartItem ;
-			id += 0; //gsys_pUserSessionObj->m_wLanguage ; //mHeader.m_dwLanguages ;
+			id += gSessionLocal.mLanguageId; //gsys_pUserSessionObj->m_wLanguage ; //mHeader.m_dwLanguages ;
 
 			
 			
@@ -77,9 +77,9 @@ namespace mango
 			fseek (mFile, Item.m_dwOffset + mHeader.m_dwOffsetOfData , SEEK_SET);
 			fread (readbuf, 1, Item.m_dwBytes, mFile) ;
 
-			for(i=0;i<Item.m_dwBytes/2;i++){
-				buffer[i] = readbuf[i];
-			}
+//			for(i=0;i<Item.m_dwBytes/2;i++){
+//				buffer[i] = readbuf[i];
+//			}
 
 			buffer[iResTChars] = '\0' ;
 

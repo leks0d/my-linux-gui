@@ -114,4 +114,9 @@ namespace mango
 		system(reboot);
 	}
 
+	void Environment::openMute(){
+		char *cmd = "./system/bin/muteopen";
+		system(cmd);
+	}
+
 };

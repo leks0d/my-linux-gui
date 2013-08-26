@@ -14,7 +14,6 @@
 #include "BitmapFactory.h"
 #include "mediaView.h"
 #include "SettingsView.h"
-#include "playlist.h"
 #include "playingView.h"
 #include "MusicInfoView.h"
 #include "DisplaySettingView.h"
@@ -32,6 +31,8 @@
 
 namespace mango
 {	
+//#define NEED_SLEEP
+
 	enum{
 		IOCTRL_BRIGTNESS_READ=0,
 		IOCTRL_BRIGTNESS_WRITE
@@ -176,6 +177,7 @@ namespace mango
 		bool isSpdifIn();
 		bool isHeadestIn();
 		void openCodecPower(bool enable);
+		void openOrCloseMute(bool enable);
 		void setBootWakeLock(int en);
 		void shutDown();
 	public:
@@ -205,4 +207,5 @@ namespace mango
 	};
 	
 	extern Player  gPlayer;
+	
 };

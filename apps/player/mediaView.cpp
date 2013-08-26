@@ -66,7 +66,9 @@ namespace mango
 		strlwr(type);
 		return type;
 	}
+/*
 	static int ismusic(char *file)
+	
 	{
 		char *type;
 		char *music_type[] = {"mp3","wav","flac","aac","ogg","ape","m4a","wma","\0"};
@@ -84,6 +86,7 @@ namespace mango
 		}
 		return 0;
 	}
+*/	
 	MediaListView::MediaListView(void)
 	{
 
@@ -133,6 +136,9 @@ namespace mango
 		mArtistAdapter = NULL;
 		mMainListAdapter = NULL;
 		mRootDirectListAdapter = NULL;
+		mAlbumMusicAdapter = NULL;
+		mArtistMusicAdapter = NULL;
+		
 		mOrderMenuShow = 0;
 	}
 
@@ -702,8 +708,10 @@ namespace mango
 									adapter = (MusicAdapter *)mListView->getListAdapter();
 									
 									if(adapter != NULL){
-										if(getMainState() != 0x1300)
-											mPlayinglist->addArrayItem(*(adapter->mMusicArrayList));
+										if(getMainState() != 0x1300){
+											mPlayinglist->clearAll();
+											mPlayinglist->addArrayItem(*(adapter->mMusicArrayList));		
+										}
 										playMediaInfo(adapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem),1);
 									}
 								}else if(pt.x>LIST_MUSIC_ICON_LEFT){
@@ -1052,7 +1060,7 @@ namespace mango
 		y = rect.top;
 		info = mMusicArrayList->getMediaInfo(lvitem->iItem);
 		x = LIST_MUSIC_ICON_LEFT;
-		canvas.drawImageResource(IDP_MUSIC_ICON,x,y+5);
+		canvas.drawImageResource(IDP_LISTICON_ALBUM,x,y+5);
 		log_i("AlbumAdapter::PaintView isSec=%d",isSec);
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));

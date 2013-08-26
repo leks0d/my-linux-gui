@@ -39,7 +39,6 @@ LOCAL_SRC_FILES := player.cpp
 LOCAL_SRC_FILES += mediaView.cpp
 LOCAL_SRC_FILES += playingView.cpp
 LOCAL_SRC_FILES += SettingsView.cpp
-LOCAL_SRC_FILES += playlist.cpp
 LOCAL_SRC_FILES += MediaPlayerInterface.cpp
 LOCAL_SRC_FILES += MedaiPlayerService.cpp
 LOCAL_SRC_FILES += mediaprovider.cpp

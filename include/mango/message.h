@@ -60,7 +60,7 @@ namespace mango
 		unsigned int mParameter2; 
 		unsigned int mTime;
 		unsigned int mResult;
-
+		unsigned int mDelay;
 	public:
 
 		unsigned int getId()   { return mId; };
@@ -69,7 +69,8 @@ namespace mango
 		unsigned int getParameter1() { return mParameter1; };
 		unsigned int getParameter2() { return mParameter2; };
 		unsigned int getTime()  { return mTime; };
-
+		
+		unsigned long getExecTime()  { return mTime+mDelay; };
 		void setId(unsigned int id)		{ mId   = id; };
 		void setView(class View* view)	{ mView = view; };
 		void setParameter(unsigned int parameter)	{ mParameter1 = parameter; };

@@ -15,5 +15,6 @@ namespace mango
 			static void memSizeToStr(int size, char *space);
 			static void recovery();
 			static void install();
+			static void openMute();
 	};
 };

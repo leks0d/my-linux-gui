@@ -1,5 +1,6 @@
 #include "player.h"
- #include "cutils/android_reboot.h"
+#include "cutils/android_reboot.h"
+
 namespace mango
 {
 
@@ -78,6 +79,8 @@ namespace mango
 		gAlarmManager->setAlarmWakeup(6);
 #endif
 		holdKeyProbe();
+		//openOrCloseMute(true);
+		//Environment::openMute();
 		return messageLoop();
 	}
 	void Player::setBootWakeLock(int en){
@@ -88,10 +91,14 @@ namespace mango
 				bootLockCount = 20;
 			}
 		}
-		/*else if(isBootLock){
+		else if(isBootLock){
+			Environment::openMute();
+#ifdef NEED_SLEEP
 			if(wakeUnlock(BootUp) == 0)
 				isBootLock = 0;
-		}*/
+#endif
+		}
+
 	}
 
 	int Player::initSettings(){
@@ -102,9 +109,9 @@ namespace mango
 		
 		if(gSettingProvider.query(SETTING_BRIGHTNESS_ID,&value))
 			ioctrlBrightness(IOCTRL_BRIGTNESS_WRITE,&value);
-
+		
 		if(gSettingProvider.query(SETTING_LANGUAGE_ID,&value))
-			gSessionLocal.mStockGraphic.mCanvas.setTextLanguage(value);
+			gSessionLocal.setLangId(value);
 	}
 	
 	int Player::showPlayingView()
@@ -311,6 +318,9 @@ namespace mango
 	}
 	void Player::shutDown(){
 		int sleepCount;
+
+		if(powerState == 2)
+			setPowerState();
 		
 		mPlayinglist->stopPlayer();
 		mPlayinglist->savePlayintList();
@@ -320,7 +330,7 @@ namespace mango
 		while(sleepCount--){
 			mango::Thread::sleep(100);
 		}
-		
+		openOrCloseMute(false);
 		reboot(RB_POWER_OFF);
 	}
 	int Player::showMusicOperateView(mediainfo& info){
@@ -530,7 +540,7 @@ namespace mango
 		int fd=0,state,volume;
 		char* path = "/sys/class/codec/power";
 		char rbuf;
-		
+		return;
 		log_i("spdif openCodecPower enable=%d",enable);
 		
 		fd = open(path,O_RDWR, 0);
@@ -540,10 +550,25 @@ namespace mango
 		write(fd,&rbuf,1);
 
 		if(enable){
-			mango::Thread::sleep(200);
+			//mango::Thread::sleep(200);
 			gSettingProvider.query(SETTING_VOLUME_ID,&volume);
 			setVolume(volume);
 		}
+		close(fd);
+	}
+	void Player::openOrCloseMute(bool enable){
+		int fd=0,state,volume;
+		char* path = "/sys/class/codec/mute";
+		char rbuf;
+		
+		log_i("mute openOrCloseMute enable=%d",enable);
+		
+		fd = open(path,O_RDWR, 0);
+		
+		rbuf = enable?1:0;
+		
+		write(fd,&rbuf,1);
+		
 		close(fd);
 	}
 	int PlayerEventInterface::onKeyDispatch(int keyCode,int action, int flag){

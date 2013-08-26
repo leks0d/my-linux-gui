@@ -212,7 +212,7 @@ namespace mango
 	void SettingsView::initLanguageList(){
 		int img[]={0,0,0,0,0};
 		int imgsec[]={0,0,0,0,0};
-		int text[]={STR_LANGUAGE_CN,STR_LANGUAGE_EN,STR_LANGUAGE_JA};
+		int text[]={STR_LANGUAGE_EN,STR_LANGUAGE_CN,STR_LANGUAGE_JA};
 		int i,count = 3;
 		
 		if(mLanguageListAdapter == NULL){
@@ -309,8 +309,9 @@ namespace mango
 						}
 					break;
 				case 0x1410:
-					gSessionLocal.mStockGraphic.mCanvas.setTextLanguage(index+1);
-					gSettingProvider.update(SETTING_LANGUAGE_ID,index+1);
+					//gSessionLocal.mStockGraphic.mCanvas.setTextLanguage(index+1);
+					gSessionLocal.setLangId(index);
+					gSettingProvider.update(SETTING_LANGUAGE_ID,index);
 					mLanguageListAdapter->refresh();
 					break;
 				case 0x1430:{
@@ -585,7 +586,7 @@ namespace mango
 		canvas.setTextSize(18);
 		canvas.drawTextResource(mTextRes[index],x,y+13);
 		x+=150;
-		if(index == canvas.getTextLanguage()-1)
+		if(index == gSessionLocal.getLangId())
 			canvas.drawImageResource(IDP_LISTITEM_SEC,x,y+13);
 		else
 			canvas.drawImageResource(IDP_LISTITEM_NO_SEC,x,y+13);

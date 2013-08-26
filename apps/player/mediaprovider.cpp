@@ -209,25 +209,6 @@ namespace mango
 		delete temp;
 		log_i("getFileTitle title=%s",title);
 	}
-	
-	static int ismusic(char *file)
-	{
-		char *type;
-		char *music_type[] = {"mp3","wav","flac","aac","ogg","ape","m4a","wma","\0"};
-		char **mtype;
-		mtype = music_type;
-		//log_i("getfiletype filename:%s\n",file);
-		type = getfiletype(file);
-		//log_i("getfiletype :%s\n",type);
-		if(type == 0)
-			return 0;
-		while(*mtype!="\0"){
-			if(strcmp(*mtype,type) == 0)
-				return 1;
-			mtype++;
-		}
-		return 0;
-	}
 
 	int mediaprovider::music_exsit_db(char *path){
 		mediainfo *infolist;
@@ -251,6 +232,49 @@ namespace mango
 		mCurrentTimes = 0;
 	}
 
+	void mediaprovider::externFileScanner(char *filepath){
+		ScanInfo *info;
+
+		info = new ScanInfo();
+		info->media = this;
+		strcpy(info->path,filepath);
+
+		mScannerThread.create(mediaprovider::FileScannerRunnig, info);
+	}
+	unsigned int mediaprovider::FileScannerRunnig(void *parameter){
+			ScanInfo *info = (ScanInfo*)parameter;
+			mediaprovider *media = info->media;
+			char *path = info->path;
+			
+			media->sendMsgStart();
+			
+			media->ScannerDirectory(path);
+			
+			media->sendMsgEnd();
+				
+			return 0;		
+	}
+	void mediaprovider::ScannerDirectory(char* file){
+		ArrayMediaInfo array;
+		mediainfo info;
+		int count,i;
+		
+		count = MediaView::getArrayInfoFromFile(file,array);
+		
+		mMutex.lock();
+		
+		for(i=0;i<count;i++){
+			char *dirpath;
+			dirpath = array.getMediaInfo(i)->path;
+			if(!music_exsit_db(dirpath)){
+				getmediainfo(array.getMediaInfo(i)->path,&info);
+				insert(0,&info);
+			}
+		}
+		
+		mMutex.unlock();
+	}
+
 	int mediaprovider::mediascanner(char *path)
 	{
 		mMutex.lock();
@@ -272,9 +296,10 @@ namespace mango
 		file = info->path;
 		strcpy(file,path);
 		
-		mScannerThread.create(mediaprovider::FileScannerRunnig, info);
+		mScannerThread.create(mediaprovider::VolumeScannerRunnig, info);
 	}
-	unsigned int mediaprovider::FileScannerRunnig(void *parameter){
+	
+	unsigned int mediaprovider::VolumeScannerRunnig(void *parameter){
 			ScanInfo *info = (ScanInfo*)parameter;
 			mediaprovider *media = info->media;
 			char *path = info->path;
@@ -284,15 +309,19 @@ namespace mango
 			media->sendMsgEnd();
 				
 			return 0;
-	}	
+	}
 	int mediaprovider::sendMsgStart(){
 		log_i("sendMsgStart:show MediaScannerView");
 		//gPlayer.showMediaScannerView();
+		scanTime = Time::getMillisecond();
 		gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,MEDIA_SCANNER_START,0);
 	}
 	int mediaprovider::sendMsgEnd(){
 		log_i("sendMsgEnd:dismissView MediaScannerView");
 		//gPlayer.dismissView(gPlayer.mMediaScannerView);
+		int dur = Time::getMillisecond() - scanTime;
+		if(dur<50)
+			mango::Thread::sleep(500);
 		gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,MEDIA_SCANNER_END,0);
 	}
 	int mediaprovider::getmediainfo(char *path,mediainfo *info)
@@ -331,6 +360,8 @@ namespace mango
 
 			info->album_key = new char[len];
 			strlwr(value,info->album_key);
+		}else{
+			
 		}
 		
 		memset(value, 0, 256);
@@ -469,7 +500,7 @@ namespace mango
 		DIR* d;
 		struct dirent* de;
 
-		
+		log_i("opendir DT_DIR :%s\n",path);
 		d = opendir(path);
 
 		while((de = readdir(d)) != NULL)
@@ -479,15 +510,18 @@ namespace mango
 			strcpy(direct,path);
 			strcat(direct,"/");
 			strcat(direct,de->d_name);
-			//log_i("opendir DT_DIR :%s\n",direct);
-
-			if (de->d_type == DT_DIR) {		
+			log_i("scan DT_DIR=%d :%s,de->d_type=%d",DT_DIR,direct,de->d_type);
+			
+//			if (de->d_type == DT_DIR || de->d_type == 0 ) {	
+			if(File::isDirect(direct)){
 #if 0				
 				if (name_len == 1 && de->d_name[0] == '.') continue;
             	if (name_len == 2 && de->d_name[0] == '.' &&
                 de->d_name[1] == '.') continue;
 #endif			
-				if (de->d_name[0] == '.')  continue;
+				
+				if (de->d_name[0] == '.'){ log_i("scan DT_DIR continue");continue;}
+				//if(File::isDirect(direct))
 				filescanner(direct);
 				count++;
 			}

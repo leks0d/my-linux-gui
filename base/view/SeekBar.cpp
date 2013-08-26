@@ -30,8 +30,8 @@ namespace mango
 	}
 	
 	void SeekBar::setProgress(int n){
-		if(mMax <= 0){
-			log_i("error invail mMax.");
+		if(mMax <= 0 || n<0 || n>mMax){
+			log_i("error:invail mMax or progress.");
 			return;
 		}
 		mProgress = n;

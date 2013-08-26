@@ -171,6 +171,18 @@ namespace mango
 
 			return true;
 		}
+	bool File::isDirect(char* file){
+		struct stat64 statbuf ;
+		
+		if (stat64 (file, &statbuf) == -1)
+		{
+			log_e("Get stat Error:%s\n",file) ;
+			return false;
+		}
+		log_i("statbuf.st_mode = 0x%x,file:%s",file);
+		return S_ISDIR(statbuf.st_mode);
+	}
+
 
 	TCHAR* File::pathAddBackslash(TCHAR* path)
 	{

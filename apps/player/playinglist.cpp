@@ -92,7 +92,7 @@ static const char *PlayerLock = "playerlock";
 				int count = getCount();
 				mediainfo *ptr = mplaylist;
 
-				if(count <= 0 || n<0)
+				if(count <= 0 || n < 0)
 					return;
 
 				for(i=n;i<count-1;i++){
@@ -260,6 +260,10 @@ static const char *PlayerLock = "playerlock";
 					mParticleplayer = particle::createMediaPlayer();
 					mParticleplayer->setEventCallback(Playinglist::playerCallback,(void *)this);
 					PlayerInit();
+					//mango::Thread::sleep(1000 * 3);
+					//gPlayer.openOrCloseMute(true);
+					//mango::Thread::sleep(1000 * 3);
+					Environment::openMute();
 				}
 				if(mParticleplayer == NULL)
 					return -1;
@@ -403,6 +407,7 @@ static const char *PlayerLock = "playerlock";
 			}else if(inPause == 1){
 				log_i("mParticleplayer inPause");
 				mParticleplayer->start();
+				setWakeLock();
 				inPause = 0;
 			}else{
 				log_i("mParticleplayer startPlay");
@@ -478,16 +483,24 @@ static const char *PlayerLock = "playerlock";
 		void Playinglist::setWakeLock(){
 			log_i("Playinglist::setWakeLock isWakeLock=%d",isWakeLock);
 			if(!isWakeLock){
-				if(gPlayer.wakeLock(PlayerLock) == 0)
+				if(gPlayer.wakeLock(PlayerLock) == 0){
+#ifndef NEED_SLEEP					
+					gPlayer.openCodecPower(true);
+#endif				
 					isWakeLock = 1;
+				}
 			}
 		}
 
 		void Playinglist::releaseWakeLock(){
 			log_i("Playinglist::releaseWakeLock isWakeLock=%d",isWakeLock);
 			if(isWakeLock){
-				if(gPlayer.wakeUnlock(PlayerLock) == 0)
+				if(gPlayer.wakeUnlock(PlayerLock) == 0){
+#ifndef NEED_SLEEP
+					gPlayer.openCodecPower(false);
+#endif
 					isWakeLock = 0;
+				}
 			}
 		}
 		void Playinglist::stopForSdcardEject(){
@@ -514,6 +527,12 @@ static const char *PlayerLock = "playerlock";
 				mParticleplayer->stop();
 			}
 			releaseWakeLock();
+		}
+		void Playinglist::clearAll(){
+			if(len>0){
+				memset(mplaylist,0,sizeof(mediainfo)*len);
+				len = 0;
+			}
 		}
 		
 		Playinglist *mPlayinglist = NULL;

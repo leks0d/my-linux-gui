@@ -21,6 +21,7 @@ namespace mango
 		bool findClose();
 		bool findNext(TCHAR* path, int *attribute);
 		bool findNext(TCHAR* path, int *attribute,char *cName);
+		static bool isDirect(char* file);
 		static TCHAR* pathAddBackslash(TCHAR* path);
 		static bool  pathMatchSpec(LPCTSTR pszFile, LPCTSTR pszSpec,DWORD dwFlags);
 		static TCHAR* pathFindFileName(TCHAR* path);

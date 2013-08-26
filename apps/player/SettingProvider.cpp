@@ -50,7 +50,7 @@ namespace mango
 
 	void SettingProvider::dataBaseInit(void){
 		insert(SETTING_BRIGHTNESS_ID,127);
-		insert(SETTING_VOLUME_ID,150);
+		insert(SETTING_VOLUME_ID,170);
 		insert(SETTING_PLAYMODE_ID,0);
 		insert(SETTING_GAPLESS_ID,0);
 		insert(SETTING_EQMODE_ID,0);

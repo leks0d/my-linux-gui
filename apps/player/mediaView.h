@@ -119,6 +119,7 @@ namespace mango
 		static int getMusicIcon(char* name);
 		virtual ~MediaView(void);
 		int onTouchDispatch(int x,int y, int action);
+		static int getArrayInfoFromFile(char *file,ArrayMediaInfo& array);
 	public:
 		virtual int onCreate();
 		virtual int onDestroy();
@@ -151,22 +152,23 @@ namespace mango
 		void showOrderByMenu();
 		void dismissOrderByMenu();
 		bool menuIsShow();
-		static int getArrayInfoFromFile(char *file,ArrayMediaInfo& array);
 	public:
 		MediaListView*  mListView;
 		TextView* mTitle;
+		TextView* mEqState;
 		Button* mBack;
 		Button* mHome;
 		ImageView* mTitleImageView;
+		
 		PlayingListAdapter* mPlayingListAdapter;
 		RootDirectListAdapter* mRootDirectListAdapter;
-		
 		MusicAdapter* mMusicAdapter;
 		MusicAdapter* mAlbumMusicAdapter;
 		MusicAdapter* mArtistMusicAdapter;
 		AlbumAdapter* mAlbumAdapter;
 		ArtistAdapter* mArtistAdapter;
 		MainListAdapter* mMainListAdapter;
+		
 		ImageView* mOrderMenuBk;
 		TextView* mOrderByTitle;
 		TextView* mOrderByAlbum;

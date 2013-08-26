@@ -77,6 +77,7 @@ namespace mango
 			void stopForSdcardEject();
 			void setPauseToStart(){ if(inPause&&mParticleplayer != NULL){mParticleplayer->start();inPause = 0;} }
 			void setPlayPause();
+			void clearAll();
 			static void playerCallback(void* calldata, int evnet, int param0, int param1);
 	};		
 	extern Playinglist *mPlayinglist;

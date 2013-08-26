@@ -246,6 +246,7 @@ class ValueTextView : public View
 			int getProgress();
 			void setTouchX(int x);
 			void setMax(int n){mMax=n; if(mMax == 0) mMax = 1;log_i("SeekBar setMax = %d",mMax);}
+			int getMax(){return mMax;}
 			void setBackgroundRes(int resId,int x,int y);
 			void setSeekgroundRes(int resId,int x,int y);
 			virtual int onPaint(Canvas& canvas);

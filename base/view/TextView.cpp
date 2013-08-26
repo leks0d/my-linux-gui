@@ -124,7 +124,7 @@ namespace mango
 	}
 	
 	void TextView::setTextResoure(int id){
-		if(id>0){
+		if(id>=0){
 			resId = id;
 			ResType = 1;
 			invalidateRect();

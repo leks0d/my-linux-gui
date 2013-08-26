@@ -18,6 +18,7 @@ namespace mango
 		void updatePlayMode();
 		void updatePlayButtonIcon();
 		void updateAudioInfo();
+		void updateEqState();
 		static void CalculateSize(float srcw,float srch,float dstw,float dsth,SkRect &rect);
 		virtual ~PlayingView(void);
 		virtual int onCreate();
@@ -27,6 +28,7 @@ namespace mango
 		virtual int onKeyDown(int keyCode, int flag);
 		virtual int onKeyUp(int keyCode, int flag); 
 		virtual int onCommand(int id, int code, View* fromView);
+		
 	private:
 		mediainfo mCurrentInfo;
 		Button*  mNextButton;
@@ -43,6 +45,7 @@ namespace mango
 		TextView* mDurtionText;
 		TextView* mMyMusicText;
 		TextView* mSettingText;
+		TextView* mEqState;
 		
 		TextView* mAudioInfo;
 		TextView* mMusicName;
