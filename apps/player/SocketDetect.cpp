@@ -198,6 +198,10 @@ void SocketDetect::DetectRun(void){
 				result = SDCARD_START_UNMOUNT;
 			}else
 				log_i("usb unknow");
+			if(result > 0)
+		   		gPowerManager->setPowerState(POWER_STATE_ON);
+			
+			log_i("set power state POWER_STATE_ON");
 			if(mPlayerEventInterface != NULL)
 				mPlayerEventInterface->onKeyDispatch(result,VM_MEDIA,0);
          }

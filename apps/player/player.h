@@ -27,6 +27,7 @@
 #include "MediaScannerView.h"
 #include "MusicOperateView.h"
 #include "KeyLockView.h"
+#include "ChosenView.h"
 
 
 namespace mango
@@ -37,7 +38,10 @@ namespace mango
 		IOCTRL_BRIGTNESS_READ=0,
 		IOCTRL_BRIGTNESS_WRITE
 	};
-
+	enum{
+		POWER_STATE_ON = 0,
+		POWER_STATE_STANDBY
+	};
 	enum
 	{
 		SETTING_BACK = 10,
@@ -167,6 +171,7 @@ namespace mango
 		int showSdcardInsertView();
 		int showMusicOperateView(mediainfo& info);
 		int showKeyLockView();
+		int showChosenView(int type);
 		void dismissView(View *view);
 		int  getVolume(void);
 		void setVolume(int volume);
@@ -196,6 +201,7 @@ namespace mango
 		MusicOperateView *mMusicOperateView;
 		UsmConnectView *mUsmConnectView;
 		KeyLockView *mKeyLockView;
+		ChosenView *mChosenView;
 		
 		PlayerEventInterface* mPlayerEventInterface;
 		int powerState;

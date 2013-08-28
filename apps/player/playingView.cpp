@@ -73,7 +73,7 @@ namespace mango
 		mMusicName->setTextColor(RGB(248,136,0));
 		mMusicName->setTextSize(23);
 
-		rect.setEx(left, 55, 190, 25);
+		rect.setEx(left, 55, 188, 25); 
 		mMusicNameStatic = new StaticView(TEXT("mMusicName"), this, &rect, 0);
 		mMusicNameStatic->setTextColor(RGB(248,136,0));
 		mMusicNameStatic->setTextSize(23);
@@ -136,6 +136,7 @@ namespace mango
 		rect.setEx(0, 213, 115, 27);		
 		mMyMusicText = new  TextView(PLAYING_IDB_MUSIC, TEXT("mMyMusicText"), this, &rect, 0);
 		mMyMusicText->setTextColor(RGB(209,209,209));
+		mMyMusicText->setTextSelectColor(COLOR_ORANGE);
 		mMyMusicText->setTextSize(16);
 		mMyMusicText->setTextResoure(MUSIC_MY_MUSIC);
 		mMyMusicText->setTextLayoutType(TEXT_LAYOUT_CENTER);
@@ -144,6 +145,7 @@ namespace mango
 		rect.setEx(205, 213, 115, 27);		
 		mSettingText = new  TextView(PLAYING_IDB_SETTING, TEXT("mSettingText"), this, &rect, 0);
 		mSettingText->setTextColor(RGB(209,209,209));
+		mSettingText->setTextSelectColor(COLOR_ORANGE);
 		mSettingText->setTextSize(16);
 		mSettingText->setTextResoure(MUSIC_MUSIC_FUN);
 		mSettingText->setTextLayoutType(TEXT_LAYOUT_CENTER);
@@ -173,8 +175,9 @@ namespace mango
 		updatePlayButtonIcon();
 		updateAudioInfo();
 		updateEqState();
-
-		if(currentinfo == NULL){	
+		
+		if(currentinfo == NULL){
+			log_i("tag");
 			mMusicName->setTextResoure(STR_NO_MUSIC);
 			mMusicNameStatic->setTextResoure(STR_NO_MUSIC);
 			mAudioInfo->setTextString(NULL);
@@ -183,7 +186,6 @@ namespace mango
 			return;
 		}
 
-		mCurrentInfo = *currentinfo;
 #if 0
 		if( (currentinfo->img_path == NULL) || (strcmp(currentinfo->img_path,"(null)") == 0)){
 			mMSkBitmap->release();
@@ -218,53 +220,43 @@ namespace mango
 			}
 		}
 #else
+		log_i("tag currentinfo->img_path=0x%x",currentinfo->img_path);
 		BitmapFactory::decodeFile(mMSkBitmap,currentinfo->img_path,109,109);
+		
 #endif
-
+		log_i("tag");
 		mAlbumImage->setMSkBitmap(mMSkBitmap);
+		log_i("tag");
 
-		if(mMSkBitmap->isVaild()){
 			Rect rect;
 			int left = 127;
-			
+			log_i("tag");
 			rect.setEx(left, 32, 100, 20);
 			mAudioInfo->setRect(rect);
-			
+			log_i("tag");
 			rect.setEx(left, 55, 190, 25);
 			mMusicNameStatic->setRect(rect);
+			log_i("tag");
 
 			rect.setEx(left, 85, 190, 20);
 			mArtist->setRect(rect);
+			log_i("tag");
 
 			rect.setEx(left, 105, 190, 20);
 			mAlbum->setRect(rect);
 			mMusicNameStatic->setTextBkRes(IDP_PLAYING_MUSICNAME_BK);
-		}else{
-			Rect rect;
-			int left = 111;	 
-			
-			rect.setEx(left, 32, 100, 20);
-			mAudioInfo->setRect(rect);
-			
-			rect.setEx(left, 55, 320-left, 25);
-			mMusicNameStatic->setRect(rect);
+			log_i("tag");
 
-			rect.setEx(left, 85, 320-left, 20);
-			mArtist->setRect(rect);
-
-			rect.setEx(left, 105, 320-left, 20);
-			mAlbum->setRect(rect);
-			mMusicNameStatic->setTextBkRes(IDP_PLAYING_NAME_BK2);
-		}
-	
-		mMusicName->setTextString(currentinfo->name);
-
-		mMusicNameStatic->setTextString(currentinfo->name);
-
+		
+		log_i("tag 0x%s",currentinfo->title);
+		mMusicName->setTextString(currentinfo->title);
+		log_i("tag 0x%x",currentinfo->title);
+		mMusicNameStatic->setTextString(currentinfo->title);
+		log_i("tag");
 		mArtist->setTextString(currentinfo->artist);
-
+		log_i("tag");
 		mAlbum->setTextString(currentinfo->album);
-
+		log_i("tag");
 		duration = mPlayinglist->getDuration();
 		log_i("mPlayinglist->getDuration()=%d",duration);
 		if(duration<=1)
@@ -347,7 +339,8 @@ namespace mango
 			mEqState->setTextResoure(eqMode[mode]);
 		}else{
 			mEqState->setTextResoure(0);
-		} 
+		}
+		log_i("end");
 	}
 	
 	void PlayingView::updateAudioInfo(){
@@ -357,20 +350,20 @@ namespace mango
 		
 		memset(info,0,sizeof(int)*6);
 		mstr = new Mstring(30);
-		
+
 		mPlayinglist->getAudioInfo(info);
 		
-		//log_i("getAudioInfo:%d,%d,%d,%d,%d,%d",info[0],info[1],info[2],info[3],info[4],info[5]);
 		sampleRate = info[1];
-		//log_i("getAudioInfo:%.1f",sampleRate);
 		sampleRate = sampleRate/1000.0;
-		//log_i("getAudioInfo:%.1f",sampleRate);
+		
 		mstr->mfloatSprintf("%.1fKHz/",sampleRate);
 		mstr->mSprintf("%dKbps",info[2]/1000);
-
+		
 		mAudioInfo->setTextString(mstr->mstr);
-		delete mstr;
 
+		delete mstr;
+		mstr = NULL;
+		
 		log_i("PlayingView::updateAudioInfo end");
 	}
 	
@@ -524,6 +517,7 @@ namespace mango
 					gPlayer.setBootWakeLock(0);
 				gPlayer.bootLockCount--;
 			}
+			mKeyCount.TriggerKey();
 		}else if(code == FLASH_MOUNT){
 			gPlayer.dismissView(gPlayer.mUsmConnectView);
 			mPlayinglist->checkPlayintList();
@@ -567,8 +561,12 @@ namespace mango
 	int PlayingView::onKeyDown(int keyCode, int flag)
 	{
 		switch(keyCode)	{
-		case KEYCODE_BACK:
-			break;
+			case KEYCODE_BACK:
+				break;
+			case KEYCODE_PREV:
+			case KEYCODE_NEXT:
+				mKeyCount.initKeyPress(keyCode);
+				break;
 		}
 
 		return 0;
@@ -577,9 +575,20 @@ namespace mango
 
 	int PlayingView::onKeyUp(int keyCode, int flag)
 	{
+		log_i("enter");
 		switch(keyCode)	{
-		case KEYCODE_BACK:
-			break;
+			case KEYCODE_BACK:
+				break;
+			case KEYCODE_PREV:
+			case KEYCODE_NEXT:
+				if(!mKeyCount.isKeyPress(keyCode)){
+					if(keyCode == KEYCODE_NEXT){
+						gMessageQueue.post(gPlayer.mPlayingView,VM_COMMAND,PLAYING_IDB_NEXT,NULL);
+					}else if(keyCode == KEYCODE_PREV){
+						gMessageQueue.post(gPlayer.mPlayingView,VM_COMMAND,PLAYING_IDB_PREV,NULL);
+					}
+				}
+				break;	
 		}
 
 		return -1;
@@ -597,7 +606,8 @@ namespace mango
 			ViewInit();
 			break;
 		case PLAYING_IDB_PREV:
-			mPlayinglist->playPrev();
+			//mPlayinglist->playPrev();
+			mPlayinglist->seekTo(0);
 			ViewInit();
 			break;
 		case PLAYING_IDB_PLAY:
@@ -662,7 +672,17 @@ namespace mango
 		sec=time%60;
 		min=time/60;
 		ptr = mstr + pos;
-		pos+=sprintf(ptr,"%d:%d",min,sec);
+		
+		if(min>=10)
+			ptr+=sprintf(ptr,"%d:",min);
+		else
+			ptr+=sprintf(ptr,"0%d:",min);
+
+		if(sec>=10)
+			ptr+=sprintf(ptr,"%d",sec);
+		else
+			ptr+=sprintf(ptr,"0%d",sec);
+		pos = ptr - mstr;
 		//log_i("Mstring::setPlayTime n=%d,%s",n,mstr);
 	}
 };

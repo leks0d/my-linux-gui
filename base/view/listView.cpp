@@ -955,7 +955,7 @@ namespace mango
 
 	int ListView::onPaint(Canvas& canvas)
 	{
-		//log_i("ListView::onPaint------------------------------------");
+		log_i("ListView::onPaint------------------------------------");
 
 		LISTVIEW_RECORD* record;
 		Rect  clientRect;

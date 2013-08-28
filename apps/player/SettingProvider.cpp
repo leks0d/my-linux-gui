@@ -57,7 +57,7 @@ namespace mango
 		insert(SETTING_EQSTATE_ID,0);
 		insert(SETTING_PLAYPOS_ID,0);
 		insert(SETTING_AUTOSLEEP_ID,30);
-		insert(SETTING_LANGUAGE_ID,1);
+		insert(SETTING_LANGUAGE_ID,0);
 		insert(SETTING_AUTOPOWEROFF_ID,60*5);
 		insert(100,100);
 	}

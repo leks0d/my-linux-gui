@@ -339,7 +339,7 @@ namespace mango
 
 		while(file.findNext(fileName, &fileAttribute,cName))
 		{
-			log_i("cName = %s",cName);
+			//log_i("cName = %s",cName);
 			if (fileAttribute & FILE_ATTRIBUTE_HIDDEN)
 				continue;
 
@@ -555,6 +555,22 @@ namespace mango
 #endif
 		return false;
 	}
+	bool MediaView::isVolumRootpath(char *path){
+		bool ret;
+		if(path == NULL)
+			ret = false;
+		if(strcmp(path,"/mnt/sdcard") == 0){
+			ret = true;
+		}else if(strcmp(path,"/mnt/external_sd") == 0){
+			ret = true;
+		}else if(strcmp(path,"/mnt/usbotg") == 0){
+			ret = true;
+		}else{
+			ret = false;
+		}
+		log_i("isVolumRootpath ret=%d:%s",ret,path);
+		return ret;
+	}
 
 
 	void MediaView::backToParentDirectory()
@@ -612,39 +628,30 @@ namespace mango
 							char* name,parent[255];
 							ArrayMediaInfo arrayInfo;
 							
-							getparent(utf8Path,parent);
-							
 							if(mPlayinglist == NULL)
 								mPlayinglist = new Playinglist();
-							
+							mPlayinglist->clearAll();
 							mPlayinglist->playMediaInfo(pinfo->getMediaInfo(0));	
-
-							ptr = where = new char[300];
-							ptr += sprintf(ptr," where path like '%s/%%' ",parent);
-							count = gmediaprovider.queryMusicArray(where,&arrayInfo);					
-							mPlayinglist->addArrayItem(arrayInfo);
 							
+							getparent(utf8Path,parent);
+							if(!isVolumRootpath(parent)){
+								ptr = where = new char[300];
+								ptr += sprintf(ptr," where path like '%s/%%' ",parent);
+								count = gmediaprovider.queryMusicArray(where,&arrayInfo);					
+								mPlayinglist->addArrayItem(arrayInfo);
+							}
 						}else{
 							mediainfo info;
 							char* name,parent[255];					
 							ArrayMediaInfo arrayInfo;
 							memset(&info,0,sizeof(mediainfo));
-							/*
-							info.path = new char[strlen(utf8Path)+1];
-							info.id = -1;
-							name = getfilename(utf8Path);
 							
-							info.name = new char[strlen(utf8Path)+1]; 
-							
-							memcpy(info.name,name,strlen(name)+1);
-							memcpy(info.path,utf8Path,strlen(utf8Path)+1);
-							*/
 							getparent(utf8Path,parent);
 							
 							log_i("getparent parent=%s",parent);
 							
 							getArrayInfoFromFile(parent,arrayInfo);
-							
+							mPlayinglist->clearAll();
 							mPlayinglist->addArrayItem(arrayInfo);
 							
 							mediaprovider::FilePathToInfo(utf8Path,info);
@@ -777,7 +784,7 @@ namespace mango
 			strcpy(direct,path);
 			strcat(direct,"/");
 			strcat(direct,de->d_name);
-			log_i("opendir DT_DIR :%s\n",direct);
+			//log_i("opendir DT_DIR :%s\n",direct);
 
 			if (de->d_type == DT_DIR) {
 				;
@@ -880,7 +887,7 @@ namespace mango
 			lvItem.iSubItem = 0;
 			lvItem.paramType = LIST_PARAM_MUSIC;
 			mlist->insertItem(&lvItem);
-			log_i("PlayingListAdapter insertItem i=%d",i);
+			//log_i("PlayingListAdapter insertItem i=%d",i);
 		}
 		mlist->invalidateRect();
 	}
@@ -903,7 +910,7 @@ namespace mango
 			canvas.setTextColor(RGB(255,255,255));
 		canvas.setTextSize(16);
 		x = x+40;
-		canvas.drawText(info->name,strlen(info->name),x,y+5);
+		canvas.drawText(info->name,strlen(info->title),x,y+5);
 		canvas.setTextColor(RGB(255,255,255));
 		canvas.setTextSize(12);
 		if(info->artist!=NULL)
@@ -936,7 +943,7 @@ namespace mango
 
 		switch(order){
 			case MEDIA_ORDER_TILE:
-				orderby = MUSIC_NAME_KEY;
+				orderby = MUSIC_TITLE_KEY;
 				break;
 			case MEDIA_ORDER_ALBUM:
 				orderby = MUSIC_ALBUM_KEY;
@@ -1010,7 +1017,7 @@ namespace mango
 		
 		info = mMusicArrayList->getMediaInfo(lvitem->iItem);
 		x = LIST_MUSIC_ICON_LEFT;
-		canvas.drawImageResource(MediaView::getMusicIcon(info->name),x,y+5);
+		canvas.drawImageResource(MediaView::getMusicIcon(info->title),x,y+5);
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else
@@ -1048,7 +1055,6 @@ namespace mango
 			lvItem.iSubItem = 0;
 			lvItem.paramType = LIST_PARAM_MUSIC;
 			mlist->insertItem(&lvItem);
-			log_i("PlayingListAdapter insertItem i=%d",i);
 		}
 		mlist->invalidateRect();
 	}
@@ -1061,7 +1067,7 @@ namespace mango
 		info = mMusicArrayList->getMediaInfo(lvitem->iItem);
 		x = LIST_MUSIC_ICON_LEFT;
 		canvas.drawImageResource(IDP_LISTICON_ALBUM,x,y+5);
-		log_i("AlbumAdapter::PaintView isSec=%d",isSec);
+
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else
@@ -1100,7 +1106,6 @@ namespace mango
 			lvItem.iSubItem = 0;
 			lvItem.paramType = LIST_PARAM_MUSIC;
 			mlist->insertItem(&lvItem);
-			log_i("PlayingListAdapter insertItem i=%d",i);
 		}
 		mlist->invalidateRect();
 	}
@@ -1113,7 +1118,7 @@ namespace mango
 		info = mMusicArrayList->getMediaInfo(lvitem->iItem);
 		x = LIST_MUSIC_ICON_LEFT;
 		canvas.drawImageResource(IDP_LISTICON_ARTIST,x,y+5);
-		log_i("ArtistAdapter::PaintView isSec=%d",isSec);
+
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else

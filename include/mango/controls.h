@@ -54,7 +54,12 @@ namespace mango
 			int mStringSprintf(const char* str,char* s);
 			void clear(){	memset(mstr,0,len);		pos=0;}
 			void setPlayTime(int n);
-			~Mstring(void){if(mstr!=NULL)delete mstr;mstr=NULL;}
+			~Mstring(void){
+				log_i("-----%s",mstr);
+				if(mstr!=NULL)
+					delete mstr;
+				mstr=NULL;
+			}
 	};
 
 	class StaticView : public View

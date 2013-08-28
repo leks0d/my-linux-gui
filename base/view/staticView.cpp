@@ -31,8 +31,12 @@ namespace mango
 	}
 
 	int StaticView::setTextString(const char* string){
-		WCHAR  wcBuf[81] ;
-		int    i ;
+		WCHAR  wcBuf[81];
+		int    i;
+		if(string == NULL){
+			setTitle(NULL);
+			return 0;
+		}
 		memset(wcBuf,0,sizeof(wcBuf));
 		if(Charset::isTextUtf8(string)){
 			i = Charset::multiByteToWideChar(CP_UTF8, string, strlen(string), wcBuf, 80);
@@ -40,6 +44,7 @@ namespace mango
 			i = Charset::multiByteToWideChar(CP_ACP, string, strlen(string), wcBuf, 80);
 		}
 		setTitle(wcBuf);
+		return 0;
 	}
 
 	int StaticView::setTextResoure(int res){

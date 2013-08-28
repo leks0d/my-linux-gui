@@ -109,6 +109,7 @@ namespace mango
 		if(mAdvanceListAdapter == NULL){
 			mListView->deleteAllItems();
 			mAdvanceListAdapter = new SettingListAdapter(mListView,ADAPTER_PLAYING);
+			mAdvanceListAdapter->mLayoutleft = 80;
 		}
 		mAdvanceListAdapter->setData(img,imgsec,text,count);
 
@@ -128,6 +129,7 @@ namespace mango
 		if(mSettingListAdapter == NULL){
 			mSettingListAdapter = new SettingListAdapter(mListView,ADAPTER_PLAYING);
 			mSettingListAdapter->setData(img,imgsec,text,count);
+			//mSettingListAdapter->mLayoutleft = 70;
 		}else
 			mSettingListAdapter->refresh();
 		
@@ -146,13 +148,14 @@ namespace mango
 			mListView->deleteAllItems();
 			mPowerListAdapter = new SettingListAdapter(mListView,ADAPTER_PLAYING);
 			mPowerListAdapter->setData(img,imgsec,text,count);
+			mPowerListAdapter->mLayoutleft = 80;
 		}else
 			mPowerListAdapter->refresh();
 		
 		mTitle->setTextResoure(STR_ADVANCE_POWER);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mTitle->invalidateRect();
-		setMainState(0x1430);		
+		setMainState(0x1430);
 	}
 	void  SettingsView::initPlayOrderList(){
 		int img[]={IDP_PLAYMODE_0,IDP_PLAYMODE_1,IDP_PLAYMODE_2,IDP_PLAYMODE_3};
@@ -299,12 +302,14 @@ namespace mango
 							gPlayer.showSystemInfoView(); break;
 						case 4:
 							//gPlayer.showPointDrawView(); 
-							Environment::recovery();
+							//Environment::recovery();
+							gPlayer.showChosenView(ChosenView::CHOSEN_RECOVERY);
 							break;
 						case 5:
 							//gmediaprovider.mediascanner("/mnt/sdcard");
 							//gPlayer.showMediaView();
-							Environment::install();
+							//Environment::install();
+							gPlayer.showChosenView(ChosenView::CHOSEN_SYSTEMUPDATE);
 							break;
 						}
 					break;
@@ -395,6 +400,7 @@ namespace mango
 		mTextRes = NULL;
 		mSecImgRes = NULL;
 		mCount = 0;
+		mLayoutleft = 100;
 	}
 	void SettingListAdapter::setData(int* img,int* imgsec,int* text,int count){
 		mCount = count;
@@ -441,7 +447,6 @@ namespace mango
 			lvItem.paramType = LIST_PARAM_MUSIC;
 			
 			mlist->insertItem(&lvItem);
-			log_i("PlayingListAdapter insertItem i=%d",i);
 		}
 		mlist->invalidateRect();
 	}
@@ -453,7 +458,7 @@ namespace mango
 		y = rect.top;
 
 		index = lvitem->iItem;
-		x+=100;
+		x+=mLayoutleft;
 		if(isSec)
 			canvas.drawImageResource(mSecImgRes[index],x,y+10);
 		else

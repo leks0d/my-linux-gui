@@ -15,7 +15,16 @@ static const char *PlayerLock = "playerlock";
 #ifndef WIN32
 	//	particle::MediaPlayerInterface*  mParticleplayer = NULL; // = particle::createMediaPlayer();
 #endif
-	
+			static	char* mstrcpy(char *str,char *arg){
+				int len;		
+				if(arg == NULL)
+					return NULL;
+				len = strlen(arg)+1;
+				str = (char *)malloc(len);
+				memcpy(str,arg,len);
+				
+				return 0;
+			}
 
 			Playinglist::Playinglist(){
 				particle::MediaPlayerInterface*  mtemp;
@@ -94,7 +103,7 @@ static const char *PlayerLock = "playerlock";
 
 				if(count <= 0 || n < 0)
 					return;
-
+				safefreeMediainfo(&mplaylist[n]);
 				for(i=n;i<count-1;i++){
 					memcpy(&ptr[i],&ptr[i+1],sizeof(mediainfo));
 				}
@@ -126,12 +135,90 @@ static const char *PlayerLock = "playerlock";
 					mplaylist = temp;
 				}
 
-				memcpy(&mplaylist[len],item,sizeof(mediainfo));
+				//memcpy(&mplaylist[len],item,sizeof(mediainfo));
+				
+				mediaInfoCpy(len,item);
+
 				mplaylist[len].isPlayed = 0;
 				len++;
 			}
-
-
+			
+			void Playinglist::mediaInfoCpy(int des,mediainfo *src){
+				//log_i("enter src=0x%x",src);
+				memset(&mplaylist[des],0,sizeof(mediainfo));
+				mplaylist[des].id = src->id;
+				mplaylist[des].track = src->track;
+				mplaylist[des].add_time = src->add_time;
+				mplaylist[des].duration = src->duration;
+				mplaylist[des].isInPlayList = src->isInPlayList;
+				mplaylist[des].inPlay = src->inPlay;
+				mplaylist[des].isPlayed = src->isPlayed;
+				mplaylist[des].times = src->times;
+				//log_i("src->path=%s",src->path);
+				
+				if(src->path == NULL)
+					return;
+				mplaylist[des].path = new char[strlen(src->path)+1];
+				strcpy(mplaylist[des].path,src->path);
+				
+				//log_i("tag src->name_key=0x%x",src->name_key);
+				if(src->name != NULL){
+					mplaylist[des].name = new char[strlen(src->name)+1];
+					strcpy(mplaylist[des].name,src->name);
+				}
+				
+				//log_i("tag ");
+				if(src->name_key != NULL){
+					mplaylist[des].name_key = new char[strlen(src->name_key)+1];
+					strcpy(mplaylist[des].name_key,src->name_key);
+				}
+				
+				//log_i("tag");
+				if(src->title != NULL){
+					mplaylist[des].title = new char[strlen(src->title)+1];
+					strcpy(mplaylist[des].title,src->title);
+				}else{
+					//log_i("mplaylist[des].title=0x%x",mplaylist[des].title);
+				}
+				
+				//log_i("tag");
+				if(src->title_key != NULL){
+					mplaylist[des].title_key = new char[strlen(src->title_key)+1];
+					strcpy(mplaylist[des].title_key,src->title_key);
+				}
+				
+				//log_i("tag");
+				if(src->artist != NULL){
+					mplaylist[des].artist = new char[strlen(src->artist)+1];
+					strcpy(mplaylist[des].artist,src->artist);
+				}
+				
+				//log_i("tag");
+				if(src->artist_key != NULL){
+					mplaylist[des].artist_key = new char[strlen(src->artist_key)+1];
+					strcpy(mplaylist[des].artist_key,src->artist_key);
+				}
+				
+				//log_i("tag");
+				if(src->album != NULL){
+					mplaylist[des].album = new char[strlen(src->album)+1];
+					strcpy(mplaylist[des].album,src->album);
+				}
+				
+				//log_i("tag");
+				if(src->album_key != NULL){
+					mplaylist[des].album_key = new char[strlen(src->album_key)+1];
+					strcpy(mplaylist[des].album_key,src->album_key);
+				}
+				
+				//log_i("tag");
+				if(src->img_path != NULL){
+					mplaylist[des].img_path = new char[strlen(src->img_path)+1];
+					strcpy(mplaylist[des].img_path,src->img_path);
+				}
+				//log_i("leave");
+			}
+			
 			int Playinglist::moveToNext(){
 				int p = mCurrent;
 
@@ -322,9 +409,12 @@ static const char *PlayerLock = "playerlock";
 			}
 
 			int Playinglist::getCurrent(){
-				if(mParticleplayer!=NULL)
-					return mParticleplayer->getCurrentPosition();
-				else
+				int dur;
+				if(mParticleplayer!=NULL){
+					dur = mParticleplayer->getCurrentPosition();
+					log_i("Playinglist::getCurrent dur=%d",dur);
+					return dur;
+				}else
 					return 0;
 			}
 
@@ -521,6 +611,10 @@ static const char *PlayerLock = "playerlock";
 				}
 			}
 		}
+		void Playinglist::seekTo(int n){
+			if(mParticleplayer!=NULL)	
+				mParticleplayer->seekTo(n);
+		}
 
 		void Playinglist::stopPlayer(){
 			if(mParticleplayer != NULL){
@@ -529,12 +623,48 @@ static const char *PlayerLock = "playerlock";
 			releaseWakeLock();
 		}
 		void Playinglist::clearAll(){
+			int i;
+			log_i("enter len = %d",len);
 			if(len>0){
+				for(i=0;i<len;i++){
+					safefreeMediainfo(&mplaylist[i]);
+				}
 				memset(mplaylist,0,sizeof(mediainfo)*len);
 				len = 0;
 			}
 		}
+		#define WEST_TIME 1000*10
 		
+		void Playinglist::fastForward(){
+			int cur,dur,pos;
+			if(mParticleplayer != NULL&&mParticleplayer->isPlaying()){
+				cur = mParticleplayer->getCurrentPosition();
+				dur = mParticleplayer->getDuration();
+				pos = cur + WEST_TIME;
+				
+				log_i("cur=%d,dur=%d",cur/1000,dur/1000);
+				
+				if(pos >= dur)
+					pos = dur;
+				
+				mParticleplayer->seekTo(pos);
+			}
+		}
+		void Playinglist::fastRewind(){
+			int cur,dur,pos;
+			if(mParticleplayer != NULL&&mParticleplayer->isPlaying()){
+				cur = mParticleplayer->getCurrentPosition();
+				dur = mParticleplayer->getDuration();
+				pos = cur - WEST_TIME;
+				
+				if(pos <= 0)
+					return;
+				
+				mParticleplayer->seekTo(pos);
+			}
+
+		}
+
 		Playinglist *mPlayinglist = NULL;
 };
 

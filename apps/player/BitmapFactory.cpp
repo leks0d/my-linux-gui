@@ -99,7 +99,7 @@ namespace mango
 		file  = fopen(COMMAND_FILE, "w");
 		if (file == NULL) {
 			log_e("fopen error:%s",COMMAND_FILE);
-			return ;
+			return;
 		}
 
 		ret = fwrite(cmd_update,strlen(cmd_update),1,file);
@@ -112,6 +112,10 @@ namespace mango
 		fclose(file);
 		
 		system(reboot);
+	}
+	void Environment::reboot(){
+		char *cmd = "reboot";
+		system(cmd);
 	}
 
 	void Environment::openMute(){

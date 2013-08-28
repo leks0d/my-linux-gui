@@ -86,6 +86,25 @@ namespace mango
 		}
 		str[count+1] = '\0';
 	};
+	static void getFileParentName(char *path,char *name ){
+		int i,len,start,end;
+		
+		len = strlen(path);
+		start = end = -1;
+		for(i=len-1;i>=0;i--){
+			if(path[i] == '/'){
+				if(end == -1){
+					end = i;
+				}else if(start == -1){
+					start = i+1;
+					break;
+				}
+			}
+		}
+		if(start>=0&&end>0&&end-start>0){
+			memcpy(name,&path[start],end-start);
+		}
+	}
 	int mediaprovider::str_to_int(char *arg){
 		/*int value,len,i;
 		char ch;
@@ -328,17 +347,22 @@ namespace mango
 	{
 		ID3INFO m_id3(path);
 		char *value;
+		char *filename;
 		int len,charCount;
 		TCHAR	fileName[255];
 		
 		value = (char*)malloc(256);
-		
-		memset(info, 0, sizeof(mediainfo));
 
+		filename = getfilename(path);
 		info->times = mCurrentTimes + 1;
+		
+		len = strlen(path)+1;
+		info->path = new char[len];
+		memcpy(info->path,path,len);
 
-		info->path = path;
-		info->name = getfilename(path);
+		len = strlen(filename)+1;
+		info->name = new char[len];
+		memcpy(info->name,filename,len);
 		
 		info->name_key = new char[strlen(info->name)+1];
 		strlwr(info->name,info->name_key);
@@ -349,21 +373,22 @@ namespace mango
 		if (m_id3.GetTags(METADATA_KEY_CD_TRACK_NUMBER, value)){
 			info->track = str_to_int(value);
 		}
-
+/*------------------------------album---------------------------------------*/		
 		memset(value, 0, 256);
 		if (m_id3.GetTags(METADATA_KEY_ALBUM, value)){
-			//strdelspa(value);
-			len = strlen(value)+1;
-			
-			info->album = new char[len];
-			memcpy(info->album,value,len);
 
-			info->album_key = new char[len];
-			strlwr(value,info->album_key);
 		}else{
-			
+			getFileParentName(path,value);
+			log_i("id3 album is null;getname=%s",value);
 		}
-		
+			
+		len = strlen(value)+1;
+		info->album = new char[len];
+		memcpy(info->album,value,len);
+
+		info->album_key = new char[len];
+		strlwr(value,info->album_key);	
+/*------------------------------album---------------------------------------*/				
 		memset(value, 0, 256);
 		if (m_id3.GetTags(METADATA_KEY_ARTIST, value)){
 			strdelspa(value);
@@ -375,14 +400,32 @@ namespace mango
 			info->artist_key = new char[len];
 			strlwr(value,info->artist_key);			
 		}
+		
+/*------------------------------title---------------------------------------*/		
 		memset(value, 0, 256);
 		if (m_id3.GetTags(METADATA_KEY_TITLE, value)){
-			strdelspa(value);
+			/*strdelspa(value);
 			len = strlen(value)+1;
+			
 			info->title = new char[len];
 			memcpy(info->title,value,len);
-			
+
+			info->title_key = new char[len];
+			strlwr(value,info->title_key);*/
+			log_i("title gettag:title=%s",value);
+		}else{
+			log_i("title gettag fail");
+			getFileTitle(info->name,value);
 		}
+		len = strlen(value)+1;
+			
+		info->title = new char[len];
+		memcpy(info->title,value,len);
+
+		info->title_key = new char[len];
+		strlwr(value,info->title_key);
+/*--------------------------------title---------------------------------------------*/
+
 		memset(value, 0, 256);
 		if (m_id3.GetTags(METADATA_KEY_DURATION, value)){
 			info->duration = str_to_int(value);
@@ -478,16 +521,19 @@ namespace mango
 		char* name;					
 							
 		memset(&info,0,sizeof(mediainfo));
-							
-		info.path = new char[strlen(path)+1];
 		info.id = -1;
+		
 		name = getfilename(path);
 							
 		info.name = new char[strlen(path)+1]; 
-							
-		memcpy(info.name,name,strlen(name)+1);
-		memcpy(info.path,path,strlen(path)+1);
+		info.path = new char[strlen(path)+1];
+		info.title = new char[strlen(path)+1];
 		
+		memcpy(info.name,name,strlen(name)+1);
+		memcpy(info.title,name,strlen(name)+1);
+		memcpy(info.path,path,strlen(path)+1);
+
+		log_i("info.title=0x%x",info.title);
 	}
 	int mediaprovider::filescanner(char *path)
 	{	
@@ -500,7 +546,8 @@ namespace mango
 		DIR* d;
 		struct dirent* de;
 
-		log_i("opendir DT_DIR :%s\n",path);
+		memset(&info,0,sizeof(mediainfo));
+		//log_i("opendir DT_DIR :%s\n",path);
 		d = opendir(path);
 
 		while((de = readdir(d)) != NULL)
@@ -510,7 +557,7 @@ namespace mango
 			strcpy(direct,path);
 			strcat(direct,"/");
 			strcat(direct,de->d_name);
-			log_i("scan DT_DIR=%d :%s,de->d_type=%d",DT_DIR,direct,de->d_type);
+			//log_i("scan DT_DIR=%d :%s,de->d_type=%d",DT_DIR,direct,de->d_type);
 			
 //			if (de->d_type == DT_DIR || de->d_type == 0 ) {	
 			if(File::isDirect(direct)){
@@ -520,7 +567,10 @@ namespace mango
                 de->d_name[1] == '.') continue;
 #endif			
 				
-				if (de->d_name[0] == '.'){ log_i("scan DT_DIR continue");continue;}
+				if (de->d_name[0] == '.'){
+					//log_i("scan DT_DIR continue");
+					continue;
+				}
 				//if(File::isDirect(direct))
 				filescanner(direct);
 				count++;
@@ -529,11 +579,12 @@ namespace mango
 			{
 				getmediainfo(direct,&info);
 				insert("music",&info);
+				safefreeMediainfo(&info);
 				count++;
 			}
 
 		}
-
+		safefreeMediainfo(&info);
 		closedir(d);	
 		
 		return 0;

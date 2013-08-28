@@ -84,6 +84,30 @@ namespace mango
 		int times;
 	}mediainfo;
 
+	static void safedelete(char *str){
+		if(str != NULL){
+			//log_i("str=0x%x,%s",str,str);
+			delete str;
+		}
+	}
+	static void safefreeMediainfo(mediainfo *info){
+		if(info!=NULL){
+			//log_i("enter free mediainfo");
+			safedelete(info->path);
+			safedelete(info->name);
+			safedelete(info->name_key);
+			safedelete(info->title);
+			safedelete(info->title_key);
+			safedelete(info->artist);
+			safedelete(info->artist_key);
+			safedelete(info->album);
+			safedelete(info->album_key);
+			safedelete(info->img_path);
+			memset(info,0,sizeof(mediainfo));
+			//log_i("leave free mediainfo");
+		}
+	}
+
 	struct Musicdb{
 		mediainfo info;
 		struct Musicdb *next;;

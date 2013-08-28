@@ -179,7 +179,7 @@ namespace mango
 			log_e("Get stat Error:%s\n",file) ;
 			return false;
 		}
-		log_i("statbuf.st_mode = 0x%x,file:%s",file);
+		//log_i("statbuf.st_mode = 0x%x,file:%s",file);
 		return S_ISDIR(statbuf.st_mode);
 	}
 

@@ -8,6 +8,76 @@
 
 namespace mango
 {
+class KeyCount{
+		int keycode;
+		int action;
+		int press;
+		int count;
+		int enter;
+		Mutex	mMutex;
+		public:
+			KeyCount(){
+				keycode = 0;
+				press = 0;
+				count = 0;
+				enter = 0;
+			}
+		int initKeyPress(int code){
+			mMutex.lock();
+			
+			keycode = code;
+			press = 1;
+			count = 0;
+			enter = 0;
+			
+			mMutex.unlock();
+		}
+		int TriggerKey(){
+			mMutex.lock();
+			
+			if(press){
+				count++;
+				if(count>1){
+					enter = 1;
+					switch(keycode){
+						case KEYCODE_NEXT:
+							mPlayinglist->fastForward();
+							break;
+						case KEYCODE_PREV:
+							mPlayinglist->fastRewind();
+							break;			
+					}
+				}
+			}
+			
+			mMutex.unlock();
+			//log_i("press=%d,count=%d,enter=%d",press,count,enter);
+		}
+		int isKeyPress(int code){
+			int ret = 0;
+			
+			mMutex.lock();
+			
+			if(code == keycode && enter){
+				ret = 1;
+			}else
+				ret = 0;
+			
+			keyRelease();
+			
+			mMutex.unlock();
+			
+			log_i("isKeyPress keycode=%d,press=%d",keycode,press);
+			
+			return ret;
+		}
+		int keyRelease(){
+			press = 0;
+			count = 0;
+			keycode = 0;
+			enter = 0;
+		}
+	};
 	class PlayingView: public View
 	{
 	public:
@@ -55,11 +125,16 @@ namespace mango
 		
 		SeekBar* mSeekBar;
 		MSkBitmap *mMSkBitmap;
+		
 		Thread mSeekBarUpdateThread;
 		int isNeedFresh;
 		int isNeedFreshOld; //backup when sleep in and sleep out
 		int mVolume;
 		int mBattery;
 		int isCharge;
+	public:
+		KeyCount mKeyCount;
+		
 	};
+	
 }

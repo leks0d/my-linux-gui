@@ -17,7 +17,8 @@ namespace mango
 		int* mImgRes;
 		int* mSecImgRes;
 		int* mTextRes;
-		int mCount;	
+		int mCount;
+		int mLayoutleft;
 	};
 	class RootDirectListAdapter : public SettingListAdapter
 	{
@@ -135,6 +136,7 @@ namespace mango
 
 		void insertFileToListView(UINT mask, TCHAR* name, int iconId, void* param,int itext = 0,int paramtype = 1);
 		bool isRootDirectory();
+		bool isVolumRootpath(char *path);
 		void backToParentDirectory();
 		void initRootDirect();
 		void initMainList();

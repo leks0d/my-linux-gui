@@ -77,10 +77,11 @@ namespace mango
 			fseek (mFile, Item.m_dwOffset + mHeader.m_dwOffsetOfData , SEEK_SET);
 			fread (readbuf, 1, Item.m_dwBytes, mFile) ;
 
-//			for(i=0;i<Item.m_dwBytes/2;i++){
-//				buffer[i] = readbuf[i];
-//			}
-
+			for(i=0;i<Item.m_dwBytes/2;i++){
+				buffer[i] = readbuf[i];
+				buffer[i] &= 0x00ffff;
+			}
+			delete readbuf;
 			buffer[iResTChars] = '\0' ;
 
 			iRtnTChars = iResTChars ;

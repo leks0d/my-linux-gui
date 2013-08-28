@@ -11,7 +11,9 @@ namespace mango
 		}
 		
 		ArrayMediaInfo::~ArrayMediaInfo(){
-			delete mplaylist;
+			log_i("enter");
+			clear();
+			log_i("leave");
 		}
 			
 		void ArrayMediaInfo::addMediaInfo(mediainfo *info){
@@ -67,9 +69,17 @@ namespace mango
 		}
 			
 		void ArrayMediaInfo::clear(){
+			int i;
+			
+			for(i=0;i<len;i++){
+				safefreeMediainfo(&mplaylist[i]);
+			}
+			
 			len = mMax = 0;
+			
 			if(mplaylist!=NULL)
 				delete mplaylist;
+			
 			mplaylist = NULL;
 		}
 	

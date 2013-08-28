@@ -91,7 +91,7 @@ namespace mango
 	void Session::updateRoutine()
 	{
 		while (1) {
-			Thread::sleep(30);
+			Thread::sleep(50);
 
 			mViewZAxis.invalidScreenRectToView();
 			if (!mViewZAxis.mExistInvalidateView)
@@ -154,7 +154,7 @@ namespace mango
 		evnetCount = readBytes / sizeof(struct input_event);
 		for (i = 0 ; i < evnetCount ; i++)
 		{
-			log_i("type = %d, code = %d, value = %d\n", EventBuf[i].type, EventBuf[i].code, EventBuf[i].value);
+			log_i("type = %d, code = %d, value = %d", EventBuf[i].type, EventBuf[i].code, EventBuf[i].value);
 
 			switch (EventBuf[i].type)
 			{
@@ -183,6 +183,7 @@ namespace mango
 				log_d ("Unknow type %d \n", EventBuf[i].type) ;
 				break ;
 			}
+			log_i("end");
 		}
 
 	}
@@ -353,21 +354,23 @@ namespace mango
 		
 		if (!mKeyPressed && pressed)
 		{
-			//log_i("dispatchKeycode code=%d,pressed=%d",keycode,pressed);
+			log_i("dispatchKeycode code=%d,pressed=%d",keycode,pressed);
+			mKeyPressed = true;
 			if(mUseEventInterface->onKeyDispatch(keycode,VM_KEYDOWN,0))
 				return;
 			gMessageQueue.post(focusView, VM_KEYDOWN, keycode, 0);
-			mKeyPressed = true;
+			
 		}
 		else if (mKeyPressed && !pressed)
 		{
-			//log_i("dispatchKeycode code=%d,pressed=%d",keycode,pressed);
+			log_i("dispatchKeycode code=%d,pressed=%d",keycode,pressed);
+			mKeyPressed = false;
 			if(mUseEventInterface->onKeyDispatch(keycode,VM_KEYUP,0))
 				return;
 			gMessageQueue.post(focusView, VM_KEYUP, keycode, 0);
-			mKeyPressed = false;
+			
 		}
-		log_i("dispatchKeycode code=%d,pressed=%d",keycode,pressed);
+		//log_i("dispatchKeycode code=%d,pressed=%d",keycode,pressed);
 	}
 
 

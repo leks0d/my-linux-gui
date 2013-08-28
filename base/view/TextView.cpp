@@ -91,7 +91,10 @@ namespace mango
 	void TextView::setTextString(char* text){
 		int len;
 		int charCount;
-			
+		char *tmp;
+
+		log_i("text=%s",text);
+		
 		if(iText!=NULL){
 			delete iText;
 			iText = NULL;
@@ -100,21 +103,21 @@ namespace mango
 		ResType = 0;
 		if(text == NULL)
 			return;
-		
+
+		tmp = new char[strlen(text)+1];
+		memcpy(tmp,text,strlen(text)+1);
+
 		iText = new WCHAR[103];
-		
-		if(Charset::isTextUtf8(text)){
-			charCount = Charset::multiByteToWideChar(CP_UTF8, text, strlen(text), iText, 102);
+
+		if(Charset::isTextUtf8(tmp)){
+			charCount = Charset::multiByteToWideChar(CP_UTF8, tmp, strlen(tmp), iText, 102);
 		}else{
-			charCount = Charset::multiByteToWideChar(CP_ACP, text, strlen(text), iText, 102);
+			charCount = Charset::multiByteToWideChar(CP_ACP, tmp, strlen(tmp), iText, 102);
 		}
+		
 		iText[charCount] = '\0';
 		iTextLen = charCount;
 
-		len = strlen(text);
-		mText = new char[len];
-		memcpy(mText,text,len+1);
-		
 		invalidateRect();
 	}
 

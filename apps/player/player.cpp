@@ -27,6 +27,7 @@ namespace mango
 		mMusicOperateView = NULL;
 		mUsmConnectView = NULL;
 		mKeyLockView = NULL;
+		mChosenView = NULL;
 		
 		powerState = 0;
 		isBootLock = 0;
@@ -316,23 +317,12 @@ namespace mango
 		}
 		shutDown();
 	}
-	void Player::shutDown(){
-		int sleepCount;
-
-		if(powerState == 2)
-			setPowerState();
-		
+	void Player::shutDown(){		
 		mPlayinglist->stopPlayer();
 		mPlayinglist->savePlayintList();
 		gSettingProvider.dbclose();
-
-		sleepCount = 30;
-		while(sleepCount--){
-			mango::Thread::sleep(100);
-		}
-		openOrCloseMute(false);
-		reboot(RB_POWER_OFF);
 	}
+	
 	int Player::showMusicOperateView(mediainfo& info){
 		if(mMusicOperateView == NULL){
 			mMusicOperateView = new MusicOperateView(TEXT("MusicOperate"), NULL, NULL, 0, SW_NORMAL);
@@ -359,7 +349,22 @@ namespace mango
 			mKeyLockView->invalidateRect();
 			mKeyLockView->setFocus();
 		}
-	}	
+	}
+	int Player::showChosenView(int type){
+		if(mChosenView == NULL){
+			mChosenView = new ChosenView(TEXT("mChosenView"), NULL, NULL, 0, SW_NORMAL);
+			mChosenView->setType(type);
+			mChosenView->onCreate();
+		}else{
+			mChosenView->setType(type);
+			gSession.mViewZAxis.bringViewToTop(mChosenView);
+		}
+
+		if (mChosenView){
+			mChosenView->invalidateRect();
+			mChosenView->setFocus();
+		}		
+	}
 	void Player::dismissView(View *view){
 		View *displayView;
 		
@@ -572,16 +577,42 @@ namespace mango
 		close(fd);
 	}
 	int PlayerEventInterface::onKeyDispatch(int keyCode,int action, int flag){
+		KeyCount *keycount = NULL;
+		int ret = 0;
+		if(gPlayer.mPlayingView != NULL)
+			keycount = &(gPlayer.mPlayingView->mKeyCount);
 		//log_i("PlayerEventInterface::onKeyDispatch keyCode=%d,action=%d",keyCode,action);
 		if((keyCode == KEYCODE_VOLUMEUP||keyCode == KEYCODE_VOLUMEDOWN)&& action == VM_KEYDOWN){
 			gMessageQueue.post(gPlayer.mPlayingView,VM_COMMAND,PLAYING_SHOW_VOLUME,keyCode);
-		}else if(keyCode == KEYCODE_PREV&& action == VM_KEYDOWN){
-			gMessageQueue.post(gPlayer.mPlayingView,VM_COMMAND,PLAYING_IDB_PREV,NULL);
-		}else if(keyCode == KEYCODE_NEXT&& action == VM_KEYDOWN)
-			gMessageQueue.post(gPlayer.mPlayingView,VM_COMMAND,PLAYING_IDB_NEXT,NULL);
+		}else if(keyCode == KEYCODE_PREV||keyCode == KEYCODE_NEXT){
+			log_i("enter");
+			gMessageQueue.post(gPlayer.mPlayingView, action, keyCode, 0);
+			ret = 1;
+		}
+#if 0		
+		else if(keyCode == KEYCODE_PREV&& action == VM_KEYDOWN){
+			if(keycount != NULL)
+				keycount->initKeyPress(keyCode);
+		}else if(keyCode == KEYCODE_NEXT&& action == VM_KEYDOWN){
+			if(keycount != NULL)
+				keycount->initKeyPress(keyCode);
+		}
+		else if(keyCode == KEYCODE_PREV&& action == VM_KEYUP){
+			if(keycount != NULL && keycount->isKeyPress(keyCode))
+				;
+			else
+				gMessageQueue.post(gPlayer.mPlayingView,VM_COMMAND,PLAYING_IDB_PREV,NULL);
+			
+		}else if(keyCode == KEYCODE_NEXT&& action == VM_KEYUP){
+			if(keycount != NULL && keycount->isKeyPress(keyCode))
+				;
+			else
+				gMessageQueue.post(gPlayer.mPlayingView,VM_COMMAND,PLAYING_IDB_NEXT,NULL);
+		}
+#endif
 		else if(keyCode == KEYCODE_PLAY&& action == VM_KEYDOWN){
 			gMessageQueue.post(gPlayer.mPlayingView,VM_COMMAND,PLAYING_IDB_PLAY,NULL);
-			log_i("gMessageQueue.post PLAYING_IDB_PLAY"); 
+			//log_i("gMessageQueue.post PLAYING_IDB_PLAY"); 
 		}else if(action == VM_CAPACITY){
 			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,NM_BATTERY_UPDATE,keyCode);
 			if(gPowerManager!=NULL)
@@ -590,7 +621,8 @@ namespace mango
 			if(gPowerManager!=NULL)
 				gPowerManager->setPowerState();
 		}else if(keyCode == KEYCODE_LONG_POWER&&action == VM_KEYDOWN){
-			gPlayer.showShutDownView();
+			//gPlayer.showShutDownView();
+			gPlayer.showChosenView(ChosenView::CHOSEN_POWEROFF);
 		}else if(action == VM_MEDIA){
 			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,keyCode,0);
 		}else if(keyCode == KEYCODE_HOLD&& action == VM_KEYDOWN){
@@ -603,7 +635,7 @@ namespace mango
 		
 		if(action!=VM_CAPACITY&&gPowerManager!=NULL)
 			gPowerManager->resetCount();
-		return 0;
+		return ret;
 	}
 
 	int PlayerEventInterface::onTouchDispatch(int x,int y, int action){
