@@ -34,14 +34,14 @@ namespace mango
 		Rect rect;
 		int firstLeft = 98;
 		
-		rect.setEx(10,130,310,50);
+		rect.setEx(10,130,300,50);
 		mScannerButton = new TextView(BUTTON_SCANNER, TEXT("mScannerButton"), this, &rect, 0);
 		mScannerButton->setTextColor(COLOR_GRAY);
 		mScannerButton->setTextSize(16);
 		mScannerButton->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mScannerButton->setBackGround(IDP_LISTITEM_BGD,IDP_LISTITEM_BGD_SEC);
 
-		rect.setEx(10,180,310,50);
+		rect.setEx(10,180,300,50);
 		mDirectButton = new TextView(BUTTON_BROWSER, TEXT("mDirectButton"), this, &rect, 0);
 		mDirectButton->setTextColor(COLOR_GRAY);
 		mDirectButton->setTextSize(16);

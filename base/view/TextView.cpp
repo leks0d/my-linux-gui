@@ -45,6 +45,7 @@ namespace mango
 	{
 		int charCount;
 		Rect rect;
+		return 0;
 
 		if(!mVisiable)
 			return 0;
@@ -93,7 +94,7 @@ namespace mango
 		int charCount;
 		char *tmp;
 
-		log_i("text=%s",text);
+		//log_i("text=%s",text);
 		
 		if(iText!=NULL){
 			delete iText;
@@ -232,6 +233,7 @@ namespace mango
 		//log_i("onTouchUp VM_COMMAND:mId=%d",mId);
 		postMessage(getParent(), VM_COMMAND, mId, (unsigned int)this);
 		postMessage(getParent(), VM_NOTIFY, VSEEKBAR_TEXTVIEW_UP, (unsigned int)this);
+		//log_i("VSEEKBAR_TEXTVIEW_UP=%d",VSEEKBAR_TEXTVIEW_UP);
 		return 0;
 	 }
 

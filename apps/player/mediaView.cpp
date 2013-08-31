@@ -634,12 +634,12 @@ namespace mango
 							mPlayinglist->playMediaInfo(pinfo->getMediaInfo(0));	
 							
 							getparent(utf8Path,parent);
-							if(!isVolumRootpath(parent)){
+							//if(!isVolumRootpath(parent)){
 								ptr = where = new char[300];
-								ptr += sprintf(ptr," where path like '%s/%%' ",parent);
+								ptr += sprintf(ptr," where path like '%s/%%' and not path like '%s/%%/%%' ",parent,parent);
 								count = gmediaprovider.queryMusicArray(where,&arrayInfo);					
 								mPlayinglist->addArrayItem(arrayInfo);
-							}
+							//}
 						}else{
 							mediainfo info;
 							char* name,parent[255];					
@@ -1017,14 +1017,14 @@ namespace mango
 		
 		info = mMusicArrayList->getMediaInfo(lvitem->iItem);
 		x = LIST_MUSIC_ICON_LEFT;
-		canvas.drawImageResource(MediaView::getMusicIcon(info->title),x,y+5);
+		canvas.drawImageResource(MediaView::getMusicIcon(info->name),x,y+5);
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else
 			canvas.setTextColor(RGB(255,255,255));
 		x= x+40;
 		canvas.setTextSize(16);
-		canvas.drawText(info->name,strlen(info->name),x,y+5);
+		canvas.drawText(info->name,strlen(info->title),x,y+5);
 		canvas.setTextColor(RGB(255,255,255));
 		canvas.setTextSize(12);
 		canvas.drawText(info->artist,strlen(info->artist),x,y+28);

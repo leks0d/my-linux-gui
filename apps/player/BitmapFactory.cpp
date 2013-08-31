@@ -3,12 +3,46 @@
 
 namespace mango
 {
+	bool BitmapFactory::genBitmapFromFile(MSkBitmap* mMSkBitmap,char* path,int w,int h){
+		MSkBitmap mskBitmap;
+		
+		mskBitmap.createFile(path);
+		
+		if(mskBitmap.isVaild()){
+			SkBitmap skBitmap,*pskBitmap;
+			
+			skBitmap.setConfig(SkBitmap::kARGB_8888_Config,mskBitmap.width,mskBitmap.height);
+			skBitmap.setPixels(mskBitmap.mBits);
+
+			pskBitmap = new SkBitmap();
+		    pskBitmap->setConfig(SkBitmap::kARGB_8888_Config,w,h);
+		    pskBitmap->allocPixels();
+		    memset((char *)pskBitmap->getPixels(),0,w*h*4);
+
+			SkCanvas *skCanvas = new SkCanvas(*pskBitmap);
+			SkIRect srcRect;
+			SkRect dstRect;
+				
+			srcRect.set(0,0,skBitmap.width(),skBitmap.height());
+			dstRect.set(0,0,w,h);
+
+			skCanvas->drawBitmapRect(skBitmap,&srcRect,dstRect);
+
+			skCanvas->restore();
+			
+			mMSkBitmap->create((int *)pskBitmap->getPixels(),pskBitmap->width(),pskBitmap->height());
+			delete pskBitmap;
+		}
+	}
 	bool BitmapFactory::decodeFile(MSkBitmap* mMSkBitmap,char* path,int w,int h){
 		if( (path == NULL) || (strcmp(path,"(null)") == 0)){
 			mMSkBitmap->release();
 		}else{
+			int start,end;
 			SkBitmap skBitmap,*pskBitmap;
 			SkCanvas *skCanvas;
+
+			start = Time::getMillisecond();
 			
 		    pskBitmap = new SkBitmap();
 		    pskBitmap->setConfig(SkBitmap::kARGB_8888_Config,w,h);
@@ -35,9 +69,50 @@ namespace mango
 				log_i("DecodeFile fail path=%s\n",path);
 				mMSkBitmap->release();
 			}
+			end = Time::getMillisecond() - start;
+			log_i("DecodeFile space time %dms",end);
 		}		
 	}
 
+	bool BitmapFactory::decodeBuffer(MSkBitmap* mMSkBitmap,void* buf,int size,int w,int h){
+		if( buf == NULL && size <= 0){
+			mMSkBitmap->release();
+		}else{
+			int start,end;
+			SkBitmap skBitmap,*pskBitmap;
+			SkCanvas *skCanvas;
+
+			start = Time::getMillisecond();
+			
+		    pskBitmap = new SkBitmap();
+		    pskBitmap->setConfig(SkBitmap::kARGB_8888_Config,w,h);
+		    pskBitmap->allocPixels();//分配位图所占空间
+		    memset((char *)pskBitmap->getPixels(),0,w*h*4);
+		    
+			//bool ret = SkImageDecoder::DecodeFile(path,&skBitmap,SkBitmap::kARGB_8888_Config,SkImageDecoder::kDecodePixels_Mode);			
+			bool ret = SkImageDecoder::DecodeMemory(buf,size,&skBitmap,SkBitmap::kARGB_8888_Config,SkImageDecoder::kDecodePixels_Mode);
+			if(ret){
+				log_i("skBitmap->width()=%d,skBitmap->height()=%d",skBitmap.width(),skBitmap.height());
+
+				skCanvas = new SkCanvas(*pskBitmap);
+				SkIRect srcRect;
+				SkRect dstRect;
+				
+				srcRect.set(0,0,skBitmap.width(),skBitmap.height());
+				PlayingView::CalculateSize(skBitmap.width(),skBitmap.height(),w,h,dstRect);
+
+				skCanvas->drawBitmapRect(skBitmap,&srcRect,dstRect);
+
+				skCanvas->restore();
+				mMSkBitmap->create((int *)pskBitmap->getPixels(),pskBitmap->width(),pskBitmap->height());
+			}else{
+				//log_i("DecodeFile fail path=%s\n",path);
+				mMSkBitmap->release();
+			}
+			end = Time::getMillisecond() - start;
+			log_i("DecodeFile space time %dms",end);
+		}		
+	}
 
 	void Environment::space_info(char *path,int& toatl,int& avail,int& free)
 	{

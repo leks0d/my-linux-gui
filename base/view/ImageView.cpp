@@ -34,7 +34,7 @@ namespace mango
 	{
 		int imageId = 0;
 		Rect rect;
-
+		return 0;
 		if(!mVisiable)
 			return 0;
 		

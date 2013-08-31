@@ -23,6 +23,7 @@ namespace mango
 		public:
 			particle::MediaPlayerInterface*  mParticleplayer;
 			mediainfo *mplaylist;
+			Thread mThread;
 			int len;
 			int mCurrent;
 			int mMax;
@@ -83,6 +84,7 @@ namespace mango
 			void mediaInfoCpy(int des,mediainfo *src);
 			//char* mstrcpy(char *str,char *arg);
 			static void playerCallback(void* calldata, int evnet, int param0, int param1);
+			static unsigned int CloseMuteRunnig(void *parameter);
 	};		
 	extern Playinglist *mPlayinglist;
 

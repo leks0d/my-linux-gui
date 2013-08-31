@@ -347,9 +347,6 @@ static const char *PlayerLock = "playerlock";
 					mParticleplayer = particle::createMediaPlayer();
 					mParticleplayer->setEventCallback(Playinglist::playerCallback,(void *)this);
 					PlayerInit();
-					//mango::Thread::sleep(1000 * 3);
-					//gPlayer.openOrCloseMute(true);
-					//mango::Thread::sleep(1000 * 3);
 					Environment::openMute();
 				}
 				if(mParticleplayer == NULL)
@@ -368,18 +365,24 @@ static const char *PlayerLock = "playerlock";
 					else{log_i("gaplessPlay() fail!");return -1;}
 					
 				}else{
-				
+					//gPlayer.openWm8740Mute();
 					if(mParticleplayer->stop()){log_i("stop() success!");}else{log_i("stop() fail!");return -1;}
 					if(mParticleplayer->setSource(playPath)){log_i("setSource() success!");}else{log_i("setSource() fail!");return -1;}
 					if(mParticleplayer->prepare()){log_i("prepare() success!");}else{log_i("prepare() fail!");return -1;}
 					//if(mParticleplayer->seekTo(mesc)){log_i("seekTo() success!");}else{log_i("seekTo() fail!");return -1;}
 					if(needStart)
 						if(mParticleplayer->start()){log_i("start() success!");}else{log_i("start() fail!");return -1;}
+					//mango::Thread::sleep(600);
+					//gPlayer.closeWm8740Mute();
+					//mThread.create(Playinglist::CloseMuteRunnig,NULL);
 				}
 				getPlayingItem()->isPlayed = 1;
 				setWakeLock();
 			}
-			
+			unsigned int Playinglist::CloseMuteRunnig(void *parameter){
+				mango::Thread::sleep(600);
+				gPlayer.closeWm8740Mute();
+			}
 			int Playinglist::isItemExsit(mediainfo *info){
 				int i;
 				for(i=0;i<len;i++){
@@ -402,20 +405,25 @@ static const char *PlayerLock = "playerlock";
 			}
 
 			int Playinglist::getDuration(){
-				if(mParticleplayer!=NULL)
-					return mParticleplayer->getDuration();
-				else
-					return 1;
+				int dur;
+				if(mParticleplayer!=NULL){
+					dur = mParticleplayer->getDuration();
+				}else{
+					dur = 0;
+				}
+				log_i("Playinglist::getDuration dur=%d",dur);
+				return dur;
 			}
 
 			int Playinglist::getCurrent(){
-				int dur;
+				int cur;
 				if(mParticleplayer!=NULL){
-					dur = mParticleplayer->getCurrentPosition();
-					log_i("Playinglist::getCurrent dur=%d",dur);
-					return dur;
-				}else
-					return 0;
+					cur = mParticleplayer->getCurrentPosition();
+				}else{
+					cur = 0;
+				}
+				log_i("Playinglist::getCurrentPosition cur=%d",cur);
+				return cur;
 			}
 
 			int Playinglist::getCount(){
@@ -662,7 +670,6 @@ static const char *PlayerLock = "playerlock";
 				
 				mParticleplayer->seekTo(pos);
 			}
-
 		}
 
 		Playinglist *mPlayinglist = NULL;

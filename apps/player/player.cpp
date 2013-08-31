@@ -31,6 +31,7 @@ namespace mango
 		
 		powerState = 0;
 		isBootLock = 0;
+		muteCount = 0;
 	}
 
 
@@ -576,6 +577,45 @@ namespace mango
 		
 		close(fd);
 	}
+	void Player::openOrCloseWm8740Mute(bool enable){
+		int fd=0,state,volume;
+		char* path = "/sys/class/codec/wm8740_mute";
+		char rbuf;
+		
+		log_i("openOrCloseMute enable=%d",enable);
+			
+		fd = open(path,O_RDWR, 0);
+		
+		rbuf = enable?1:0;
+		
+		write(fd,&rbuf,1);
+		
+		close(fd);
+	}
+	void Player::openWm8740Mute(){	
+		muteMutex.lock();
+		
+		muteCount++;
+		log_i("openOrCloseMute muteCount=%d",muteCount);
+		if(muteCount == 1){
+			openOrCloseWm8740Mute(true);
+		}
+		
+		muteMutex.unlock();
+	}
+	void Player::closeWm8740Mute(){
+		muteMutex.lock();
+		
+		muteCount--;
+		log_i("openOrCloseMute muteCount=%d",muteCount);
+		if(muteCount == 0){
+			openOrCloseWm8740Mute(false);
+		}
+		
+		muteMutex.unlock();
+	}
+
+	
 	int PlayerEventInterface::onKeyDispatch(int keyCode,int action, int flag){
 		KeyCount *keycount = NULL;
 		int ret = 0;
@@ -631,8 +671,9 @@ namespace mango
 			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,NM_SPIDF,keyCode);
 		}else if(keyCode == KEYCODE_HEADEST&& action == VM_KEYDOWN){
 			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,NM_HEADEST,keyCode);
+		}else if(action == VM_POWEROFF){
+			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,NM_POWER_OFF,keyCode);
 		}
-		
 		if(action!=VM_CAPACITY&&gPowerManager!=NULL)
 			gPowerManager->resetCount();
 		return ret;

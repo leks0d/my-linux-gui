@@ -17,6 +17,7 @@ namespace mango
 		void setPowerState(int n);
 		void setAutoSleepTime(int time);
 		void setAutoPoweroffTime(int index);
+		int getPowerState(){return isSleep;}
 		int getAutoSleepTime();
 		int getPoweroffTime();
 	};

@@ -62,6 +62,7 @@ namespace mango
 		UseEventInterface* mUseEventInterface;
 		Point mPoint;
 		int holdKetState;
+		int lowVolCount;
 	public:
 		Screen		mScreen;
 

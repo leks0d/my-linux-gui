@@ -430,7 +430,7 @@ namespace mango
 		if (m_id3.GetTags(METADATA_KEY_DURATION, value)){
 			info->duration = str_to_int(value);
 		}
-#if 1
+#if 0
 		if(m_id3.PicValid() >= 0)//save picture
 		{
 			log_i("m_id3.PicValid() m_id3.piclength=%d",m_id3.piclength);
@@ -491,6 +491,31 @@ namespace mango
 			}
 		}else{
 			log_i("m_id3 not PicValid()");
+		}
+#else
+		if(m_id3.PicValid() >= 0){
+			if(m_id3.piclength > 0){
+				char *imgPath,*fileTitle;
+				MSkBitmap mMSkBitmap;
+				
+				BitmapFactory::decodeBuffer(&mMSkBitmap,(void*)m_id3.picdata,m_id3.piclength,109,109);
+
+				imgPath = new char[255];
+				fileTitle = new char[strlen(info->name)];
+					
+				getFileTitle(info->name,fileTitle);
+				genImgPath(fileTitle,imgPath);
+					
+				int ret = mMSkBitmap.saveToFile(imgPath);
+
+				if(ret == 1){
+					int pathlen = strlen(imgPath);
+					info->img_path = new char[pathlen+1];
+					memcpy(info->img_path,imgPath,pathlen+1);
+					log_i("album img save sucess.");
+				}else
+					log_i("fwrite fail,ret=%d",ret);				
+			}
 		}
 #endif
 		delete value;

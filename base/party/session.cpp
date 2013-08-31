@@ -20,6 +20,7 @@ namespace mango
 	{
 		mViewZAxis.mSession = this;
 		mUseEventInterface = NULL;
+		lowVolCount = 0;
 	}
 
 	Session::~Session()
@@ -428,6 +429,30 @@ namespace mango
 			close(fd);
 			memset(chagerbuf,0,20);
 
+			fd = open("/sys/class/power_supply/battery/voltage_now", O_RDONLY);
+
+			if(fd<=0){
+				log_i("open /sys/class/power_supply/battery/voltage_now fail");
+				break;
+			}
+			
+			count = read(fd,chagerbuf,20);
+
+			int voltage_now = 0;
+			
+			sscanf(chagerbuf,"%d",&voltage_now);
+			//log_i("voltage_now = %d,lowVolCount=%d",voltage_now,lowVolCount);
+			//voltage_now = 3300*1000;
+			close(fd);
+			memset(chagerbuf,0,20);
+
+			if(mUseEventInterface != NULL && voltage_now<3400000 && charge == 0){
+				lowVolCount++;
+				if(lowVolCount>10)
+					mUseEventInterface->onKeyDispatch(0,VM_POWEROFF,0);
+			}else{
+				lowVolCount = 0;
+			}
 			if(mUseEventInterface != NULL)
 				mUseEventInterface->onKeyDispatch(capacity,VM_CAPACITY,0);				
 

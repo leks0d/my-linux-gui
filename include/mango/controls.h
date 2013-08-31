@@ -9,20 +9,74 @@ namespace mango
 		int* mBits;
 		int width;
 		int height;
-	
-		MSkBitmap(){mBits = NULL;};
+		char *mFilePath;
 		
+		MSkBitmap(){mBits = NULL;mFilePath=NULL;}
+		~MSkBitmap(){release();}
+		int saveToFile(char* path){
+			if(isVaild() && mBits!=NULL){
+				int headr[2];
+				FILE *fb = fopen(path, "wb");
+				headr[0] = width;
+				headr[1] = height;
+				fwrite(headr,1,sizeof(int)*2,fb);
+				fseek(fb,sizeof(int)*2,SEEK_SET);
+				fwrite(mBits,1,sizeof(int)*width*height,fb);
+				fclose(fb);
+				return 1;
+			}
+			return 0;
+		}
+		void createFile(char* path){
+			int headr[2],pathlen;
+			FILE* mFile;
+			
+			if(path == NULL)
+				return;
+
+			if(mFilePath!=NULL && strcmp(mFilePath,path) == 0){
+				log_i("invail img path");
+				return;
+			}
+			
+
+			release();
+			
+			pathlen = strlen(path)+1;
+			mFilePath = new char[pathlen];
+			memcpy(mFilePath,path,pathlen);
+			log_i("open file:%s",mFilePath);
+			mFile = fopen(mFilePath, "rb");
+			if (mFile == NULL) {
+				log_e ("Can't open resource file %s \n", path);
+				return;
+			}
+
+			fread(headr, 1, sizeof(int)*2, mFile);
+			
+			width = headr[0];
+			height = headr[1];
+			log_i("width=%d,height=%d",width,height);
+			mBits = new int[width*height];
+			
+			fseek(mFile,sizeof(int)*2,SEEK_SET);
+			fread(mBits,1,sizeof(int)*width*height,mFile);
+			
+			fclose(mFile);
+		}
 		void create(int *bit,int w,int h){
 			int i,count;
 			
+			release();
+
 			mBits = new int[w*h];
 			count = w*h;
 			
 			for(i = 0;i<count;i++){
 				int r = bit[i]&0x00FF0000;
-				int b = bit[i]&0x000000FF;			
+				int b = bit[i]&0x000000FF;
 				mBits[i] = (bit[i]&0xFF00FF00) | (r>>16) | (b<<16);
-			}		
+			}
 			
 			width = w;
 			height = h;
@@ -32,6 +86,10 @@ namespace mango
 			if(mBits != NULL){
 				delete mBits;
 				mBits = NULL;
+			}
+			if(mFilePath != NULL){
+				delete mFilePath;
+				mFilePath = NULL;
 			}
 			width = 0;
 			height = 0;			
@@ -55,7 +113,7 @@ namespace mango
 			void clear(){	memset(mstr,0,len);		pos=0;}
 			void setPlayTime(int n);
 			~Mstring(void){
-				log_i("-----%s",mstr);
+				//log_i("-----%s",mstr);
 				if(mstr!=NULL)
 					delete mstr;
 				mstr=NULL;

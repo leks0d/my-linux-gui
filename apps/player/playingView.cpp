@@ -163,7 +163,7 @@ namespace mango
 		Mstring* mstr;
 		mediainfo* currentinfo;
 		int duration = 0;
-
+		int current = 0;
 		
 		currentinfo = mPlayinglist->getPlayingItem();
 
@@ -221,8 +221,9 @@ namespace mango
 		}
 #else
 		log_i("tag currentinfo->img_path=0x%x",currentinfo->img_path);
-		BitmapFactory::decodeFile(mMSkBitmap,currentinfo->img_path,109,109);
-		
+		//BitmapFactory::decodeFile(mMSkBitmap,currentinfo->img_path,109,109);
+		mMSkBitmap->createFile(currentinfo->img_path);
+		//BitmapFactory::genBitmapFromFile(mMSkBitmap,currentinfo->img_path,30,30);
 #endif
 		log_i("tag");
 		mAlbumImage->setMSkBitmap(mMSkBitmap);
@@ -257,20 +258,28 @@ namespace mango
 		log_i("tag");
 		mAlbum->setTextString(currentinfo->album);
 		log_i("tag");
+		
 		duration = mPlayinglist->getDuration();
-		log_i("mPlayinglist->getDuration()=%d",duration);
-		if(duration<=1)
+		if(duration<=1 && currentinfo->duration!=0){
 			duration = currentinfo->duration;
+			log_i("invail duration,use currentinfo->duration=%d",duration);
+		}
+		
+		current = mPlayinglist->getCurrent();
+		if(current<0||current>duration){
+			current = 0;
+			log_i("error current,clear current");
+		}
 		
 		mSeekBar->setMax(duration);
-		mSeekBar->setProgress(mPlayinglist->getCurrent());
+		mSeekBar->setProgress(current);
 		
 		mstr->clear();
 		mstr->setPlayTime(duration);
 		mDurtionText->setTextString(mstr->mstr);
 		
 		mstr->clear();
-		mstr->setPlayTime(mPlayinglist->getCurrent());
+		mstr->setPlayTime(current);
 		mTimeText->setTextString(mstr->mstr);
 		delete mstr;
 		
@@ -410,11 +419,12 @@ namespace mango
 
 	int PlayingView::onNotify(View* fromView, int code, void* parameter)
 	{
-
+		//log_i("code = %d,NM_POWER_OFF=%d",code,NM_POWER_OFF);
 		if(fromView == NULL && code == NM_DISPLAY){
 			log_i("PlayingView::onNotify NM_DISPLAY");
 			ViewInit();
-			isNeedFresh = 1;
+			if(gPowerManager->getPowerState() == 0)
+				isNeedFresh = 1;
 			log_i("PlayingView::onNotify NM_DISPLAY leave");
 		}else if(fromView == NULL && code == NM_DISMISS){
 			log_i("PlayingView::onNotify NM_DISMISS");
@@ -438,28 +448,39 @@ namespace mango
 					break;
 			}
 		}else if(code == NM_SEEK_UPDATE){
-			//log_i("isNeedFresh=%d,mPlayinglist->isPlaying()=%d",isNeedFresh,mPlayinglist->isPlaying());
-			if(isNeedFresh && mPlayinglist->isPlaying()){
-				Mstring* mstr;
+		
+			if(isNeedFresh){
+				
+				log_i("isNeedFresh=%d",isNeedFresh);
+			
+				if(mPlayinglist->isPlaying()){
 					
-				mstr = new Mstring(20);
+					Mstring* mstr;
 
-				if(mSeekBar!=NULL){
-					int max = mSeekBar->getMax();
-					int cur = mPlayinglist->getCurrent();
-					
-					if(cur>=0&&cur<=max){
+					if(mSeekBar!=NULL){
 						
-						mstr->setPlayTime(mPlayinglist->getCurrent());
+						int max = mSeekBar->getMax();
+						int cur = mPlayinglist->getCurrent();
+						
+						if(cur>=0&&cur<=max){
 							
-						mTimeText->setTextString(mstr->mstr);
+							mstr = new Mstring(20);
+							
+							mstr->clear();
+							mstr->setPlayTime(cur);
+							mTimeText->setTextString(mstr->mstr);
 
-						mSeekBar->setProgress(mPlayinglist->getCurrent());
+							mSeekBar->setProgress(cur);
+							
+							delete mstr;
+						}
 					}
 				}
-				delete mstr;
+				
+				log_i("NM_SEEK_UPDATE end");
 			}
-		}else if(code == NM_BATTERY_UPDATE){
+		}
+		else if(code == NM_BATTERY_UPDATE){
 			int val = (unsigned int)parameter&0xFF;
 			int charge = ((unsigned int)parameter&0xF00)>>8;
 			int batteryIcon = IDP_BATTERY_0;
@@ -518,7 +539,8 @@ namespace mango
 				gPlayer.bootLockCount--;
 			}
 			mKeyCount.TriggerKey();
-		}else if(code == FLASH_MOUNT){
+		}
+		else if(code == FLASH_MOUNT){
 			gPlayer.dismissView(gPlayer.mUsmConnectView);
 			mPlayinglist->checkPlayintList();
 			gmediaprovider.externVolumeScanner("/mnt/sdcard");	
@@ -553,6 +575,17 @@ namespace mango
 				isNeedFresh = 0;
 			}
 			log_i("isNeedFresh = %d",isNeedFresh);
+		}
+		else if(code == NM_POWER_OFF){
+			gPlayer.showShutDownView();
+			//reboot(RB_POWER_OFF);
+			log_i("RB_POWER_OFF");
+			int i = 20;
+			while(i--){
+				mango::Thread::sleep(100);
+			}
+			
+			reboot(RB_POWER_OFF);	
 		}
 		return 0;
 	}
@@ -604,6 +637,7 @@ namespace mango
 		case PLAYING_IDB_NEXT:
 			mPlayinglist->playNext();
 			ViewInit();
+			log_i("PLAYING_IDB_NEXT complete.");
 			break;
 		case PLAYING_IDB_PREV:
 			//mPlayinglist->playPrev();
@@ -636,6 +670,7 @@ namespace mango
 			break;
 			}
 		}
+		log_i("onCommand id = %d end",id);
 		return -1;
 	}
 

@@ -41,6 +41,7 @@ namespace mango
 		VM_CAPACITY,
 		VM_CHAGER,
 		VM_MEDIA,
+		VM_POWEROFF,
 	} ;
 
 

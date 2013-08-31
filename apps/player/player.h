@@ -44,7 +44,7 @@ namespace mango
 	};
 	enum
 	{
-		SETTING_BACK = 10,
+		SETTING_BACK = 0x10,
 		SETTING_HOME,
 		SETTING_TITLE,
 		SETTING_EQ_RESET,
@@ -183,6 +183,9 @@ namespace mango
 		bool isHeadestIn();
 		void openCodecPower(bool enable);
 		void openOrCloseMute(bool enable);
+		void openOrCloseWm8740Mute(bool enable);
+		void openWm8740Mute();
+		void closeWm8740Mute();
 		void setBootWakeLock(int en);
 		void shutDown();
 	public:
@@ -202,6 +205,9 @@ namespace mango
 		UsmConnectView *mUsmConnectView;
 		KeyLockView *mKeyLockView;
 		ChosenView *mChosenView;
+		
+		Mutex muteMutex;
+		int muteCount;
 		
 		PlayerEventInterface* mPlayerEventInterface;
 		int powerState;

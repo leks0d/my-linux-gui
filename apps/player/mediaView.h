@@ -83,7 +83,7 @@ namespace mango
 		virtual int getCount(){return 0;}
 		virtual void* getItem(int index){return 0;}
 		ListView* mlist;
-		ArrayMediaInfo *mMusicArrayList;	
+		ArrayMediaInfo *mMusicArrayList;
 	};
 
 	class ArtistAdapter : public BaseAdapter

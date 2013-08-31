@@ -71,9 +71,9 @@ namespace mango
 		Rect rect;
 		TCHAR *title;
 		getClientRect(rect);
-		
+		return 0;
 		title = getTitle();
-		if (title)
+		if (title != NULL)
 		{
 			canvas.setTextColor(mColor);
 			canvas.setTextSize(mTextSize);
