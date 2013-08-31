@@ -845,15 +845,17 @@ namespace mango
 		FILE* file = NULL;
 		bool success = false;
 
-#define CODEPAGE_FILE_BYTES   (64*1024*2)
+#define CODEPAGE_FILE_BYTES   (64*1024*2+512)
 		const char conCodePageFileName[][56] = 
 		{
 #ifdef WIN32
 			"E:\\EmluatorStore\\C\\turnip\\codepage\\c_936.bin",
 			"E:\\EmluatorStore\\C\\turnip\\codepage\\c_950.bin",
+			"E:\\EmluatorStore\\C\\turnip\\codepage\\c_932.bin",
 #else
 			MANGO_ROOT"codepage/c_936.bin",
 			MANGO_ROOT"codepage/c_950.bin",
+			MANGO_ROOT"codepage/c_932.bin",
 #endif
 		} ;
 
@@ -866,6 +868,9 @@ namespace mango
 			break ;
 		case LANGID_TRADITIONAL:
 			path = conCodePageFileName[1] ;
+			break ;
+		case LANGID_JAPANESE:
+			path = conCodePageFileName[2] ;
 			break ;
 		}
 

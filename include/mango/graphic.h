@@ -123,6 +123,8 @@ namespace mango
 	};
 
 
+	#define FONT_CACHE_MAX_FONT	28
+
 
 	class FontCache : public Object
 	{
@@ -130,10 +132,18 @@ namespace mango
 		FontCache();
 		~FontCache();
 
+		bool getCharBmp(int fontSize, WCHAR wchar, Size *size, int *dyExtra, unsigned char** fontBmp);
+		void setCharBmp (int fontSize, WCHAR wchar, Size& size, int dyExtra, unsigned char*	fontBmp);
+
+
+
 	private:
+//	public:
+		bool init(int iMaxFontSize, void *pMemoryAddr, int iMemoryBytes);
 		void* mCache;
 	};
 
+	extern FontCache  gFontCache;
 
 
 

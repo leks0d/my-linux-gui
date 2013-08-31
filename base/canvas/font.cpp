@@ -88,8 +88,10 @@ namespace mango
 	unsigned char *Font::getCharBmp(WCHAR wchar, Size *size, int *dyExtra)
 	{
 		unsigned char *bits;
-		SIZE   bmpSize;
+		SIZE   bmpSize = {0, 0};
 
+		if (gFontCache.getCharBmp(mFontSize, wchar, size, dyExtra, &bits))
+			return bits;
 
 		if (wchar <= 256)
 		{
@@ -105,14 +107,10 @@ namespace mango
 		size->cx = bmpSize.cx;
 		size->cy = bmpSize.cy;
 
+		gFontCache.setCharBmp(mFontSize, wchar, *size, *dyExtra, bits);
+
 		return bits;
 	}
-
-
-
-
-
-
 
 
 
@@ -122,45 +120,42 @@ namespace mango
 	//cahche 条目
 	typedef struct tagFONT_CACHE_ENTRY
 	{
-		LIST_HEAD	m_list ;
+		LIST_HEAD	mList;
 
-		WCHAR	m_wCode		;	//字符内码
-		WORD	m_wReserve	;
-		BYTE	m_FontSize ;
-		BYTE	m_Width	   ;
-		BYTE	m_Height   ;
-		char	m_dyExtra  ;
+		WCHAR	mCode;	//字符内码
+		WORD	m_wReserve;
+		unsigned char	mFontSize;
+		unsigned char	mWidth;
+		unsigned char	mHeight;
+		char	mDyExtra;
 
-		BYTE  m_Data[4]  ;
+		unsigned char  mData[4];
 
 	} FONT_CACHE_ENTRY, *PFONT_CACHE_ENTRY ;
 
 	//cache header
 	typedef struct tagFONT_CACHE_HEADER
 	{
-		LIST_HEAD			m_listEntry ; //
+		LIST_HEAD	mEntryHead; 
 
-		PFONT_CACHE_ENTRY	m_pbEntry ; //条目数开始地址
-		int					m_iTotalEntries ;	 //总条目数
-		int					m_iBytesOfEntry ;	 //条目占的字节数
+		PFONT_CACHE_ENTRY	mEntry; //条目数开始地址
+		int mTotalEntries;	//总条目数
+		int	mBytesOfEntry;  //条目占的字节数
 
-		int					m_iMaxFontSize ;
-		WORD				m_wCharEntryMap[FONT_CACHE_CHARS] ;
+		int	 mMaxFontSize;
+		WORD mCharEntryMap[FONT_CACHE_CHARS];
 
-	} FONT_CACHE_HEADER, *PFONT_CACHE_HEADER ;
-
-	//本地字体Cache
-	typedef struct tagFONT_CACHE_LOCAL
-	{
-		void	*m_pCahceAddr		;
-		int		 m_iBytesOfBmpBuf	;
-		BYTE	 m_CharBmpBuf[1]	;
-
-	} FONT_CACHE_LOCAL, *PFONT_CACHE_LOCAL ;
+	} FONT_CACHE_HEADER, *PFONT_CACHE_HEADER;
 
 
 	FontCache::FontCache()
 	{
+		mCache = NULL;
+
+		int memBytes  = 1024 * 1024;
+		void *memAddr = malloc(memBytes);
+
+		init(16, memAddr, memBytes);
 
 	}
 
@@ -168,183 +163,127 @@ namespace mango
 	FontCache::~FontCache()
 	{
 
+		safeFree(mCache);
 
 	}
-
-#if 0
 
 
 	//字体Cache 全局初始化
-	BOOL turglFontCacheSessionInit (int iMaxFontSize, void *pMemoryAddr, int iMemoryBytes)
+	bool FontCache::init (int maxFontSize, void *memAddr, int memBytes)
 	{
-		PFONT_CACHE_HEADER	pHeader ;
-		PFONT_CACHE_ENTRY	pEntry  ;	
-		int					i ;
+		PFONT_CACHE_HEADER	cacheHeader;
+		PFONT_CACHE_ENTRY	cacheEntry;	
+		int	i;
 
-		if (pMemoryAddr == NULL)
-			return FALSE ;
+		if (memAddr == NULL)
+			return false ;
 
-		if (iMemoryBytes < sizeof (FONT_CACHE_HEADER))
+		if (memBytes < sizeof (FONT_CACHE_HEADER))
 		{
-			log_e ("memory is too small \n") ;
-			return FALSE ;
+			log_e("memory is too small \n");
+			return false;
 		}
 
-		pHeader = (PFONT_CACHE_HEADER)pMemoryAddr ;
-		memset (pHeader, 0, sizeof (FONT_CACHE_HEADER)) ;
+		cacheHeader = (PFONT_CACHE_HEADER)memAddr;
+		memset (cacheHeader, 0, sizeof (FONT_CACHE_HEADER));
 
-		pHeader->m_iBytesOfEntry = (sizeof (FONT_CACHE_ENTRY) - 4 + iMaxFontSize * iMaxFontSize + 3) & (~0x03);
-		pHeader->m_iTotalEntries = (iMemoryBytes - sizeof (FONT_CACHE_HEADER)) / pHeader->m_iBytesOfEntry ;
-		pHeader->m_pbEntry		 = (PFONT_CACHE_ENTRY)((PFONT_CACHE_HEADER)pMemoryAddr + 1) ;
+		cacheHeader->mBytesOfEntry = (sizeof (FONT_CACHE_ENTRY) - 4 + maxFontSize * maxFontSize + 3) & (~0x03);
+		cacheHeader->mTotalEntries = (memBytes - sizeof (FONT_CACHE_HEADER)) / cacheHeader->mBytesOfEntry;
+		cacheHeader->mEntry		   = (PFONT_CACHE_ENTRY)((PFONT_CACHE_HEADER)memAddr + 1);
+		cacheHeader->mTotalEntries = min(cacheHeader->mTotalEntries, FONT_CACHE_CHARS - 1);
 
-		pHeader->m_iTotalEntries = min (pHeader->m_iTotalEntries, FONT_CACHE_CHARS - 1) ;
+		cacheEntry = cacheHeader->mEntry;
 
-		pEntry = pHeader->m_pbEntry ;
+		INIT_LIST_HEAD(&(cacheHeader->mEntryHead));
 
-		INIT_LIST_HEAD (&(pHeader->m_listEntry)) ;
-
-		for (i = 0 ; i < pHeader->m_iTotalEntries ; i++)
+		for (i = 0; i < cacheHeader->mTotalEntries; i++)
 		{
-			list_add_tail (&(pEntry->m_list), &(pHeader->m_listEntry)) ;
-			pEntry->m_wCode = 0 ;
-			pEntry = (BYTE *)pEntry + (pHeader->m_iBytesOfEntry) ;
+			list_add_tail(&(cacheEntry->mList), &(cacheHeader->mEntryHead));
+			cacheEntry->mCode = 0;
+			cacheEntry = (PFONT_CACHE_ENTRY)((unsigned char *)cacheEntry + (cacheHeader->mBytesOfEntry));
 		}
-
-		return TRUE ;
+		mCache = memAddr;
+		return true;
 	}
 
-	//字体Cache 本地初始化
-	PFONT_CACHE_LOCAL turglFontCacheLocalInit (int iMaxFontSize, void *pFontCacheAddr)
-	{
-		PFONT_CACHE_LOCAL pLocal ;
-
-		pLocal = lcMalloc (sizeof (FONT_CACHE_LOCAL) + iMaxFontSize * iMaxFontSize) ;
-
-		if (pLocal == NULL)
-		{
-			log ("can't alloc memory \n") ;
-			return NULL ;
-		}
-
-		pLocal->m_pCahceAddr = pFontCacheAddr ;
-		pLocal->m_iBytesOfBmpBuf = iMaxFontSize * iMaxFontSize ;
-
-		return pLocal ;
-	}
-
-	//字体Cache 本地反初始化
-	BOOL turglFontCacheLocalDeinit (PFONT_CACHE_LOCAL *ppLocal)
-	{
-		if (*ppLocal)
-		{
-			lcFree (*ppLocal) ;
-			*ppLocal = NULL ;
-		}
-
-		return TRUE ;
-	}
 
 
 	//从字体Cache 获取字体位图
-	BYTE *turglFontCacheGetCharBmp (PFONT_CACHE_LOCAL pLocal, int iFontSize, WCHAR wchar, SIZE *psize, int *pdyExtra)
+	bool FontCache::getCharBmp(int fontSize, WCHAR wchar, Size *size, int *dyExtra, unsigned char** fontBmp)
 	{
-		PFONT_CACHE_HEADER	pHeader ;
-		PFONT_CACHE_ENTRY	pEntry  ;	
-		int					iEntry ;
-		BYTE				*pbyBmp = NULL ;
-		int					iBytes ;
+		PFONT_CACHE_HEADER	cacheHeader;
+		PFONT_CACHE_ENTRY	cacheEntry;	
+		int	order;
 
-		if (pLocal == NULL)
-			return NULL ;
+		if (mCache == NULL)
+			return false;
 
-		pHeader = (PFONT_CACHE_HEADER)(pLocal->m_pCahceAddr) ;
+		cacheHeader = (PFONT_CACHE_HEADER)mCache;
+		order  = (int)(DWORD)(cacheHeader->mCharEntryMap[(DWORD)(WORD)wchar]);
+		if (order >= cacheHeader->mTotalEntries)
+			return false;
 
-		ENTER_FONTCACHE_CRITICAL_SECTION ;
+		cacheEntry = (PFONT_CACHE_ENTRY)((char *)cacheHeader->mEntry + order * cacheHeader->mBytesOfEntry);
+		if (cacheEntry->mCode != wchar)
+			return false;
 
-		do
-		{
-			iEntry  = (int)(DWORD)(pHeader->m_wCharEntryMap[(DWORD)(WORD)wchar]) ;
-			if (iEntry >= pHeader->m_iTotalEntries)
-				break ;
+		if (cacheEntry->mFontSize != fontSize)
+			return false;
 
-			pEntry = pHeader->m_pbEntry + iEntry ;
-			if (pEntry->m_wCode != wchar)
-				break ;
+		size->cx = (int)(WORD)cacheEntry->mWidth; 
+		size->cy = (int)(WORD)cacheEntry->mHeight;
+		*dyExtra = (int)cacheEntry->mDyExtra;
 
-			if (pEntry->m_FontSize != iFontSize)
-				break ;
+		if (size->cx > 0)
+			*fontBmp = cacheEntry->mData;
+		else
+			*fontBmp = NULL;
 
-			iBytes = (WORD)pEntry->m_Width * (WORD)pEntry->m_Height ;
-			if (iBytes > pLocal->m_iBytesOfBmpBuf)
-				break ;
-
-			memcpy (pLocal->m_CharBmpBuf, pEntry->m_Data, iBytes) ;
-			pbyBmp = pLocal->m_CharBmpBuf ;
-
-			psize->cx = (int)(WORD)pEntry->m_Width ; 
-			psize->cy = (int)(WORD)pEntry->m_Height ;
-			*pdyExtra = (int)pEntry->m_dyExtra ;
-
-			list_del (&(pEntry->m_list)) ;
-			list_add_tail (&(pEntry->m_list), &(pHeader->m_listEntry)) ;
-
-		}while (0) ;
-
-		LEAVE_FONTCACHE_CRITICAL_SECTION ;
-
-		return pbyBmp ;
+		list_move_tail(&(cacheEntry->mList), &(cacheHeader->mEntryHead));
+		return true;
 	}
 
 
 
 	//将字体位图存到字体Cache
-	void turglFontCacheSetCharBmp (PFONT_CACHE_LOCAL pLocal, int iFontSize, WCHAR wchar, SIZE size, int dyExtra, BYTE	*pbyBmp)
+	void FontCache::setCharBmp (int fontSize, WCHAR wchar, Size& size, int dyExtra, unsigned char*	fontBmp)
 	{
-		PFONT_CACHE_HEADER	pHeader ;
-		PFONT_CACHE_ENTRY	pEntry  ;	
-		int					iEntry ;
-		int					iBytes ;
-		int					iIndex ;
+		PFONT_CACHE_HEADER	cacheHeader;
+		PFONT_CACHE_ENTRY	cacheEntry;	
+		int	 order;
+		int	 byteCount;
+		int	 index;
 
-		if ((pLocal == NULL) || (pbyBmp == NULL))
-			return ;
+		if ((mCache == NULL) || (fontBmp == NULL && size.cx != 0))
+			return;
 
-		pHeader = (PFONT_CACHE_HEADER)(pLocal->m_pCahceAddr) ;
-		iBytes  = size.cx * size.cy ;
-		if (iBytes > (pHeader->m_iBytesOfEntry - (int)(sizeof (FONT_CACHE_ENTRY) - 4)))
-			return ;
+		cacheHeader = (PFONT_CACHE_HEADER)mCache;
+		byteCount   = size.cx * size.cy ;
+		if (byteCount > (cacheHeader->mBytesOfEntry - (int)(sizeof (FONT_CACHE_ENTRY) - 4)))
+			return;
 
-	//	ENTER_FONTCACHE_CRITICAL_SECTION ;
-
-		iIndex  = (int)(DWORD)wchar ;
-		iEntry  = (int)(DWORD)(pHeader->m_wCharEntryMap[iIndex]) ;
-		if (iEntry < pHeader->m_iTotalEntries)
+		index  = (int)(DWORD)wchar;
+		order  = (int)(DWORD)(cacheHeader->mCharEntryMap[index]);
+		if (order < cacheHeader->mTotalEntries)
 		{
-			pEntry = pHeader->m_pbEntry + iEntry ;
-			if (pEntry->m_wCode != wchar)
-				pEntry = NULL ;
+			cacheEntry = (PFONT_CACHE_ENTRY)((char *)cacheHeader->mEntry + order * cacheHeader->mBytesOfEntry);
+			if (cacheEntry->mCode == wchar && cacheEntry->mFontSize == fontSize)
+				return;
 		}
-		else
-			pEntry = NULL ;
 
-		if (pEntry == NULL)
-			pEntry = list_entry((pHeader->m_listEntry.next), FONT_CACHE_ENTRY, m_list) ; 
+		cacheEntry = list_entry((cacheHeader->mEntryHead.next), FONT_CACHE_ENTRY, mList); 
 
+		list_move_tail(&(cacheEntry->mList), &(cacheHeader->mEntryHead));
 
-		list_del (&(pEntry->m_list)) ;
-		list_add_tail (&(pEntry->m_list), &(pHeader->m_listEntry)) ;
+		cacheEntry->mCode	  = wchar;
+		cacheEntry->mWidth    = (unsigned char)size.cx;
+		cacheEntry->mHeight   = (unsigned char)size.cy;
+		cacheEntry->mDyExtra  = dyExtra;
+		cacheEntry->mFontSize = (unsigned char)fontSize;
 
-		pEntry->m_wCode	   = wchar ;
-		pEntry->m_Width    = (BYTE)size.cx ;
-		pEntry->m_Height   = (BYTE)size.cy ;
-		pEntry->m_dyExtra  = dyExtra ;
-		pEntry->m_FontSize = (BYTE)iFontSize ;
-
-		memcpy (pEntry->m_Data, pbyBmp, iBytes) ;
-
-		pHeader->m_wCharEntryMap[iIndex] = (pEntry - pHeader->m_pbEntry) ;
-
-	//	LEAVE_FONTCACHE_CRITICAL_SECTION ;
+		memcpy(cacheEntry->mData, fontBmp, byteCount);
+		cacheHeader->mCharEntryMap[index] = ((char *)cacheEntry - (char *)cacheHeader->mEntry) / cacheHeader->mBytesOfEntry;
 	}
-#endif
+
+	FontCache  gFontCache;
 }

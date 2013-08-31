@@ -22,6 +22,7 @@ namespace mango
 #define LANGID_SIMPLIFIED  0x0000
 #define LANGID_ENGLISH     0x0001
 #define LANGID_TRADITIONAL 0x0002
+#define LANGID_JAPANESE    0x0003
 
 	class Charset : public Object
 	{

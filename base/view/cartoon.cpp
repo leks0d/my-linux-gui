@@ -110,12 +110,12 @@ namespace mango
 			else if (absDestShift >= gearShift)
 			{
 				speed = absDestShift * 10 / gearShift - 10 ;
-				shift = absDestShift * ((int)conGearshiftGreater[speed]) / 100 ;
+				shift = absDestShift * ((int)conGearshiftGreater[speed]) / 100 * 2;
 			}
 			else
 			{
 				speed = absDestShift * 100 / gearShift ;
-				shift = absDestShift * ((int)conGearshiftLess[speed]) / 100 ;
+				shift = absDestShift * ((int)conGearshiftLess[speed]) / 100 * 2;
 
 				if (absDestShift && shift < 5)
 				{
@@ -139,7 +139,7 @@ namespace mango
 		} ;
 
 		while (Time::getMillisecond() - dwTickCount < CARTOON_MS_PER_FRAME) ;
-		dwTickCount = Time::getMillisecond();
+		dwTickCount = GetTickCount () ;
 	}
 
 };
