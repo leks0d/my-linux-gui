@@ -139,7 +139,7 @@ namespace mango
 		} ;
 
 		while (Time::getMillisecond() - dwTickCount < CARTOON_MS_PER_FRAME) ;
-		dwTickCount = GetTickCount () ;
+		dwTickCount = Time::getMillisecond() ;
 	}
 
 };

@@ -365,7 +365,7 @@ static const char *PlayerLock = "playerlock";
 					else{log_i("gaplessPlay() fail!");return -1;}
 					
 				}else{
-					//gPlayer.openWm8740Mute();
+					gPlayer.openWm8740Mute();
 					if(mParticleplayer->stop()){log_i("stop() success!");}else{log_i("stop() fail!");return -1;}
 					if(mParticleplayer->setSource(playPath)){log_i("setSource() success!");}else{log_i("setSource() fail!");return -1;}
 					if(mParticleplayer->prepare()){log_i("prepare() success!");}else{log_i("prepare() fail!");return -1;}
@@ -374,7 +374,7 @@ static const char *PlayerLock = "playerlock";
 						if(mParticleplayer->start()){log_i("start() success!");}else{log_i("start() fail!");return -1;}
 					//mango::Thread::sleep(600);
 					//gPlayer.closeWm8740Mute();
-					//mThread.create(Playinglist::CloseMuteRunnig,NULL);
+					mThread.create(Playinglist::CloseMuteRunnig,NULL);
 				}
 				getPlayingItem()->isPlayed = 1;
 				setWakeLock();

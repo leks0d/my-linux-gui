@@ -264,6 +264,7 @@ namespace mango
 			mUsmConnectView->setFocus();
 		}
 	}
+
 	int Player::showMediaScannerView(){
 		if (mMediaScannerView == NULL) {
 			mMediaScannerView = new MediaScannerView(TEXT("MediaScannerView"), NULL, NULL, 0, SW_NORMAL);
@@ -375,6 +376,8 @@ namespace mango
 			displayView = gSession.mViewZAxis.getDisplayingView();
 			displayView->invalidateRect();
 			displayView->setFocus();
+			if(displayView!=NULL)
+				log_i("dimiss view and show view:%s",displayView->name);
 			gMessageQueue.post(displayView,VM_NOTIFY,NM_DISPLAY,0);
 		}
 	}
@@ -413,7 +416,7 @@ namespace mango
 		FILE* file;
 		char buffer[20];
 		int ret;
-
+		
 		file  = fopen("/dev/codec_volume", "wt");
 		if (file == NULL) {
 			log_e("/dev/codec_volume");

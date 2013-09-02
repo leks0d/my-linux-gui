@@ -71,7 +71,7 @@ namespace mango
 		Rect rect;
 		TCHAR *title;
 		getClientRect(rect);
-		return 0;
+
 		title = getTitle();
 		if (title != NULL)
 		{

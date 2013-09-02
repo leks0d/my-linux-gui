@@ -215,8 +215,8 @@ namespace mango
 	void SettingsView::initLanguageList(){
 		int img[]={0,0,0,0,0};
 		int imgsec[]={0,0,0,0,0};
-		int text[]={STR_LANGUAGE_EN,STR_LANGUAGE_CN,STR_LANGUAGE_JA};
-		int i,count = 3;
+		int text[]={STR_LANGUAGE_EN,STR_LANGUAGE_CN,STR_LANGUAGE_JA,STR_LANGUAGE_JAP};
+		int i,count = 4;
 		
 		if(mLanguageListAdapter == NULL){
 			mListView->deleteAllItems();

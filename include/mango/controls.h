@@ -31,15 +31,15 @@ namespace mango
 			int headr[2],pathlen;
 			FILE* mFile;
 			
-			if(path == NULL)
+			if(path == NULL){
+				release();
 				return;
-
+			}
 			if(mFilePath!=NULL && strcmp(mFilePath,path) == 0){
 				log_i("invail img path");
 				return;
 			}
 			
-
 			release();
 			
 			pathlen = strlen(path)+1;

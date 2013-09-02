@@ -13,11 +13,11 @@ namespace mango
 	{
 		mMessageQueue = &gMessageQueue;
 		mTitle = NULL;
-
+		name = NULL;
 		mParent = parent;
 		mStyle  = style;
 		mShowState = show;
-
+		
 		if (rect)
 			mRect = *rect;
 		else if (mParent)
@@ -112,10 +112,11 @@ namespace mango
 
 		invalidateRect() ;
 
-		name = new char[30];
+		safeFree(mTitle);
+		name = new char[MAX_PATH];
 		Charset::wideCharToMultiByte(CP_UTF8, newTitle, String::lstrlen(newTitle), name, MAX_PATH * 3);
-		name[29] = '\0';
-
+		//name[29] = '\0';
+		
 		//log_i("View::setTitle name=%s",name);
 		
 		return newTitleLen;

@@ -260,6 +260,15 @@ namespace mango
 
 		mScannerThread.create(mediaprovider::FileScannerRunnig, info);
 	}
+	void mediaprovider::externFileCheck(){
+		ScanInfo *info;
+
+		info = new ScanInfo();
+		info->media = this;
+		//info->path = "(null)";
+
+		mFileCheckThread.create(mediaprovider::FileCheckRunnig, info);		
+	}
 	unsigned int mediaprovider::FileScannerRunnig(void *parameter){
 			ScanInfo *info = (ScanInfo*)parameter;
 			mediaprovider *media = info->media;
@@ -273,11 +282,20 @@ namespace mango
 				
 			return 0;		
 	}
+	unsigned int mediaprovider::FileCheckRunnig(void *parameter){
+		ScanInfo *info = (ScanInfo*)parameter;
+		mediaprovider *media = info->media;
+		
+		media->sendMsgStart();
+		media->checkfile();
+		//Thread::sleep(2000);
+		media->sendMsgEnd();
+	}
 	void mediaprovider::ScannerDirectory(char* file){
 		ArrayMediaInfo array;
 		mediainfo info;
 		int count,i;
-		
+		memset(&info,0,sizeof(mediainfo));
 		count = MediaView::getArrayInfoFromFile(file,array);
 		
 		mMutex.lock();
@@ -286,11 +304,15 @@ namespace mango
 			char *dirpath;
 			dirpath = array.getMediaInfo(i)->path;
 			if(!music_exsit_db(dirpath)){
+				log_i("getmediainfo info");
 				getmediainfo(array.getMediaInfo(i)->path,&info);
-				insert(0,&info);
+				log_i("inster info");
+				insert("music",&info);
+				log_i("safefreeMediainfo info");
+				safefreeMediainfo(&info);
 			}
 		}
-		
+		safefreeMediainfo(&info);
 		mMutex.unlock();
 	}
 
@@ -332,15 +354,15 @@ namespace mango
 	int mediaprovider::sendMsgStart(){
 		log_i("sendMsgStart:show MediaScannerView");
 		//gPlayer.showMediaScannerView();
-		scanTime = Time::getMillisecond();
+		//scanTime = Time::getMillisecond();
 		gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,MEDIA_SCANNER_START,0);
 	}
 	int mediaprovider::sendMsgEnd(){
 		log_i("sendMsgEnd:dismissView MediaScannerView");
 		//gPlayer.dismissView(gPlayer.mMediaScannerView);
-		int dur = Time::getMillisecond() - scanTime;
-		if(dur<50)
-			mango::Thread::sleep(500);
+		//int dur = Time::getMillisecond() - scanTime;
+		//if(dur<50)
+		//	mango::Thread::sleep(500);
 		gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,MEDIA_SCANNER_END,0);
 	}
 	int mediaprovider::getmediainfo(char *path,mediainfo *info)
@@ -350,7 +372,7 @@ namespace mango
 		char *filename;
 		int len,charCount;
 		TCHAR	fileName[255];
-		
+		log_i("tag");		
 		value = (char*)malloc(256);
 
 		filename = getfilename(path);
@@ -692,7 +714,7 @@ namespace mango
 			log_e("sqlite3_exec error : %s",sql);
 			log_e("sqlite3_exec pErrMsg : %s",pErrMsg);
 		}else
-			//log_i("sqlite3_exec success : %s",sql);
+			log_i("sqlite3_exec success : %s",sql);
 			;
 		return ret;	
 	}
@@ -700,17 +722,17 @@ namespace mango
 	int mediaprovider::insert(char *table,mediainfo *info)
 	{
 		char *ptr,sql[1024];
-		
+		log_i("tag");
 		ptr = sql;
 		ptr += sprintf(ptr,"insert into %s (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ",
 			table,MUSIC_PTAH,MUSIC_NAME,MUSIC_NAME_KEY,MUSIC_TITLE,MUSIC_TITLE_KEY,MUSIC_ART,MUSIC_ART_KEY,
 			MUSIC_ALBUM,MUSIC_ALBUM_KEY,MUSIC_TRACK,MUSIC_ART_IMG,MUSIC_ADD_TIME,MUSIC_DURATION,MUSIC_IN_PLAY,MUSIC_TIMES);
-
+		log_i("tag");
 		ptr += sprintf(ptr,"values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%d','%s','%d','%d','%d','%d');",
 				info->path,info->name,info->name_key,info->title,info->title_key,info->artist,
 				info->artist_key,info->album,info->album_key,info->track,info->img_path,
 				info->add_time,info->duration,info->inPlay,info->times);
-
+		log_i("tag");
 		exec(sql,0,0);
 
 		return 0;

@@ -16,6 +16,19 @@ namespace mango
 	#define SETTING_LANGUAGE_ID		9
 	#define SETTING_AUTOPOWEROFF_ID	10
 
+	#define SETTING_BRIGHTNESS_NAME		"brightness"
+	#define SETTING_VOLUME_NAME			"volume"
+	#define SETTING_PLAYMODE_NAME 		"playmode"
+	#define SETTING_GAPLESS_NAME			"gapless"
+	#define SETTING_EQMODE_NAME			"eqmode"
+	#define SETTING_EQSTATE_NAME			"eqopenOrclose"
+	#define SETTING_PLAYPOS_NAME			"playposition"
+	#define SETTING_AUTOSLEEP_NAME		"autosleepTime"
+	#define SETTING_LANGUAGE_NAME 	 	"languageId"
+	#define SETTING_AUTOPOWEROFF_NAME  	"autopoweroffTime"
+
+
+
 	#define EQ_CUSTOM_ID		0
 	#define EQ_POP_ID			1
 	#define EQ_ROCK_ID			2
@@ -25,7 +38,8 @@ namespace mango
 	
 	#define SETTING_TABLE_CREATE "CREATE TABLE IF NOT EXISTS settings(\
 									_id INTEGER PRIMARY KEY,\
-									value INTEGER\
+									value INTEGER,\
+									name TEXT\
 									);"
 	#define EQDATA_TABLE_CREATE "CREATE TABLE IF NOT EXISTS eqdata(\
 									_id INTEGER PRIMARY KEY,\
@@ -46,6 +60,7 @@ namespace mango
 			void dbclose();
 			void dataBaseInit(void);
 			int insert(int id,int value);
+			int insert(int id,int value,char *str);
 			int update(int id,int value);
 			int query(int id,int *value);
 			void EqInitialize();

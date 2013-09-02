@@ -45,7 +45,6 @@ namespace mango
 	{
 		int charCount;
 		Rect rect;
-		return 0;
 
 		if(!mVisiable)
 			return 0;

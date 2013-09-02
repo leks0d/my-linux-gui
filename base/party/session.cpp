@@ -446,12 +446,15 @@ namespace mango
 			close(fd);
 			memset(chagerbuf,0,20);
 
-			if(mUseEventInterface != NULL && voltage_now<3400000 && charge == 0){
+			if(mUseEventInterface != NULL && voltage_now<3500000 && charge == 0){
 				lowVolCount++;
 				if(lowVolCount>10)
 					mUseEventInterface->onKeyDispatch(0,VM_POWEROFF,0);
 			}else{
 				lowVolCount = 0;
+			}
+			if(voltage_now>4250000){
+				capacity = capacity&0xFF;
 			}
 			if(mUseEventInterface != NULL)
 				mUseEventInterface->onKeyDispatch(capacity,VM_CAPACITY,0);				

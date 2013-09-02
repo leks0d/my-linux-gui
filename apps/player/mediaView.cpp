@@ -138,7 +138,7 @@ namespace mango
 		mRootDirectListAdapter = NULL;
 		mAlbumMusicAdapter = NULL;
 		mArtistMusicAdapter = NULL;
-		
+		mNeedPlayPath = NULL;
 		mOrderMenuShow = 0;
 	}
 
@@ -606,7 +606,7 @@ namespace mango
 					{
 
 						TCHAR path[MAX_PATH];
-						char utf8Path[300],*where,*ptr;
+						char utf8Path[300],*where,*ptr,parent[255];
 						int count;
 						ArrayMediaInfo *pinfo;
 						
@@ -622,10 +622,11 @@ namespace mango
 
 						count = gmediaprovider.queryMusicArray(where,pinfo);
 						
-						delete where;
+						delete where; where =NULL;
+
+						getparent(utf8Path,parent);
 						
 						if(count>0){
-							char* name,parent[255];
 							ArrayMediaInfo arrayInfo;
 							
 							if(mPlayinglist == NULL)
@@ -633,14 +634,17 @@ namespace mango
 							mPlayinglist->clearAll();
 							mPlayinglist->playMediaInfo(pinfo->getMediaInfo(0));	
 							
-							getparent(utf8Path,parent);
+							//getparent(utf8Path,parent);
 							//if(!isVolumRootpath(parent)){
 								ptr = where = new char[300];
 								ptr += sprintf(ptr," where path like '%s/%%' and not path like '%s/%%/%%' ",parent,parent);
 								count = gmediaprovider.queryMusicArray(where,&arrayInfo);					
 								mPlayinglist->addArrayItem(arrayInfo);
 							//}
+							
+							gPlayer.showPlayingView();
 						}else{
+							/*
 							mediainfo info;
 							char* name,parent[255];					
 							ArrayMediaInfo arrayInfo;
@@ -656,10 +660,14 @@ namespace mango
 							
 							mediaprovider::FilePathToInfo(utf8Path,info);
 							mPlayinglist->playMediaInfo(&info);
+							*/
+							int len = strlen(utf8Path)+1;
+							gmediaprovider.externFileScanner(parent);
+							mNeedPlayPath = new char[len];
+							memcpy(mNeedPlayPath,utf8Path,len);
 						}
 
 						delete pinfo;
-						gPlayer.showPlayingView();
 					}
 					break;
 				case LIST_PARAM_MAIN:
@@ -754,6 +762,43 @@ namespace mango
 				}
 		}
 		else if(fromView == NULL && code == NM_DISPLAY){
+			log_i("NM_DISPLAY");
+			if(mNeedPlayPath != NULL){
+						char *where,*ptr,parent[255];
+						int count;
+						ArrayMediaInfo *pinfo;
+
+						
+						pinfo = new ArrayMediaInfo();
+						ptr = where = new char[300];
+
+						ptr += sprintf(ptr," where path = '%s' ",mNeedPlayPath);
+
+						count = gmediaprovider.queryMusicArray(where,pinfo);
+						
+						delete where;
+
+						getparent(mNeedPlayPath,parent);
+						
+						if(count>0){
+							char* name;
+							ArrayMediaInfo arrayInfo;
+							
+							if(mPlayinglist == NULL)
+								mPlayinglist = new Playinglist();
+							mPlayinglist->clearAll();
+							mPlayinglist->playMediaInfo(pinfo->getMediaInfo(0));	
+							
+							ptr = where = new char[300];
+							ptr += sprintf(ptr," where path like '%s/%%' and not path like '%s/%%/%%' ",parent,parent);
+							count = gmediaprovider.queryMusicArray(where,&arrayInfo);					
+							mPlayinglist->addArrayItem(arrayInfo);
+						}
+						delete pinfo;
+						delete mNeedPlayPath;
+						mNeedPlayPath = NULL;
+						gPlayer.showPlayingView();
+			}
 			if(getMainState() != 0x1210)
 				mListView->refresh();
 		}
@@ -903,7 +948,7 @@ namespace mango
 		if(info == NULL)
 			return;
 		x = LIST_MUSIC_ICON_LEFT;
-		canvas.drawImageResource(IDP_LISTICON_MUSIC,x,y+5);
+		canvas.drawImageResource(MediaView::getMusicIcon(info->name),x,y+5);
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else

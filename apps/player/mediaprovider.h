@@ -125,7 +125,9 @@ namespace mango
 		int getmediainfo(char *path,mediainfo *info);
 		static unsigned int VolumeScannerRunnig(void *parameter);
 		static unsigned int FileScannerRunnig(void *parameter);
-		void externFileScanner(char *file);
+		static unsigned int FileCheckRunnig(void *parameter);
+		void externFileCheck();
+		void externFileScanner(char *filepath);
 		void ScannerDirectory(char* file);
 		int initialize(void);
 		int exec(char *sql,void *arg,int (*callback)(void*,int,char**,char**));
@@ -149,6 +151,7 @@ namespace mango
 		int scanTime;
 		Thread mScannerThread;
 		Thread mFileScanThread;
+		Thread mFileCheckThread;
 		Mutex	mMutex;
 	};
 

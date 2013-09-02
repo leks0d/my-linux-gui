@@ -85,6 +85,7 @@ class KeyCount{
 		PlayingView(const TCHAR* title, View* parent, Rect* rect, int style, int show = SW_NORMAL);
 		void ViewInit(void);
 		static unsigned int SeekBarRunnig(void *parameter);
+		static unsigned int shutdownRunnig(void *parameter);
 		void updatePlayMode();
 		void updatePlayButtonIcon();
 		void updateAudioInfo();
@@ -127,13 +128,16 @@ class KeyCount{
 		MSkBitmap *mMSkBitmap;
 		
 		Thread mSeekBarUpdateThread;
+		Thread mShutdowmThread;
 		int isNeedFresh;
 		int isNeedFreshOld; //backup when sleep in and sleep out
 		int mVolume;
 		int mBattery;
 		int isCharge;
+		
 	public:
 		KeyCount mKeyCount;
+		int isUsmCon;
 		
 	};
 	

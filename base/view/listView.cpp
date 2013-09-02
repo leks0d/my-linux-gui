@@ -1,5 +1,5 @@
 #include "mango.h"
-//#define PRINT_TIME
+#define PRINT_TIME
 namespace mango
 {
 

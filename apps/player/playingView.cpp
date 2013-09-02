@@ -14,6 +14,7 @@ namespace mango
 	{	
 		mMSkBitmap = new MSkBitmap();
 		isNeedFreshOld = 0;
+		isUsmCon = 0;
 	}
 
 
@@ -77,6 +78,7 @@ namespace mango
 		mMusicNameStatic = new StaticView(TEXT("mMusicName"), this, &rect, 0);
 		mMusicNameStatic->setTextColor(RGB(248,136,0));
 		mMusicNameStatic->setTextSize(23);
+		mMusicNameStatic->setTextBkRes(IDP_PLAYING_MUSICNAME_BK);
 		
 		rect.setEx(left, 85, 190, 20);
 		mArtist = new TextView(PLAYING_IDB_MUSIC_NAME, TEXT("mArtist"), this, &rect, 0);
@@ -159,7 +161,8 @@ namespace mango
 	}
 
 	void PlayingView::ViewInit(void){
-		log_i("PlayingView::ViewInit");	
+		log_i("PlayingView::ViewInit");
+
 		Mstring* mstr;
 		mediainfo* currentinfo;
 		int duration = 0;
@@ -168,6 +171,7 @@ namespace mango
 		currentinfo = mPlayinglist->getPlayingItem();
 
 		mstr = new Mstring(20);
+	
 		mstr->mSprintf("%d",gPlayer.getVolume());
 		mVolumeText->setTextString(mstr->mstr);
 		
@@ -175,7 +179,7 @@ namespace mango
 		updatePlayButtonIcon();
 		updateAudioInfo();
 		updateEqState();
-		
+	
 		if(currentinfo == NULL){
 			log_i("tag");
 			mMusicName->setTextResoure(STR_NO_MUSIC);
@@ -221,34 +225,11 @@ namespace mango
 		}
 #else
 		log_i("tag currentinfo->img_path=0x%x",currentinfo->img_path);
-		//BitmapFactory::decodeFile(mMSkBitmap,currentinfo->img_path,109,109);
-		mMSkBitmap->createFile(currentinfo->img_path);
-		//BitmapFactory::genBitmapFromFile(mMSkBitmap,currentinfo->img_path,30,30);
+		mMSkBitmap->createFile(currentinfo->img_path);		
 #endif
+
 		log_i("tag");
 		mAlbumImage->setMSkBitmap(mMSkBitmap);
-		log_i("tag");
-
-			Rect rect;
-			int left = 127;
-			log_i("tag");
-			rect.setEx(left, 32, 100, 20);
-			mAudioInfo->setRect(rect);
-			log_i("tag");
-			rect.setEx(left, 55, 190, 25);
-			mMusicNameStatic->setRect(rect);
-			log_i("tag");
-
-			rect.setEx(left, 85, 190, 20);
-			mArtist->setRect(rect);
-			log_i("tag");
-
-			rect.setEx(left, 105, 190, 20);
-			mAlbum->setRect(rect);
-			mMusicNameStatic->setTextBkRes(IDP_PLAYING_MUSICNAME_BK);
-			log_i("tag");
-
-		
 		log_i("tag 0x%s",currentinfo->title);
 		mMusicName->setTextString(currentinfo->title);
 		log_i("tag 0x%x",currentinfo->title);
@@ -281,6 +262,7 @@ namespace mango
 		mstr->clear();
 		mstr->setPlayTime(current);
 		mTimeText->setTextString(mstr->mstr);
+	
 		delete mstr;
 		
 		log_i("PlayingView::ViewInit end");	
@@ -384,8 +366,10 @@ namespace mango
 			}
 			return 0;
 	}
-
-	
+	unsigned int PlayingView::shutdownRunnig(void *parameter){
+		Thread::sleep(2000);
+		reboot(RB_POWER_OFF);
+	}
 	int PlayingView::onDestroy()
 	{
 		if (mPrevButton)
@@ -451,7 +435,7 @@ namespace mango
 		
 			if(isNeedFresh){
 				
-				log_i("isNeedFresh=%d",isNeedFresh);
+				//log_i("isNeedFresh=%d",isNeedFresh);
 			
 				if(mPlayinglist->isPlaying()){
 					
@@ -477,7 +461,7 @@ namespace mango
 					}
 				}
 				
-				log_i("NM_SEEK_UPDATE end");
+				//log_i("NM_SEEK_UPDATE end");
 			}
 		}
 		else if(code == NM_BATTERY_UPDATE){
@@ -541,10 +525,12 @@ namespace mango
 			mKeyCount.TriggerKey();
 		}
 		else if(code == FLASH_MOUNT){
+			isUsmCon = 0;
 			gPlayer.dismissView(gPlayer.mUsmConnectView);
 			mPlayinglist->checkPlayintList();
 			gmediaprovider.externVolumeScanner("/mnt/sdcard");	
 		}else if(code == FLASH_UNMOUNT){
+			isUsmCon = 1;
 			gPlayer.showUsmConnectView();
 			mPlayinglist->stopPlayer();
 		}else if(code == SDCARD_MOUNT){
@@ -555,7 +541,7 @@ namespace mango
 			gPlayer.dismissView(gPlayer.mSdcardInsertView);
 			mPlayinglist->checkPlayintList();
 			ViewInit();
-			gmediaprovider.checkfile();
+			gmediaprovider.externFileCheck();
 		}else if(code == MEDIA_SCANNER_START){
 			gPlayer.showMediaScannerView();
 		}else if(code == MEDIA_SCANNER_END){
@@ -580,12 +566,7 @@ namespace mango
 			gPlayer.showShutDownView();
 			//reboot(RB_POWER_OFF);
 			log_i("RB_POWER_OFF");
-			int i = 20;
-			while(i--){
-				mango::Thread::sleep(100);
-			}
-			
-			reboot(RB_POWER_OFF);	
+			mShutdowmThread.create(PlayingView::shutdownRunnig, this);
 		}
 		return 0;
 	}
@@ -640,8 +621,10 @@ namespace mango
 			log_i("PLAYING_IDB_NEXT complete.");
 			break;
 		case PLAYING_IDB_PREV:
-			//mPlayinglist->playPrev();
-			mPlayinglist->seekTo(0);
+			if(mPlayinglist->getCurrent()>5000)
+				mPlayinglist->seekTo(0);
+			else
+				mPlayinglist->playPrev();
 			ViewInit();
 			break;
 		case PLAYING_IDB_PLAY:

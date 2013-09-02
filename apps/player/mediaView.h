@@ -183,7 +183,7 @@ namespace mango
 		TCHAR	mCurrentPath[MAX_PATH];
 		int 	mainState;
 		int     mOrderMenuShow;
-
+		char    *mNeedPlayPath;
 	};
 
 
