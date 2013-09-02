@@ -224,7 +224,7 @@ namespace mango
 			}
 		}
 #else
-		log_i("tag currentinfo->img_path=0x%x",currentinfo->img_path);
+		log_i("tag currentinfo->img_path=0x%x:%s",currentinfo->img_path,currentinfo->img_path);
 		mMSkBitmap->createFile(currentinfo->img_path);		
 #endif
 

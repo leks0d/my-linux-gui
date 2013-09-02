@@ -112,7 +112,7 @@ namespace mango
 
 		invalidateRect() ;
 
-		safeFree(mTitle);
+		safeFree(name);
 		name = new char[MAX_PATH];
 		Charset::wideCharToMultiByte(CP_UTF8, newTitle, String::lstrlen(newTitle), name, MAX_PATH * 3);
 		//name[29] = '\0';

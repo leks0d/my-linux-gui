@@ -49,6 +49,7 @@ namespace mango
 			mFile = fopen(mFilePath, "rb");
 			if (mFile == NULL) {
 				log_e ("Can't open resource file %s \n", path);
+				safeFree(mFilePath);
 				return;
 			}
 
