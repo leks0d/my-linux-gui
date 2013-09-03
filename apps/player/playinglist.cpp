@@ -58,7 +58,8 @@ static const char *PlayerLock = "playerlock";
 				//checkPlayintList();
 				gSettingProvider.query(SETTING_PLAYMODE_ID,&playMode);
 				gSettingProvider.query(SETTING_PLAYPOS_ID,&playpost);
-
+				gSettingProvider.query(SETTING_GAPLESS_ID,&mGapless);
+				
 				log_i("playpost = %d",playpost);
 				moveToPosition(playpost);
 			}
@@ -535,16 +536,18 @@ static const char *PlayerLock = "playerlock";
 			}
 		}
 		void Playinglist::PlayerInit(){
-			int eqOpen;
+			int eqOpen,eqMode;
 			int gaplessEn;
 			int EqValue[8];
+			
 			
 			if(mParticleplayer == NULL)
 				return;
 
 			gSettingProvider.query(SETTING_EQSTATE_ID,&eqOpen);
 			gSettingProvider.query(SETTING_GAPLESS_ID,&gaplessEn);
-			gSettingProvider.EqQuery(SETTING_GAPLESS_ID,EqValue);
+			gSettingProvider.query(SETTING_EQMODE_ID,&eqMode);
+			gSettingProvider.EqQuery(eqMode,EqValue);
 
 			log_i("PlayerInit eqOpen=%d,gaplessEn=%d",eqOpen,gaplessEn);
 			
