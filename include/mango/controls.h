@@ -49,7 +49,7 @@ namespace mango
 			mFile = fopen(mFilePath, "rb");
 			if (mFile == NULL) {
 				log_e ("Can't open resource file %s \n", path);
-				safeFree(mFilePath);
+				safeDelete(mFilePath);
 				return;
 			}
 
@@ -77,6 +77,23 @@ namespace mango
 				int r = bit[i]&0x00FF0000;
 				int b = bit[i]&0x000000FF;
 				mBits[i] = (bit[i]&0xFF00FF00) | (r>>16) | (b<<16);
+			}
+			
+			width = w;
+			height = h;
+		}
+		void createNormal(int *bit,int w,int h){
+			int i,count;
+			
+			release();
+
+			mBits = new int[w*h];
+			count = w*h;
+			
+			for(i = 0;i<count;i++){
+				//int r = bit[i]&0x00FF0000;
+				//int b = bit[i]&0x000000FF;
+				mBits[i] = bit[i];//&0xFF00FF00) | (r>>16) | (b<<16);
 			}
 			
 			width = w;
@@ -116,7 +133,7 @@ namespace mango
 			~Mstring(void){
 				//log_i("-----%s",mstr);
 				if(mstr!=NULL)
-					delete mstr;
+					delete[] mstr;
 				mstr=NULL;
 			}
 	};

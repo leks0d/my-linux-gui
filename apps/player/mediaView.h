@@ -84,6 +84,7 @@ namespace mango
 		virtual void* getItem(int index){return 0;}
 		ListView* mlist;
 		ArrayMediaInfo *mMusicArrayList;
+		MSkBitmap *mMSkBitmap;
 	};
 
 	class ArtistAdapter : public BaseAdapter

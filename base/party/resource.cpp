@@ -81,7 +81,7 @@ namespace mango
 				buffer[i] = readbuf[i];
 				buffer[i] &= 0x00ffff;
 			}
-			delete readbuf;
+			delete[] readbuf;
 			buffer[iResTChars] = '\0' ;
 
 			iRtnTChars = iResTChars ;

@@ -175,7 +175,7 @@ namespace mango
 					dispatchKeycode(keyCode, pressed);
 					keyCode = -1;
 				}
-				break ;
+				break;
 
 			case EV_SYN:
 				break;

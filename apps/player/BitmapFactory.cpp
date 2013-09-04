@@ -30,7 +30,7 @@ namespace mango
 
 			skCanvas->restore();
 			
-			mMSkBitmap->create((int *)pskBitmap->getPixels(),pskBitmap->width(),pskBitmap->height());
+			mMSkBitmap->createNormal((int *)pskBitmap->getPixels(),pskBitmap->width(),pskBitmap->height());
 			delete pskBitmap;
 		}
 	}

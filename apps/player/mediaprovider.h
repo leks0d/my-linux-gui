@@ -88,6 +88,7 @@ namespace mango
 		if(str != NULL){
 			//log_i("str=0x%x,%s",str,str);
 			delete str;
+			str = NULL;
 		}
 	}
 	static void safefreeMediainfo(mediainfo *info){

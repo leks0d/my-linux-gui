@@ -1078,7 +1078,7 @@ namespace mango
 	AlbumAdapter::AlbumAdapter(ListView* list,int id):BaseAdapter(){
 		mId = id;
 		mlist = list;
-		
+		mMSkBitmap = NULL;
 		mMusicArrayList = new ArrayMediaInfo();
 	}
 	void AlbumAdapter::refresh(){
@@ -1090,8 +1090,10 @@ namespace mango
 		mlist->setListAdapter(this);
 		mlist->deleteAllRecord();
 		mMusicArrayList->clear();
+		delete[] mMSkBitmap;
 		
 		count = gmediaprovider.queryMusicArray(where,mMusicArrayList);
+		mMSkBitmap = new MSkBitmap[count];
 		
 		for(i=0;i<count;i++){
 			ListViewItem  lvItem;
@@ -1104,15 +1106,24 @@ namespace mango
 		mlist->invalidateRect();
 	}
 	void AlbumAdapter::PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec){
-		int	 x, y;
+		int	 x, y,index;
 		mediainfo *info;
 		
 		x = rect.left;
 		y = rect.top;
-		info = mMusicArrayList->getMediaInfo(lvitem->iItem);
+		index = lvitem->iItem;
+		info = mMusicArrayList->getMediaInfo(index);
 		x = LIST_MUSIC_ICON_LEFT;
-		canvas.drawImageResource(IDP_LISTICON_ALBUM,x,y+5);
+		
+		if(!mMSkBitmap[index].isVaild()){
+			BitmapFactory::genBitmapFromFile(&mMSkBitmap[index],info->img_path,36,36);
+		}
 
+		if(mMSkBitmap[index].isVaild())
+			canvas.drawBitmap(mMSkBitmap[index].mBits,x,y+5,mMSkBitmap[index].width,mMSkBitmap[index].height);
+		else
+			canvas.drawImageResource(IDP_LISTICON_ALBUM,x,y+5);
+		
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else
