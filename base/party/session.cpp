@@ -741,15 +741,17 @@ namespace mango
 
 		//字体文件名
 #ifdef WIN32
-		ppszfilename[0] = "E:\\EmluatorStore\\C\\turnip\\font\\arial.ttf";
-		ppszfilename[1] = "E:\\EmluatorStore\\C\\turnip\\font\\simsun.ttc";
+		ppszfilename[0] = "E:\\EmluatorStore\\C\\turnip\\font\\msyh.ttf";
+	//	ppszfilename[0] = "E:\\EmluatorStore\\C\\turnip\\font\\arial.ttf";
+	//	ppszfilename[1] = "E:\\EmluatorStore\\C\\turnip\\font\\simsun.ttc";
 #else
-		ppszfilename[0] = MANGO_ROOT"font/arial.ttf";
-		ppszfilename[1] = MANGO_ROOT"font/simsun.ttc";
+		ppszfilename[0] = MANGO_ROOT"font/msyh.ttf";
+	//	ppszfilename[0] = MANGO_ROOT"font/arial.ttf";
+	//	ppszfilename[1] = MANGO_ROOT"font/simsun.ttc";
 #endif
-		ft_ex_meminit (malloc (ift_ex_mem_size), ift_ex_mem_size) ;
+//		ft_ex_meminit (malloc (ift_ex_mem_size), ift_ex_mem_size) ;
 
-		ft_ex_TrueTypeInit ((char **)ppszfilename, 2) ;
+		ft_ex_TrueTypeInit ((char **)ppszfilename, 1); //2) ;
 	}
 
 

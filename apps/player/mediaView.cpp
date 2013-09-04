@@ -1102,6 +1102,7 @@ namespace mango
 			lvItem.iSubItem = 0;
 			lvItem.paramType = LIST_PARAM_MUSIC;
 			mlist->insertItem(&lvItem);
+			mMSkBitmap[i].release();
 		}
 		mlist->invalidateRect();
 	}
@@ -1116,8 +1117,10 @@ namespace mango
 		x = LIST_MUSIC_ICON_LEFT;
 		
 		if(!mMSkBitmap[index].isVaild()){
-			BitmapFactory::genBitmapFromFile(&mMSkBitmap[index],info->img_path,36,36);
+			if(info->img_path!=NULL && info->img_path[0]=='/')
+				BitmapFactory::genBitmapFromFile(&mMSkBitmap[index],info->img_path,36,36);
 		}
+		log_i("mMSkBitmap[%d] vai,%d,%s",index,info->id,info->img_path);
 
 		if(mMSkBitmap[index].isVaild())
 			canvas.drawBitmap(mMSkBitmap[index].mBits,x,y+5,mMSkBitmap[index].width,mMSkBitmap[index].height);

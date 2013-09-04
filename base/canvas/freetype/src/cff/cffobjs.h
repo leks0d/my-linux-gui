@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    OpenType objects manager (specification).                            */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2006, 2007, 2008 by             */
+/*  Copyright 1996-2004, 2006-2008, 2013 by                                */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -21,11 +21,11 @@
 
 
 #include <ft2build.h>
-#include "d:\freetype\include\freetype\internal\ftobjs.h"
+#include FT_INTERNAL_OBJECTS_H
 #include "cfftypes.h"
-#include "d:\freetype\include\freetype\internal\tttypes.h"
+#include FT_INTERNAL_TRUETYPE_TYPES_H
 #include FT_SERVICE_POSTSCRIPT_CMAPS_H
-#include "d:\freetype\include\freetype\internal\pshints.h"
+#include FT_INTERNAL_POSTSCRIPT_HINTS_H
 
 
 FT_BEGIN_HEADER
@@ -112,12 +112,14 @@ FT_BEGIN_HEADER
 
   /***********************************************************************/
   /*                                                                     */
-  /* TrueType driver class.                                              */
+  /* CFF driver class.                                                   */
   /*                                                                     */
   typedef struct  CFF_DriverRec_
   {
     FT_DriverRec  root;
-    void*         extension_component;
+
+    FT_UInt  hinting_engine;
+    FT_Bool  no_stem_darkening;
 
   } CFF_DriverRec;
 
@@ -167,10 +169,10 @@ FT_BEGIN_HEADER
   /* Driver functions                                                      */
   /*                                                                       */
   FT_LOCAL( FT_Error )
-  cff_driver_init( FT_Module  module );
+  cff_driver_init( FT_Module  module );         /* CFF_Driver */
 
   FT_LOCAL( void )
-  cff_driver_done( FT_Module  module );
+  cff_driver_done( FT_Module  module );         /* CFF_Driver */
 
 
 FT_END_HEADER

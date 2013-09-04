@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    VMS-specific FreeType low-level system interface (body).             */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2005 by                                     */
+/*  Copyright 1996-2002, 2005, 2010, 2013 by                               */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -19,11 +19,11 @@
 #include <ft2build.h>
   /* we use our special ftconfig.h file, not the standard one */
 #include <ftconfig.h>
-#include "d:\freetype\include\freetype\internal\ftdebug.h"
-#include "d:\freetype\include\freetype\ftsystem.h"
-#include "d:\freetype\include\freetype\fterrors.h"
-#include "d:\freetype\include\freetype\fttypes.h"
-#include "d:\freetype\include\freetype\internal\ftobjs.h"
+#include FT_INTERNAL_DEBUG_H
+#include FT_SYSTEM_H
+#include FT_ERRORS_H
+#include FT_TYPES_H
+#include FT_INTERNAL_OBJECTS_H
 
   /* memory-mapping includes and definitions */
 #ifdef HAVE_UNISTD_H
@@ -212,7 +212,7 @@
 
 
     if ( !stream )
-      return FT_Err_Invalid_Stream_Handle;
+      return FT_THROW( Invalid_Stream_Handle );
 
     /* open the file */
     file = open( filepathname, O_RDONLY );
@@ -220,7 +220,7 @@
     {
       FT_ERROR(( "FT_Stream_Open:" ));
       FT_ERROR(( " could not open `%s'\n", filepathname ));
-      return FT_Err_Cannot_Open_Resource;
+      return FT_THROW( Cannot_Open_Resource );
     }
 
     if ( fstat( file, &stat_buf ) < 0 )
@@ -231,6 +231,13 @@
     }
 
     stream->size = stat_buf.st_size;
+    if ( !stream->size )
+    {
+      FT_ERROR(( "FT_Stream_Open:" ));
+      FT_ERROR(( " opened `%s' but zero-sized\n", filepathname ));
+      goto Fail_Map;
+    }
+
     stream->pos  = 0;
     stream->base = (unsigned char *)mmap( NULL,
                                           stream->size,
@@ -267,7 +274,7 @@
     stream->size = 0;
     stream->pos  = 0;
 
-    return FT_Err_Cannot_Open_Stream;
+    return FT_THROW( Cannot_Open_Stream );
   }
 
 

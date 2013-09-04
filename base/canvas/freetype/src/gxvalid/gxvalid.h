@@ -28,12 +28,12 @@
 #define __GXVALID_H__
 
 #include <ft2build.h>
-#include "d:\freetype\include\freetype\freetype.h"
+#include FT_FREETYPE_H
 
 #include "gxverror.h"          /* must come before FT_INTERNAL_VALIDATE_H */
 
-#include "d:\freetype\include\freetype\internal\ftvalid.h"
-#include "d:\freetype\include\freetype\internal\ftstream.h"
+#include FT_INTERNAL_VALIDATE_H
+#include FT_INTERNAL_STREAM_H
 
 
 FT_BEGIN_HEADER

@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Win FNT/FON error codes (specification only).                        */
 /*                                                                         */
-/*  Copyright 2001 by                                                      */
+/*  Copyright 2001, 2012 by                                                */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -26,14 +26,15 @@
 #ifndef __FNTERRS_H__
 #define __FNTERRS_H__
 
-#include "d:\freetype\include\freetype\ftmoderr.h"
+#include FT_MODULE_ERRORS_H
 
 #undef __FTERRORS_H__
 
+#undef  FT_ERR_PREFIX
 #define FT_ERR_PREFIX  FNT_Err_
 #define FT_ERR_BASE    FT_Mod_Err_Winfonts
 
-#include "d:\freetype\include\freetype\fterrors.h"
+#include FT_ERRORS_H
 
 #endif /* __FNTERRS_H__ */
 

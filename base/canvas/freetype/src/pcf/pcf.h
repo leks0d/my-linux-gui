@@ -2,7 +2,7 @@
 
   FreeType font driver for pcf fonts
 
-  Copyright (C) 2000, 2001, 2002, 2003, 2006 by
+  Copyright (C) 2000, 2001, 2002, 2003, 2006, 2010 by
   Francesco Zappa Nardelli
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,8 +30,8 @@ THE SOFTWARE.
 
 
 #include <ft2build.h>
-#include "d:\freetype\include\freetype\internal\ftdriver.h"
-#include "d:\freetype\include\freetype\internal\ftstream.h"
+#include FT_INTERNAL_DRIVER_H
+#include FT_INTERNAL_STREAM_H
 
 
 FT_BEGIN_HEADER
@@ -72,8 +72,8 @@ FT_BEGIN_HEADER
     union
     {
       FT_String*  atom;
-      FT_Long     integer;
-      FT_ULong    cardinal;
+      FT_Long     l;
+      FT_ULong    ul;
 
     } value;
 
@@ -136,8 +136,8 @@ FT_BEGIN_HEADER
   {
     FT_FaceRec     root;
 
-    FT_StreamRec   gzip_stream;
-    FT_Stream      gzip_source;
+    FT_StreamRec   comp_stream;
+    FT_Stream      comp_source;
 
     char*          charset_encoding;
     char*          charset_registry;

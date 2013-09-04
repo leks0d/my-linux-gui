@@ -21,7 +21,7 @@
 
 
 #include <ft2build.h>
-#include "d:\freetype\include\freetype\internal\ftstream.h"
+#include FT_INTERNAL_STREAM_H
 #include "cidparse.h"
 
 

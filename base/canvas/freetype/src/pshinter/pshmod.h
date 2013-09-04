@@ -21,13 +21,13 @@
 
 
 #include <ft2build.h>
-#include "d:\freetype\include\freetype\ftmodapi.h"
+#include FT_MODULE_H
 
 
 FT_BEGIN_HEADER
 
 
-  FT_EXPORT_VAR( const FT_Module_Class )  pshinter_module_class;
+  FT_DECLARE_MODULE( pshinter_module_class )
 
 
 FT_END_HEADER

@@ -21,7 +21,7 @@
 
 
 #include <ft2build.h>
-#include "d:\freetype\include\freetype\internal\tttypes.h"
+#include FT_INTERNAL_TRUETYPE_TYPES_H
 
 
 FT_BEGIN_HEADER

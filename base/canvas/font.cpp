@@ -93,16 +93,16 @@ namespace mango
 		if (gFontCache.getCharBmp(mFontSize, wchar, size, dyExtra, &bits))
 			return bits;
 
-		if (wchar <= 256)
-		{
+		//if (wchar <= 256)
+		//{
 			ft_ex_iTrueTypeSetSize (0, mFontSize);
 			bits = ft_ex_TrueTypeGetCharBmp(0, wchar, &bmpSize, dyExtra);
-		}
-		else
-		{
-			ft_ex_iTrueTypeSetSize (1, mFontSize);
-			bits = ft_ex_TrueTypeGetCharBmp(1, wchar, &bmpSize, dyExtra);
-		}
+		//}
+		//else
+		//{
+		//	ft_ex_iTrueTypeSetSize (1, mFontSize);
+		//	bits = ft_ex_TrueTypeGetCharBmp(1, wchar, &bmpSize, dyExtra);
+		//}
 
 		size->cx = bmpSize.cx;
 		size->cy = bmpSize.cy;

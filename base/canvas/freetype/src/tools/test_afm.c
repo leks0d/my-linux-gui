@@ -3,9 +3,9 @@
  *     -L../../objs/.libs -lfreetype -lz -static
  */
 #include <ft2build.h>
-#include "d:\freetype\include\freetype\freetype.h"
-#include "d:\freetype\include\freetype\internal\ftstream.h"
-#include "d:\freetype\include\freetype\internal\psaux.h"
+#include FT_FREETYPE_H
+#include FT_INTERNAL_STREAM_H
+#include FT_INTERNAL_POSTSCRIPT_AUX_H
 
   void dump_fontinfo( AFM_FontInfo  fi )
   {
@@ -63,7 +63,7 @@
 
   int
   dummy_get_index( const char*  name,
-                   FT_UInt      len,
+                   FT_Offset    len,
                    void*        user_data )
   {
     if ( len )
@@ -118,7 +118,7 @@
 
 
     if ( argc < 2 )
-      return FT_Err_Invalid_Argument;
+      return FT_ERR( Invalid_Argument );
 
     error = FT_Init_FreeType( &library );
     if ( error )

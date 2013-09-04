@@ -20,10 +20,10 @@
 
 
 #include <ft2build.h>
-#include "d:\freetype\include\freetype\freetype.h"
+#include FT_FREETYPE_H
 #include FT_TYPE1_TABLES_H
-#include "d:\freetype\include\freetype\internal\t1types.h"
-#include "d:\freetype\include\freetype\internal\pshints.h"
+#include FT_INTERNAL_TYPE1_TYPES_H
+#include FT_INTERNAL_POSTSCRIPT_HINTS_H
 
 
 FT_BEGIN_HEADER

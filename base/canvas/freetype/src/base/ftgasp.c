@@ -18,7 +18,7 @@
 
 #include <ft2build.h>
 #include FT_GASP_H
-#include "d:\freetype\include\freetype\internal\tttypes.h"
+#include FT_INTERNAL_TRUETYPE_TYPES_H
 
 
   FT_EXPORT_DEF( FT_Int )

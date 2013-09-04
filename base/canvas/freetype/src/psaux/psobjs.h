@@ -21,7 +21,7 @@
 
 
 #include <ft2build.h>
-#include "d:\freetype\include\freetype\internal\psaux.h"
+#include FT_INTERNAL_POSTSCRIPT_AUX_H
 
 
 FT_BEGIN_HEADER
@@ -111,7 +111,7 @@ FT_BEGIN_HEADER
   FT_LOCAL( FT_Error )
   ps_parser_to_bytes( PS_Parser  parser,
                       FT_Byte*   bytes,
-                      FT_Long    max_bytes,
+                      FT_Offset  max_bytes,
                       FT_Long*   pnum_bytes,
                       FT_Bool    delimiters );
 

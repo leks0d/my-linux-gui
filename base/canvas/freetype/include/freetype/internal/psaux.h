@@ -5,7 +5,7 @@
 /*    Auxiliary functions and data structures related to PostScript fonts  */
 /*    (specification).                                                     */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2006, 2008, 2009 by             */
+/*  Copyright 1996-2004, 2006, 2008, 2009, 2012 by                         */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -22,8 +22,8 @@
 
 
 #include <ft2build.h>
-#include "d:\freetype\include\freetype\internal\ftobjs.h"
-#include "d:\freetype\include\freetype\internal\t1types.h"
+#include FT_INTERNAL_OBJECTS_H
+#include FT_INTERNAL_TYPE1_TYPES_H
 #include FT_SERVICE_POSTSCRIPT_CMAPS_H
 
 
@@ -100,6 +100,9 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /*    capacity  :: The current size of the heap block.  Increments by    */
   /*                 1kByte chunks.                                        */
+  /*                                                                       */
+  /*    init      :: Set to 0xDEADBEEF if `elements' and `lengths' have    */
+  /*                 been allocated.                                       */
   /*                                                                       */
   /*    max_elems :: The maximum number of elements in table.              */
   /*                                                                       */
@@ -183,6 +186,7 @@ FT_BEGIN_HEADER
     T1_FIELD_TYPE_STRING,
     T1_FIELD_TYPE_KEY,
     T1_FIELD_TYPE_BBOX,
+    T1_FIELD_TYPE_MM_BBOX,
     T1_FIELD_TYPE_INTEGER_ARRAY,
     T1_FIELD_TYPE_FIXED_ARRAY,
     T1_FIELD_TYPE_CALLBACK,
@@ -197,6 +201,7 @@ FT_BEGIN_HEADER
   {
     T1_FIELD_LOCATION_CID_INFO,
     T1_FIELD_LOCATION_FONT_DICT,
+    T1_FIELD_LOCATION_FONT_EXTRA,
     T1_FIELD_LOCATION_FONT_INFO,
     T1_FIELD_LOCATION_PRIVATE,
     T1_FIELD_LOCATION_BBOX,
@@ -224,7 +229,7 @@ FT_BEGIN_HEADER
     T1_Field_ParseFunc  reader;
     FT_UInt             offset;       /* offset of field in object      */
     FT_Byte             size;         /* size of field in bytes         */
-    FT_UInt             array_max;    /* maximal number of elements for */
+    FT_UInt             array_max;    /* maximum number of elements for */
                                       /* array                          */
     FT_UInt             count_offset; /* offset of element count for    */
                                       /* arrays; must not be zero if in */
@@ -359,7 +364,7 @@ FT_BEGIN_HEADER
     FT_Error
     (*to_bytes)( PS_Parser  parser,
                  FT_Byte*   bytes,
-                 FT_Long    max_bytes,
+                 FT_Offset  max_bytes,
                  FT_Long*   pnum_bytes,
                  FT_Bool    delimiters );
 
@@ -530,9 +535,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /*    max_points   :: maximum points in builder outline                  */
   /*                                                                       */
-  /*    max_contours :: Maximal number of contours in builder outline.     */
-  /*                                                                       */
-  /*    last         :: The last point position.                           */
+  /*    max_contours :: Maximum number of contours in builder outline.     */
   /*                                                                       */
   /*    pos_x        :: The horizontal translation (if composite glyph).   */
   /*                                                                       */
@@ -566,8 +569,6 @@ FT_BEGIN_HEADER
     FT_Outline*     base;
     FT_Outline*     current;
 
-    FT_Vector       last;
-
     FT_Pos          pos_x;
     FT_Pos          pos_y;
 
@@ -578,7 +579,6 @@ FT_BEGIN_HEADER
     T1_ParseState   parse_state;
     FT_Bool         load_points;
     FT_Bool         no_recurse;
-    FT_Bool         shift;
 
     FT_Bool         metrics_only;
 
@@ -693,8 +693,10 @@ FT_BEGIN_HEADER
     T1_Decoder_Callback  parse_callback;
     T1_Decoder_FuncsRec  funcs;
 
-    FT_Int*              buildchar;
+    FT_Long*             buildchar;
     FT_UInt              len_buildchar;
+
+    FT_Bool              seac;
 
   } T1_DecoderRec;
 
@@ -757,7 +759,7 @@ FT_BEGIN_HEADER
 
     FT_Int
     (*get_index)( const char*  name,
-                  FT_UInt      len,
+                  FT_Offset    len,
                   void*        user_data );
 
     void*         user_data;

@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    OpenType common tables validation (specification).                   */
 /*                                                                         */
-/*  Copyright 2004, 2005, 2007 by                                          */
+/*  Copyright 2004, 2005, 2007, 2009 by                                    */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -22,7 +22,7 @@
 
 #include <ft2build.h>
 #include "otvalid.h"
-#include "d:\freetype\include\freetype\internal\ftdebug.h"
+#include FT_INTERNAL_DEBUG_H
 
 
 FT_BEGIN_HEADER
@@ -85,27 +85,27 @@ FT_BEGIN_HEADER
               FT_INVALID_TOO_SHORT;                  \
           FT_END_STMNT
 
-#define OTV_SIZE_CHECK( _size )                                        \
-          FT_BEGIN_STMNT                                               \
-            if ( _size > 0 && _size < table_size )                     \
-            {                                                          \
-              if ( valid->root->level == FT_VALIDATE_PARANOID )        \
-                FT_INVALID_OFFSET;                                     \
-              else                                                     \
-              {                                                        \
-                /* strip off `const' */                                \
-                FT_Byte*  pp = (FT_Byte*)_size ## _p;                  \
-                                                                       \
-                                                                       \
-                FT_TRACE3(( "\n"                                       \
-                            "Invalid offset to optional table `%s'!\n" \
-                            "Set to zero.\n"                           \
-                            "\n", #_size ));                           \
-                                                                       \
-                /* always assume 16bit entities */                     \
-                _size = pp[0] = pp[1] = 0;                             \
-              }                                                        \
-            }                                                          \
+#define OTV_SIZE_CHECK( _size )                                     \
+          FT_BEGIN_STMNT                                            \
+            if ( _size > 0 && _size < table_size )                  \
+            {                                                       \
+              if ( valid->root->level == FT_VALIDATE_PARANOID )     \
+                FT_INVALID_OFFSET;                                  \
+              else                                                  \
+              {                                                     \
+                /* strip off `const' */                             \
+                FT_Byte*  pp = (FT_Byte*)_size ## _p;               \
+                                                                    \
+                                                                    \
+                FT_TRACE3(( "\n"                                    \
+                            "Invalid offset to optional table `%s'" \
+                            " set to zero.\n"                       \
+                            "\n", #_size ));                        \
+                                                                    \
+                /* always assume 16bit entities */                  \
+                _size = pp[0] = pp[1] = 0;                          \
+              }                                                     \
+            }                                                       \
           FT_END_STMNT
 
 

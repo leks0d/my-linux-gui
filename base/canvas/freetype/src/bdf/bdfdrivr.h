@@ -29,12 +29,16 @@ THE SOFTWARE.
 #define __BDFDRIVR_H__
 
 #include <ft2build.h>
-#include "d:\freetype\include\freetype\internal\ftdriver.h"
+#include FT_INTERNAL_DRIVER_H
 
 #include "bdf.h"
 
 
 FT_BEGIN_HEADER
+
+#ifdef FT_CONFIG_OPTION_PIC
+#error "this module does not support PIC yet"
+#endif
 
 
   typedef struct  BDF_encoding_el_

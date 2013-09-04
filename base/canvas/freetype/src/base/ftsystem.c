@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    ANSI-specific FreeType low-level system interface (body).            */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2006, 2008 by                               */
+/*  Copyright 1996-2002, 2006, 2008-2011, 2013 by                          */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -26,49 +26,12 @@
 
 
 #include <ft2build.h>
-#include "..\..\include\freetype\config\ftconfig.h"
-#include "..\..\include\freetype\internal\ftdebug.h"
-#include "..\..\include\freetype\internal\ftstream.h"
-#include "..\..\include\freetype\ftsystem.h"
-#include "..\..\include\freetype\fterrors.h"
-#include "..\..\include\freetype\fttypes.h"
-
-
-//
-#include "mango.h"
-extern void* ft_ex_malloc (size_t size) ;
-extern void ft_ex_free (void *memblock) ;
-extern void* ft_ex_realloc( void *memblock, size_t size ) ;
-
-#undef ft_sfree     
-#undef ft_smalloc   
-#undef ft_srealloc  
-#define ft_sfree     ft_ex_free
-#define ft_smalloc   ft_ex_malloc
-#define ft_srealloc  ft_ex_realloc
-
-#undef FT_FILE     
-#undef ft_fclose   
-#undef ft_fopen    
-#undef ft_fread    
-#undef ft_fseek    
-#undef ft_ftell    
-
-#define FILE void
-extern FILE * ft_ex_fopen (const char *filename, const char *mode) ;
-extern size_t ft_ex_fread (void *buffer, size_t size, size_t count, FILE *stream ) ;
-extern int ft_ex_fseek (FILE *stream, long offset, int origin) ;
-extern long ft_ex_ftell(FILE *stream ) ;
-extern int ft_ex_fclose (FILE *stream) ;
-
-#define FT_FILE     void
-#define ft_fclose   ft_ex_fclose
-#define ft_fopen    ft_ex_fopen
-#define ft_fread	ft_ex_fread
-#define ft_fseek    ft_ex_fseek
-#define ft_ftell    ft_ex_ftell
-
-  
+#include FT_CONFIG_CONFIG_H
+#include FT_INTERNAL_DEBUG_H
+#include FT_INTERNAL_STREAM_H
+#include FT_SYSTEM_H
+#include FT_ERRORS_H
+#include FT_TYPES_H
 
 
   /*************************************************************************/
@@ -174,6 +137,7 @@ extern int ft_ex_fclose (FILE *stream) ;
   /*                                                                       */
   /*************************************************************************/
 
+#ifndef FT_CONFIG_OPTION_DISABLE_STREAM_SUPPORT
 
   /*************************************************************************/
   /*                                                                       */
@@ -203,7 +167,7 @@ extern int ft_ex_fclose (FILE *stream) ;
   FT_CALLBACK_DEF( void )
   ft_ansi_stream_close( FT_Stream  stream )
   {
-	ft_fclose( STREAM_FILE( stream ) );
+    ft_fclose( STREAM_FILE( stream ) );
 
     stream->descriptor.pointer = NULL;
     stream->size               = 0;
@@ -229,7 +193,9 @@ extern int ft_ex_fclose (FILE *stream) ;
   /*    count  :: The number of bytes to read from the stream.             */
   /*                                                                       */
   /* <Return>                                                              */
-  /*    The number of bytes actually read.                                 */
+  /*    The number of bytes actually read.  If `count' is zero (this is,   */
+  /*    the function is used for seeking), a non-zero return value         */
+  /*    indicates an error.                                                */
   /*                                                                       */
   FT_CALLBACK_DEF( unsigned long )
   ft_ansi_stream_io( FT_Stream       stream,
@@ -240,9 +206,13 @@ extern int ft_ex_fclose (FILE *stream) ;
     FT_FILE*  file;
 
 
+    if ( !count && offset > stream->size )
+      return 1;
+
     file = STREAM_FILE( stream );
 
-    ft_fseek( file, offset, SEEK_SET );
+    if ( stream->pos != offset )
+      ft_fseek( file, offset, SEEK_SET );
 
     return (unsigned long)ft_fread( buffer, 1, count, file );
   }
@@ -258,25 +228,36 @@ extern int ft_ex_fclose (FILE *stream) ;
 
 
     if ( !stream )
-      return FT_Err_Invalid_Stream_Handle;
+      return FT_THROW( Invalid_Stream_Handle );
+
+    stream->descriptor.pointer = NULL;
+    stream->pathname.pointer   = (char*)filepathname;
+    stream->base               = 0;
+    stream->pos                = 0;
+    stream->read               = NULL;
+    stream->close              = NULL;
 
     file = ft_fopen( filepathname, "rb" );
     if ( !file )
     {
-      FT_ERROR(( "FT_Stream_Open:" ));
-      FT_ERROR(( " could not open `%s'\n", filepathname ));
+      FT_ERROR(( "FT_Stream_Open:"
+                 " could not open `%s'\n", filepathname ));
 
-      return FT_Err_Cannot_Open_Resource;
+      return FT_THROW( Cannot_Open_Resource );
     }
 
     ft_fseek( file, 0, SEEK_END );
     stream->size = ft_ftell( file );
+    if ( !stream->size )
+    {
+      FT_ERROR(( "FT_Stream_Open:" ));
+      FT_ERROR(( " opened `%s' but zero-sized\n", filepathname ));
+      ft_fclose( file );
+      return FT_THROW( Cannot_Open_Stream );
+    }
     ft_fseek( file, 0, SEEK_SET );
 
     stream->descriptor.pointer = file;
-    stream->pathname.pointer   = (char*)filepathname;
-    stream->pos                = 0;
-
     stream->read  = ft_ansi_stream_io;
     stream->close = ft_ansi_stream_close;
 
@@ -287,6 +268,7 @@ extern int ft_ex_fclose (FILE *stream) ;
     return FT_Err_Ok;
   }
 
+#endif /* !FT_CONFIG_OPTION_DISABLE_STREAM_SUPPORT */
 
 #ifdef FT_DEBUG_MEMORY
 

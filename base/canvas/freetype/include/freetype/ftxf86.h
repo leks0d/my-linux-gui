@@ -20,7 +20,7 @@
 #define __FTXF86_H__
 
 #include <ft2build.h>
-#include "d:\freetype\include\freetype\freetype.h"
+#include FT_FREETYPE_H
 
 #ifdef FREETYPE_H
 #error "freetype.h of FreeType 1 has been loaded!"
@@ -48,6 +48,9 @@ FT_BEGIN_HEADER
   /*   format.  Note that this information is not needed normally;         */
   /*   however, there are special cases (like in PDF devices) where it is  */
   /*   important to differentiate, in spite of FreeType's uniform API.     */
+  /*                                                                       */
+  /*   This function is in the X11/xf86 namespace for historical reasons   */
+  /*   and in no way depends on that windowing system.                     */
   /*                                                                       */
   /*************************************************************************/
 

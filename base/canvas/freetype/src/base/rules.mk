@@ -3,7 +3,7 @@
 #
 
 
-# Copyright 1996-2000, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by
+# Copyright 1996-2000, 2002-2009, 2013 by
 # David Turner, Robert Wilhelm, and Werner Lemberg.
 #
 # This file is part of the FreeType project, and may only be used, modified,
@@ -33,23 +33,27 @@ BASE_COMPILE := $(FT_COMPILE) $I$(subst /,$(COMPILER_SEP),$(SRC_DIR)/base)
 # All files listed here should be included in `ftbase.c' (for a `single'
 # build).
 #
-BASE_SRC := $(BASE_DIR)/ftcalc.c   \
+BASE_SRC := $(BASE_DIR)/ftadvanc.c \
+            $(BASE_DIR)/ftcalc.c   \
             $(BASE_DIR)/ftdbgmem.c \
             $(BASE_DIR)/ftgloadr.c \
-            $(BASE_DIR)/ftnames.c  \
             $(BASE_DIR)/ftobjs.c   \
             $(BASE_DIR)/ftoutln.c  \
             $(BASE_DIR)/ftrfork.c  \
+            $(BASE_DIR)/ftsnames.c \
             $(BASE_DIR)/ftstream.c \
             $(BASE_DIR)/fttrigon.c \
-            $(BASE_DIR)/ftutil.c   \
-            $(BASE_DIR)/ftadvanc.c
+            $(BASE_DIR)/ftutil.c
+
 
 ifneq ($(ftmac_c),)
   BASE_SRC += $(BASE_DIR)/$(ftmac_c)
 endif
 
-BASE_H := $(BASE_DIR)/ftbase.h
+# for simplicity, we also handle `md5.c' (which gets included by `ftobjs.h')
+BASE_H := $(BASE_DIR)/ftbase.h \
+          $(BASE_DIR)/md5.c    \
+          $(BASE_DIR)/md5.h
 
 # Base layer `extensions' sources
 #
