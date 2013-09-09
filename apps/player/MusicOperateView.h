@@ -21,6 +21,7 @@ namespace mango
 		void setMusicInfo(mediainfo& info){mCurrentInfo = info;initView();}
 		void initView();
 		void initOperateMuiscList();
+		void initPlayList();
 	public:
 		virtual int onCreate();
 		virtual int onDestroy();
@@ -44,7 +45,9 @@ namespace mango
 		ImageView* mDisplayIcon;
 		SeekBar* mBrightnessBar;
 		TextView* mBrightnessValue;
-		OperateMuiscListAdapter* mOperateMuiscListAdapter;
+		
+		OperateMuiscListAdapter *mOperateMuiscListAdapter;
+		PlayListAdapter *mPlayListAdapter;
 	private:
 		int		mMode;					//menu菜单 媒体库index 收藏夹 或 浏览路径
 		int		mPath;

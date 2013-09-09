@@ -16,6 +16,8 @@ namespace mango
 	#define SETTING_LANGUAGE_ID		9
 	#define SETTING_AUTOPOWEROFF_ID	10
 
+	#define SETTING_DEFAULT_VOLUME	170
+
 	#define SETTING_BRIGHTNESS_NAME		"brightness"
 	#define SETTING_VOLUME_NAME			"volume"
 	#define SETTING_PLAYMODE_NAME 		"playmode"
@@ -26,8 +28,6 @@ namespace mango
 	#define SETTING_AUTOSLEEP_NAME		"autosleepTime"
 	#define SETTING_LANGUAGE_NAME 	 	"languageId"
 	#define SETTING_AUTOPOWEROFF_NAME  	"autopoweroffTime"
-
-
 
 	#define EQ_CUSTOM_ID		0
 	#define EQ_POP_ID			1
@@ -63,13 +63,16 @@ namespace mango
 			int insert(int id,int value,char *str);
 			int update(int id,int value);
 			int query(int id,int *value);
+			void saveVolume(int vol);
+			int readVolume();
 			void EqInitialize();
 			int EqInsert(int id,int *value);
 			int EqUpdate(int id,int *value);
 			int EqQuery(int id ,int *value);	
 			static int sql_callback(void * use, int argc, char ** argv, char ** szColName);
 		private:
-			sqlite3 * db;	
+			sqlite3 * db;
+			
 	};
 	
 	class IntegerArray{

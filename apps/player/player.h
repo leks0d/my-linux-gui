@@ -8,6 +8,7 @@
 #include "AlarmManager.h"
 #include "mediaprovider.h"
 #include "ArrayMediaInfo.h"
+#include "playlist.h"
 #include "SettingProvider.h"
 #include "PowerManager.h"
 #include "playinglist.h"

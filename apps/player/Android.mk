@@ -62,6 +62,7 @@ LOCAL_SRC_FILES += BitmapFactory.cpp
 LOCAL_SRC_FILES += MusicOperateView.cpp
 LOCAL_SRC_FILES += KeyLockView.cpp
 LOCAL_SRC_FILES += ChosenView.cpp
+LOCAL_SRC_FILES += playlist.cpp
 
 LOCAL_CPPFLAGS:=\
 -I $(MY_ANDROID_SOURCE)/frameworks/base/core/jni/android/graphics\

@@ -7,26 +7,26 @@ include $(CLEAR_VARS)
 LOCAL_ARM_MODE := arm
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../include
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/canvas/freetype_ndk/include
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/canvas/freetype_ndk/devel
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/canvas/freetype/include
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/canvas/freetype/devel
 
 LOCAL_MODULE    := Mango
 
-LOCAL_SRC_FILES += canvas/freetype_ndk/src/expansion/ft_ex_heap.c
-LOCAL_SRC_FILES += canvas/freetype_ndk/src/expansion/ft_ex_mem.c
-LOCAL_SRC_FILES += canvas/freetype_ndk/src/expansion/ft_ex_truetype.c
-LOCAL_SRC_FILES += canvas/freetype_ndk/src/base/ftbase.c
-LOCAL_SRC_FILES += canvas/freetype_ndk/src/base/ftbbox.c
-LOCAL_SRC_FILES += canvas/freetype_ndk/src/base/ftbitmap.c
-LOCAL_SRC_FILES += canvas/freetype_ndk/src/base/ftdebug.c
-LOCAL_SRC_FILES += canvas/freetype_ndk/src/base/ftglyph.c
-LOCAL_SRC_FILES += canvas/freetype_ndk/src/smooth/ftgrays.c
-LOCAL_SRC_FILES += canvas/freetype_ndk/src/base/ftinit.c
-LOCAL_SRC_FILES += canvas/freetype_ndk/src/smooth/ftsmooth.c
-LOCAL_SRC_FILES += canvas/freetype_ndk/src/base/ftsystem.c
-LOCAL_SRC_FILES += canvas/freetype_ndk/src/psnames/psnames.c
-LOCAL_SRC_FILES += canvas/freetype_ndk/src/sfnt/sfnt.c
-LOCAL_SRC_FILES += canvas/freetype_ndk/src/truetype/truetype.c
+LOCAL_SRC_FILES += canvas/freetype/src/expansion/ft_ex_heap.c
+LOCAL_SRC_FILES += canvas/freetype/src/expansion/ft_ex_mem.c
+LOCAL_SRC_FILES += canvas/freetype/src/expansion/ft_ex_truetype.c
+LOCAL_SRC_FILES += canvas/freetype/src/base/ftbase.c
+LOCAL_SRC_FILES += canvas/freetype/src/base/ftbbox.c
+LOCAL_SRC_FILES += canvas/freetype/src/base/ftbitmap.c
+LOCAL_SRC_FILES += canvas/freetype/src/base/ftdebug.c
+LOCAL_SRC_FILES += canvas/freetype/src/base/ftglyph.c
+LOCAL_SRC_FILES += canvas/freetype/src/smooth/ftgrays.c
+LOCAL_SRC_FILES += canvas/freetype/src/base/ftinit.c
+LOCAL_SRC_FILES += canvas/freetype/src/smooth/ftsmooth.c
+LOCAL_SRC_FILES += canvas/freetype/src/base/ftsystem.c
+LOCAL_SRC_FILES += canvas/freetype/src/psnames/psnames.c
+LOCAL_SRC_FILES += canvas/freetype/src/sfnt/sfnt.c
+LOCAL_SRC_FILES += canvas/freetype/src/truetype/truetype.c
 
 LOCAL_SRC_FILES += canvas/bitBlt.cpp
 LOCAL_SRC_FILES += canvas/bitmap.cpp
@@ -73,6 +73,7 @@ LOCAL_SRC_FILES += view/ValueTextView.cpp
 LOCAL_SRC_FILES += view/VerticalSeekBar.cpp
 LOCAL_SRC_FILES += view/cartoon.cpp
 
+LOCAL_CFLAGS += -DFT2_BUILD_LIBRARY
 #LOCAL_LDLIBS :=  -llog 
 
 include $(BUILD_STATIC_LIBRARY)

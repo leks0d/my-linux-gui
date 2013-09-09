@@ -492,27 +492,34 @@ static const char *PlayerLock = "playerlock";
 			}
 		}
 		
-		void Playinglist::playPauseOrStart(){
+		int Playinglist::playPauseOrStart(){
+			int ret = 0;
 			if(mParticleplayer == NULL){
 				log_i("mParticleplayer=NULL");
-				if(len>0)
+				if(len>0){
 					startPlay();
-				return;
+					ret = 1;
+				}
 			}else if(mParticleplayer->isPlaying()){
 				log_i("mParticleplayer->isPlaying");
 				mParticleplayer->pause();
 				releaseWakeLock();
 				inPause = 1;
+				ret = 2;
 			}else if(inPause == 1){
 				log_i("mParticleplayer inPause");
 				mParticleplayer->start();
 				setWakeLock();
 				inPause = 0;
+				ret = 3;
 			}else{
 				log_i("mParticleplayer startPlay");
-				if(len>0)
+				if(len>0){
 					startPlay();
+					ret = 1;
+				}
 			}
+			return ret;
 		}
 		void Playinglist::setEq(int *val){
 			int i;

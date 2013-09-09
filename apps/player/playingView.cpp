@@ -627,10 +627,14 @@ namespace mango
 				mPlayinglist->playPrev();
 			ViewInit();
 			break;
-		case PLAYING_IDB_PLAY:
-			mPlayinglist->playPauseOrStart();
+		case PLAYING_IDB_PLAY:{
+			int ret = 0;
+			ret = mPlayinglist->playPauseOrStart();
 			updatePlayButtonIcon();
+			if(ret == 1)
+				updateAudioInfo();
 			break;
+		}
 		case PLAYING_IDB_MUSIC:
 			gPlayer.showMediaView();
 			break;

@@ -64,12 +64,14 @@ namespace mango
 		void rePaintList();
 		void setListData(ArrayMediaInfo* info);
 		void setWhere(char* wh);
+		void setSql(char* sql);
 		virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);
 		virtual int getCount(){return 0;}
 		virtual void* getItem(int index){return 0;}
 		ListView* mlist;
 		ArrayMediaInfo *mMusicArrayList;
 		char *mWhere;
+		char *mSql;
 	};
 
 	class AlbumAdapter : public BaseAdapter
@@ -85,6 +87,16 @@ namespace mango
 		ListView* mlist;
 		ArrayMediaInfo *mMusicArrayList;
 		MSkBitmap *mMSkBitmap;
+	};
+	class GenreAdapter : public AlbumAdapter
+	{
+	public:
+
+		GenreAdapter(ListView* list,int id):AlbumAdapter(list,id){}
+		void refresh();
+		virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);
+		virtual int getCount(){return 0;}
+		virtual void* getItem(int index){return 0;}
 	};
 
 	class ArtistAdapter : public BaseAdapter
@@ -142,11 +154,15 @@ namespace mango
 		void initRootDirect();
 		void initMainList();
 		void initPlayingList();
+		void initPlayList();
+		void initPlayListMem(PlayListItem& item);
 		void initMusicList();
 		void initAlbumList();
 		void initArtistList();
-		void initAlbumMusicList(char* album);
-		void initSpecMusicList(char* key,char* value,int state);
+		void initGenreList();
+		void initAlbumMusicList(mediainfo* info);
+		void initArtistMusicList(char* key,char* value,int state);
+		void initGenreMusicList(char* key,char* value,int state);
 		void setMainState(int state){ mainState = state;log_i("mainState = 0x%x",mainState);onMainStateChange(mainState);}
 		void onMainStateChange(int mainState);
 		int getMainState(){return mainState;}
@@ -168,9 +184,13 @@ namespace mango
 		MusicAdapter* mMusicAdapter;
 		MusicAdapter* mAlbumMusicAdapter;
 		MusicAdapter* mArtistMusicAdapter;
+		MusicAdapter* mGenreMusicAdapter;
 		AlbumAdapter* mAlbumAdapter;
 		ArtistAdapter* mArtistAdapter;
 		MainListAdapter* mMainListAdapter;
+		PlayListAdapter* mPlayListAdapter;
+		MusicAdapter* mPlayListMemAdapter;
+		GenreAdapter* mGenreAdapter;
 		
 		ImageView* mOrderMenuBk;
 		TextView* mOrderByTitle;

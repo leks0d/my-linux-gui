@@ -21,6 +21,8 @@ namespace mango
 		: View(title, parent, rect, style, show)
 	{
 		mOperateMuiscListAdapter = NULL;
+		mPlayListAdapter = NULL;
+		
 		memset(&mCurrentInfo,0,sizeof(mCurrentInfo));
 	}
 
@@ -58,7 +60,6 @@ namespace mango
 		mHome->setPressedImageId(IDP_MUSIC_HOME_SEC);
 		mHome->onCreate();
 
-		
 		initView();
 		setFocus(this);
 		invalidateRect();
@@ -74,6 +75,20 @@ namespace mango
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 
 		initOperateMuiscList();
+	}
+	void MusicOperateView::initPlayList(){
+		mListView->deleteAllItems();
+
+		if(mPlayListAdapter == NULL){
+			mPlayListAdapter = new PlayListAdapter(mListView); 
+		}
+		
+		mPlayListAdapter->refresh();
+		
+		mTitle->setTextResoure(STR_LAYLIST_LIST);
+		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
+		mTitle->invalidateRect();
+		setMainState(0x1200);
 	}
 
 	void MusicOperateView::initOperateMuiscList(){
@@ -91,7 +106,7 @@ namespace mango
 			log_i("initOperateMuiscList mOperateMuiscListAdapter refresh");
 			mOperateMuiscListAdapter->refresh();
 		}
-		setMainState(0x1200);		
+		setMainState(0x1000);		
 	}
 	
 	int MusicOperateView::onDestroy()
@@ -124,27 +139,48 @@ namespace mango
 				return 0;
 			type = (int)(record->m_lvItem.paramType);
 			index = (int)(record->m_lvItem.iItem);
+			
+			switch(getMainState()){
+				case 0x1000:{
+						switch(index){
+							case 0:
+								mPlayinglist->playMediaInfo(&mCurrentInfo);
+								break;
+							/*case 1:
+								if(mPlayinglist->isItemExsit(&mCurrentInfo)<0)
+									mPlayinglist->addItem(&mCurrentInfo);
+								break;*/
+							case 1:	
+								initPlayList();
+								break;
+							case 2:
+								gPlayer.dismissView(this);
+								gPlayer.showMusicInfoView(&mCurrentInfo);
+								break;
+							case 3:
+								gmediaprovider.del(NULL,mCurrentInfo.id);
+								remove(mCurrentInfo.path);
+								mPlayinglist->removeItem(mPlayinglist->isItemExsit(&mCurrentInfo));
+								break;
+						}
+						if(index != 1)
+							gPlayer.dismissView(this);
+						break;
+					}
+				case 0x1200:{
+						PlayListItem item = mPlayListAdapter->mArrayPlayList.getItem(index);
 
-			switch(index){
-				case 0:
-					mPlayinglist->playMediaInfo(&mCurrentInfo);
-					break;
-				case 1:
-					if(mPlayinglist->isItemExsit(&mCurrentInfo)<0)
-						mPlayinglist->addItem(&mCurrentInfo);
-					break;
-				case 2:
-					gPlayer.dismissView(this);
-					gPlayer.showMusicInfoView(&mCurrentInfo);
-					break;
-				case 3:
-					gmediaprovider.del(NULL,mCurrentInfo.id);
-					remove(mCurrentInfo.path);
-					remove(mCurrentInfo.img_path);
-					mPlayinglist->removeItem(mPlayinglist->isItemExsit(&mCurrentInfo));
-					break;
+						if(item.id == -1){
+							PlayList::newPlaylist();
+							mPlayListAdapter->refresh();
+						}else{
+							PlayList::insertToPlaylist(item.id,mCurrentInfo.id);
+							gPlayer.dismissView(this);
+						}
+						break;
+					}
 			}
-			gPlayer.dismissView(this);
+			
 		}
 		
 		return 0;

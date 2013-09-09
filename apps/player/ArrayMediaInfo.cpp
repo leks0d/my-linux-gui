@@ -11,9 +11,9 @@ namespace mango
 		}
 		
 		ArrayMediaInfo::~ArrayMediaInfo(){
-			log_i("enter");
+			//log_i("enter");
 			clear();
-			log_i("leave");
+			//log_i("leave");
 		}
 			
 		void ArrayMediaInfo::addMediaInfo(mediainfo *info){

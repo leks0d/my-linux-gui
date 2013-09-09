@@ -18,5 +18,6 @@ namespace mango
 			static void install();
 			static void reboot();
 			static void openMute();
+			static void sync();
 	};
 };

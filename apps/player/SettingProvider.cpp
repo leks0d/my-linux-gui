@@ -3,6 +3,8 @@
 
 namespace mango
 {	
+	const static char* volumePath = "/data/volume";
+	
 	SettingProvider::SettingProvider(){
 
 	}
@@ -50,7 +52,7 @@ namespace mango
 
 	void SettingProvider::dataBaseInit(void){
 		insert(SETTING_BRIGHTNESS_ID,127,SETTING_BRIGHTNESS_NAME);
-		insert(SETTING_VOLUME_ID,170,SETTING_VOLUME_NAME);
+		insert(SETTING_VOLUME_ID,SETTING_DEFAULT_VOLUME,SETTING_VOLUME_NAME);
 		insert(SETTING_PLAYMODE_ID,0,SETTING_PLAYMODE_NAME);
 		insert(SETTING_GAPLESS_ID,0,SETTING_GAPLESS_NAME);
 		insert(SETTING_EQMODE_ID,0,SETTING_EQMODE_NAME);
@@ -89,7 +91,10 @@ namespace mango
 		int ret = 0;
 		char *pErrMsg = 0;
 		char *ptr,sql[1024];
-		
+
+		if(id == SETTING_VOLUME_ID){
+			saveVolume(value);
+		}
 		ptr = sql;
 		sprintf(ptr,"insert into settings values(%d,%d,'%s')",id,value,str);
 		
@@ -101,11 +106,52 @@ namespace mango
 
 		return ret;	
 	}
+	void SettingProvider::saveVolume(int vol){
+		FILE *fd=NULL;
+		Mstring mstr(10);
+			
+		mstr.mSprintf("%d.",vol);
+			
+		fd = fopen(volumePath,"w");
+		
+		if(fd!=NULL){
+			fwrite(mstr.mstr,1,mstr.len,fd);
+			fclose(fd);
+			log_i("saveVolume mstr=%s,vol=%d",mstr.mstr,vol);
+		}
+		
+		Environment::sync();
+	}
+	int SettingProvider::readVolume(){
+		FILE *fd=NULL;
+		char buf[10];
+		int vol = -1;
+			
+		fd = fopen(volumePath,"r");
+		if(fd != NULL){
+			fread(buf,1,10,fd);
+			fclose(fd);
+			sscanf(buf,"%d.",&vol);
+			log_i("readVolume buf=%s,vol=%d",buf,vol);
+			return vol;
+		}
+		return vol;
+	}
+
 	int SettingProvider::update(int id,int value){
 		int ret = 0;
 		char *pErrMsg = 0;
 		char *ptr,sql[1024],safe[100];
 		
+		if(id == SETTING_VOLUME_ID){
+			int retry = 3;
+			while(retry--){
+				saveVolume(value);
+				if(readVolume() == value)
+					break;
+			}
+		}
+
 		ptr = sql;
 		sprintf(ptr,"update settings set value=%d where _id=%d",value,id);
 		
@@ -129,7 +175,13 @@ namespace mango
 		char *ptr,sql[1024];
 		IntegerArray *array;
 		array = new IntegerArray();
-		
+
+		if(id == SETTING_VOLUME_ID){
+			*value = readVolume();
+			if(*value<=255||*value>=0)
+				return 1;
+		}
+
 		ptr = sql;
 		sprintf(ptr,"select value from settings where _id=%d",id);
 		

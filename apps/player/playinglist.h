@@ -52,7 +52,7 @@ namespace mango
 			void playPrev();
 			void checkPlayintList();
 			void savePlayintList();
-			void playPauseOrStart();
+			int playPauseOrStart();
 			void callbackPlay();
 			void addItem(mediainfo *item);
 			void addArrayItem(ArrayMediaInfo& array);

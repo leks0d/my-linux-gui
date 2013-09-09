@@ -528,7 +528,7 @@ namespace mango
 		if (file == NULL)
 		{
 			log_i("can't open /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor \n");
-			return ;
+			return;
 		}
 
 		fwrite(policy, 1, strlen(policy), file);

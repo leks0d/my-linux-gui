@@ -124,8 +124,6 @@ namespace mango
 		Rect rect;
 		int firstLeft,infoWidth;
 		
-		log_i("setPlayTime mCurrentInfo.duration");
-		
 		mstr = new Mstring(10);
 		mstr->setPlayTime(mCurrentInfo->duration);
 		
@@ -150,7 +148,7 @@ namespace mango
 		mAlbumImage->setMSkBitmap(mMSkBitmap);
 		
 		mMusicPath->setTextString(mCurrentInfo->path);
-
+		log_i("mCurrentInfo->path=%s",mCurrentInfo->path);
 		mFilename->setTextString(mCurrentInfo->name);
 		mMusicTitle->setTextString(mCurrentInfo->title);
 		mAlbum->setTextString(mCurrentInfo->album);
@@ -161,8 +159,9 @@ namespace mango
 	}
 
 	void MusicInfoView::setMusicInfo(mediainfo* info){
+		memset(mCurrentInfo,0,sizeof(mediainfo));
 		if(info == NULL){
-			memset(mCurrentInfo,0,sizeof(mediainfo));
+			
 		}else{
 			memcpy(mCurrentInfo,info,sizeof(mediainfo));
 		}

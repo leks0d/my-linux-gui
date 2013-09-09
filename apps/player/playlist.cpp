@@ -1,241 +1,238 @@
-
 #include "player.h"
-
-#ifndef WIN32
-#include <stdio.h>
-#include <assert.h>
-#include <limits.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include "MediaPlayerInterface.h"
-#endif
 
 namespace mango
 {
-#ifndef WIN32
-	particle::MediaPlayerInterface*  gParticleplayer = NULL; // = particle::createMediaPlayer();
-#endif
-
-	PlaylistItem::PlaylistItem(void)
-	{
-
+	PlayListItem::PlayListItem(){
+		id = 0;
+		name = NULL;
+		remark = NULL;
 	}
-
-
-	PlaylistItem::PlaylistItem(TCHAR* path)
-	{
-		String::copy(mPath, path);
+	PlayListItem::~PlayListItem(){
+		id = 0;
+		safeDelete(name);
+		safeDelete(remark);
 	}
-
-	
-	PlaylistItem::~PlaylistItem(void)
-	{
-
+	void PlayListItem::setId(int id){
+		this->id = id;
 	}
-
-
-	Playlist::Playlist(void)
-	{
-		INIT_LIST_HEAD(&mSongHead);
-#ifndef WIN32
-		if (gParticleplayer == NULL)
-			gParticleplayer = particle::createMediaPlayer();
-#endif
-	}
-
-
-	Playlist::~Playlist(void)
-	{
-
-	}
-
-
-	int Playlist::setSource(TCHAR* path)
-	{
-		char  utf8Path[MAX_PATH * 3];
-
-		Charset::wideCharToMultiByte(CP_UTF8, path, String::lstrlen(path), utf8Path, MAX_PATH * 3);
-		log_i("setSource utf8Path=%s\n",utf8Path);
-#ifndef WIN32
-		if (gParticleplayer->setSource(utf8Path))
-			return 1;
-		else
-			return -1;
-#else
-		return 1;
-#endif
-	}
-
-	int Playlist::dsetSource(char* path)
-		{
-			if (gParticleplayer->setSource(path))
-				return 1;
-			else
-				return -1;
+	void PlayListItem::setName(char *name){	
+		if(name == NULL){
+			safeDelete(this->name);
+		}else{
+			this->name = new char[strlen(name)+1];
+			memcpy(this->name,name,strlen(name)+1);
 		}
-
-
-	int Playlist::prepare()
-	{
-#ifndef WIN32
-		if (gParticleplayer->prepare())
-			return 1;
-		else
-			return -1;
-#else
-		return 1;
-#endif
 	}
-
-
-	int Playlist::start()
-	{
-#ifndef WIN32
-		if (gParticleplayer->start())
-			return 1;
-		else
-			return -1;
-#else
-		return 1;
-#endif
+	void PlayListItem::setRemark(char *remark){	
+		if(name == NULL){
+			safeDelete(this->remark);
+		}else{
+			this->remark = new char[strlen(remark)+1];
+			memcpy(this->remark,remark,strlen(remark)+1);
+		}
 	}
-
-
-
-	int Playlist::pause()
-	{
-#ifndef WIN32
-		if (gParticleplayer->pause())
-			return 1;
-		else
-			return -1;
-#else
-		return 1;
-#endif
+	PlayListItem& PlayListItem::operator =(PlayListItem& item){
+		setId(item.id);
+		setName(item.name);
+		setRemark(item.remark);
+		return *this;
 	}
-
-
-	
-	int Playlist::stop()
-	{
-#ifndef WIN32
-		if (gParticleplayer->stop())
-			return 1;
-		else
-			return -1;
-#else
-		return 1;
-#endif
+	ArrayPlayListItem::ArrayPlayListItem(){
+		mList = NULL;
+		mLen = mMax = 0;
 	}
-
-
-	bool Playlist::isPlaying()
-	{
-#ifndef WIN32
-		if (gParticleplayer->isPlaying())
-			return true;
-		else
-			return false;
-#else
-		return true;
-#endif
+	ArrayPlayListItem::~ArrayPlayListItem(){
+		//log_i("------");
+		mLen = mMax = 0;
+		if(mList!=NULL){
+			delete[] mList;
+			mList = NULL;
+		}
 	}
-
-
-
-	int Playlist::play(TCHAR* path)
-	{
-		PlaylistItem* item;
+	PlayListItem& ArrayPlayListItem::getItem(int pos){
+		PlayListItem *tmp;
+		tmp = new PlayListItem();
 		
-		item = addSong(path);
-		play(item);
-		mCurrentSong = item;
+		if(pos>=0 && pos<mLen){
+			*tmp = mList[pos];
+		}
+		return *tmp;
+	}
+	int ArrayPlayListItem::addItem(PlayListItem& item){
+		if(mLen>=mMax){
+			PlayListItem *temp;
+			int i,count;
+			if(mMax == 0)
+				mMax = 8;
+			else
+				mMax*=2;
+
+			temp = new PlayListItem[mMax];
+			for(i=0;i<mLen;i++){
+				temp[i] = mList[i];
+			}
+			delete[] mList;
+			mList = temp;
+		}
+		mList[mLen] = item;
+		mLen++;
+	}
+	int ArrayPlayListItem::getCount(){
+		return mLen;
+	}
+	
+	int PlayList::sql_callback(void * use, int argc, char ** argv, char ** szColName)
+	{
+		ArrayPlayListItem* array = (ArrayPlayListItem*)use;
+		PlayListItem item;
+		
+		item.setId(mediaprovider::str_to_int(*argv++));
+		item.setName(*argv++);
+		item.setRemark(*argv);
+
+		
+		array->addItem(item);
+		//log_i("item.name = %s,len=%d",item.name,array->getCount());
 		return 0;
 	}
-
-
-
-	int Playlist::play(PlaylistItem* item)
-	{
-		if(stop() != 1){log_i("stop() fail!");return -1;}else{log_i("stop() success!");}
-		if(setSource(item->mPath) != 1){log_i("setSource() fail!");return -1;}else{log_i("setSource() success!");}
-		if(prepare() != 1){log_i("prepare() fail!");return -1;}else{log_i("prepare() success!");}
-		if(start() != 1){log_i("start() fail!");return -1;}else{log_i("start() success!");}
-		return 0;
+	void PlayList::createTable(){
+		gmediaprovider.exec(PLAYLIST_TABLE_CREATE,0,0);
+		gmediaprovider.exec(PLAYLISTMEM_TABLE_CREATE,0,0);
 	}
-	int Playlist::dplay(char *path)
-	{
-		if(stop() != 1){log_i("stop() fail!");return -1;}else{log_i("stop() success!");}
-		if(dsetSource(path) != 1){log_i("setSource() fail!");return -1;}else{log_i("setSource() success!");}
-		if(prepare() != 1){log_i("prepare() fail!");return -1;}else{log_i("prepare() success!");}
-		if(start() != 1){log_i("start() fail!");return -1;}else{log_i("start() success!");}
-		return 0;
+	void PlayList::newPlaylist(){
+		char *ptr,sql[255],name[100];
+		
+		ptr = sql;
+		genPlaylistName(&name[0],100);
+		ptr+=sprintf(ptr,"insert into playlist (name,remark) values('%s','(null)')",name);
+		
+		gmediaprovider.exec(sql,0,0);
 	}
+	void PlayList::genPlaylistName(char* name,int len){
+		int i,count;
+		char *ptr,where[255];
 
+		i=1;
+		ptr = where;
+		
+		while(1){
+			ArrayPlayListItem array;
 
-
-	int Playlist::next()
-	{
-		return -1;
-	}
-
-
-
-	int Playlist::prev()
-	{
-		return -1;
-	}
-
-
-	int Playlist::clearAllSong()
-	{
-		PlaylistItem* item;
-		stop();
-
-		while(item = Playlist::getFirstSong()) {
-			list_del(&item->mList);
-			delete item;
+			memset(where,0,255);
+			sprintf(ptr,"where name='Playlist%d'",i);
+			
+			queryPlaylist(array,where);
+			
+			if(array.getCount() == 0)
+				break;
+			
+			i++;
 		}
 
-		return 0;
+		memset(name,0,len);
+		sprintf(name,"Playlist%d",i);
+		log_i("i=%d,%s",i,name);
 	}
+	void PlayList::queryPlaylist(ArrayPlayListItem& array,char *arg){
+		char *ptr,sql[255];
 
-
-	PlaylistItem* Playlist::addSong(TCHAR* path)
-	{
-		PlaylistItem* item = new PlaylistItem(path);
-
-		list_add_tail(&item->mList, &mSongHead);  
-		return item;
+		array.~ArrayPlayListItem();
+		ptr = sql;
+		ptr+=sprintf(ptr,"select * from playlist");
+		if(arg != NULL)
+			ptr+=sprintf(ptr," %s",arg);
+		
+		gmediaprovider.exec(sql,&array,PlayList::sql_callback);
+		//log_i("array.getcount()=%d",array.getCount());
 	}
+	void PlayList::insertToPlaylist(int playlist_id,int audio_id){
+		char *ptr,sql[255];
 
-
-	PlaylistItem* Playlist::getCurrentSong(void)
-	{
-		return mCurrentSong;
+		ptr = sql;
+		ptr+=sprintf(ptr,"insert into playlistmem (playlist_id,audio_id) values(%d,%d)",
+			playlist_id,audio_id);
+		
+		gmediaprovider.exec(sql,0,0);
 	}
-
-
-	PlaylistItem* Playlist::getFirstSong(void)
-	{
-		if (list_empty(&mSongHead))
-			return NULL;
-
-		return list_entry(mSongHead.next, PlaylistItem, mList); 
+	void PlayList::delAudioFromPlaylist(int audio_id){
+		char *ptr,sql[255];
+		
+		ptr = sql;
+		ptr+=sprintf(ptr,"delete from playlistmem where audio_id=%d",audio_id);
+		
+		gmediaprovider.exec(sql,0,0);	
 	}
+	void PlayList::queryPlaylistMem(ArrayMediaInfo& array,int playlist_id){
+		char *ptr,sql[255];
+		
+		array.clear();
+		ptr = sql;
+		ptr+=sprintf(ptr,"select music.* from  music,playlistmem where playlistmem.playlist_id=%d and music._id=playlistmem.audio_id",
+			playlist_id);
+		
+		gmediaprovider.queryMusicArray(sql,&array);
+	}
+	PlayListAdapter::PlayListAdapter(){
+		mSql = NULL;
+	}
+	PlayListAdapter::PlayListAdapter(ListView* list){
+		mSql = NULL;
+		mList = list;
+	}
+	PlayListAdapter::~PlayListAdapter(){
+		safeDelete(mSql);
+	}
+	int PlayListAdapter::getCount(){
+		return 	mArrayPlayList.getCount();
+	}
+	void PlayListAdapter::refresh(){
+		int count,i;
+		
+		PlayList::queryPlaylist(mArrayPlayList,NULL);
+		
+		mList->setListAdapter(this);
+		mList->deleteAllRecord();
 
+		PlayListItem item;
+		item.setId(-1);
+		log_i("mArrayPlayList.getcount=%d:item.id=%d",mArrayPlayList.getCount(),item.id);
+		mArrayPlayList.addItem(item);
+		log_i("mArrayPlayList.getcount=%d",mArrayPlayList.getCount());
+		count = mArrayPlayList.getCount();
+		for(i=0;i<count;i++){
+			ListViewItem  lvItem;
+			lvItem.mask     = LVIF_ADAPTER;
+			lvItem.iItem    = i;
+			lvItem.iSubItem = 0;
+			lvItem.paramType = LIST_PARAM_MUSIC;
+			mList->insertItem(&lvItem);
+		}
+		mList->invalidateRect();
+	}
+	void PlayListAdapter::PaintView(Canvas & canvas,Rect & rect,ListViewItem * lvitem,int isSec){
+		
 
-	PlaylistItem* Playlist::getNextSong(PlaylistItem* item)
-	{
-		if (item->mList.next == &mSongHead)
-			return NULL;
+		int	 x, y;
+		int index = lvitem->iItem;
+		PlayListItem item = mArrayPlayList.getItem(index);
+
+		x = rect.left;
+		y = rect.top;
+
+		if(isSec)
+			canvas.setTextColor(RGB(255,149,0));
 		else
-			return list_entry(item->mList.next, PlaylistItem, mList); 
+			canvas.setTextColor(RGB(255,255,255));
+		canvas.setTextSize(18);
+
+		x=20;y+=10;
+
+		if(item.id>0){
+			canvas.drawText(item.name,-1,x,y);
+		}else{
+			canvas.drawTextResource(STR_NEW_LAYLIST_LIST,x,y);
+		}
+
 	}
-
-	
-	Playlist* gPlaylist = NULL;
-
 };
-
 

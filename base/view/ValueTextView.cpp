@@ -34,7 +34,7 @@ namespace mango
 	{
 		TCHAR *wt;
 		wt = TEXT("MY MUSIC");
-		log_i("TextView::onPaint");
+		//log_i("TextView::onPaint");
 		canvas.setTextColor(mValueColor);
 		canvas.setTextSize(mSize);
 		
@@ -44,7 +44,7 @@ namespace mango
 		}
 		
 		canvas.setTextColor(mContextColor);
-		log_i("mContextColor = 0x%x",mContextColor);
+		//log_i("mContextColor = 0x%x",mContextColor);
 		if(mText != NULL)
 			canvas.drawText(mText, strlen(mText), mKeyLen+3, 0);
 

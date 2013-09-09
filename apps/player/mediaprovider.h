@@ -36,6 +36,8 @@ namespace mango
 									artist_key TEXT,\
 									album TEXT,\
 									album_key TEXT,\
+									genre TEXT,\
+									genre_key TEXT,\
 									track TEXT,\
 									img_path TEXT,\
 									add_time INTEGER,\
@@ -44,23 +46,6 @@ namespace mango
 									times INTEGER\
 									);"
 	#define IMG_PATH "/mnt/sdcard/.album_img"
-
-	#define TABLE_PLAYLIST "playlist"
-	
-	#define PLAYLIST_TABLE_CREATE "CREATE TABLE IF NOT EXISTS playlist(\
-									_id INTEGER PRIMARY KEY autoincrement,\
-									name TEXT,\
-									remak TEXT\
-									);"
-	#define TABLE_PLAYLIST_MEM "playlistmem"
-	
-	#define PLAYLISTMEM_TABLE_CREATE "CREATE TABLE IF NOT EXISTS playlistmem(\
-									_id INTEGER PRIMARY KEY autoincrement,\
-									playlist_id INTEGER,\
-									audio_id INTEGER\
-									);"	
-	class Playlist{
-		};
 	
 	typedef struct
 	{
@@ -74,6 +59,8 @@ namespace mango
 		char *artist_key;
 		char *album;
 		char *album_key;
+		char *genre;
+		char *genre_key;
 		int track;
 		char *img_path;
 		int add_time;
@@ -130,11 +117,14 @@ namespace mango
 		void externFileCheck();
 		void externFileScanner(char *filepath);
 		void ScannerDirectory(char* file);
+		void albumImageSync();
+		void mTimesSync();
 		int initialize(void);
 		int exec(char *sql,void *arg,int (*callback)(void*,int,char**,char**));
 		int insert(char *table,mediainfo *info);
 		int querymusic(char *where,mediainfo **info);
 		int queryMusicArray(char *where, void* array);
+		int queryArrayMedia(char *where, void *array);
 		int updateInPlay(int value,int id =-1);
 		int del(char *table,int id);
 		virtual ~mediaprovider(void);

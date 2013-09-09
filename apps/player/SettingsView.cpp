@@ -109,7 +109,7 @@ namespace mango
 		if(mAdvanceListAdapter == NULL){
 			mListView->deleteAllItems();
 			mAdvanceListAdapter = new SettingListAdapter(mListView,ADAPTER_PLAYING);
-			mAdvanceListAdapter->mLayoutleft = 80;
+			mAdvanceListAdapter->mLayoutleft = 20;
 		}
 		mAdvanceListAdapter->setData(img,imgsec,text,count);
 
@@ -129,7 +129,7 @@ namespace mango
 		if(mSettingListAdapter == NULL){
 			mSettingListAdapter = new SettingListAdapter(mListView,ADAPTER_PLAYING);
 			mSettingListAdapter->setData(img,imgsec,text,count);
-			//mSettingListAdapter->mLayoutleft = 70;
+			mSettingListAdapter->mLayoutleft = 20;
 		}else
 			mSettingListAdapter->refresh();
 		
@@ -215,8 +215,9 @@ namespace mango
 	void SettingsView::initLanguageList(){
 		int img[]={0,0,0,0,0};
 		int imgsec[]={0,0,0,0,0};
-		int text[]={STR_LANGUAGE_EN,STR_LANGUAGE_CN,STR_LANGUAGE_JA,STR_LANGUAGE_JAP};
-		int i,count = 4;
+		int text[]={STR_LANGUAGE_EN,STR_LANGUAGE_CN,STR_LANGUAGE_JA,STR_LANGUAGE_JAP,STR_LANGUAGE_KR,
+			STR_LANGUAGE_TH,STR_LANGUAGE_RU,STR_LANGUAGE_SP,STR_LANGUAGE_PU};
+		int i,count = 9;
 		
 		if(mLanguageListAdapter == NULL){
 			mListView->deleteAllItems();
@@ -317,7 +318,7 @@ namespace mango
 					//gSessionLocal.mStockGraphic.mCanvas.setTextLanguage(index+1);
 					gSessionLocal.setLangId(index);
 					gSettingProvider.update(SETTING_LANGUAGE_ID,index);
-					mLanguageListAdapter->refresh();
+					mListView->invalidateRect();
 					break;
 				case 0x1430:{
 					switch(index){

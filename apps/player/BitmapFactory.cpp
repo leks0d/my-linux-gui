@@ -198,4 +198,11 @@ namespace mango
 		system(cmd);
 	}
 
+	void Environment::sync(){
+		char *cmd = "./system/bin/sync";
+		system(cmd);
+		mango::Thread::sleep(100);
+		system(cmd);
+	}
+
 };

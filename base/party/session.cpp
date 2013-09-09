@@ -746,12 +746,11 @@ namespace mango
 	//	ppszfilename[1] = "E:\\EmluatorStore\\C\\turnip\\font\\simsun.ttc";
 #else
 		ppszfilename[0] = MANGO_ROOT"font/msyh.ttf";
-	//	ppszfilename[0] = MANGO_ROOT"font/arial.ttf";
-	//	ppszfilename[1] = MANGO_ROOT"font/simsun.ttc";
+		ppszfilename[1] = MANGO_ROOT"font/boramche.ttf";
 #endif
 //		ft_ex_meminit (malloc (ift_ex_mem_size), ift_ex_mem_size) ;
 
-		ft_ex_TrueTypeInit ((char **)ppszfilename, 1); //2) ;
+		ft_ex_TrueTypeInit ((char **)ppszfilename, 2); //2) ;
 	}
 
 
@@ -858,9 +857,14 @@ namespace mango
 			"E:\\EmluatorStore\\C\\turnip\\codepage\\c_950.bin",
 			"E:\\EmluatorStore\\C\\turnip\\codepage\\c_932.bin",
 #else
-			MANGO_ROOT"codepage/c_936.bin",
-			MANGO_ROOT"codepage/c_950.bin",
-			MANGO_ROOT"codepage/c_932.bin",
+			MANGO_ROOT"codepage/c_936.bin",//0
+			MANGO_ROOT"codepage/c_950.bin",//1
+			MANGO_ROOT"codepage/c_932.bin",//2
+			MANGO_ROOT"codepage/c_949_kr.bin",//3
+			MANGO_ROOT"codepage/c_874_th.bin",//4
+			MANGO_ROOT"codepage/c_866_ru.bin",//5
+			MANGO_ROOT"codepage/c_850_la.bin",//7
+			MANGO_ROOT"codepage/c_860_pu.bin",//8
 #endif
 		} ;
 
@@ -876,6 +880,21 @@ namespace mango
 			break ;
 		case LANGID_JAPANESE:
 			path = conCodePageFileName[2] ;
+			break ;
+		case LANGID_KOREAN:
+			path = conCodePageFileName[3] ;
+			break ;
+		case LANGID_TH:
+			path = conCodePageFileName[4] ;
+			break ;
+		case LANGID_RU:
+			path = conCodePageFileName[5] ;
+			break ;
+		case LANGID_LA:
+			path = conCodePageFileName[6] ;
+			break ;
+		case LANGID_PU:
+			path = conCodePageFileName[7] ;
 			break ;
 		}
 

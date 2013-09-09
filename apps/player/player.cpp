@@ -190,7 +190,8 @@ namespace mango
 		if (mMusicInfoView == NULL) {
 			mMusicInfoView = new MusicInfoView (TEXT("MusicInfo"), NULL, NULL, 0, SW_NORMAL);
 			mMusicInfoView->onCreate();
-		}			
+		}
+		log_i("info->name=%s",info->name);
 		mMusicInfoView->setMusicInfo(info);
 		showMusicInfoView();
 		return 0;
@@ -319,10 +320,11 @@ namespace mango
 		}
 		shutDown();
 	}
-	void Player::shutDown(){		
+	void Player::shutDown(){	
 		mPlayinglist->stopPlayer();
 		mPlayinglist->savePlayintList();
 		gSettingProvider.dbclose();
+		Environment::sync();
 	}
 	
 	int Player::showMusicOperateView(mediainfo& info){
@@ -332,11 +334,13 @@ namespace mango
 		}else{
 			gSession.mViewZAxis.bringViewToTop(mMusicOperateView);
 		}
-
+		log_i("---");
 		if (mMusicOperateView){
+			log_i("---");
 			mMusicOperateView->setMusicInfo(info);
 			mMusicOperateView->invalidateRect();
 			mMusicOperateView->setFocus();
+			log_i("---");
 		}
 	}
 	int Player::showKeyLockView(){
