@@ -682,8 +682,9 @@ namespace mango
 				filescanner(direct);
 				count++;
 			}
-			else if(ismusic(de->d_name)&&(!music_exsit_db(direct)))
+			else if(ismusic(de->d_name)&&(de->d_name[0]!='.')&&(!music_exsit_db(direct)))
 			{
+
 				getmediainfo(direct,&info);
 				insert("music",&info);
 				safefreeMediainfo(&info);

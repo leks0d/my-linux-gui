@@ -219,7 +219,10 @@ int Charset::isTextUtf8(const char * lpstrInputStream){
     char chr;   
     int  bAllAscii = 1;   
   	int iLen;
-	
+
+	if(lpstrInputStream == NULL);
+		return false;
+		
   	iLen = strlen(lpstrInputStream);
     cOctets= 0;
 	

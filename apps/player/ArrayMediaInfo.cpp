@@ -7,7 +7,7 @@ namespace mango
 			len = 0;
 			mMax = 0;
 			mplaylist = NULL;
-			log_i("ArrayMediaInfo::ArrayMediaInfo %d,len=%d,mMax=%d,",mplaylist,len,mMax);
+			//log_i("ArrayMediaInfo::ArrayMediaInfo %d,len=%d,mMax=%d,",mplaylist,len,mMax);
 		}
 		
 		ArrayMediaInfo::~ArrayMediaInfo(){
@@ -52,14 +52,14 @@ namespace mango
 
 		ArrayMediaInfo& ArrayMediaInfo::operator =(ArrayMediaInfo& info){
 			mediainfo *temp;
-			log_i("ArrayMediaInfo::operator = mplaylist=0x%x",mplaylist);
+			//log_i("ArrayMediaInfo::operator = mplaylist=0x%x",mplaylist);
 
 			mMax = info.mMax;
 			len = info.len;
 			
 			temp = new mediainfo[mMax];
 			
-			log_i("new mediainfo[mMax] temp=0x%x",temp);
+			//log_i("new mediainfo[mMax] temp=0x%x",temp);
 			
 			memcpy(temp,info.mplaylist,len*sizeof(mediainfo));
 			delete mplaylist;

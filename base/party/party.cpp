@@ -85,7 +85,6 @@ namespace mango
 			break;
 
 		case VM_COMMAND:
-			log_i("view->onCommand msg.getParameter1()=%d",msg.getParameter1());
 			result = view->onCommand(msg.getParameter1() & 0x00ffff, (msg.getParameter1() >> 16) & 0x00ffff, (View* )(msg.getParameter2()));
 			break;
 

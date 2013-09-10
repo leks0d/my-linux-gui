@@ -541,6 +541,8 @@ namespace mango
 	{
 		WCHAR  wcBuf[81] ;
 		int    i ;
+		if(string == NULL)
+			return;
 #if 0
 		for (i = 0 ; i < 80 && (*string) && count ; i++, count--) {
 			wcBuf[i] =  *string ;

@@ -63,6 +63,7 @@ LOCAL_SRC_FILES += MusicOperateView.cpp
 LOCAL_SRC_FILES += KeyLockView.cpp
 LOCAL_SRC_FILES += ChosenView.cpp
 LOCAL_SRC_FILES += playlist.cpp
+LOCAL_SRC_FILES += CCue.cpp
 
 LOCAL_CPPFLAGS:=\
 -I $(MY_ANDROID_SOURCE)/frameworks/base/core/jni/android/graphics\
@@ -77,7 +78,7 @@ LOCAL_SHARED_LIBRARIES += libParticleOmxil-prebuild
 LOCAL_SHARED_LIBRARIES += libParticleOmxal-prebuild
 LOCAL_SHARED_LIBRARIES += libFFmpegForId3-prebuild
 LOCAL_SHARED_LIBRARIES += libskia-prebuild
-
+APP_STL := stlport_static
 LOCAL_LDLIBS :=  -llog -lcutils -licuuc -licui18n -lutils -lsqlite -L/home/liuwenlong/backup/lib
 
 

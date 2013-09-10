@@ -65,28 +65,7 @@ namespace mango
 		strcpy(type,file+i+1);
 		strlwr(type);
 		return type;
-	}
-/*
-	static int ismusic(char *file)
-	
-	{
-		char *type;
-		char *music_type[] = {"mp3","wav","flac","aac","ogg","ape","m4a","wma","\0"};
-		char **mtype;
-		mtype = music_type;
-		//log_i("getfiletype filename:%s\n",file);
-		type = getfiletype(file);
-		//log_i("getfiletype :%s\n",type);
-		if(type == 0)
-			return 0;
-		while(*mtype!="\0"){
-			if(strcmp(*mtype,type) == 0)
-				return 1;
-			mtype++;
-		}
-		return 0;
-	}
-*/	
+	}	
 	MediaListView::MediaListView(void)
 	{
 
@@ -363,7 +342,8 @@ namespace mango
 				insertFileToListView(LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM, fileName, IDP_FOLDER_ICON, (void*)FILE_ATTRIBUTE_DIRECTORY);
 				count++;
 			}
-			else if (ismusic(cName)) //PathMatchSpecEx (FindFileData.cFileName, pctl->lpofn->lpstrFilter, PMSF_MULTIPLE))
+			else if (ismusic(cName) //|| isCueFile(cName)
+				) //PathMatchSpecEx (FindFileData.cFileName, pctl->lpofn->lpstrFilter, PMSF_MULTIPLE))
 			{
 			//	mListView->insertString(0, fileName);
 				insertFileToListView(LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM, fileName, getMusicIcon(cName), (void*)FILE_ATTRIBUTE_NORMAL);
@@ -660,6 +640,7 @@ namespace mango
 
 	int MediaView::onNotify(View* fromView, int code, void* parameter)
 	{
+		log_i("MediaView::onNotify code = %d",code);
 		if (fromView == mListView && code == NM_CLICK) {
 			int type,index;
 			
@@ -677,7 +658,8 @@ namespace mango
 						File::pathAddBackslash(mCurrentPath);
 						String::lstrcat(mCurrentPath, record->m_lvItem.pszText);
 						renewFillViewList();
-					} else //if(type & FILE_ATTRIBUTE_NORMAL)
+					} 
+					else //if(type & FILE_ATTRIBUTE_NORMAL)
 					{
 
 						TCHAR path[MAX_PATH];
@@ -718,7 +700,7 @@ namespace mango
 							//}
 							
 							gPlayer.showPlayingView();
-						}else{
+						}else if(ismusic(utf8Path)){
 							/*
 							mediainfo info;
 							char* name,parent[255];					
@@ -741,7 +723,23 @@ namespace mango
 							mNeedPlayPath = new char[len];
 							memcpy(mNeedPlayPath,utf8Path,len);
 						}
-
+						else if(isCueFile(utf8Path))
+						{
+							CCue mCue;
+							int i;
+							int ret = -1;
+							ret = mCue.file_load(utf8Path);
+							//log_i("file_load ret=%d",ret);
+							if(ret>=0){
+								for(i=0;i<mCue.m_total_song;i++){
+									song_t song;
+									mCue.get_cert_song(i,&song);
+									//log_i("song.star=%d",song.star);
+									log_i("song.star=%d,%s",song.star,song.m_strname.string);
+								}
+							}
+						}
+						
 						delete pinfo;
 					}
 					break;
@@ -884,6 +882,20 @@ namespace mango
 			if(getMainState() != 0x1210)
 				mListView->refresh();
 		}
+		else if(code == SDCARD_START_UNMOUNT){
+			char *ret = NULL;
+			char *ptr = NULL;
+			char utf8Path[300];
+							
+			Charset::wideCharToMultiByte(CP_UTF8, mCurrentPath, String::lstrlen(mCurrentPath), utf8Path, MAX_PATH * 3);
+
+			ret = strstr(utf8Path,"/mnt/external_sd");
+			ptr = strstr(utf8Path,"/mnt/usb_storage");
+			if(ret || ptr){
+				log_i("ret = %s",ret);
+				initRootDirect();
+			}
+		}
 
 		return 0;
 	}
@@ -913,17 +925,18 @@ namespace mango
 			strcat(direct,de->d_name);
 			//log_i("opendir DT_DIR :%s\n",direct);
 
-			if (de->d_type == DT_DIR) {
+			//if (de->d_type == DT_DIR) {
+			if(File::isDirect(direct)){
 				;
-			}else if( ismusic(de->d_name) ){
+			}else if(ismusic(de->d_name)){
+				if(de->d_name[0] == '.')
+					continue;
 				mediaprovider::FilePathToInfo(direct,info);
 				array.addMediaInfo(&info);
 			}
-
 		}
 
 		closedir(d);
-
 		return array.getCount();
 	}
 

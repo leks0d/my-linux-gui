@@ -191,7 +191,8 @@ namespace mango
 			mMusicInfoView = new MusicInfoView (TEXT("MusicInfo"), NULL, NULL, 0, SW_NORMAL);
 			mMusicInfoView->onCreate();
 		}
-		log_i("info->name=%s",info->name);
+		log_i("info->title=%s",info->title);
+		log_i("info->path=%s",info->path);
 		mMusicInfoView->setMusicInfo(info);
 		showMusicInfoView();
 		return 0;
@@ -672,6 +673,7 @@ namespace mango
 			gPlayer.showChosenView(ChosenView::CHOSEN_POWEROFF);
 		}else if(action == VM_MEDIA){
 			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,keyCode,0);
+			gMessageQueue.post(gPlayer.mMeidaView,VM_NOTIFY,keyCode,0);
 		}else if(keyCode == KEYCODE_HOLD&& action == VM_KEYDOWN){
 			gPlayer.holdKeyProbe();
 		}else if(keyCode == KEYCODE_SPIDF&& action == VM_KEYDOWN){

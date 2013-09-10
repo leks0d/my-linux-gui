@@ -21,8 +21,7 @@ namespace mango
 		: View(title, parent, rect, style, show)
 	{
 		mMSkBitmap = new MSkBitmap();
-		mCurrentInfo = new mediainfo;
-		memset(mCurrentInfo,0,sizeof(mediainfo));
+		memset(&mCurrentInfo,0,sizeof(mediainfo));
 	}
 
 	MusicInfoView::~MusicInfoView(void)
@@ -125,9 +124,9 @@ namespace mango
 		int firstLeft,infoWidth;
 		
 		mstr = new Mstring(10);
-		mstr->setPlayTime(mCurrentInfo->duration);
+		mstr->setPlayTime(mCurrentInfo.duration);
 		
-		BitmapFactory::decodeFile(mMSkBitmap,mCurrentInfo->img_path,76,76);
+		BitmapFactory::decodeFile(mMSkBitmap,mCurrentInfo.img_path,76,76);
 
 		if(mMSkBitmap->isVaild()){
 			firstLeft = 98;
@@ -147,24 +146,100 @@ namespace mango
 		
 		mAlbumImage->setMSkBitmap(mMSkBitmap);
 		
-		mMusicPath->setTextString(mCurrentInfo->path);
-		log_i("mCurrentInfo->path=%s",mCurrentInfo->path);
-		mFilename->setTextString(mCurrentInfo->name);
-		mMusicTitle->setTextString(mCurrentInfo->title);
-		mAlbum->setTextString(mCurrentInfo->album);
-		mArtist->setTextString(mCurrentInfo->artist);
+		mMusicPath->setTextString(mCurrentInfo.path);
+		log_i("mCurrentInfo->path=%s",mCurrentInfo.path);
+		mFilename->setTextString(mCurrentInfo.name);
+		mMusicTitle->setTextString(mCurrentInfo.title);
+		mAlbum->setTextString(mCurrentInfo.album);
+		mArtist->setTextString(mCurrentInfo.artist);
 		mDuration->setTextString(mstr->mstr);
 
 		mstr->clear();
 	}
 
-	void MusicInfoView::setMusicInfo(mediainfo* info){
-		memset(mCurrentInfo,0,sizeof(mediainfo));
-		if(info == NULL){
-			
+	void MusicInfoView::setMusicInfo(mediainfo* src){
+		safefreeMediainfo(&mCurrentInfo);
+		
+		if(src == NULL){
+			memset(&mCurrentInfo,0,sizeof(mediainfo));
+			return;
 		}else{
-			memcpy(mCurrentInfo,info,sizeof(mediainfo));
+			;
 		}
+		
+			//log_i("enter src=0x%x",src);
+			memset(&mCurrentInfo,0,sizeof(mediainfo));
+			mCurrentInfo.id = src->id;
+			mCurrentInfo.track = src->track;
+			mCurrentInfo.add_time = src->add_time;
+			mCurrentInfo.duration = src->duration;
+			mCurrentInfo.isInPlayList = src->isInPlayList;
+			mCurrentInfo.inPlay = src->inPlay;
+			mCurrentInfo.isPlayed = src->isPlayed;
+			mCurrentInfo.times = src->times;
+			//log_i("src->path=%s",src->path);
+			
+			if(src->path == NULL)
+				return;
+			mCurrentInfo.path = new char[strlen(src->path)+1];
+			strcpy(mCurrentInfo.path,src->path);
+			
+			//log_i("tag src->name_key=0x%x",src->name_key);
+			if(src->name != NULL){
+				mCurrentInfo.name = new char[strlen(src->name)+1];
+				strcpy(mCurrentInfo.name,src->name);
+			}
+			
+			//log_i("tag ");
+			if(src->name_key != NULL){
+				mCurrentInfo.name_key = new char[strlen(src->name_key)+1];
+				strcpy(mCurrentInfo.name_key,src->name_key);
+			}
+			
+			//log_i("tag");
+			if(src->title != NULL){
+				mCurrentInfo.title = new char[strlen(src->title)+1];
+				strcpy(mCurrentInfo.title,src->title);
+			}else{
+				//log_i("mplaylist[des].title=0x%x",mplaylist[des].title);
+			}
+			
+			//log_i("tag");
+			if(src->title_key != NULL){
+				mCurrentInfo.title_key = new char[strlen(src->title_key)+1];
+				strcpy(mCurrentInfo.title_key,src->title_key);
+			}
+			
+			//log_i("tag");
+			if(src->artist != NULL){
+				mCurrentInfo.artist = new char[strlen(src->artist)+1];
+				strcpy(mCurrentInfo.artist,src->artist);
+			}
+			
+			//log_i("tag");
+			if(src->artist_key != NULL){
+				mCurrentInfo.artist_key = new char[strlen(src->artist_key)+1];
+				strcpy(mCurrentInfo.artist_key,src->artist_key);
+			}
+			
+			//log_i("tag");
+			if(src->album != NULL){
+				mCurrentInfo.album = new char[strlen(src->album)+1];
+				strcpy(mCurrentInfo.album,src->album);
+			}
+			
+			//log_i("tag");
+			if(src->album_key != NULL){
+				mCurrentInfo.album_key = new char[strlen(src->album_key)+1];
+				strcpy(mCurrentInfo.album_key,src->album_key);
+			}
+			
+			//log_i("tag");
+			if(src->img_path != NULL){
+				mCurrentInfo.img_path = new char[strlen(src->img_path)+1];
+				strcpy(mCurrentInfo.img_path,src->img_path);
+			}
+			//log_i("leave");
 	}
 
 	int MusicInfoView::onDestroy()

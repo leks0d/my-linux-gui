@@ -29,6 +29,7 @@
 #include "MusicOperateView.h"
 #include "KeyLockView.h"
 #include "ChosenView.h"
+#include "CCue.h"
 
 
 namespace mango

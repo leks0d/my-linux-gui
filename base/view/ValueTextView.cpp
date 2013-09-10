@@ -45,6 +45,7 @@ namespace mango
 		
 		canvas.setTextColor(mContextColor);
 		//log_i("mContextColor = 0x%x",mContextColor);
+		
 		if(mText != NULL)
 			canvas.drawText(mText, strlen(mText), mKeyLen+3, 0);
 

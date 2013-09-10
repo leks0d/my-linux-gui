@@ -182,6 +182,29 @@ static int ismusic(char *file)
 	}
 	return 0;
 }
+static int isCueFile(char *file)
+{
+	char *type;
+	const char *music_type[] = {"cue","\0"};
+	const char **mtype;
+	mtype = music_type;
+
+	type = getfiletype(file);
+
+	if(type == 0)
+		return 0;
+	
+	while(*mtype != "\0"){
+		
+		if(strcmp(*mtype,type) == 0)
+			return 1;
+		
+		mtype++;
+	}
+	
+	return 0;
+
+}
 
 
 extern mediaprovider gmediaprovider;

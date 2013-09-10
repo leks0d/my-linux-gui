@@ -27,7 +27,7 @@ namespace mango
 		int getMainState(){return mainState;}
 	public:
 		MediaListView*  mListView;
-		mediainfo* mCurrentInfo;
+		mediainfo mCurrentInfo;
 		TextView* mTitle;
 		Button* mBack;
 		Button* mHome;
