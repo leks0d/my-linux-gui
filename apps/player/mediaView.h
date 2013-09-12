@@ -45,6 +45,7 @@ namespace mango
 		PlayingListAdapter(void){}
 		~PlayingListAdapter(void){}
 		PlayingListAdapter(ListView* list,int id);
+		void setPaintStartOffset(int offset);
 		void refresh();
 		void backEvent();
 		virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);

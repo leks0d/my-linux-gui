@@ -146,13 +146,13 @@ namespace mango
 							case 0:
 								mPlayinglist->playMediaInfo(&mCurrentInfo);
 								break;
-							/*case 1:
+							case 1:
 								if(mPlayinglist->isItemExsit(&mCurrentInfo)<0)
 									mPlayinglist->addItem(&mCurrentInfo);
-								break;*/
-							case 1:	
-								initPlayList();
 								break;
+							//case 1:	
+							//	initPlayList();
+							//	break;
 							case 2:
 								gPlayer.dismissView(this);
 								gPlayer.showMusicInfoView(&mCurrentInfo);

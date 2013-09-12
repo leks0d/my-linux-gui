@@ -146,6 +146,73 @@ namespace mango
 		memcpy(pt,val,len+1);
 		log_i("str_cpy:%s",pt);
 	}
+	char* mediaprovider::slqFormat(char *arg){
+		int i,len;
+		char *ptr,*src,*des;
+		char ch = '\'';
+		
+		if(arg){
+			src = arg;
+			
+			len = strlen(src);
+			des = ptr = new char[len*2];
+			memset(ptr,0,len*2);
+			
+			while(*src){
+				
+				if(*src == '\''){
+					*ptr++ = *src;
+					*ptr = *src;
+				}else{
+					*ptr = *src;
+				}
+				
+				ptr++;src++;
+			}
+		}
+		return des;
+	}
+	char* mediaprovider::slqFormatOut(char *arg,char *out){
+		int i,len;
+		char *ptr,*src,*des;
+		char ch = '\'';
+		
+		if(arg){
+			src = arg;
+			ptr = out;
+			memset(ptr,0,len*2);
+			
+			while(*src){
+				
+				if(*src == '\''){
+					*ptr++ = *src;
+					*ptr = *src;
+				}else{
+					*ptr = *src;
+				}
+				
+				ptr++;src++;
+			}
+			*ptr = *src;
+		}
+		return 0;
+	}
+
+	char* mediaprovider::slqCheck(char *arg){
+		int i,len;
+		char *src;
+		return 0;
+		if(arg){
+			src = arg;	
+			while(*src){		
+				if(*src == '\''){
+					*src = '\`';
+				}
+				src++;
+			}
+		}
+		
+	}
 	
 	int mediaprovider::power_operation(int ary,int th){
 		int value ,i;
@@ -235,9 +302,11 @@ namespace mango
 		mediainfo *infolist;
 		int count,i;
 		char *ptr,sql[1024];
-		
+		char sqlPath[300];
+
+		slqFormatOut(path,sqlPath);
 		ptr = sql;
-		ptr += sprintf(ptr,"path = '%s'",path);
+		ptr += sprintf(ptr,"path = '%s'",sqlPath);
 		count = querymusic(sql,&infolist);
 
 		if(count>0)
@@ -419,17 +488,28 @@ namespace mango
 		TCHAR	fileName[255];
 		log_i("tag");		
 		value = (char*)malloc(256);
-
+		
 		filename = getfilename(path);
 		info->times = mCurrentTimes + 1;
 		
 		len = strlen(path)+1;
-		info->path = new char[len];
-		memcpy(info->path,path,len);
+//**************************
+		//info->path = new char[len];
+		//memcpy(info->path,path,len);
+//-----------------------------
+		info->path = new char[len*2];
+		slqFormatOut(path,info->path);
+//**************************
 
 		len = strlen(filename)+1;
-		info->name = new char[len];
-		memcpy(info->name,filename,len);
+//**************************
+		//info->name = new char[len];
+		//memcpy(info->name,filename,len);
+//-----------------------------
+		info->name = new char[len*2];
+		slqFormatOut(filename,info->name);
+//**************************
+
 		
 		info->name_key = new char[strlen(info->name)+1];
 		strlwr(info->name,info->name_key);
@@ -448,7 +528,7 @@ namespace mango
 			getFileParentName(path,value);
 			log_i("id3 album is null;getname=%s",value);
 		}
-			
+		//slqCheck(value);
 		len = strlen(value)+1;
 		info->album = new char[len];
 		memcpy(info->album,value,len);

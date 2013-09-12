@@ -220,7 +220,7 @@ int Charset::isTextUtf8(const char * lpstrInputStream){
     int  bAllAscii = 1;   
   	int iLen;
 
-	if(lpstrInputStream == NULL);
+	if(lpstrInputStream == NULL)
 		return false;
 		
   	iLen = strlen(lpstrInputStream);

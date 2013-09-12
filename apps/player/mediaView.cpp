@@ -327,11 +327,10 @@ namespace mango
 			//log_i("cName = %s",cName);
 			if (fileAttribute & FILE_ATTRIBUTE_HIDDEN)
 				continue;
-
+			if(cName[0] == '.')
+					continue;
 			if (fileAttribute & FILE_ATTRIBUTE_DIRECTORY)
 			{
-				if(cName[0] == '.')
-					continue;
 			
 				if (String::lstrcmp (fileName, TEXT (".")) == 0)
 					continue;
@@ -390,9 +389,11 @@ namespace mango
 	}
 	void MediaView::initMainList(){
 		
-		int img[]={IDP_PLAYING_LIST,IDP_FILE_LIST,IDP_PLAYLIST_LIST,IDP_ALL_MUSIC,IDP_ALBUM_LIST,IDP_ARTIST_LIST,IDP_GENRE_LIST};
-		int til[]={STR_PLAYING_LIST,STR_FILE_LIST,STR_LAYLIST_LIST,STR_MUSIC_LIST,STR_ALBUM_LIST,STR_ARTIST_LIST,STR_GENRE_LIST};
-		int i,count = 7;
+		int img[]={IDP_PLAYING_LIST,IDP_FILE_LIST,//IDP_PLAYLIST_LIST,
+			IDP_ALL_MUSIC,IDP_ALBUM_LIST,IDP_ARTIST_LIST,IDP_GENRE_LIST};
+		int til[]={STR_PLAYING_LIST,STR_FILE_LIST,//STR_LAYLIST_LIST,
+			STR_MUSIC_LIST,STR_ALBUM_LIST,STR_ARTIST_LIST,STR_GENRE_LIST};
+		int i,count = 6;
 		int mask = LVIF_ITEXT | LVIF_IMAGE | LVIF_PARAM;
 #if 0		
 		mListView->deleteAllItems();
@@ -410,6 +411,7 @@ namespace mango
 			mListView->deleteAllItems();
 			mMainListAdapter->refresh();
 		}
+		mListView->setZoneY(mMainListAdapter->getYoffset(),false);
 #endif
 		mTitle->setTextResoure(MUSIC_MY_MUSIC);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
@@ -424,7 +426,9 @@ namespace mango
 			
 			mPlayingListAdapter = new PlayingListAdapter(mListView,ADAPTER_MUSIC); 
 		}
+		
 		mPlayingListAdapter->refresh();
+		mPlayingListAdapter->setPaintStartOffset(0);
 		
 		mTitle->setTextResoure(STR_PLAYING_LIST);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
@@ -486,10 +490,10 @@ namespace mango
 	void MediaView::initAlbumList(){
 		mListView->deleteAllItems();
 		if(mAlbumAdapter == NULL){
-			
 			mAlbumAdapter = new AlbumAdapter(mListView,ADAPTER_ALBUM); 
 		}
 		mAlbumAdapter->refresh();
+		mListView->setZoneY(mAlbumAdapter->getYoffset(),false);
 		
 		mTitle->setTextResoure(STR_ALBUM_LIST);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
@@ -505,7 +509,7 @@ namespace mango
 			mArtistAdapter = new ArtistAdapter(mListView,ADAPTER_ALBUM); 
 		}
 		mArtistAdapter->refresh();
-		
+		mListView->setZoneY(mArtistAdapter->getYoffset(),false);
 		mTitle->setTextResoure(STR_ARTIST_LIST);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mTitle->invalidateRect();
@@ -517,10 +521,8 @@ namespace mango
 		mListView->deleteAllItems();
 		
 		if(mGenreAdapter == NULL){
-
 			mGenreAdapter = new GenreAdapter(mListView,ADAPTER_ALBUM); 
 		}
-		
 		mGenreAdapter->refresh();
 		
 		mTitle->setTextResoure(STR_GENRE_LIST);
@@ -548,7 +550,7 @@ namespace mango
 		ptr += sprintf(ptr,"where album='%s' and artist='%s'",info->album,info->artist);
 
 		mAlbumMusicAdapter->setWhere(where);
-
+		
 		setMainState(0x1410);
 		
 	}
@@ -641,7 +643,8 @@ namespace mango
 	int MediaView::onNotify(View* fromView, int code, void* parameter)
 	{
 		log_i("MediaView::onNotify code = %d",code);
-		if (fromView == mListView && code == NM_CLICK) {
+		if (fromView == mListView && 
+			code == NM_CLICK) {
 			int type,index;
 			
 			LISTVIEW_RECORD* record;
@@ -663,7 +666,9 @@ namespace mango
 					{
 
 						TCHAR path[MAX_PATH];
-						char utf8Path[300],*where,*ptr,parent[255];
+						char utf8Path[300],*ptr,parent[255];
+						char *where = NULL;
+						char *sqlpath = NULL;
 						int count;
 						ArrayMediaInfo *pinfo;
 						
@@ -675,11 +680,13 @@ namespace mango
 						String::lstrcat(path, record->m_lvItem.pszText);
 
 						Charset::wideCharToMultiByte(CP_UTF8, path, String::lstrlen(path), utf8Path, MAX_PATH * 3);
-						ptr += sprintf(ptr," where path = '%s' ",utf8Path);
+						sqlpath = mediaprovider::slqFormat(utf8Path);
+						ptr += sprintf(ptr," where path = '%s' ",sqlpath);
 
 						count = gmediaprovider.queryMusicArray(where,pinfo);
 						
-						delete where; where =NULL;
+						safeDelete(where);
+						safeDelete(sqlpath);
 
 						getparent(utf8Path,parent);
 						
@@ -688,39 +695,26 @@ namespace mango
 							
 							if(mPlayinglist == NULL)
 								mPlayinglist = new Playinglist();
-							mPlayinglist->clearAll();
-							mPlayinglist->playMediaInfo(pinfo->getMediaInfo(0));	
 							
-							//getparent(utf8Path,parent);
-							//if(!isVolumRootpath(parent)){
-								ptr = where = new char[300];
-								ptr += sprintf(ptr," where path like '%s/%%' and not path like '%s/%%/%%' ",parent,parent);
-								count = gmediaprovider.queryMusicArray(where,&arrayInfo);					
-								mPlayinglist->addArrayItem(arrayInfo);
-							//}
+							mPlayinglist->clearAll();
+							
+							ptr = where = new char[300];
+							ptr += sprintf(ptr," where path like '%s/%%' and not path like '%s/%%/%%' ",parent,parent);
+
+							count = gmediaprovider.queryMusicArray(where,&arrayInfo);
+							
+							mPlayinglist->addArrayItem(arrayInfo);
+							
+							mPlayinglist->playMediaInfo(pinfo->getMediaInfo(0));	
 							
 							gPlayer.showPlayingView();
 						}else if(ismusic(utf8Path)){
-							/*
-							mediainfo info;
-							char* name,parent[255];					
-							ArrayMediaInfo arrayInfo;
-							memset(&info,0,sizeof(mediainfo));
-							
-							getparent(utf8Path,parent);
-							
-							log_i("getparent parent=%s",parent);
-							
-							getArrayInfoFromFile(parent,arrayInfo);
-							mPlayinglist->clearAll();
-							mPlayinglist->addArrayItem(arrayInfo);
-							
-							mediaprovider::FilePathToInfo(utf8Path,info);
-							mPlayinglist->playMediaInfo(&info);
-							*/
 							int len = strlen(utf8Path)+1;
+							
 							gmediaprovider.externFileScanner(parent);
+							
 							mNeedPlayPath = new char[len];
+							
 							memcpy(mNeedPlayPath,utf8Path,len);
 						}
 						else if(isCueFile(utf8Path))
@@ -751,15 +745,15 @@ namespace mango
 									initPlayingList();	break;
 								case 1:
 									initRootDirect(); 	break;
+								//case 2:
+								//	initPlayList();		break;	
 								case 2:
-									initPlayList();		break;	
-								case 3:
 									initMusicList();	break;
-								case 4:
+								case 3:
 									initAlbumList();	break;
-								case 5:
+								case 4:
 									initArtistList();	break;
-								case 6:
+								case 5:
 									initGenreList();	break;
 								default:
 									break;
@@ -784,10 +778,10 @@ namespace mango
 								
 								if(pt.x>iconRight){								
 									if(adapter != NULL){
-										if(getMainState() != 0x1300){
+										//if(getMainState() != 0x1300){
 											mPlayinglist->clearAll();
 											mPlayinglist->addArrayItem(*(adapter->mMusicArrayList));		
-										}
+										//}
 										playMediaInfo(adapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem),1);
 									}
 								}else if(pt.x>LIST_MUSIC_ICON_LEFT-10){
@@ -844,19 +838,24 @@ namespace mango
 		else if(fromView == NULL && code == NM_DISPLAY){
 			log_i("NM_DISPLAY");
 			if(mNeedPlayPath != NULL){
-						char *where,*ptr,parent[255];
+						char *ptr,parent[255];
+						char *where = NULL;
+						char *sqlpath = NULL;
 						int count;
 						ArrayMediaInfo *pinfo;
 
 						
 						pinfo = new ArrayMediaInfo();
 						ptr = where = new char[300];
-
-						ptr += sprintf(ptr," where path = '%s' ",mNeedPlayPath);
-
+						
+						sqlpath = mediaprovider::slqFormat(mNeedPlayPath);
+						
+						ptr += sprintf(ptr," where path = '%s' ",sqlpath);
+						
 						count = gmediaprovider.queryMusicArray(where,pinfo);
 						
-						delete where;
+						safeDelete(where);
+						safeDelete(sqlpath);
 
 						getparent(mNeedPlayPath,parent);
 						
@@ -1019,7 +1018,13 @@ namespace mango
 		mId = id;
 		mlist = list;
 	}
-	
+	void PlayingListAdapter::setPaintStartOffset(int offset){
+		int y;
+
+		y = mPlayinglist->mCurrent*53;
+		log_i("setPaintStartOffset y=%d",y);
+		mlist->setZoneY(-y,false);
+	}
 	void PlayingListAdapter::refresh(){
 		int count,i;
 		
@@ -1037,6 +1042,7 @@ namespace mango
 			mlist->insertItem(&lvItem);
 			//log_i("PlayingListAdapter insertItem i=%d",i);
 		}
+		
 		mlist->invalidateRect();
 	}
 
@@ -1344,14 +1350,7 @@ namespace mango
 		else
 			canvas.setTextColor(RGB(255,255,255));
 		canvas.setTextSize(18);
-#if 0
-		log_i("info->artist=%s,len=%d",info->artist,strlen(info->artist));
-		if(Charset::isTextUtf8(info->artist)){
-			log_i("isTextUtf8 true");
-		}else{
-			log_i("isTextUtf8 false");
-		}
-#endif	
+
 		x+=40;
 		canvas.drawText(info->artist,strlen(info->artist),x,y+10);
 		

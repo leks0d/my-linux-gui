@@ -671,6 +671,13 @@ namespace particle
 	{
 		LOGI("MediaPlayerService::mediaDeinit Enter");
 
+		gMediaServiceData->mCurrentPosition = 0;
+		gMediaServiceData->mIsPlaying		= false;
+		if(mPlayer){
+			mPlayer->setIsPlayingAddress(&gMediaServiceData->mIsPlaying);
+			mPlayer->setCurrentPositionAddress(&gMediaServiceData->mCurrentPosition);
+		}
+
 		if (mPlayer)
 		{
 			mPlayer->setPlayState(XA_PLAYSTATE_STOPPED);

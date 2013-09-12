@@ -22,6 +22,7 @@ namespace mango
 	{
 		mMSkBitmap = new MSkBitmap();
 		memset(&mCurrentInfo,0,sizeof(mediainfo));
+		log_i("---------");
 	}
 
 	MusicInfoView::~MusicInfoView(void)
@@ -34,6 +35,8 @@ namespace mango
 		Rect rect;
 		int firstLeft = 98;
 		rect.setEx(0, 0, 41, 22);
+		log_i("----");
+		//return 0;
 		mBack = new Button(SETTING_BACK, TEXT("mBack"), this, &rect, 0);
 		mBack->setNormalImageId(IDP_SETTING_BACK);
 		mBack->setPressedImageId(IDP_SETTING_BACK_SEC);
@@ -122,7 +125,8 @@ namespace mango
 		mediainfo *info;
 		Rect rect;
 		int firstLeft,infoWidth;
-		
+
+		//return;
 		mstr = new Mstring(10);
 		mstr->setPlayTime(mCurrentInfo.duration);
 		
@@ -161,7 +165,7 @@ namespace mango
 		safefreeMediainfo(&mCurrentInfo);
 		
 		if(src == NULL){
-			memset(&mCurrentInfo,0,sizeof(mediainfo));
+			//memset(&mCurrentInfo,0,sizeof(mediainfo));
 			return;
 		}else{
 			;

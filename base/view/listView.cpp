@@ -379,9 +379,12 @@ namespace mango
 			return NULL ;
 
 		yPaint = 0 - mZonePoint.y ;
-		if (pItem->m_rect.top <= yPaint && pItem->m_rect.bottom > yPaint)
-			return pItem ;
-
+		
+		//log_i("pItem->iItem=%d,top=%d,bottom=%d,yPaint=%d",pItem->m_lvItem.iItem,pItem->m_rect.top,pItem->m_rect.bottom,yPaint);
+		
+		if (pItem->m_rect.top <= yPaint && pItem->m_rect.bottom > yPaint){
+			return pItem;		
+		}
 		else if (pItem->m_rect.top > yPaint)
 		{
 			//需要向上查找
@@ -390,12 +393,14 @@ namespace mango
 				pItem = getPrevRecord (pItem, FALSE) ;
 				if (pItem)
 				{
+					//log_i("pItem->iItem=%d,top=%d",pItem->m_lvItem.iItem,pItem->m_rect.top);
 					if (pItem->m_rect.top <= yPaint)
-						break ;
+						break;
 				}
 				else
 				{
 					pItem = getFirsetRecord () ;
+					//log_i("getPrevRecord = NULL,return first record.");
 					break ;
 				}
 
@@ -409,12 +414,24 @@ namespace mango
 				pItem = getNextRecord (pItem, FALSE) ;
 				if (pItem)
 				{
+					log_i("pItem->iItem=%d,bottom=%d",pItem->m_lvItem.iItem,pItem->m_rect.bottom);
 					if (pItem->m_rect.bottom > yPaint)
 						break ;
 				}
 				else
 				{
+					int offset;
 					pItem = getTailRecord () ;
+					/************************************************/					
+					if(pItem){
+						log_i("getTailRecord top=%d",pItem->m_rect.top);
+						offset = pItem->m_rect.bottom - 53 * 4;
+						if(offset < 0)
+							offset = 0;
+						mZonePoint.y = 0 - offset;
+						log_i("mZonePoint.y=%d",mZonePoint.y);
+					}
+					/**************位置不对的时候重设******/						
 					break ;
 				}
 
@@ -422,7 +439,7 @@ namespace mango
 		}
 
 		mFirstPaintRecord = pItem ;
-
+		//log_i("mFirstPaintRecord->iItem=%d,y=%d",mFirstPaintRecord->m_lvItem.iItem,mZonePoint.y);
 		return pItem ;
 	}
 
@@ -1013,8 +1030,8 @@ namespace mango
 			mFocusedTime = (unsigned int)Time::getMillisecond();
 			mSelectedRecord = mFocusedRecord ; 
 		}
-		invalidateRect(NULL);
-
+		//invalidateRect(NULL);
+		cartoonDisplay();
 		mTouchDownPosition.set(x, y);
 		mTouchMove = false;
 
@@ -1068,6 +1085,7 @@ namespace mango
 		releaseCapture () ;
 
 		mTouchPrevPosition.set(x, y);
+		
 #if 0
 		index =  getIndex(mFocusedRecord);
 		if (index >= 0)
@@ -1080,6 +1098,7 @@ namespace mango
 		mFocusedRecord = NULL ;
 		mSelectedIndex = -1 ;
 #else
+		//log_i("validateGesture=%d,ySpeed=%d",validateGesture,ySpeed);
 		if (validateGesture)
 		{
 			if (ySpeed)
@@ -1094,12 +1113,16 @@ namespace mango
 			{
 				mSelectedIndex = index ;
 				getParent()->onNotify(this, NM_CLICK, (void*)index);
+				//postMessage(getParent(), VM_NOTIFY, NM_CLICK, index);
 			}
 		}
 
 #endif
-		cartoonTropic() ;
-
+		if(mSelectedIndex == -1)
+			cartoonTropic() ;
+		else
+			invalidateRect(NULL);
+		
 		mFocusedRecord = NULL ;
 		mSelectedIndex = -1 ;
 		return 0 ;
@@ -1313,7 +1336,6 @@ namespace mango
 		canvas.fillRect(redrawRect, brush);
 #else		
 		canvas.drawImageResource(mListViewBackgound,0,0);
-		//log_i("canvas.mViewPos.y=%d",canvas.getViewPos().y);
 #endif
 		redrawZoneRect = redrawRect;
 		redrawZoneRect.offset(0, 0 - (mZonePoint.y + clientRect.top));

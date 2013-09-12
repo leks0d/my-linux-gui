@@ -32,6 +32,8 @@ namespace mango
 		powerState = 0;
 		isBootLock = 0;
 		muteCount = 0;
+		volumeInitFail = true;
+
 	}
 
 
@@ -106,8 +108,7 @@ namespace mango
 	int Player::initSettings(){
 		int value;
 		
-		if(gSettingProvider.query(SETTING_VOLUME_ID,&value))
-			setVolume(value);
+		VolumeCheck();
 		
 		if(gSettingProvider.query(SETTING_BRIGHTNESS_ID,&value))
 			ioctrlBrightness(IOCTRL_BRIGTNESS_WRITE,&value);
@@ -191,8 +192,8 @@ namespace mango
 			mMusicInfoView = new MusicInfoView (TEXT("MusicInfo"), NULL, NULL, 0, SW_NORMAL);
 			mMusicInfoView->onCreate();
 		}
-		log_i("info->title=%s",info->title);
-		log_i("info->path=%s",info->path);
+		//log_i("info->title=%s",info->title);
+		//log_i("info->path=%s",info->path);
 		mMusicInfoView->setMusicInfo(info);
 		showMusicInfoView();
 		return 0;
@@ -327,7 +328,24 @@ namespace mango
 		gSettingProvider.dbclose();
 		Environment::sync();
 	}
-	
+	void Player::VolumeCheck(){
+		int value;
+		
+		if(volumeInitFail && gSettingProvider.query(SETTING_VOLUME_ID,&value)){
+			int i,count = 3;
+			for(i=0;i<count;i++){
+				setVolume(value);
+				if(getVolume() == value){
+					volumeInitFail = false;
+					break;
+				}
+			}
+			if(i>=count){
+				log_i("error setVolume to system fail.");
+				volumeInitFail = true;
+			}
+		}
+	}
 	int Player::showMusicOperateView(mediainfo& info){
 		if(mMusicOperateView == NULL){
 			mMusicOperateView = new MusicOperateView(TEXT("MusicOperate"), NULL, NULL, 0, SW_NORMAL);

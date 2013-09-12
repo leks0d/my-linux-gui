@@ -131,6 +131,9 @@ namespace mango
 		int checkfile();
 		void genImgPath(char *title,char *path);
 		int music_exsit_db(char *path);
+		static char* slqFormatOut(char *arg,char *out);
+		static char* slqFormat(char *arg);
+		static char* slqCheck(char *arg);
 		static int str_to_int(char *arg);
 		static int power_operation(int ary,int th);
 		static int FilePathToInfo(char *path,mediainfo& info);

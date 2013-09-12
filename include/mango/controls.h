@@ -589,7 +589,7 @@ typedef struct tagCTRL_LISTVIEW_LAYOUT
 		virtual void* getItem(int index){return NULL;}
 		virtual int getId(){return mId;}
 		virtual int setYoffset(int y){
-			//log_i("mYoffset = %d",mYoffset);
+			//log_i("mYoffset = %d,y=%d",mYoffset,y);
 			mYoffset = y;
 		}
 		virtual int getYoffset(){

@@ -190,6 +190,7 @@ namespace mango
 		void closeWm8740Mute();
 		void setBootWakeLock(int en);
 		void shutDown();
+		void VolumeCheck();
 	public:
 		MediaView*  mMeidaView;
 		PlayingView* mPlayingView;
@@ -218,6 +219,8 @@ namespace mango
 		SocketDetect *mSocketDetect;
 		PlayerSwitch *mSpdifSwitch;
 		PlayerSwitch *mHeadestSwitch;
+
+		bool volumeInitFail;
 	};
 	
 	extern Player  gPlayer;

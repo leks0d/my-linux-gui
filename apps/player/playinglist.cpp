@@ -375,6 +375,7 @@ static const char *PlayerLock = "playerlock";
 						if(mParticleplayer->start()){log_i("start() success!");}else{log_i("start() fail!");return -1;}
 					//mango::Thread::sleep(600);
 					//gPlayer.closeWm8740Mute();
+					gPlayer.VolumeCheck();
 					mThread.create(Playinglist::CloseMuteRunnig,NULL);
 				}
 				getPlayingItem()->isPlayed = 1;

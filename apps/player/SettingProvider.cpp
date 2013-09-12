@@ -144,12 +144,13 @@ namespace mango
 		char *ptr,sql[1024],safe[100];
 		
 		if(id == SETTING_VOLUME_ID){
-			int retry = 3;
+			/*int retry = 3;
 			while(retry--){
 				saveVolume(value);
 				if(readVolume() == value)
 					break;
-			}
+			}*/
+			value += 300;
 		}
 
 		ptr = sql;
@@ -177,9 +178,10 @@ namespace mango
 		array = new IntegerArray();
 
 		if(id == SETTING_VOLUME_ID){
-			*value = readVolume();
+			/**value = readVolume();
 			if(*value<=255||*value>=0)
-				return 1;
+				return 1;*/
+			
 		}
 
 		ptr = sql;
@@ -191,6 +193,12 @@ namespace mango
 			log_e("sqlite3_exec error : %s\n",pErrMsg);			
 		}
 		*value = array->getItem(0);
+		if(id == SETTING_VOLUME_ID){
+			*value-=300;
+			if(*value<0){
+				*value = 170;
+			}
+		}		
 		log_i("SettingProvider::query array=%d",array->getCount());
 		return array->getCount();
 	}
