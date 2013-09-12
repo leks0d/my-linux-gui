@@ -79,7 +79,9 @@ namespace mango
 	unsigned int VolumeView::VolumeRunning(void* p){
 		VolumeView* iVolume = (VolumeView*)p;
 		int vol,closeCount;
+		
 		closeCount = VOLUME_TIME;
+		vol = -1;
 		while (1) {
 			Thread::sleep(VOLUME_REFRESH);
 			
@@ -112,8 +114,7 @@ namespace mango
 			}			
 		}
 		iVolume->isShow = 0;
-		
-		gSettingProvider.update(SETTING_VOLUME_ID,vol);
+		gSettingProvider.update(SETTING_VOLUME_ID,gPlayer.getVolume());
 		gMessageQueue.post(iVolume,VM_NOTIFY,NM_DISMISS,0);
 		
 	}
