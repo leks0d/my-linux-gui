@@ -201,7 +201,7 @@ namespace mango
 	char* mediaprovider::slqCheck(char *arg){
 		int i,len;
 		char *src;
-		return 0;
+		
 		if(arg){
 			src = arg;	
 			while(*src){		
@@ -211,7 +211,7 @@ namespace mango
 				src++;
 			}
 		}
-		
+		return 0;
 	}
 	
 	int mediaprovider::power_operation(int ary,int th){
@@ -528,17 +528,17 @@ namespace mango
 			getFileParentName(path,value);
 			log_i("id3 album is null;getname=%s",value);
 		}
-		//slqCheck(value);
+		slqCheck(value);
 		len = strlen(value)+1;
 		info->album = new char[len];
 		memcpy(info->album,value,len);
 
 		info->album_key = new char[len];
 		strlwr(value,info->album_key);	
-/*------------------------------album---------------------------------------*/				
+/*------------------------------artist---------------------------------------*/				
 		memset(value, 0, 256);
 		if (m_id3.GetTags(METADATA_KEY_ARTIST, value)){
-			strdelspa(value);
+			slqCheck(value);
 			len = strlen(value)+1;
 			
 			info->artist = new char[len];
@@ -571,7 +571,7 @@ namespace mango
 
 		info->title_key = new char[len];
 		strlwr(value,info->title_key);
-/*--------------------------------title---------------------------------------------*/
+/*--------------------------------genre---------------------------------------------*/
 		memset(value, 0, 256);
 		if (m_id3.GetTags(METADATA_KEY_GENRE, value)){
 			log_i("title gettag:title=%s",value);
@@ -579,6 +579,7 @@ namespace mango
 			log_i("title gettag fail");
 			sprintf(value,"(null)");
 		}
+		slqCheck(value);
 		len = strlen(value)+1;
 			
 		info->genre = new char[len];
@@ -587,7 +588,7 @@ namespace mango
 		info->genre_key = new char[len];
 		strlwr(value,info->genre_key);
 
-/*--------------------------------genre--------------------------------------------*/
+/*--------------------------------duration--------------------------------------------*/
 
 		memset(value, 0, 256);
 		if (m_id3.GetTags(METADATA_KEY_DURATION, value)){

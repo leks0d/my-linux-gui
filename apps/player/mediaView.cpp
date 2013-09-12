@@ -668,7 +668,7 @@ namespace mango
 						TCHAR path[MAX_PATH];
 						char utf8Path[300],*ptr,parent[255];
 						char *where = NULL;
-						char *sqlpath = NULL;
+						char sqlpath[300];
 						int count;
 						ArrayMediaInfo *pinfo;
 						
@@ -680,13 +680,12 @@ namespace mango
 						String::lstrcat(path, record->m_lvItem.pszText);
 
 						Charset::wideCharToMultiByte(CP_UTF8, path, String::lstrlen(path), utf8Path, MAX_PATH * 3);
-						sqlpath = mediaprovider::slqFormat(utf8Path);
+						mediaprovider::slqFormatOut(utf8Path,sqlpath);
 						ptr += sprintf(ptr," where path = '%s' ",sqlpath);
 
 						count = gmediaprovider.queryMusicArray(where,pinfo);
 						
 						safeDelete(where);
-						safeDelete(sqlpath);
 
 						getparent(utf8Path,parent);
 						
@@ -840,7 +839,7 @@ namespace mango
 			if(mNeedPlayPath != NULL){
 						char *ptr,parent[255];
 						char *where = NULL;
-						char *sqlpath = NULL;
+						char sqlpath[300];
 						int count;
 						ArrayMediaInfo *pinfo;
 
@@ -848,14 +847,13 @@ namespace mango
 						pinfo = new ArrayMediaInfo();
 						ptr = where = new char[300];
 						
-						sqlpath = mediaprovider::slqFormat(mNeedPlayPath);
+						mediaprovider::slqFormatOut(mNeedPlayPath,sqlpath);
 						
 						ptr += sprintf(ptr," where path = '%s' ",sqlpath);
 						
 						count = gmediaprovider.queryMusicArray(where,pinfo);
 						
 						safeDelete(where);
-						safeDelete(sqlpath);
 
 						getparent(mNeedPlayPath,parent);
 						
