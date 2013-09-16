@@ -503,7 +503,7 @@ namespace mango
 			}
 			if(gPlayer.mSpdifSwitch->isToSwicth()){
 				isSpdifIn = gPlayer.isSpdifIn();
-				gPlayer.openCodecPower(!isSpdifIn);
+				//gPlayer.openCodecPower(!isSpdifIn);
 				mPlayinglist->setSpdifOut(isSpdifIn);
 				gPlayer.mSpdifSwitch->resetSwicth();
 			}

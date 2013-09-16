@@ -101,7 +101,7 @@ namespace mango
 				mSelectedRecord = NULL ;
 
 		} while (1) ;	
-
+		mFirstPaintRecord = NULL;
 		return TRUE ;
 	}
 
@@ -414,7 +414,7 @@ namespace mango
 				pItem = getNextRecord (pItem, FALSE) ;
 				if (pItem)
 				{
-					log_i("pItem->iItem=%d,bottom=%d",pItem->m_lvItem.iItem,pItem->m_rect.bottom);
+					//log_i("pItem->iItem=%d,bottom=%d",pItem->m_lvItem.iItem,pItem->m_rect.bottom);
 					if (pItem->m_rect.bottom > yPaint)
 						break ;
 				}
@@ -437,7 +437,7 @@ namespace mango
 
 			}while (1) ;
 		}
-
+		
 		mFirstPaintRecord = pItem ;
 		//log_i("mFirstPaintRecord->iItem=%d,y=%d",mFirstPaintRecord->m_lvItem.iItem,mZonePoint.y);
 		return pItem ;
@@ -855,6 +855,7 @@ namespace mango
 				//log_i("mListAdapter->PaintView lvitem->iItem=%d",lvitem->iItem);
 				mListAdapter->PaintView(canvas,rect,lvitem,record == mSelectedRecord);
 				mListAdapter->setYoffset(mZonePoint.y);
+				log_i("---");
 				return true;
 			}
 		}
@@ -980,8 +981,9 @@ namespace mango
 		Brush brush(RGB(255, 255, 255));
 		Rect rect;
 		rect.setEx(0,0,320,212);
+
 		layout();
-		
+
 		//canvas.fillRect(rect, brush);
 
 		record = findFirstPainRecord();

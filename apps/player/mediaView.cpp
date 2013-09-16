@@ -1128,6 +1128,11 @@ namespace mango
 		}
 		if(count>=0)
 			rePaintList();
+		else{
+			mlist->deleteAllItems();
+			mlist->invalidateRect();
+		}
+			
 	}
 
 	void MusicAdapter::setListData(ArrayMediaInfo* info){
@@ -1183,8 +1188,13 @@ namespace mango
 		
 		x = rect.left;
 		y = rect.top;
-		
+
 		info = mMusicArrayList->getMediaInfo(lvitem->iItem);
+
+		if(info == NULL){
+			log_i("----");
+			return;
+		}
 		x = LIST_MUSIC_ICON_LEFT;
 		canvas.drawImageResource(MediaView::getMusicIcon(info->name),x,y+5);
 		if(isSec)

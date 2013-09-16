@@ -451,9 +451,17 @@ static const char *PlayerLock = "playerlock";
 				if(mParticleplayer != NULL){
 					if(mParticleplayer->isSpdifOut() != isSpdif){
 						mParticleplayer->enableSpdifOut(isSpdif);
-						if(!isSpdif && (isPlaying()||inPause)){
-							playPostion = mParticleplayer->getCurrentPosition();
-							startPlayPosition(playPostion,inPause?false:true,false);
+						if(!isSpdif && (isPlaying())){
+							//playPostion = mParticleplayer->getCurrentPosition();
+							//startPlayPosition(playPostion,inPause?false:true,false);
+
+							//playPauseOrStart();
+							//mango::Thread::sleep(500);
+							//playPauseOrStart();
+						}else if(isSpdif && isPlaying()){
+							playPauseOrStart();
+							mango::Thread::sleep(500);
+							playPauseOrStart();
 						}
 					}
 				}
