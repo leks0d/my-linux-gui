@@ -560,6 +560,7 @@ namespace mango
 			info->title_key = new char[len];
 			strlwr(value,info->title_key);*/
 			log_i("title gettag:title=%s",value);
+			slqCheck(value);
 		}else{
 			log_i("title gettag fail");
 			getFileTitle(info->name,value);
@@ -702,6 +703,7 @@ namespace mango
 				memset(ptr,0,strlen(ptr));
 			}else{
 				log_i("genImgPath:%s",path);
+				slqCheck(path);
 				break;
 			}
 		}

@@ -90,7 +90,7 @@ namespace mango
 		mDuration->onCreate();
 		
 
-		rect.setEx(left1, 145, 139-14, 20);
+		rect.setEx(left1, 145, 318-left1, 20);
 		mSimpleRate = new ValueTextView(SETTING_BACK, TEXT("mSimpleRate"), this, &rect, 0);
 		mSimpleRate->setTextResoure(STRSAMPLE_RATE);
 		mSimpleRate->onCreate();
@@ -102,7 +102,7 @@ namespace mango
 		mSimpleBit->onCreate();
 		
 
-		rect.setEx(left1, 165, 139-14, 20);
+		rect.setEx(left1, 165, 318-left1, 20);
 		mSimpleBps = new ValueTextView(STR_MUSIC_BPS, TEXT("mSimpleBps"), this, &rect, 0);
 		mSimpleBps->setTextResoure(STR_MUSIC_BPS);
 		mSimpleBps->onCreate();
@@ -158,7 +158,48 @@ namespace mango
 		mArtist->setTextString(mCurrentInfo.artist);
 		mDuration->setTextString(mstr->mstr);
 
-		mstr->clear();
+		delete mstr;
+		mstr = NULL;
+		
+		updateAudioInfo();
+	}
+	void MusicInfoView::updateAudioInfo(){
+		int info[6];	
+		Mstring *mstr;
+		float sampleRate;
+
+		if((mPlayinglist->getPlayingItem() != NULL) && 
+			(mCurrentInfo.id == mPlayinglist->getPlayingItem()->id)	){
+			
+			log_i("show playing music info.");
+			memset(info,0,sizeof(int)*6);
+			mstr = new Mstring(30);
+
+			mPlayinglist->getAudioInfo(info);
+			
+			sampleRate = info[1];
+			sampleRate = sampleRate/1000.0;
+			
+			mstr->mfloatSprintf("%.1fKHz",sampleRate);
+			mSimpleRate->setTextString(mstr->mstr);
+			
+			mstr->clear();
+			mstr->mSprintf("%dKbps",info[2]/1000);
+			mSimpleBps->setTextString(mstr->mstr);
+
+			mstr->clear();
+			mstr->mSprintf("%dBit",info[0]);
+			mSimpleBit->setTextString(mstr->mstr);
+			
+			delete mstr;
+			mstr = NULL;
+		}
+		else{
+			mSimpleRate->setTextString(" ");
+			mSimpleBit->setTextString(" ");
+			mSimpleBps->setTextString(" ");
+		}
+		log_i("PlayingView::updateAudioInfo end");
 	}
 
 	void MusicInfoView::setMusicInfo(mediainfo* src){

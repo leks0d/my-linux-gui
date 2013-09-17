@@ -138,6 +138,7 @@ class KeyCount{
 	public:
 		KeyCount mKeyCount;
 		int isUsmCon;
+		int isMediaScanning;
 		
 	};
 	

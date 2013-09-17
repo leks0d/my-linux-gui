@@ -455,9 +455,9 @@ static const char *PlayerLock = "playerlock";
 							//playPostion = mParticleplayer->getCurrentPosition();
 							//startPlayPosition(playPostion,inPause?false:true,false);
 
-							//playPauseOrStart();
-							//mango::Thread::sleep(500);
-							//playPauseOrStart();
+							playPauseOrStart();
+							mango::Thread::sleep(500);
+							playPauseOrStart();
 						}else if(isSpdif && isPlaying()){
 							playPauseOrStart();
 							mango::Thread::sleep(500);

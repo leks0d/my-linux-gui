@@ -855,7 +855,6 @@ namespace mango
 				//log_i("mListAdapter->PaintView lvitem->iItem=%d",lvitem->iItem);
 				mListAdapter->PaintView(canvas,rect,lvitem,record == mSelectedRecord);
 				mListAdapter->setYoffset(mZonePoint.y);
-				log_i("---");
 				return true;
 			}
 		}

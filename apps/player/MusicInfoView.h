@@ -10,6 +10,7 @@ namespace mango
 		void setMusicInfo(mediainfo* info);
 		virtual ~MusicInfoView(void);
 		void initView();
+		void updateAudioInfo();
 	public:
 		virtual int onCreate();
 		virtual int onDestroy();

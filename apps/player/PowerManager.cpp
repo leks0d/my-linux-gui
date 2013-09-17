@@ -37,7 +37,8 @@ namespace mango
 		if(mPlayinglist->isPlaying()){
 			atuoPoweroffCount = 0;
 		}
-		if(gPlayer.mPlayingView != NULL && gPlayer.mPlayingView->isUsmCon){
+		if(gPlayer.mPlayingView != NULL && 
+			(gPlayer.mPlayingView->isUsmCon || gPlayer.mPlayingView->isMediaScanning)){
 			atuoPoweroffCount = 0;
 		}
 		if(atuoPoweroffCount>=poweroffTime)

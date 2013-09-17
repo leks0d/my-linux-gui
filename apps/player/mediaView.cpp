@@ -139,7 +139,7 @@ namespace mango
 		Rect rect;
 		int menuBkX = 5,orderTextX = menuBkX+3,orderDiv = 78,orderTextY = 21;
 
-		rect.setEx(0,21,320,219);
+		rect.setEx(0,21,318,219);
 		mListView = new MediaListView(TEXT("Media List"), this, &rect, LVS_LIST);
 		mListView->setListItemBackground(IDP_LISTITEM_BGD,IDP_LISTITEM_BGD_SEC);
 		mListView->setTextColor(RGB(255,255,255));
@@ -524,7 +524,7 @@ namespace mango
 			mGenreAdapter = new GenreAdapter(mListView,ADAPTER_ALBUM); 
 		}
 		mGenreAdapter->refresh();
-		
+		mListView->setZoneY(mGenreAdapter->getYoffset(),false);
 		mTitle->setTextResoure(STR_GENRE_LIST);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mTitle->invalidateRect();
@@ -547,7 +547,7 @@ namespace mango
 			mAlbumMusicAdapter = new MusicAdapter(mListView,ADAPTER_PLAYING); 
 		}
 
-		ptr += sprintf(ptr,"where album='%s' and artist='%s'",info->album,info->artist);
+		ptr += sprintf(ptr,"where album='%s' ",info->album,info->artist);
 
 		mAlbumMusicAdapter->setWhere(where);
 		
@@ -1219,7 +1219,7 @@ namespace mango
 		int count,i;
 		char *ptr,where[255];
 		ptr = where;
-		sprintf(ptr,"group by album,artist");
+		sprintf(ptr,"group by album");
 		
 		mlist->setListAdapter(this);
 		mlist->deleteAllRecord();

@@ -15,6 +15,7 @@ namespace mango
 		mMSkBitmap = new MSkBitmap();
 		isNeedFreshOld = 0;
 		isUsmCon = 0;
+		isMediaScanning = 0;
 	}
 
 
@@ -64,7 +65,8 @@ namespace mango
 		mAlbumImage->setImageResoure(IDP_MUSICINFO_ICON);
 		mAlbumImage->setBitmapAlps(true);
 		
-		rect.setEx(left, 32, 100, 20);
+		rect.setEx(left, 32, 120, 20);
+		
 		mAudioInfo = new TextView(PLAYING_IDB_MUSIC_NAME, TEXT("mAudioInfo"), this, &rect, 0);
 		mAudioInfo->setTextColor(COLOR_GRAY);
 		mAudioInfo->setTextSize(15);
@@ -354,7 +356,6 @@ namespace mango
 
 		delete mstr;
 		mstr = NULL;
-		
 		log_i("PlayingView::updateAudioInfo end");
 	}
 	
@@ -543,8 +544,10 @@ namespace mango
 			ViewInit();
 			gmediaprovider.externFileCheck();
 		}else if(code == MEDIA_SCANNER_START){
+			isMediaScanning = 1;
 			gPlayer.showMediaScannerView();
 		}else if(code == MEDIA_SCANNER_END){
+			isMediaScanning = 0;
 			gPlayer.dismissView(gPlayer.mMediaScannerView);
 		}else if(code == NM_SPIDF){
 			gPlayer.mSpdifSwitch->setPlayerSwitch();

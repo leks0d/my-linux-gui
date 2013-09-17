@@ -96,6 +96,7 @@ namespace mango
 			}
 		}
 		else if(isBootLock){
+			if((!mPlayinglist->isPlaying()) && (mPlayinglist->inPause == 0))
 			Environment::openMute();
 #ifdef NEED_SLEEP
 			if(wakeUnlock(BootUp) == 0)
