@@ -210,26 +210,29 @@ namespace mango
 		mList->invalidateRect();
 	}
 	void PlayListAdapter::PaintView(Canvas & canvas,Rect & rect,ListViewItem * lvitem,int isSec){
-		
-
 		int	 x, y;
 		int index = lvitem->iItem;
 		PlayListItem item = mArrayPlayList.getItem(index);
 
 		x = rect.left;
 		y = rect.top;
-
+		
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else
 			canvas.setTextColor(RGB(255,255,255));
+		
 		canvas.setTextSize(18);
 
-		x=20;y+=10;
+		x=20;
 
 		if(item.id>0){
+			canvas.drawImageResource(IDP_MUSIC_PLAYLIST_ICO,x,y,false);
+			x+=50;y+=10;
 			canvas.drawText(item.name,-1,x,y);
 		}else{
+			canvas.drawImageResource(IDP_MUSIC_NEW_PLAYLIST,x,y,false);
+			x+=50;y+=10;
 			canvas.drawTextResource(STR_NEW_LAYLIST_LIST,x,y);
 		}
 
