@@ -124,7 +124,7 @@ namespace mango
 		
 		mNeedPlayPath = NULL;
 		mOrderMenuShow = 0;
-		
+		mCurrentPlaylistId = -1;
 	}
 
 
@@ -389,11 +389,11 @@ namespace mango
 	}
 	void MediaView::initMainList(){
 		
-		int img[]={IDP_PLAYING_LIST,IDP_FILE_LIST,//IDP_PLAYLIST_LIST,
+		int img[]={IDP_PLAYING_LIST,IDP_FILE_LIST,IDP_PLAYLIST_LIST,
 			IDP_ALL_MUSIC,IDP_ALBUM_LIST,IDP_ARTIST_LIST,IDP_GENRE_LIST};
-		int til[]={STR_PLAYING_LIST,STR_FILE_LIST,//STR_LAYLIST_LIST,
+		int til[]={STR_PLAYING_LIST,STR_FILE_LIST,STR_LAYLIST_LIST,
 			STR_MUSIC_LIST,STR_ALBUM_LIST,STR_ARTIST_LIST,STR_GENRE_LIST};
-		int i,count = 6;
+		int i,count = 7;
 		int mask = LVIF_ITEXT | LVIF_IMAGE | LVIF_PARAM;
 #if 0		
 		mListView->deleteAllItems();
@@ -464,8 +464,8 @@ namespace mango
 			mPlayListMemAdapter = new MusicAdapter(mListView,ADAPTER_PLAYING);
 		}
 		mPlayListMemAdapter->setSql(sql);
-		
-		//mTitle->setTextResoure(item.name);
+		mCurrentPlaylistId = item.id;
+
 		mTitle->setTextString(item.name);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mTitle->invalidateRect();
@@ -744,15 +744,15 @@ namespace mango
 									initPlayingList();	break;
 								case 1:
 									initRootDirect(); 	break;
-								//case 2:
-								//	initPlayList();		break;	
 								case 2:
-									initMusicList();	break;
+									initPlayList();		break;	
 								case 3:
-									initAlbumList();	break;
+									initMusicList();	break;
 								case 4:
-									initArtistList();	break;
+									initAlbumList();	break;
 								case 5:
+									initArtistList();	break;
+								case 6:
 									initGenreList();	break;
 								default:
 									break;
@@ -775,7 +775,7 @@ namespace mango
 									
 								adapter = (MusicAdapter *)mListView->getListAdapter();
 								
-								if(pt.x>iconRight){								
+								if(pt.x>iconRight){
 									if(adapter != NULL){
 										//if(getMainState() != 0x1300){
 											mPlayinglist->clearAll();
@@ -785,7 +785,10 @@ namespace mango
 									}
 								}else if(pt.x>LIST_MUSIC_ICON_LEFT-10){
 									log_i("---");
-									gPlayer.showMusicOperateView( *(adapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)) );
+									if(getMainState() == 0x1610)
+										gPlayer.showMusicOperateView( *(adapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)) ,OPERATE_TYPE_MUSIC_PLAYLIST);
+									else
+										gPlayer.showMusicOperateView( *(adapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)) );
 								}
 								break;
 							}
@@ -796,6 +799,8 @@ namespace mango
 							initGenreMusicList("genre",mGenreAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->genre,0x1710);
 							break;
 						case 0x1600:{
+								Point pt =  mListView->getTouchPrevPosition();
+								int iconRight = LIST_MUSIC_ICON_LEFT+40;
 								PlayListItem item;
 								
 								item = mPlayListAdapter->mArrayPlayList.getItem(record->m_lvItem.iItem);
@@ -806,7 +811,11 @@ namespace mango
 									PlayList::newPlaylist();
 									mPlayListAdapter->refresh();
 								}else{
-									initPlayListMem(item);
+									if(pt.x>iconRight){
+										initPlayListMem(item);
+									}else if(pt.x>LIST_MUSIC_ICON_LEFT-10){
+										gPlayer.showPlaylistOperateView(item);
+									}
 								}
 								break;
 							}
@@ -892,6 +901,11 @@ namespace mango
 				log_i("ret = %s",ret);
 				initRootDirect();
 			}
+		}
+		else if(code == NM_REMOVE_FROM_PLAYLIST){
+			int id = (int)parameter;
+			PlayList::delAudioFromPlaylist(mCurrentPlaylistId,id);
+			//mPlayListMemAdapter.refresh();
 		}
 
 		return 0;
@@ -1196,7 +1210,7 @@ namespace mango
 			return;
 		}
 		x = LIST_MUSIC_ICON_LEFT;
-		canvas.drawImageResource(MediaView::getMusicIcon(info->name),x,y+5);
+		canvas.drawImageResource(MediaView::getMusicIcon(info->path),x,y+5);
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else

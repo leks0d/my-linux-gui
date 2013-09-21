@@ -217,7 +217,7 @@ namespace mango
 		int imgsec[]={0,0,0,0,0};
 		int text[]={STR_LANGUAGE_EN,STR_LANGUAGE_CN,STR_LANGUAGE_JA,STR_LANGUAGE_JAP,STR_LANGUAGE_KR,
 			STR_LANGUAGE_TH,STR_LANGUAGE_RU,STR_LANGUAGE_SP,STR_LANGUAGE_PU};
-		int i,count = 4;
+		int i,count = 9;
 		
 		if(mLanguageListAdapter == NULL){
 			mListView->deleteAllItems();

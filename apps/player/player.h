@@ -6,6 +6,7 @@
 #include "resource.h"
 #include "SocketDetect.h"
 #include "AlarmManager.h"
+#include "CCue.h"
 #include "mediaprovider.h"
 #include "ArrayMediaInfo.h"
 #include "playlist.h"
@@ -29,7 +30,7 @@
 #include "MusicOperateView.h"
 #include "KeyLockView.h"
 #include "ChosenView.h"
-#include "CCue.h"
+#include "PlaylistOperateView.h"
 
 
 namespace mango
@@ -172,8 +173,10 @@ namespace mango
 		int showMediaScannerView();
 		int showSdcardInsertView();
 		int showMusicOperateView(mediainfo& info);
+		int showMusicOperateView(mediainfo& info,int type);
 		int showKeyLockView();
 		int showChosenView(int type);
+		int showPlaylistOperateView(PlayListItem& info);
 		void dismissView(View *view);
 		int  getVolume(void);
 		void setVolume(int volume);
@@ -208,7 +211,7 @@ namespace mango
 		UsmConnectView *mUsmConnectView;
 		KeyLockView *mKeyLockView;
 		ChosenView *mChosenView;
-		
+		PlaylistOperateView *mPlaylistOperateView;
 		Mutex muteMutex;
 		int muteCount;
 		

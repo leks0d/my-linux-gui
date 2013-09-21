@@ -206,6 +206,7 @@ namespace mango
 		int 	mainState;
 		int     mOrderMenuShow;
 		char    *mNeedPlayPath;
+		int     mCurrentPlaylistId;
 	};
 
 

@@ -17,12 +17,25 @@ public:
 	int Find(const char *tag,int offset);
 	int getLen();
 	char* getString();
-	char* Mid(int start,int end);
+	char* Mid(int start,int len);
+	int Mid(int start,int len,CString& out);
 	CString& operator=(CString& cstring);
 	CString& operator=(const char *str);
 public:
 	char *string;
 	int mlen;
+};
+class CStringArray{
+public:
+	CStringArray();
+	~CStringArray();
+	int addCString(CString& cstr);
+	int getCString(int index,CString& out);
+	int getCount();
+private:
+	CString *mList;
+	int mLen;
+	int mMax;
 };
 
 class CFile{

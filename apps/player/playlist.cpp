@@ -162,6 +162,28 @@ namespace mango
 		
 		gmediaprovider.exec(sql,0,0);	
 	}
+	void PlayList::delAudioFromPlaylist(int playlist_id, int audio_id){
+		char *ptr,sql[255];
+		
+		ptr = sql;
+		ptr+=sprintf(ptr,"delete from playlistmem where audio_id=%d and playlist_id=%d",audio_id,playlist_id);
+		
+		gmediaprovider.exec(sql,0,0);	
+	}
+	void PlayList::delPlaylist(int playlist_id){
+		char *ptr,sql[255];
+		
+		log_i("playlist_id=%d",playlist_id);
+		
+		ptr = sql;
+		ptr+=sprintf(ptr,"delete from playlist where _id=%d",playlist_id);
+		gmediaprovider.exec(sql,0,0);	
+
+		memset(sql,0,255);
+		ptr = sql;
+		ptr+=sprintf(ptr,"delete from playlistmem where playlist_id=%d",playlist_id);
+		gmediaprovider.exec(sql,0,0);	
+	}
 	void PlayList::queryPlaylistMem(ArrayMediaInfo& array,int playlist_id){
 		char *ptr,sql[255];
 		
@@ -170,7 +192,7 @@ namespace mango
 		ptr+=sprintf(ptr,"select music.* from  music,playlistmem where playlistmem.playlist_id=%d and music._id=playlistmem.audio_id",
 			playlist_id);
 		
-		gmediaprovider.queryMusicArray(sql,&array);
+		gmediaprovider.queryArrayMedia(sql,&array);
 	}
 	PlayListAdapter::PlayListAdapter(){
 		mSql = NULL;
@@ -227,11 +249,11 @@ namespace mango
 		x=20;
 
 		if(item.id>0){
-			canvas.drawImageResource(IDP_MUSIC_PLAYLIST_ICO,x,y,false);
+			canvas.drawImageResource(IDP_MUSIC_PLAYLIST_ICO,x,y,true);
 			x+=50;y+=10;
 			canvas.drawText(item.name,-1,x,y);
 		}else{
-			canvas.drawImageResource(IDP_MUSIC_NEW_PLAYLIST,x,y,false);
+			canvas.drawImageResource(IDP_MUSIC_NEW_PLAYLIST,x,y,true);
 			x+=50;y+=10;
 			canvas.drawTextResource(STR_NEW_LAYLIST_LIST,x,y);
 		}

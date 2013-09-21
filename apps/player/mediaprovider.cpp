@@ -41,7 +41,9 @@ namespace mango
 		data->info.add_time = mediaprovider::str_to_int(*(argv++));
 		data->info.duration = mediaprovider::str_to_int(*(argv++));
 		data->info.inPlay = mediaprovider::str_to_int(*(argv++));
-		data->info.times = mediaprovider::str_to_int(*(argv));
+		data->info.times = mediaprovider::str_to_int(*(argv++));
+		data->info.isCue = mediaprovider::str_to_int(*(argv++));
+		data->info.cueStart = mediaprovider::str_to_int(*(argv));
 		data->next = 0;
 		
 #if SQLITE_LOG
@@ -342,7 +344,7 @@ namespace mango
 		count = array.getCount();
 		
 		for(i=1;i<count;i++){
-			mediainfo *info=array.getMediaInfo(i);
+			mediainfo *info = array.getMediaInfo(i);
 			
 			memset(sql,0,1024);
 			ptr = sql;
@@ -419,7 +421,11 @@ namespace mango
 				log_i("getmediainfo info");
 				getmediainfo(array.getMediaInfo(i)->path,&info);
 				log_i("inster info");
-				insert("music",&info);
+				
+				if(!cueCheck(info.path,&info)){
+					insert("music",&info);
+				}
+				
 				log_i("safefreeMediainfo info");
 				safefreeMediainfo(&info);
 			}
@@ -767,18 +773,100 @@ namespace mango
 			}
 			else if(ismusic(de->d_name)&&(de->d_name[0]!='.')&&(!music_exsit_db(direct)))
 			{
-
+				ArrayMediaInfo array;
+				
 				getmediainfo(direct,&info);
-				insert("music",&info);
+				
+				if(!cueCheck(direct,&info)){
+					insert("music",&info);
+				}
 				safefreeMediainfo(&info);
 				count++;
 			}
-
 		}
 		safefreeMediainfo(&info);
 		closedir(d);	
 		
 		return 0;
+	}
+	bool mediaprovider::cueCheck(char *direct,mediainfo *info){
+		char cuePath[300];
+		bool ret = false;
+		
+		memset(cuePath,0,300);
+		getCuePath(direct,cuePath);
+		
+		if(FileAttr::FileExist(cuePath)){
+			ret = loadCueFile(cuePath,info);
+		}
+
+		return ret;
+	}
+	void mediaprovider::getCuePath(char* src,char * out){
+		if(src){
+			int len = strlen(src);
+			int i; 
+			for(i=len-1;i>0;i--){
+				if(src[i] == '.')
+					break;
+			}
+			memcpy(out,src,i+1);
+			strcat(out,"cue");
+			log_i("out=%s",out);
+		}
+	}
+	bool mediaprovider::loadCueFile(char* path,mediainfo *info){
+		CCue mCCue;
+		ArrayMediaInfo *list;
+		int i,count,ret;
+
+		log_i("file = %s",path);
+		
+		ret = mCCue.file_load(path);	
+		count = mCCue.m_total_song;
+		
+		if(ret<0 || count<=0)
+			return false;
+		
+		for(i=0;i<count;i++){
+			mediainfo mInfo;
+			song_t song;
+			int len;
+
+			memset(&mInfo,0,sizeof(mediainfo));
+			mediainfocpy(info,mInfo);
+			
+			mCCue.get_cert_song(i,&song);
+			
+			mInfo.isCue = 1;
+			mInfo.cueStart = song.star;
+			mInfo.duration = song.len;
+			
+			//strCopy(song.m_strname.string,mInfo.title);
+			//strCopy(song.m_strname.string,mInfo.name);
+			len = strlen(song.m_strname.string);
+			if(mInfo.name != NULL){
+				delete mInfo.name;
+				mInfo.name = NULL;
+			}
+			mInfo.name = new char[len+1];
+			memcpy(mInfo.name,song.m_strname.string,len+1);
+			
+			
+			log_i("song.m_strname=%s",song.m_strname.string);
+			
+			insert("music",&mInfo);
+			safefreeMediainfo(&mInfo);
+		}
+	}
+	void mediaprovider::strCopy(char *src,char *out){
+		int len;
+		
+		len = strlen(src);
+		safeDelete(out);
+		
+		out = new char[len+1];
+		memcpy(out,src,len+1);
 	}
 	int mediaprovider::checkfile(){
 		mediainfo *infolist;
@@ -868,14 +956,15 @@ namespace mango
 		char *ptr,sql[1024];
 		log_i("tag");
 		ptr = sql;
-		ptr += sprintf(ptr,"insert into %s (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ",
+		ptr += sprintf(ptr,"insert into %s (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ",
 			table,MUSIC_PTAH,MUSIC_NAME,MUSIC_NAME_KEY,MUSIC_TITLE,MUSIC_TITLE_KEY,MUSIC_ART,MUSIC_ART_KEY,
-			MUSIC_ALBUM,MUSIC_ALBUM_KEY,"genre","genre_key",MUSIC_TRACK,MUSIC_ART_IMG,MUSIC_ADD_TIME,MUSIC_DURATION,MUSIC_IN_PLAY,MUSIC_TIMES);
+			MUSIC_ALBUM,MUSIC_ALBUM_KEY,"genre","genre_key",MUSIC_TRACK,MUSIC_ART_IMG,MUSIC_ADD_TIME,
+			MUSIC_DURATION,MUSIC_IN_PLAY,MUSIC_TIMES,"iscue","cuestart");
 		log_i("tag");
-		ptr += sprintf(ptr,"values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%d','%s','%d','%d','%d','%d');",
+		ptr += sprintf(ptr,"values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%d','%s','%d','%d','%d','%d','%d','%d');",
 				info->path,info->name,info->name_key,info->title,info->title_key,info->artist,
 				info->artist_key,info->album,info->album_key,info->genre,info->genre_key,info->track,info->img_path,
-				info->add_time,info->duration,info->inPlay,info->times);
+				info->add_time,info->duration,info->inPlay,info->times,info->isCue,info->cueStart);
 		log_i("tag");
 		exec(sql,0,0);
 

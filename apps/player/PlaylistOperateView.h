@@ -2,30 +2,13 @@
 namespace mango
 {
 
-	class OperateMuiscListAdapter : public SettingListAdapter
-	{
-		public:
-			OperateMuiscListAdapter(void){}
-			~OperateMuiscListAdapter(void){}
-			OperateMuiscListAdapter(ListView* list,int id);
-			virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);
-	};
-
-	enum
-	{
-		OPERATE_TYPE_MUSIC_NORMAL = 0xf00c0,
-		OPERATE_TYPE_MUSIC_PLAYLIST = 0xf00c1,
-	};
-
-
-	class MusicOperateView: public View
+	class PlaylistOperateView: public View
 	{
 	public:
-		MusicOperateView(void);
-		MusicOperateView(const TCHAR* title, View* parent, Rect* rect, int style, int type,int show);
-		MusicOperateView(const TCHAR* title, View* parent, Rect* rect, int style, int show = SW_NORMAL);
-		virtual ~MusicOperateView(void);
-		void setMusicInfo(mediainfo& info){mCurrentInfo = info;initView();}
+		PlaylistOperateView(void);
+		PlaylistOperateView(const TCHAR* title, View* parent, Rect* rect, int style, int show = SW_NORMAL);
+		virtual ~PlaylistOperateView(void);
+		void setmPlayListItem(PlayListItem& info){mPlayListItem = info;initView();}
 		void initView();
 		void initOperateMuiscList();
 		void initPlayList();
@@ -46,7 +29,7 @@ namespace mango
 		int getMainState(){return mainState;}
 	public:
 		MediaListView*  mListView;
-		mediainfo mCurrentInfo;
+		PlayListItem mPlayListItem;
 		TextView* mTitle;
 		Button* mBack;
 		Button* mHome;

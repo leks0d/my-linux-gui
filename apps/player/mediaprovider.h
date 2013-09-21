@@ -43,7 +43,9 @@ namespace mango
 									add_time INTEGER,\
 									duration INTEGER,\
 									inplay INTEGER,\
-									times INTEGER\
+									times INTEGER,\
+									iscue INTEGER,\
+									cuestart INTEGER\
 									);"
 	#define IMG_PATH "/mnt/sdcard/.album_img"
 	
@@ -69,6 +71,8 @@ namespace mango
 		int inPlay;
 		int isPlayed;
 		int times;
+		int isCue;
+		int cueStart;
 	}mediainfo;
 
 	static void safedelete(char *str){
@@ -95,6 +99,73 @@ namespace mango
 			//log_i("leave free mediainfo");
 		}
 	}
+	static void mediainfocpy(mediainfo *src,mediainfo& des){
+		if(src != NULL){
+			
+			memset(&des,0,sizeof(mediainfo));
+			
+			des.id = src->id;
+			des.track = src->track;
+			des.add_time = src->add_time;
+			des.duration = src->duration;
+			des.isInPlayList = src->isInPlayList;
+			des.inPlay = src->inPlay;
+			des.isPlayed = src->isPlayed;
+			des.times = src->times;
+			
+			if(src->path == NULL)
+				return;
+			
+			des.path = new char[strlen(src->path)+1];
+			strcpy(des.path,src->path);
+			
+			if(src->name != NULL){
+				des.name = new char[strlen(src->name)+1];
+				strcpy(des.name,src->name);
+			}
+			
+			if(src->name_key != NULL){
+				des.name_key = new char[strlen(src->name_key)+1];
+				strcpy(des.name_key,src->name_key);
+			}
+			
+			if(src->title != NULL){
+				des.title = new char[strlen(src->title)+1];
+				strcpy(des.title,src->title);
+			}
+			
+			if(src->title_key != NULL){
+				des.title_key = new char[strlen(src->title_key)+1];
+				strcpy(des.title_key,src->title_key);
+			}
+			
+			if(src->artist != NULL){
+				des.artist = new char[strlen(src->artist)+1];
+				strcpy(des.artist,src->artist);
+			}
+			
+			if(src->artist_key != NULL){
+				des.artist_key = new char[strlen(src->artist_key)+1];
+				strcpy(des.artist_key,src->artist_key);
+			}
+			
+			if(src->album != NULL){
+				des.album = new char[strlen(src->album)+1];
+				strcpy(des.album,src->album);
+			}
+			
+			if(src->album_key != NULL){
+				des.album_key = new char[strlen(src->album_key)+1];
+				strcpy(des.album_key,src->album_key);
+			}
+			
+			if(src->img_path != NULL){
+				des.img_path = new char[strlen(src->img_path)+1];
+				strcpy(des.img_path,src->img_path);
+			}
+
+		}
+	}
 
 	struct Musicdb{
 		mediainfo info;
@@ -119,6 +190,10 @@ namespace mango
 		void ScannerDirectory(char* file);
 		void albumImageSync();
 		void mTimesSync();
+		bool cueCheck(char *direct,mediainfo *info);
+		void getCuePath(char* src,char * out);
+		bool loadCueFile(char* path,mediainfo *info);
+		void strCopy(char *des,char *out);
 		int initialize(void);
 		int exec(char *sql,void *arg,int (*callback)(void*,int,char**,char**));
 		int insert(char *table,mediainfo *info);

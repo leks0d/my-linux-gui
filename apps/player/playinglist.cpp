@@ -639,8 +639,10 @@ static const char *PlayerLock = "playerlock";
 			}
 		}
 		void Playinglist::seekTo(int n){
-			if(mParticleplayer!=NULL)	
+			if(mParticleplayer!=NULL){
+				log_i("seek to n=%d",n);
 				mParticleplayer->seekTo(n);
+			}
 		}
 
 		void Playinglist::stopPlayer(){

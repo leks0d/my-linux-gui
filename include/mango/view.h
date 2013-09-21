@@ -55,6 +55,7 @@ namespace mango
 #define NM_HEADEST 			17
 #define POWER_STATUS_CHANGE 		19
 #define NM_POWER_OFF 		20
+#define NM_REMOVE_FROM_PLAYLIST 		21
 
 	class View : public Object
 	{

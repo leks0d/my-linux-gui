@@ -28,6 +28,7 @@ namespace mango
 		mUsmConnectView = NULL;
 		mKeyLockView = NULL;
 		mChosenView = NULL;
+		mPlaylistOperateView = NULL;
 		
 		powerState = 0;
 		isBootLock = 0;
@@ -352,6 +353,25 @@ namespace mango
 			mMusicOperateView = new MusicOperateView(TEXT("MusicOperate"), NULL, NULL, 0, SW_NORMAL);
 			mMusicOperateView->onCreate();
 		}else{
+			mMusicOperateView->setType(OPERATE_TYPE_MUSIC_NORMAL);
+			gSession.mViewZAxis.bringViewToTop(mMusicOperateView);
+		}
+		
+		log_i("---");
+		if (mMusicOperateView){
+			log_i("---");
+			mMusicOperateView->setMusicInfo(info);
+			mMusicOperateView->invalidateRect();
+			mMusicOperateView->setFocus();
+			log_i("---");
+		}
+	}
+	int Player::showMusicOperateView(mediainfo& info,int type){
+		if(mMusicOperateView == NULL){
+			mMusicOperateView = new MusicOperateView(TEXT("MusicOperate"), NULL, NULL, 0, type, SW_NORMAL);
+			mMusicOperateView->onCreate();
+		}else{
+			mMusicOperateView->setType(type);
 			gSession.mViewZAxis.bringViewToTop(mMusicOperateView);
 		}
 		log_i("---");
@@ -379,17 +399,29 @@ namespace mango
 	int Player::showChosenView(int type){
 		if(mChosenView == NULL){
 			mChosenView = new ChosenView(TEXT("mChosenView"), NULL, NULL, 0, SW_NORMAL);
-			mChosenView->setType(type);
 			mChosenView->onCreate();
 		}else{
-			mChosenView->setType(type);
+			
 			gSession.mViewZAxis.bringViewToTop(mChosenView);
 		}
-
+		mChosenView->setType(type);
 		if (mChosenView){
 			mChosenView->invalidateRect();
 			mChosenView->setFocus();
 		}		
+	}
+	int Player::showPlaylistOperateView(PlayListItem& info){
+		if(mPlaylistOperateView == NULL){
+			mPlaylistOperateView = new PlaylistOperateView(TEXT("mChosenView"), NULL, NULL, 0, SW_NORMAL);
+			mPlaylistOperateView->onCreate();
+		}else{
+			gSession.mViewZAxis.bringViewToTop(mPlaylistOperateView);
+		}
+		mPlaylistOperateView->setmPlayListItem(info);
+		if (mPlaylistOperateView){
+			mPlaylistOperateView->invalidateRect();
+			mPlaylistOperateView->setFocus();
+		}
 	}
 	void Player::dismissView(View *view){
 		View *displayView;

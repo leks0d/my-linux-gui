@@ -60,6 +60,8 @@ namespace mango
 				static void queryPlaylist(ArrayPlayListItem& array,char *arg);
 				static void insertToPlaylist(int playlist_id,int audio_id);
 				static void delAudioFromPlaylist(int audio_id);
+				static void delAudioFromPlaylist(int playlist_id,int audio_id);
+				static void delPlaylist(int playlist_id);
 				static void queryPlaylistMem(ArrayMediaInfo& array,int playlist_id);
 		};
 

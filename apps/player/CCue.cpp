@@ -63,7 +63,7 @@ int CCue::file_load(const char *pfile)//初始化在每次加载文件的时候做
 
 	//ret=this->performer_parser();
 	//ret+=this->title_parser();
-	ret+=this->songs_parser();
+	ret=this->songs_parser();
 	//m_filepath.Format("%s",pfile);
  
 	return ret;//如果后续操作有错误，直接返回错误
@@ -147,24 +147,30 @@ int CCue::song_parser(int off,int index)
 		return -1;
 	}
 	
-	if ((off2-off1)>128)//两个偏移太远，错误的文件 
-	{
-		return -1;
-	}
+//	if ((off2-off1)>128)//两个偏移太远，错误的文件 
+//	{
+//		return -1;
+//	}
 
-	m_songs[index].m_strname=m_strbuff.Mid(off1,off2-off1);
+//	m_songs[index].m_strname=m_strbuff.Mid(off1,off2-off1);
+	m_strbuff.Mid(off1,off2-off1,m_songs[index].m_strname);
 
-	off1=m_strbuff.Find(tags[2],off)+strlen(tags[2])+1;
-	str2=m_strbuff.Mid(off1,2);
-	min=atoi(str2.getString());
-	str2=m_strbuff.Mid(off1+3,2);
-	sec=atoi(str2.getString());
-	m_songs[index].star=min*60+sec;
+	off1 = m_strbuff.Find(tags[2],off) + strlen(tags[2])+1;
+	
+//	str2 = m_strbuff.Mid(off1,2);
+	m_strbuff.Mid(off1,2,str2);
+	min = atoi(str2.getString());
+	
+//	str2 = m_strbuff.Mid(off1+3,2);
+	m_strbuff.Mid(off1+3,2,str2);
+	sec = atoi(str2.getString());
 
 	if (min<0||sec<0) //时间长度为负数 ，错误的文件
 	{
 		return -1;
 	}
+	
+	m_songs[index].star = min*60 + sec;
 
 	return 0;
 }
@@ -176,24 +182,27 @@ int CCue::songs_parser()
 	char tag[]="TRACK";
 	int len=0,off=0,i;	
 
-
 	while (1)
 	{
-		off=m_strbuff.Find(tag,off);
-		if (off==-1)//找不到TRACE标签，错误的文件 
+		off = m_strbuff.Find(tag,off);
+		if (off == -1)//找不到TRACE标签，错误的文件 
 		{
 			break;
 		}
-		off+=strlen(tag);
+		off += strlen(tag);
 		song_parser(off,this->m_total_song);
 		this->m_total_song++;	
 	}
+	
 	for (i=0;i<m_total_song-1;i++)
 	{
-		m_songs[i].len=m_songs[i+1].star-m_songs[i].star;
+		m_songs[i].len = m_songs[i+1].star - m_songs[i].star;
 	}
-	m_songs[m_total_song-1].len=0;
+	
+	m_songs[m_total_song-1].len = 0;
+	
 	log_i("songs_parser m_total_song=%d",m_total_song);
+	
 	return 0;
 }
 /************************************************************************/
@@ -229,16 +238,16 @@ int CCue::get_last_song(song_t *psong)
 /************************************************************************/
 int CCue::get_cert_song(int index,song_t *psong)
 {
-	//log_i("get_cert_song index=%d",index);
+	log_i("get_cert_song index=%d",index);
 	if (index<0||index>=m_total_song)
 	{
 		return -1;
 	}
-	//log_i("----");
+	log_i("----");
 	*psong=m_songs[index];
-	//log_i("----");
+	log_i("----");
 	m_index_song=index;
-	//log_i("get_cert_song sucess.");
+	log_i("get_cert_song sucess.");
 	return 0;
 }
 
@@ -341,19 +350,28 @@ int CString::Find(const char *tag,int offset){
 		return ret-string;
 }
 
-char* CString::Mid(int start,int end){
-	CString cstr;
+char* CString::Mid(int start,int len){
 	char *temp;
-	int len = end;
 
 	if(len>0&&len<=mlen){
 		temp = new char[len+1];
 		memset(temp,0,len+1);
 		memcpy(temp,string+start,len);
-		//cstr.Format("%s",temp);
 	}
 	
 	return temp;
+}
+int CString::Mid(int start,int len,CString& out){
+	char *temp;
+
+	if(len>0&&len<=mlen){
+		temp = new char[len+1];
+		memset(temp,0,len+1);
+		memcpy(temp,string+start,len);
+		out = temp;
+	}
+	
+	return 0;
 }
 CString& CString::operator=(CString& cstring){
 	//log_i("---0x%x",cstring.getString());
@@ -364,4 +382,50 @@ CString& CString::operator=(CString& cstring){
 CString& CString::operator=(const char *str){
 	Format("%s",str);
 	return *this;
+}
+CStringArray::CStringArray(){
+	mList = NULL;
+	mLen = mMax = 0;
+}
+CStringArray::~CStringArray(){
+	if(mList != NULL){
+		delete[] mList;
+		mList = NULL;
+	}
+	mLen = mMax = 0;
+}
+int CStringArray::addCString(CString& cstr){
+	if(mLen>=mMax){
+		CString *temp;
+		int i,count;
+		
+		if(mMax == 0){
+			mMax = 8;
+		}else{
+			mMax*=2; 
+		}
+
+		temp = new CString[mMax];
+
+		for(i=0;i<mLen;i++){
+			temp[i] = mList[i];
+		}
+
+		delete[] mList;
+		mList = temp;
+	}
+	mList[mLen] = cstr;
+	mLen++;
+	return mLen;
+}
+int CStringArray::getCString(int index,CString& out){
+	if(index<mLen && index>=0){
+		out = mList[index];
+		return index;
+	}else{
+		return -1;
+	}
+}
+int CStringArray::getCount(){
+	return mLen;
 }
