@@ -238,16 +238,16 @@ int CCue::get_last_song(song_t *psong)
 /************************************************************************/
 int CCue::get_cert_song(int index,song_t *psong)
 {
-	log_i("get_cert_song index=%d",index);
+	//log_i("get_cert_song index=%d",index);
 	if (index<0||index>=m_total_song)
 	{
 		return -1;
 	}
-	log_i("----");
+	//log_i("----");
 	*psong=m_songs[index];
-	log_i("----");
+	//log_i("----");
 	m_index_song=index;
-	log_i("get_cert_song sucess.");
+	//log_i("get_cert_song sucess.");
 	return 0;
 }
 

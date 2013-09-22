@@ -228,7 +228,7 @@ namespace mango
 		int		i, iEvent, iBytes ;
 		Point	pt ;
 		BOOL	bDown  ;	
-
+		bool 	pTouch;
 		if ((fd = open("/dev/input/event2", O_RDONLY)) < 0) 
 		{
 			log_e ("can't open /dev/input/event2 \n") ;
@@ -240,7 +240,7 @@ namespace mango
 		pt.x = 0 ;
 		pt.y = 0 ;
 		bDown = FALSE ;
-
+		pTouch = false;
 
 		while (1) {
 			iBytes = read (fd, EventBuf, sizeof(struct input_event) * INPUT_EVENT_BUF_SIZE) ;
@@ -276,8 +276,10 @@ namespace mango
 					{
 						if (EventBuf[i].value == 1)
 							bDown = TRUE;
-						else
-							bDown = FALSE;
+						else if(EventBuf[i].value == -1){
+							if(bDown)
+								bDown = FALSE;
+						}
 					}
 
 					break ;
@@ -288,8 +290,10 @@ namespace mango
 					break ;
 
 				case EV_SYN:
-					if (EventBuf[i].code == 0)
-						dispatchTouch(pt, bDown) ;
+					if (EventBuf[i].code == 0 && (bDown || bDown != pTouch)){
+						dispatchTouch(pt, bDown);
+						pTouch = bDown;
+					}
 
 					break ;
 				default:
