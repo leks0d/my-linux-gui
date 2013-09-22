@@ -831,7 +831,8 @@ namespace mango
 		for(i=0;i<count;i++){
 			mediainfo mInfo;
 			song_t song;
-			int len;
+			song_t prev_song;
+			int len,ldur;
 
 			memset(&mInfo,0,sizeof(mediainfo));
 			mediainfocpy(info,mInfo);
@@ -840,20 +841,74 @@ namespace mango
 			
 			mInfo.isCue = 1;
 			mInfo.cueStart = song.star;
-			mInfo.duration = song.len;
 			
+			if(i == count-1){
+				mCCue.get_cert_song(i-1,&prev_song);
+				ldur = info->duration - mInfo.cueStart;
+				if(ldur>0){
+					mInfo.duration = ldur;
+				}else{
+					mInfo.duration = 0;
+				}
+			}else{
+				mInfo.duration = song.len;
+			}
 			//strCopy(song.m_strname.string,mInfo.title);
 			//strCopy(song.m_strname.string,mInfo.name);
-			len = strlen(song.m_strname.string);
-			if(mInfo.name != NULL){
-				delete mInfo.name;
-				mInfo.name = NULL;
+			if(song.m_strname.string != NULL){
+				len = strlen(song.m_strname.string);
+				slqCheck(song.m_strname.string);
+//---------------------Name-------------------------------------------------------
+				log_i("tag");
+				if(mInfo.name != NULL){
+					delete mInfo.name;
+					mInfo.name = NULL;
+				}
+				mInfo.name = new char[len+1];
+				memcpy(mInfo.name,song.m_strname.string,len+1);
+				
+				if(mInfo.name_key != NULL){
+					delete mInfo.name_key;
+					mInfo.name_key = NULL;
+				}
+				mInfo.name_key = new char[len+1];
+				strlwr(song.m_strname.string,mInfo.name_key);
+//---------------------title-------------------------------------------------------			
+				if(mInfo.title != NULL){
+					delete mInfo.title;
+					mInfo.title = NULL;
+				}
+				mInfo.title = new char[len+1];
+				memcpy(mInfo.title,song.m_strname.string,len+1);
+				
+				if(mInfo.title_key != NULL){
+					delete mInfo.title_key;
+					mInfo.title_key = NULL;
+				}
+				mInfo.title_key = new char[len+1];
+				strlwr(song.m_strname.string,mInfo.title_key);
 			}
-			mInfo.name = new char[len+1];
-			memcpy(mInfo.name,song.m_strname.string,len+1);
-			
-			
-			log_i("song.m_strname=%s",song.m_strname.string);
+//---------------------artist-------------------------------------------------------
+			log_i("tag");
+			if(song.m_strart.string){
+				len = strlen(song.m_strart.string);
+				slqCheck(song.m_strart.string);
+				
+				if(mInfo.artist != NULL){
+					delete mInfo.artist;
+					mInfo.artist = NULL;
+				}
+				mInfo.artist = new char[len+1];
+				memcpy(mInfo.artist,song.m_strart.string,len+1);
+				
+				if(mInfo.artist_key != NULL){
+					delete mInfo.artist_key;
+					mInfo.artist_key = NULL;
+				}
+				mInfo.artist_key = new char[len+1];
+				strlwr(song.m_strart.string,mInfo.artist_key);
+			}
+//---------------------end------------------------------------------------------- 
 			
 			insert("music",&mInfo);
 			safefreeMediainfo(&mInfo);
@@ -939,14 +994,14 @@ namespace mango
 		
 		if(db == 0)
 			return SQLITE_ERROR;
-		
+		log_i("sqlite3_exec");
 		ret = sqlite3_exec( db, sql, callback, arg, &pErrMsg );
 		
 		if(ret != SQLITE_OK){
 			log_e("sqlite3_exec error : %s",sql);
 			log_e("sqlite3_exec pErrMsg : %s",pErrMsg);
 		}else
-			//log_i("sqlite3_exec success : %s",sql);
+			log_i("sqlite3_exec success : %s",sql);
 			;
 		return ret;	
 	}
@@ -967,7 +1022,7 @@ namespace mango
 				info->add_time,info->duration,info->inPlay,info->times,info->isCue,info->cueStart);
 		log_i("tag");
 		exec(sql,0,0);
-
+		log_i("tag");
 		return 0;
 	}
 

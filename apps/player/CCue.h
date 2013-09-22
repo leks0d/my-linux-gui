@@ -56,6 +56,7 @@ typedef struct song_t
 	int     star;
 	int     len;
 	CString m_strname;
+	CString m_strart;
 	CString m_strpath;
 }song_t;
 

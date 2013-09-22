@@ -1069,7 +1069,7 @@ namespace mango
 		if(info == NULL)
 			return;
 		x = LIST_MUSIC_ICON_LEFT;
-		canvas.drawImageResource(MediaView::getMusicIcon(info->name),x,y+5);
+		canvas.drawImageResource(MediaView::getMusicIcon(info->path),x,y+5);
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else

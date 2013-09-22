@@ -130,9 +130,10 @@ int CCue::title_parser()
 /************************************************************************/
 /*根据偏移获取某单曲信息                                                */
 /************************************************************************/
+#if 0
 int CCue::song_parser(int off,int index)
 {
-	int off1,off2,ret1,ret2,min,sec;
+	int off1,off2,ret1,ret2,min,sec,ms;
 	char  *tags[4]={"TITLE","\r\n","INDEX 01","PERFORMER"};//三个关键标签
 	CString str2;
 
@@ -174,6 +175,103 @@ int CCue::song_parser(int off,int index)
 
 	return 0;
 }
+#else
+int CCue::song_parser(int off,int index)
+{
+	int poff,eoff,off1,off2,ret1,ret2,min,sec,ms;
+	char  *tags[4]={"TITLE","\r\n","INDEX 01","PERFORMER"};//三个关键标签
+	char  tag1[] = "\"",tag2[]=":",tag3[]=" ";		
+	CString str2;
+
+	poff = off;
+//----------------------------TITLE-------------------------------------------------	
+	ret1=m_strbuff.Find(tags[0],poff);//寻找TITLE
+	if(ret1 == -1){
+		return -1;
+	}
+	ret1+=strlen(tags[0]);//定位到TITLE 之后
+	ret2=m_strbuff.Find(tag1,ret1);//找到第一个"
+	eoff=m_strbuff.Find(tags[1],ret1);//找到TITLE这一行的换行符
+	if(eoff == -1){
+		return -1;
+	}else if(ret2 == -1 || ret2>=eoff-2){//如果符号没有找到，或者找的"在下一行
+		off1 = ret1+1;
+		off2 = eoff-1;
+	}else{
+		off1 = ret2+1;
+		ret2 = m_strbuff.Find(tag1,off1);//寻找第二个"
+		if(ret2 == -1 || ret2 >= eoff){
+			off2 = eoff-1;
+		}else{
+			off2 = ret2;
+		}
+	}
+	m_strbuff.Mid(off1,off2-off1,m_songs[index].m_strname);
+//----------------------------PERFORMER-------------------------------------------------		
+	ret1=m_strbuff.Find(tags[3],poff);//寻找PERFORMER
+	if(ret1 == -1){
+		return -1;
+	}
+	ret1+=strlen(tags[3]);//定位到PERFORMER 之后
+	ret2=m_strbuff.Find(tag1,ret1);//找到第一个"
+	eoff=m_strbuff.Find(tags[1],ret1);//找到PERFORMER 这一行的换行符
+	if(eoff == -1){
+		return -1;
+	}else if(ret2 == -1 || ret2>=eoff-2){//如果符号没有找到，或者找的"在下一行
+		off1 = ret1+1;
+		off2 = eoff-1;
+	}else{
+		off1 = ret2+1;
+		ret2 = m_strbuff.Find(tag1,off1);//寻找第二个"
+		if(ret2 == -1 || ret2 >= eoff){
+			off2 = eoff-1;
+		}else{
+			off2 = ret2;
+		}
+	}
+	m_strbuff.Mid(off1,off2-off1,m_songs[index].m_strart);
+//----------------------------INDEX 01-------------------------------------------------			
+	ret1 = m_strbuff.Find(tags[2],off);//find INDEX 01
+	eoff = m_strbuff.Find(tags[1],off);//find "\r\n"
+	if(ret1 == -1)
+		return -1;
+	
+	ret1+=strlen(tags[2]);
+	ret2 = m_strbuff.Find(tag2,ret1);//find symby ':'
+	if(ret2 == -1 && ret2 >= eoff-1)
+		return -1;
+	
+	
+	if(m_strbuff.string[ret2-3]<='9' && m_strbuff.string[ret2-3]>='0'){
+		off1 = ret2-3;//min start position 3
+		m_strbuff.Mid(off1,3,str2);
+		min = atoi(str2.getString());
+	}else if(m_strbuff.string[ret2-2]<='9' && m_strbuff.string[ret2-2]>='0'){
+		off1 = ret2-2;//min start position 2
+		m_strbuff.Mid(off1,2,str2);
+		min = atoi(str2.getString());
+	}else if(m_strbuff.string[ret2-1]<='9' && m_strbuff.string[ret2-1]>='0'){
+		off1 = ret2-1;//min start position 1
+		m_strbuff.Mid(off1,1,str2);
+		min = atoi(str2.getString());
+	}
+	
+	m_strbuff.Mid(ret2+1,2,str2);
+	sec = atoi(str2.getString());
+
+	m_strbuff.Mid(ret2+4,2,str2);
+	ms = atoi(str2.getString());
+	
+	if (min<0||sec<0||ms<0) //时间长度为负数 ，错误的文件
+	{
+		return -1;
+	}
+	
+	m_songs[index].star = (min*60 + sec)*1000+ms*10;
+
+	return 0;
+}
+#endif
 /************************************************************************/
 /* 该函数解析CUE文件中所有单曲信息                                      */
 /************************************************************************/
@@ -189,9 +287,11 @@ int CCue::songs_parser()
 		{
 			break;
 		}
+		
 		off += strlen(tag);
-		song_parser(off,this->m_total_song);
-		this->m_total_song++;	
+		
+		if(song_parser(off,this->m_total_song)>=0)
+			this->m_total_song++;	
 	}
 	
 	for (i=0;i<m_total_song-1;i++)
@@ -238,16 +338,16 @@ int CCue::get_last_song(song_t *psong)
 /************************************************************************/
 int CCue::get_cert_song(int index,song_t *psong)
 {
-	//log_i("get_cert_song index=%d",index);
+	log_i("get_cert_song index=%d",index);
 	if (index<0||index>=m_total_song)
 	{
 		return -1;
 	}
-	//log_i("----");
+	log_i("----");
 	*psong=m_songs[index];
-	//log_i("----");
+	log_i("----");
 	m_index_song=index;
-	//log_i("get_cert_song sucess.");
+	log_i("get_cert_song sucess.");
 	return 0;
 }
 
@@ -308,6 +408,7 @@ void CString::Format(const char *format,const char *path){
 	
 	if(path == NULL){
 		safeDelete(string);
+		mlen = 0;
 		return;
 	}
 	
