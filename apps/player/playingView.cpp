@@ -345,7 +345,7 @@ namespace mango
 	}
 	
 	void PlayingView::updateAudioInfo(){
-		int info[6];	
+		int info[6];
 		Mstring *mstr;
 		float sampleRate;
 		

@@ -1316,7 +1316,7 @@ namespace mango
 		y = rect.top;
 		info = mMusicArrayList->getMediaInfo(lvitem->iItem);
 		x = LIST_MUSIC_ICON_LEFT;
-		canvas.drawImageResource(IDP_LISTICON_ARTIST,x,y+5);
+		canvas.drawImageResource(IDP_LIST_GENRE_ICON,x,y+1);
 		
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
@@ -1324,7 +1324,7 @@ namespace mango
 			canvas.setTextColor(RGB(255,255,255));
 		canvas.setTextSize(18);
 
-		x+=40;
+		x+=45;
 		canvas.drawText(info->genre,strlen(info->genre),x,y+10);
 	}
 

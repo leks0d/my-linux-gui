@@ -52,7 +52,7 @@ namespace mango
 		gSettingProvider.initialize();
 		initSettings();
 		
-		spdifProbe();
+		//spdifProbe();
 		gmediaprovider.initialize();
 
 		mPlayinglist = new Playinglist();
@@ -394,6 +394,8 @@ namespace mango
 		if (mKeyLockView){
 			mKeyLockView->invalidateRect();
 			mKeyLockView->setFocus();
+			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,NM_KEY_LOCK,0);
+			gMessageQueue.post(gPlayer.mVolumeView,VM_NOTIFY,NM_KEY_LOCK,0);
 		}
 	}
 	int Player::showChosenView(int type){
@@ -680,10 +682,20 @@ namespace mango
 		int ret = 0;
 		if(gPlayer.mPlayingView != NULL)
 			keycount = &(gPlayer.mPlayingView->mKeyCount);
+		
 		//log_i("PlayerEventInterface::onKeyDispatch keyCode=%d,action=%d",keyCode,action);
-		if((keyCode == KEYCODE_VOLUMEUP||keyCode == KEYCODE_VOLUMEDOWN)&& action == VM_KEYDOWN){
-			gMessageQueue.post(gPlayer.mPlayingView,VM_COMMAND,PLAYING_SHOW_VOLUME,keyCode);
-		}else if(keyCode == KEYCODE_PREV||keyCode == KEYCODE_NEXT){
+		
+		if((keyCode == KEYCODE_VOLUMEUP||keyCode == KEYCODE_VOLUMEDOWN)){
+			log_i("VOLUMEonKeyDispatch action=%d",action);
+			if(action == VM_KEYDOWN)
+				gMessageQueue.post(gPlayer.mPlayingView,VM_COMMAND,PLAYING_SHOW_VOLUME,keyCode);
+
+			if(gPlayer.mVolumeView != NULL){
+				gPlayer.mVolumeView->onKeyAction(keyCode,action);
+			}
+			ret = 1;
+		}
+		else if(keyCode == KEYCODE_PREV||keyCode == KEYCODE_NEXT){
 			log_i("enter");
 			gMessageQueue.post(gPlayer.mPlayingView, action, keyCode, 0);
 			ret = 1;

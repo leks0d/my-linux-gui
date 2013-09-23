@@ -1374,7 +1374,6 @@ namespace mango
 			if (mZoneSize.cy >= sideline * 2) {
 				if (mZonePoint.y + dy + mZoneSize.cy < sideline)
 					dy	= sideline - mZoneSize.cy - mZonePoint.y ;
-			
 			} else {
 				if (mZonePoint.y + dy + mZoneSize.cy < 0)
 					dy	= 0 - mZoneSize.cy - mZonePoint.y ;
@@ -1405,10 +1404,9 @@ namespace mango
 		Canvas* canvas;
 		Rect  clientRect;
 #ifdef	PRINT_TIME
-		ULONGLONG startTime,duration; 
-		
+		ULONGLONG startTime,duration;
 		startTime = Time::getMicrosecond();
-#endif			
+#endif
 		getClientRect(clientRect);
 
 		canvas = getCanvas();

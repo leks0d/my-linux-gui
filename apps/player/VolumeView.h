@@ -19,6 +19,7 @@ namespace mango
 		virtual int onTouchDown(int x, int y, int flag);
 		virtual int onTouchMove(int x, int y, int flag);
 		virtual int onTouchUp(int x, int y, int flag);
+		void onKeyAction(int keycode,int action);
 		int isShowing(){return isShow;}
 
 	private:

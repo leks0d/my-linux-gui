@@ -156,13 +156,36 @@ namespace mango
 			initView();
 		}else if(fromView == NULL && code == NM_DISMISS){
 			gPlayer.dismissView(this);
+		}else if(code == NM_KEY_LOCK){
+			isKeyDown = 0;
 		}
 		
 		return 0;
 	}
-
+	void VolumeView::onKeyAction(int keyCode,int action){
+		log_i("onKeyAction isKeyDown=%d",isKeyDown);
+		if(action == VM_KEYUP){
+			switch(keyCode){
+				case KEYCODE_VOLUMEUP:
+				case KEYCODE_VOLUMEDOWN:
+					isKeyDown = 0;
+					mDownKeyCode = keyCode;
+					break;
+			}
+		}else if(action == VM_KEYDOWN){
+			switch(keyCode){
+				case KEYCODE_VOLUMEUP:
+				case KEYCODE_VOLUMEDOWN:
+					isKeyDown = 1;
+					mDownKeyCode = keyCode;
+					break;
+			}	
+		}
+	}
+	
 	int VolumeView::onKeyDown(int keyCode, int flag)
 	{
+#if 0
 		switch(keyCode){
 			case KEYCODE_VOLUMEUP:
 			case KEYCODE_VOLUMEDOWN:
@@ -170,11 +193,13 @@ namespace mango
 				mDownKeyCode = keyCode;
 				break;
 		}
+#endif
 		return 0;
 	}
 
 	int VolumeView::onKeyUp(int keyCode, int flag)
 	{
+#if 0
 		switch(keyCode){
 			case KEYCODE_VOLUMEUP:
 			case KEYCODE_VOLUMEDOWN:
@@ -182,6 +207,7 @@ namespace mango
 				mDownKeyCode = keyCode;
 				break;
 		}
+#endif
 		return 0;
 	}
 

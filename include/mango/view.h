@@ -35,27 +35,28 @@ namespace mango
 #define TOUCH_FLAG_UP    0x0002
 #define TOUCH_FLAG_MOVE  0x0003
 
-#define NM_CLICK     		1   
-#define NM_DISPLAY     	2  
-#define NM_DISMISS     	3
-#define NM_SEEKBAR_DOWM   4
-#define NM_SEEKBAR_MOVE   	5
-#define NM_SEEKBAR_UP   	6
-#define NM_PLAY_COM   		7
-#define NM_SEEK_UPDATE   	8
-#define NM_BATTERY_UPDATE 9
-#define FLASH_UNMOUNT 		10
-#define FLASH_MOUNT 		11
-#define SDCARD_UNMOUNT 	12
-#define SDCARD_MOUNT 		13
-#define SDCARD_START_UNMOUNT 		18
+#define NM_CLICK     				1   
+#define NM_DISPLAY     			2  
+#define NM_DISMISS     			3
+#define NM_SEEKBAR_DOWM   			4
+#define NM_SEEKBAR_MOVE   			5
+#define NM_SEEKBAR_UP   			6
+#define NM_PLAY_COM   				7
+#define NM_SEEK_UPDATE   			8
+#define NM_BATTERY_UPDATE 		9
+#define FLASH_UNMOUNT 				10
+#define FLASH_MOUNT 				11
+#define SDCARD_UNMOUNT 			12
+#define SDCARD_MOUNT 				13
 #define MEDIA_SCANNER_START 		14
 #define MEDIA_SCANNER_END 		15
-#define NM_SPIDF 			16
-#define NM_HEADEST 			17
+#define NM_SPIDF 					16
+#define NM_HEADEST 				17
+#define SDCARD_START_UNMOUNT 		18
 #define POWER_STATUS_CHANGE 		19
-#define NM_POWER_OFF 		20
-#define NM_REMOVE_FROM_PLAYLIST 		21
+#define NM_POWER_OFF 				20
+#define NM_REMOVE_FROM_PLAYLIST 	21
+#define NM_KEY_LOCK 				22
 
 	class View : public Object
 	{
