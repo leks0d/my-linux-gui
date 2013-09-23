@@ -230,17 +230,17 @@ namespace mango
 		mMSkBitmap->createFile(currentinfo->img_path);		
 #endif
 
-		log_i("tag");
+		//log_i("tag");
 		mAlbumImage->setMSkBitmap(mMSkBitmap);
-		log_i("tag 0x%s",currentinfo->title);
+		//log_i("tag 0x%s",currentinfo->title);
 		mMusicName->setTextString(currentinfo->title);
-		log_i("tag 0x%x",currentinfo->title);
+		//log_i("tag 0x%x",currentinfo->title);
 		mMusicNameStatic->setTextString(currentinfo->title);
-		log_i("tag");
+		//log_i("tag");
 		mArtist->setTextString(currentinfo->artist);
-		log_i("tag");
+		//log_i("tag");
 		mAlbum->setTextString(currentinfo->album);
-		log_i("tag");
+		//log_i("tag");
 		
 		duration = mPlayinglist->getDuration();
 		if(duration<=1 && currentinfo->duration!=0){
@@ -252,6 +252,14 @@ namespace mango
 		if(current<0||current>duration){
 			current = 0;
 			log_i("error current,clear current");
+		}
+
+		if(currentinfo->isCue){
+			duration = currentinfo->duration;
+			current = current - currentinfo->cueStart;
+			if(current<0){
+				current = 0;
+			}
 		}
 		
 		mSeekBar->setMax(duration);
@@ -427,25 +435,63 @@ namespace mango
 					break;
 				case NM_SEEKBAR_MOVE:				
 					break;
-				case NM_SEEKBAR_UP:
-					mPlayinglist->seekTo(mSeekBar->getProgress());
+				case NM_SEEKBAR_UP:{
+						mediainfo *info;
+						
+						info = mPlayinglist->getPlayingItem();
+						if(info->isCue){
+							int seek;
+							seek = mSeekBar->getProgress() + info->cueStart;
+							if(seek<info->cueStart+info->duration)
+								mPlayinglist->seekTo(seek);
+							else
+								log_i("inval seek posistion seek=%d,cueStart+duration=%d",seek,info->cueStart+info->duration);
+						}else{
+							mPlayinglist->seekTo(mSeekBar->getProgress());
+						}
+					}
 					isNeedFresh = 1;
 					break;
 			}
 		}else if(code == NM_SEEK_UPDATE){
-		
-			if(isNeedFresh){
+/******************* 这段代码用于判断cue的下一曲*****************/
+			if(mPlayinglist!=NULL&&mPlayinglist->isPlaying()){
+				mediainfo *info;
+				int cur;
 				
-				//log_i("isNeedFresh=%d",isNeedFresh);
+				info = mPlayinglist->getPlayingItem();
+				if(info->isCue){
+					cur = mPlayinglist->getCurrent();
+					log_i("cur=%d,cueStart+duration=%d",cur,info->cueStart + info->duration);
+					if(cur > info->cueStart + info->duration){
+						mPlayinglist->callbackPlay();
+						ViewInit();
+						return 0;
+					}
+				}
+			}
+/*********************************END****************************************/
+			//log_i("isNeedFresh=%d",isNeedFresh);
+
+			if(isNeedFresh){
 			
 				if(mPlayinglist->isPlaying()){
 					
 					Mstring* mstr;
+					mediainfo *info;
 
+					info = mPlayinglist->getPlayingItem();
+					
 					if(mSeekBar!=NULL){
 						
 						int max = mSeekBar->getMax();
 						int cur = mPlayinglist->getCurrent();
+
+						if(info->isCue){
+							cur = cur - info->cueStart;
+							if(cur<0)
+								cur = 0;
+						}
 						
 						if(cur>=0&&cur<=max){
 							
@@ -458,6 +504,8 @@ namespace mango
 							mSeekBar->setProgress(cur);
 							
 							delete mstr;
+						}else{
+							log_i("inval Progress isCue=%d,cur =%d,max=%d",info->isCue,cur,max);
 						}
 					}
 				}

@@ -197,8 +197,8 @@ namespace mango
 	void SettingsView::initAutoPoweroffList(){
 		int img[]={0,0,0,0};
 		int imgsec[]={0,0,0,0};
-		int text[]={STR_POWEROFF_5M,STR_POWEROFF_10M,STR_POWEROFF_20M,STR_POWEROFF_30M};
-		int i,count = 4;
+		int text[]={STR_POWEROFF_5M,STR_POWEROFF_10M,STR_POWEROFF_20M,STR_POWEROFF_30M,STR_POWEROFF_NEVER};
+		int i,count = 5;
 		
 		if(mPoweroffListAdapter == NULL){
 			mListView->deleteAllItems();
@@ -449,6 +449,7 @@ namespace mango
 			
 			mlist->insertItem(&lvItem);
 		}
+		mlist->setZoneY(getYoffset(),false);
 		mlist->invalidateRect();
 	}
 	

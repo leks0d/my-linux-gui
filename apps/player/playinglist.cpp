@@ -155,7 +155,8 @@ static const char *PlayerLock = "playerlock";
 				mplaylist[des].inPlay = src->inPlay;
 				mplaylist[des].isPlayed = src->isPlayed;
 				mplaylist[des].times = src->times;
-				//log_i("src->path=%s",src->path);
+				mplaylist[des].isCue = src->isCue;
+				mplaylist[des].cueStart = src->cueStart;
 				
 				if(src->path == NULL)
 					return;
@@ -309,7 +310,7 @@ static const char *PlayerLock = "playerlock";
 			mediainfo* Playinglist::getPlayingItem(){
 				if(len == 0)
 					return NULL;
-				log_i("mCurrent=%d,len=%d",mCurrent,len);
+				//log_i("mCurrent=%d,len=%d",mCurrent,len);
 				if(mCurrent<len)
 					return &mplaylist[mCurrent];
 				else
@@ -344,6 +345,8 @@ static const char *PlayerLock = "playerlock";
 			}
 			
 			int Playinglist::startPlayPosition(int mesc,bool needStart,bool needGapless){
+				mediainfo *info;
+				
 				if(mParticleplayer == NULL){
 					mParticleplayer = particle::createMediaPlayer();
 					mParticleplayer->setEventCallback(Playinglist::playerCallback,(void *)this);
@@ -377,6 +380,10 @@ static const char *PlayerLock = "playerlock";
 					//gPlayer.closeWm8740Mute();
 					gPlayer.VolumeCheck();
 					mThread.create(Playinglist::CloseMuteRunnig,NULL);
+					if(getPlayingItem()->isCue){
+						mango::Thread::sleep(1000);
+						mParticleplayer->seekTo(getPlayingItem()->cueStart);
+					}
 				}
 				getPlayingItem()->isPlayed = 1;
 				setWakeLock();
@@ -424,7 +431,7 @@ static const char *PlayerLock = "playerlock";
 				}else{
 					cur = 0;
 				}
-				log_i("Playinglist::getCurrentPosition cur=%d",cur);
+				//log_i("Playinglist::getCurrentPosition cur=%d",cur);
 				return cur;
 			}
 

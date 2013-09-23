@@ -670,12 +670,13 @@ namespace particle
 	bool MediaPlayerService::mediaDeinit()
 	{
 		LOGI("MediaPlayerService::mediaDeinit Enter");
-
-		gMediaServiceData->mCurrentPosition = 0;
-		gMediaServiceData->mIsPlaying		= false;
+		
+		int position = 0,isplay = 0;
+		
 		if(mPlayer){
-			mPlayer->setIsPlayingAddress(&gMediaServiceData->mIsPlaying);
-			mPlayer->setCurrentPositionAddress(&gMediaServiceData->mCurrentPosition);
+			mPlayer->setIsPlayingAddress(&isplay);
+			mPlayer->setCurrentPositionAddress(&position);
+			log_i("MediaPlayerService::mediaDeinit set 0");
 		}
 
 		if (mPlayer)

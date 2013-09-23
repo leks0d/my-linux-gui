@@ -210,37 +210,36 @@ int CCue::song_parser(int off,int index)
 //----------------------------PERFORMER-------------------------------------------------		
 	ret1=m_strbuff.Find(tags[3],poff);//寻找PERFORMER
 	if(ret1 == -1){
-		return -1;
-	}
-	ret1+=strlen(tags[3]);//定位到PERFORMER 之后
-	ret2=m_strbuff.Find(tag1,ret1);//找到第一个"
-	eoff=m_strbuff.Find(tags[1],ret1);//找到PERFORMER 这一行的换行符
-	if(eoff == -1){
-		return -1;
-	}else if(ret2 == -1 || ret2>=eoff-2){//如果符号没有找到，或者找的"在下一行
-		off1 = ret1+1;
-		off2 = eoff-1;
+		;
 	}else{
-		off1 = ret2+1;
-		ret2 = m_strbuff.Find(tag1,off1);//寻找第二个"
-		if(ret2 == -1 || ret2 >= eoff){
+		ret1+=strlen(tags[3]);//定位到PERFORMER 之后
+		ret2=m_strbuff.Find(tag1,ret1);//找到第一个"
+		eoff=m_strbuff.Find(tags[1],ret1);//找到PERFORMER 这一行的换行符
+		if(eoff == -1){
+			return -1;
+		}else if(ret2 == -1 || ret2>=eoff-2){//如果符号没有找到，或者找的"在下一行
+			off1 = ret1+1;
 			off2 = eoff-1;
 		}else{
-			off2 = ret2;
+			off1 = ret2+1;
+			ret2 = m_strbuff.Find(tag1,off1);//寻找第二个"
+			if(ret2 == -1 || ret2 >= eoff){
+				off2 = eoff-1;
+			}else{
+				off2 = ret2;
+			}
 		}
+		m_strbuff.Mid(off1,off2-off1,m_songs[index].m_strart);
 	}
-	m_strbuff.Mid(off1,off2-off1,m_songs[index].m_strart);
 //----------------------------INDEX 01-------------------------------------------------			
-	ret1 = m_strbuff.Find(tags[2],off);//find INDEX 01
-	eoff = m_strbuff.Find(tags[1],off);//find "\r\n"
+	ret1 = m_strbuff.Find(tags[2],off);//find INDEX 01	
 	if(ret1 == -1)
-		return -1;
-	
+		return -1;			
 	ret1+=strlen(tags[2]);
+	eoff = m_strbuff.Find(tags[1],ret1);//find "\r\n"
 	ret2 = m_strbuff.Find(tag2,ret1);//find symby ':'
-	if(ret2 == -1 && ret2 >= eoff-1)
+	if(ret2 == -1 || ret2 >= eoff-1)
 		return -1;
-	
 	
 	if(m_strbuff.string[ret2-3]<='9' && m_strbuff.string[ret2-3]>='0'){
 		off1 = ret2-3;//min start position 3

@@ -5,7 +5,7 @@ namespace mango
 
 	int time[]={30,60,2*60,5*60,10*60};
 	int len = 5;
-	int power[]={60*5,60*10,60*20,60*30};
+	int power[]={60*5,60*10,60*20,60*30,-1};
 	int plen = 4;
 	
 	PowerManager::PowerManager(){
@@ -22,7 +22,7 @@ namespace mango
 		gSettingProvider.update(SETTING_AUTOSLEEP_ID,sleepTime);
 	}
 	void PowerManager::setAutoPoweroffTime(int index){
-		if(index>=0&&index<=3){
+		if(index>=0&&index<=4){
 			poweroffTime = power[index];
 			gSettingProvider.update(SETTING_AUTOPOWEROFF_ID,poweroffTime);
 		}
@@ -41,7 +41,8 @@ namespace mango
 			(gPlayer.mPlayingView->isUsmCon || gPlayer.mPlayingView->isMediaScanning)){
 			atuoPoweroffCount = 0;
 		}
-		if(atuoPoweroffCount>=poweroffTime)
+		//log_i("PowerManagerCount=%d,poweroffTime=%d",atuoPoweroffCount,poweroffTime);
+		if(atuoPoweroffCount>=poweroffTime && poweroffTime != -1)
 			reboot(RB_POWER_OFF);
 	}
 

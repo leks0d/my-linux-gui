@@ -411,7 +411,7 @@ namespace mango
 			mListView->deleteAllItems();
 			mMainListAdapter->refresh();
 		}
-		mListView->setZoneY(mMainListAdapter->getYoffset(),false);
+		//mListView->setZoneY(mMainListAdapter->getYoffset(),false);
 #endif
 		mTitle->setTextResoure(MUSIC_MY_MUSIC);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
