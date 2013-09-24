@@ -401,12 +401,13 @@ namespace mango
 	int Player::showChosenView(int type){
 		if(mChosenView == NULL){
 			mChosenView = new ChosenView(TEXT("mChosenView"), NULL, NULL, 0, SW_NORMAL);
+			mChosenView->setType(type);
 			mChosenView->onCreate();
 		}else{
-			
+			mChosenView->setType(type);
 			gSession.mViewZAxis.bringViewToTop(mChosenView);
 		}
-		mChosenView->setType(type);
+		
 		if (mChosenView){
 			mChosenView->invalidateRect();
 			mChosenView->setFocus();
@@ -607,7 +608,9 @@ namespace mango
 		int fd=0,state,volume;
 		char* path = "/sys/class/codec/power";
 		char rbuf;
-		return;
+		
+		return;		//not need to open or colse power
+		
 		log_i("spdif openCodecPower enable=%d",enable);
 		
 		fd = open(path,O_RDWR, 0);
@@ -690,6 +693,9 @@ namespace mango
 			if(action == VM_KEYDOWN)
 				gMessageQueue.post(gPlayer.mPlayingView,VM_COMMAND,PLAYING_SHOW_VOLUME,keyCode);
 
+			while(gPlayer.mVolumeView == NULL)
+				mango::Thread::sleep(100);
+			
 			if(gPlayer.mVolumeView != NULL){
 				gPlayer.mVolumeView->onKeyAction(keyCode,action);
 			}

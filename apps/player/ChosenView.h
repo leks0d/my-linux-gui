@@ -15,7 +15,7 @@ namespace mango
 		virtual ~ChosenView(void);
 		void initView();
 		void dispatchEvent();
-		void setType(int type){mType = type;}
+		void setType(int type){mType = type; invalidateRect();}
 	public:
 		virtual int onCreate();
 		virtual int onDestroy();

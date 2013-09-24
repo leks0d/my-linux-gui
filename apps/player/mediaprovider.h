@@ -206,6 +206,8 @@ namespace mango
 		int checkfile();
 		void genImgPath(char *title,char *path);
 		int music_exsit_db(char *path);
+		void getWakeLock();
+		void releaseWakeLock();
 		static char* slqFormatOut(char *arg,char *out);
 		static char* slqFormat(char *arg);
 		static char* slqCheck(char *arg);
@@ -216,6 +218,7 @@ namespace mango
 	private:
 		sqlite3 * db;
 		char *scanPath;
+		bool isWakeLock;
 		int mCurrentTimes;
 		int scanTime;
 		Thread mScannerThread;

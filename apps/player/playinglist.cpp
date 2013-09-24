@@ -610,7 +610,7 @@ static const char *PlayerLock = "playerlock";
 				if(gPlayer.wakeLock(PlayerLock) == 0){
 #ifndef NEED_SLEEP					
 					gPlayer.openCodecPower(true);
-#endif				
+#endif
 					isWakeLock = 1;
 				}
 			}

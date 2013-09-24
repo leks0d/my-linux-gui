@@ -361,6 +361,7 @@ namespace mango
 		db = 0;
 		scanPath = NULL;
 		mCurrentTimes = 0;
+		isWakeLock = false;
 	}
 
 	void mediaprovider::externFileScanner(char *filepath){
@@ -450,8 +451,6 @@ namespace mango
 		ScanInfo *info;
 		char *file;
 		
-		sendMsgStart();
-		
 		info = new ScanInfo();
 		info->media = this;
 		file = info->path;
@@ -465,6 +464,8 @@ namespace mango
 			mediaprovider *media = info->media;
 			char *path = info->path;
 
+			media->sendMsgStart();
+			
 			media->mediascanner(path);
 			
 			media->sendMsgEnd();
@@ -475,6 +476,7 @@ namespace mango
 		log_i("sendMsgStart:show MediaScannerView");
 		//gPlayer.showMediaScannerView();
 		//scanTime = Time::getMillisecond();
+		getWakeLock();
 		gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,MEDIA_SCANNER_START,0);
 	}
 	int mediaprovider::sendMsgEnd(){
@@ -483,6 +485,7 @@ namespace mango
 		//int dur = Time::getMillisecond() - scanTime;
 		//if(dur<50)
 		//	mango::Thread::sleep(500);
+		releaseWakeLock();
 		gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,MEDIA_SCANNER_END,0);
 	}
 	int mediaprovider::getmediainfo(char *path,mediainfo *info)
@@ -1184,6 +1187,21 @@ namespace mango
 		PlayList::delAudioFromPlaylist(id);
 		
 		return 0;
+	}
+	static const char* mediaLock = "mediascanner";
+	void mediaprovider::getWakeLock(){
+		if(!isWakeLock){
+			if(gPlayer.wakeLock(mediaLock) == 0){
+				isWakeLock = true;
+			}
+		}
+	}
+	void mediaprovider::releaseWakeLock(){
+		if(isWakeLock){
+			if(gPlayer.wakeUnlock(mediaLock) == 0){
+				isWakeLock = false;
+			}
+		}
 	}
 	mediaprovider::~ mediaprovider(void)
 	{
