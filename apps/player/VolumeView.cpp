@@ -1,7 +1,7 @@
 #include "player.h"
 
 #define VOLUME_REFRESH 100
-#define VOLUME_TIME 2000/VOLUME_REFRESH
+#define VOLUME_TIME 1000/VOLUME_REFRESH
 #define NOCHANG 0
 
 namespace mango
