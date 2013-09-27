@@ -50,7 +50,12 @@ int CCue::file_load(const char *pfile)//初始化在每次加载文件的时候做
 	{
 		return -1;//文件打开失败
 	}
+	
 	len=myf.GetLength();
+	if(len>=10000){
+		return -1;
+	}
+	
 	ret=myf.Read(buff,len);
 	if (ret<len)
 	{

@@ -1065,6 +1065,7 @@ namespace mango
 	void PlayingListAdapter::PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec){
 		int	 x, y;
 		mediainfo *info;
+		Rect yrect;
 		
 		x = rect.left;
 		y = rect.top;
@@ -1079,11 +1080,17 @@ namespace mango
 			canvas.setTextColor(RGB(255,255,255));
 		canvas.setTextSize(16);
 		x = x+40;
-		canvas.drawText(info->name,strlen(info->title),x,y+5);
+		//canvas.drawText(info->name,strlen(info->title),x,y+5);
+		yrect.setEx(x,y+5,308-x,30);
+		canvas.drawText(info->name,strlen(info->title),yrect,0);
+		
 		canvas.setTextColor(RGB(255,255,255));
 		canvas.setTextSize(12);
-		if(info->artist!=NULL)
-			canvas.drawText(info->artist,strlen(info->artist),x,y+28);
+		if(info->artist!=NULL){
+			//canvas.drawText(info->artist,strlen(info->artist),x,y+28);
+			yrect.setEx(x,y+28,308-x,20);
+			canvas.drawText(info->artist,strlen(info->artist),yrect,0);
+		}
 		x = x+220;
 		if(lvitem->iItem == mPlayinglist->mCurrent)
 			canvas.drawImageResource(IDP_LISTICON_PLAYING,x,y+13);
