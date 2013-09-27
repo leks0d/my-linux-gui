@@ -89,14 +89,28 @@ namespace mango
 	{
 		unsigned char *bits;
 		SIZE   bmpSize = {0, 0};
-
+		int font;
+		
 		if (gFontCache.getCharBmp(mFontSize, wchar, size, dyExtra, &bits))
 			return bits;
 
+		switch(UnicodeLanguge::getWcharLanguge(wchar)){
+			case LANGID_ENGLISH:
+				font = 1;
+				break;
+			case LANGID_SIMPLIFIED:
+			case LANGID_JAPANESE:	
+				font = 2;
+				break;
+			default:
+				font = 0;
+				break;
+		}
+		//font = 0;
 		//if (wchar <= 256)
 		//{
-			ft_ex_iTrueTypeSetSize (0, mFontSize);
-			bits = ft_ex_TrueTypeGetCharBmp(0, wchar, &bmpSize, dyExtra);
+			ft_ex_iTrueTypeSetSize(font, mFontSize);
+			bits = ft_ex_TrueTypeGetCharBmp(font, wchar, &bmpSize, dyExtra);
 		//}
 		//else
 		//{
@@ -286,4 +300,89 @@ namespace mango
 	}
 
 	FontCache  gFontCache;
+	
+	typedef struct CharRange {
+		uint16_t first;
+		uint16_t last;
+	};
+	
+	#define ARRAY_SIZE(x)   (sizeof(x) / sizeof(*x))
+	
+	static const CharRange kShiftCHRanges[] = {
+		{0x2E80,0x2FDF},
+		{0x3100,0x312F},
+		{0x3400,0x4DBF},
+		{0x4E00,0x9FFF},
+		{0xF900,0xFAFF},
+	};
+	static const CharRange kShiftJARanges[] = {
+		{0x3040,0x30FF},
+		{0x31F0,0x31FF},
+	};
+	static const CharRange kShiftENRanges[] = {
+		{0x0000,0x007F},
+	};
+	static const CharRange kShiftKORanges[] = {
+		{0x1100,0x11FF},
+		{0x3130,0x318F},
+		{0xAC00,0xD7AF},
+	};
+	static const CharRange kShiftTHRanges[] = {
+		{0x0E00,0x0E7F},
+	};
+	static const CharRange kShiftRURanges[] = {
+		{0x0400,0x052F},
+	};
+	static const CharRange kShiftLARanges[] = {
+		{0x0080,0x02AF},
+		{0x1E00,0x1EFF},
+	};
+
+
+	static bool charMatchesEncoding(WCHAR ch, const CharRange* encodingRanges, int rangeCount) {
+	    // Use binary search to see if the character is contained in the encoding
+	    int low = 0;
+	    int high = rangeCount;
+
+	    while (low < high) {
+#if 0			
+	        int i = (low + high) / 2;
+	        const CharRange* range = &encodingRanges[i];
+	        if (ch >= range->first && ch <= range->last)
+	            return true;
+	        if (ch > range->last)
+	            low = i + 1;
+	        else
+	            high = i;
+#else
+			const CharRange* range = &encodingRanges[low];
+			if (ch >= range->first && ch <= range->last)
+				return true;
+			else
+				low++;
+#endif
+	    }
+
+	    return false;
+	}
+	int UnicodeLanguge::getWcharLanguge(WCHAR wchar){
+		int languge = -1;
+
+		 if (charMatchesEncoding(wchar, kShiftENRanges, ARRAY_SIZE(kShiftENRanges)))
+		 	languge = LANGID_ENGLISH;
+		 if (charMatchesEncoding(wchar, kShiftCHRanges, ARRAY_SIZE(kShiftCHRanges)))
+		 	languge = LANGID_SIMPLIFIED;
+		 if (charMatchesEncoding(wchar, kShiftJARanges, ARRAY_SIZE(kShiftJARanges)))
+		 	languge = LANGID_JAPANESE;
+		 if (charMatchesEncoding(wchar, kShiftKORanges, ARRAY_SIZE(kShiftKORanges)))
+		 	languge = LANGID_KOREAN;
+		 if (charMatchesEncoding(wchar, kShiftTHRanges, ARRAY_SIZE(kShiftTHRanges)))
+		 	languge = LANGID_TH;
+		 if (charMatchesEncoding(wchar, kShiftRURanges, ARRAY_SIZE(kShiftRURanges)))
+		 	languge = LANGID_RU;
+		 if (charMatchesEncoding(wchar, kShiftLARanges, ARRAY_SIZE(kShiftLARanges)))
+		 	languge = LANGID_LA;
+		 
+		 return languge;
+	}
 }

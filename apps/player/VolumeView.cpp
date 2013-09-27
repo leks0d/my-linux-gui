@@ -56,8 +56,6 @@ namespace mango
 		
 		initView();	
 
-		
-		
 		setFocus(this);
 		invalidateRect();
 		isShow = 1;
@@ -215,14 +213,15 @@ namespace mango
 	{
 		return -1;
 	}
-	int VolumeView::onTouchMove(int x, int y, int flag){
-
+	int VolumeView::onTouchMove(int x, int y, int flag)
+	{
 		return -1;
 
 	}
-	int VolumeView::onTouchUp(int x, int y, int flag){
+	int VolumeView::onTouchUp(int x, int y, int flag)
+	{
 		return -1;
-		}
+	}
 
 	int VolumeView::volumeToGuage(int volume)
 	{

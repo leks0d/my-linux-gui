@@ -77,10 +77,10 @@ namespace mango
 			
 			len = mMax = 0;
 			
-			if(mplaylist!=NULL)
-				delete mplaylist;
-			
-			mplaylist = NULL;
+			if(mplaylist!=NULL){
+				delete[] mplaylist;
+				mplaylist = NULL;
+			}
 		}
 	
 }

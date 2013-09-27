@@ -150,7 +150,7 @@ namespace mango
 			return ;
 		}
 
-		ret = fwrite(cmd_all,strlen(cmd_data),1,file);
+		ret = fwrite(cmd_data,strlen(cmd_data),1,file);
 		
 		if(ret == -1){
 			log_i("recovery write fail.");
@@ -200,8 +200,6 @@ namespace mango
 
 	void Environment::sync(){
 		char *cmd = "./system/bin/sync";
-		system(cmd);
-		mango::Thread::sleep(100);
 		system(cmd);
 	}
 

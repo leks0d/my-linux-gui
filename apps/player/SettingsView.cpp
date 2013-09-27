@@ -113,6 +113,13 @@ namespace mango
 		}
 		mAdvanceListAdapter->setData(img,imgsec,text,count);
 
+		if(gSessionLocal.getLangId() == LANGID_RU
+			||gSessionLocal.getLangId() == LANGID_LA
+			||gSessionLocal.getLangId() == LANGID_PU)
+			mAdvanceListAdapter->mLayoutleft = 20;
+		else
+			mAdvanceListAdapter->mLayoutleft = 100;
+		
 		mTitle->setTextResoure(STR_SETTING_ADVANCED);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mTitle->invalidateRect();
@@ -129,9 +136,13 @@ namespace mango
 		if(mSettingListAdapter == NULL){
 			mSettingListAdapter = new SettingListAdapter(mListView,ADAPTER_PLAYING);
 			mSettingListAdapter->setData(img,imgsec,text,count);
-			//mSettingListAdapter->mLayoutleft = 20;
 		}else
 			mSettingListAdapter->refresh();
+
+		if(gSessionLocal.getLangId() == LANGID_RU)
+			mSettingListAdapter->mLayoutleft = 20;
+		else
+			mSettingListAdapter->mLayoutleft = 100;
 		
 		mTitle->setTextResoure(MUSIC_MUSIC_FUN);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);

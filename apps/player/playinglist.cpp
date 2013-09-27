@@ -380,6 +380,7 @@ static const char *PlayerLock = "playerlock";
 					//gPlayer.closeWm8740Mute();
 					gPlayer.VolumeCheck();
 					mThread.create(Playinglist::CloseMuteRunnig,NULL);
+										
 					if(getPlayingItem()->isCue){
 						mango::Thread::sleep(1000);
 						mParticleplayer->seekTo(getPlayingItem()->cueStart);

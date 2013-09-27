@@ -20,4 +20,5 @@ namespace mango
 			static void openMute();
 			static void sync();
 	};
+	
 };

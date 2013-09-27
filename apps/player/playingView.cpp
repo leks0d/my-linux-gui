@@ -357,8 +357,9 @@ namespace mango
 		sampleRate = info[1];
 		sampleRate = sampleRate/1000.0;
 		
+		mstr->mSprintf("%dBit",info[0]);
 		mstr->mfloatSprintf("%.1fKHz/",sampleRate);
-		mstr->mSprintf("%dKbps",info[2]/1000);
+		
 		
 		mAudioInfo->setTextString(mstr->mstr);
 

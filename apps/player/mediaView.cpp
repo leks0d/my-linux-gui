@@ -690,22 +690,25 @@ namespace mango
 						getparent(utf8Path,parent);
 						
 						if(count>0){
-							ArrayMediaInfo arrayInfo;
-							
-							if(mPlayinglist == NULL)
-								mPlayinglist = new Playinglist();
-							
-							mPlayinglist->clearAll();
-							
-							ptr = where = new char[300];
-							ptr += sprintf(ptr," where path like '%s/%%' and not path like '%s/%%/%%' ",parent,parent);
+							if(mPlayinglist->isItemExsit(pinfo->getMediaInfo(0))<0){
+							//if(1){	
+								ArrayMediaInfo arrayInfo;
+								char sqlParent[350];
+								
+								if(mPlayinglist == NULL)
+									mPlayinglist = new Playinglist();
+								
+								mPlayinglist->clearAll();
+								
+								mediaprovider::slqFormatOut(parent,sqlParent);
+								ptr = where = new char[300];
+								ptr += sprintf(ptr," where path like '%s/%%' and not path like '%s/%%/%%' ",sqlParent,sqlParent);
 
-							count = gmediaprovider.queryMusicArray(where,&arrayInfo);
-							
-							mPlayinglist->addArrayItem(arrayInfo);
-							
-							mPlayinglist->playMediaInfo(pinfo->getMediaInfo(0));	
-							
+								count = gmediaprovider.queryMusicArray(where,&arrayInfo);
+								
+								mPlayinglist->addArrayItem(arrayInfo);
+							}
+							mPlayinglist->playMediaInfo(pinfo->getMediaInfo(0));
 							gPlayer.showPlayingView();
 						}else if(ismusic(utf8Path)){
 							int len = strlen(utf8Path)+1;
@@ -718,6 +721,7 @@ namespace mango
 						}
 						else if(isCueFile(utf8Path))
 						{
+#if 0
 							CCue mCue;
 							int i;
 							int ret = -1;
@@ -731,6 +735,7 @@ namespace mango
 									log_i("song.star=%d,%s",song.star,song.m_strname.string);
 								}
 							}
+#endif
 						}
 						
 						delete pinfo;
@@ -826,7 +831,6 @@ namespace mango
 							switch(record->m_lvItem.iItem){
 								case 0:
 									String::copy(mCurrentPath, TEXT("/mnt/sdcard"));
-									log_i("lstrcmpi  /mnt/sdcard");
 									break;
 								case 1:
 									String::copy(mCurrentPath, TEXT("/mnt/external_sd"));
@@ -846,44 +850,43 @@ namespace mango
 		else if(fromView == NULL && code == NM_DISPLAY){
 			log_i("NM_DISPLAY");
 			if(mNeedPlayPath != NULL){
-						char *ptr,parent[255];
-						char *where = NULL;
-						char sqlpath[300];
-						int count;
-						ArrayMediaInfo *pinfo;
+				char *ptr,parent[255];
+				char *where = NULL;
+				char sqlpath[300];
+				int count;
+				ArrayMediaInfo *pinfo;
+		
+				pinfo = new ArrayMediaInfo();
+				ptr = where = new char[300];
+						
+				mediaprovider::slqFormatOut(mNeedPlayPath,sqlpath);
+						
+				ptr += sprintf(ptr," where path = '%s' ",sqlpath);
+						
+				count = gmediaprovider.queryMusicArray(where,pinfo);
+						
+				safeDelete(where);
 
+				getparent(mNeedPlayPath,parent);
 						
-						pinfo = new ArrayMediaInfo();
-						ptr = where = new char[300];
-						
-						mediaprovider::slqFormatOut(mNeedPlayPath,sqlpath);
-						
-						ptr += sprintf(ptr," where path = '%s' ",sqlpath);
-						
-						count = gmediaprovider.queryMusicArray(where,pinfo);
-						
-						safeDelete(where);
-
-						getparent(mNeedPlayPath,parent);
-						
-						if(count>0){
-							char* name;
-							ArrayMediaInfo arrayInfo;
+				if(count>0){
+					char* name;
+					ArrayMediaInfo arrayInfo;
 							
-							if(mPlayinglist == NULL)
-								mPlayinglist = new Playinglist();
-							mPlayinglist->clearAll();
-							mPlayinglist->playMediaInfo(pinfo->getMediaInfo(0));	
+					if(mPlayinglist == NULL)
+						mPlayinglist = new Playinglist();
+					mPlayinglist->clearAll();
+					mPlayinglist->playMediaInfo(pinfo->getMediaInfo(0));	
 							
-							ptr = where = new char[300];
-							ptr += sprintf(ptr," where path like '%s/%%' and not path like '%s/%%/%%' ",parent,parent);
-							count = gmediaprovider.queryMusicArray(where,&arrayInfo);					
-							mPlayinglist->addArrayItem(arrayInfo);
-						}
-						delete pinfo;
-						delete mNeedPlayPath;
-						mNeedPlayPath = NULL;
-						gPlayer.showPlayingView();
+					ptr = where = new char[300];
+					ptr += sprintf(ptr," where path like '%s/%%' and not path like '%s/%%/%%' ",parent,parent);
+					count = gmediaprovider.queryMusicArray(where,&arrayInfo);					
+					mPlayinglist->addArrayItem(arrayInfo);
+				}
+				delete pinfo;
+				delete mNeedPlayPath;
+				mNeedPlayPath = NULL;
+				gPlayer.showPlayingView();
 			}
 			if(getMainState() != 0x1210)
 				mListView->refresh();
@@ -1199,6 +1202,7 @@ namespace mango
 	void MusicAdapter::PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec){
 		int	 x, y;
 		mediainfo *info;
+		Rect yrect;
 		
 		x = rect.left;
 		y = rect.top;
@@ -1217,10 +1221,14 @@ namespace mango
 			canvas.setTextColor(RGB(255,255,255));
 		x= x+40;
 		canvas.setTextSize(16);
-		canvas.drawText(info->name,strlen(info->title),x,y+5);
+		//canvas.drawText(info->name,strlen(info->title),x,y+5);
+		yrect.setEx(x,y+5,296-x+12,40);
+		canvas.drawText(info->name,strlen(info->title),yrect,0 );
 		canvas.setTextColor(RGB(255,255,255));
 		canvas.setTextSize(12);
-		canvas.drawText(info->artist,strlen(info->artist),x,y+28);
+		//canvas.drawText(info->artist,strlen(info->artist),x,y+28);
+		yrect.setEx(x,y+28,296-x+12,40);
+		canvas.drawText(info->artist,strlen(info->artist),yrect,0 );
 	}
 
 	AlbumAdapter::AlbumAdapter(ListView* list,int id):BaseAdapter(){
@@ -1257,6 +1265,7 @@ namespace mango
 	void AlbumAdapter::PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec){
 		int	 x, y,index;
 		mediainfo *info;
+		Rect yrect;
 		
 		x = rect.left;
 		y = rect.top;
@@ -1281,10 +1290,15 @@ namespace mango
 			canvas.setTextColor(RGB(255,255,255));
 		canvas.setTextSize(16);
 		x = x+40;
-		canvas.drawText(info->album,strlen(info->album),x,y+5);
+		//canvas.drawText(info->album,strlen(info->album),x,y+5);
+		yrect.setEx(x,y+5,308-x,30);
+		canvas.drawText(info->album,strlen(info->album),yrect,0);
+		
 		canvas.setTextColor(RGB(255,255,255));
 		canvas.setTextSize(12);
-		canvas.drawText(info->artist,strlen(info->artist),x,y+28);
+		//canvas.drawText(info->artist,strlen(info->artist),x,y+28);
+		yrect.setEx(x,y+28,308-x,20);
+		canvas.drawText(info->artist,strlen(info->artist),yrect,0);
 	}
 	void GenreAdapter::refresh(){
 		int count,i;
@@ -1311,6 +1325,7 @@ namespace mango
 	void GenreAdapter::PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec){
 		int  x, y;
 		mediainfo *info;
+		Rect yrect;
 				
 		x = rect.left;
 		y = rect.top;
@@ -1325,7 +1340,9 @@ namespace mango
 		canvas.setTextSize(18);
 
 		x+=45;
-		canvas.drawText(info->genre,strlen(info->genre),x,y+10);
+		//canvas.drawText(info->genre,strlen(info->genre),x,y+10);
+		yrect.setEx(x,y+10,308-x,30);
+		canvas.drawText(info->genre,strlen(info->genre),yrect,0);
 	}
 
 	
@@ -1360,6 +1377,7 @@ namespace mango
 	void ArtistAdapter::PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec){
 		int	 x, y;
 		mediainfo *info;
+		Rect yrect;
 		
 		x = rect.left;
 		y = rect.top;
@@ -1371,10 +1389,13 @@ namespace mango
 			canvas.setTextColor(RGB(255,149,0));
 		else
 			canvas.setTextColor(RGB(255,255,255));
+		
 		canvas.setTextSize(18);
 
 		x+=40;
-		canvas.drawText(info->artist,strlen(info->artist),x,y+10);
+		//canvas.drawText(info->artist,strlen(info->artist),x,y+10);
+		yrect.setEx(x,y+10,296+12-x,30);
+		canvas.drawText(info->artist,strlen(info->artist),yrect,0);
 		
 		canvas.setTextColor(RGB(255,255,255));
 	}

@@ -514,14 +514,23 @@ namespace mango
 	{
 		WCHAR  wcBuf[81] ;
 		int    i ;
-
+		if(string == NULL)
+			return;
+#if 0
 		for (i = 0 ; i < 80 && (*string) && count ; i++, count--) {
 			wcBuf[i] =  *string ;
 			string++ ;
 		}
-		wcBuf[i] = '\0' ;
+		wcBuf[i] = '\0';
+#else
+		if(Charset::isTextUtf8(string)){
+			i = Charset::multiByteToWideChar(CP_UTF8, string, strlen(string), wcBuf, 80);
+		}else{
+			i = Charset::multiByteToWideChar(CP_ACP, string, strlen(string), wcBuf, 80);
+		}
+#endif
 
-		return drawText(wcBuf, -1, rect, format);
+		return drawText(wcBuf, i, rect, format);
 	}
 
 

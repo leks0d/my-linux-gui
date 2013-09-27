@@ -145,7 +145,10 @@ namespace mango
 
 	extern FontCache  gFontCache;
 
-
+	class UnicodeLanguge{
+		public:
+			static int getWcharLanguge(WCHAR wchar);
+	};
 
 	typedef struct _Screen 
 	{
