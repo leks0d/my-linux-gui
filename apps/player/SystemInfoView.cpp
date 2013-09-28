@@ -122,7 +122,7 @@ namespace mango
 		mTitle->setTextResoure(STR_ADVANCE_SYSINFO);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mModelNumber->setTextString("DX50");
-		mFirmwareVersion->setTextString("V1.1.6");
+		mFirmwareVersion->setTextString("V1.1.7");
 		
 		updateTotalMem();
 	}
