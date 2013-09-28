@@ -49,6 +49,61 @@ namespace mango
 				}else
 					return NULL;
 		}
+		void ArrayMediaInfo::sort(int sortby){
+			mediainfo info;
+			int i,count;
+
+			if(needSortByTrack()){
+				sortby = 1;
+			}
+			log_i("ArrayMediaInfo sort by %d,len=%d",sortby,len);
+			for(count = len;count>1;count--){
+				//log_i("sort count=%d---------------------",count);
+				for(i=0;i<count-1;i++){
+					if(compare(&mplaylist[i],&mplaylist[i+1],sortby) > 0){
+						info = mplaylist[i];
+						mplaylist[i] = mplaylist[i+1];
+						mplaylist[i+1] = info;
+					}
+				}
+			}	
+		}
+		bool ArrayMediaInfo::needSortByTrack(){
+			int i,count = 0;
+
+			for(i=0;i<len;i++){
+				if(mplaylist[i].track>0)
+					count++;
+			}
+
+			if(count>1)
+				return true;
+			else
+				return false;
+		}
+		int ArrayMediaInfo::compare(mediainfo *first,mediainfo *end,int sortby){
+			int ret=0;
+			
+			if(sortby == 0){
+				if(first->name_key == NULL)
+					ret = -1;
+				else if(end->name_key ==NULL)
+					ret = 1;
+				else
+					ret = strcmp(first->name_key,end->name_key);
+			}else if(sortby == 1){
+				//ret = strcmp(first->name,end->name);
+				if(ret == 0){
+					if(first->track < end->track){
+						ret = -1;
+					}else if(first->track > end->track){
+						ret = 1;
+					}
+				}
+			}
+			//log_i("ArrayMediaInfo::compare ret = %d",ret);
+			return ret;
+		}
 
 		ArrayMediaInfo& ArrayMediaInfo::operator =(ArrayMediaInfo& info){
 			mediainfo *temp;

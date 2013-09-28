@@ -358,7 +358,7 @@ static const char *PlayerLock = "playerlock";
 				
 				char *playPath = getPlayingItem()->path;
 
-				if(playPath == NULL)
+				if(playPath == NULL || !FileAttr::FileExist(playPath))
 					return -1;
 				
 				log_i("Playinglist::startPlayPosition needStart=%d, %d/%d:%s",needStart,mCurrent,len,playPath);

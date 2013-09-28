@@ -82,12 +82,18 @@ namespace mango
 		~AlbumAdapter(void){}
 		AlbumAdapter(ListView* list,int id);
 		void refresh();
+		void setWhere(char* where);
+		void setArtist(char* art);
+		char* getArtist();
 		virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);
 		virtual int getCount(){return 0;}
 		virtual void* getItem(int index){return 0;}
+	public:
 		ListView* mlist;
 		ArrayMediaInfo *mMusicArrayList;
 		MSkBitmap *mMSkBitmap;
+		char* sqlWhere;
+		char* mArtist;
 	};
 	class GenreAdapter : public AlbumAdapter
 	{
@@ -160,6 +166,8 @@ namespace mango
 		void initMusicList();
 		void initAlbumList();
 		void initArtistList();
+		void initArtistAlbumList(char* artist);
+		void initArtistAlbumMusicList(char* artist,char* album);
 		void initGenreList();
 		void initAlbumMusicList(mediainfo* info);
 		void initArtistMusicList(char* key,char* value,int state);
@@ -187,6 +195,7 @@ namespace mango
 		MusicAdapter* mArtistMusicAdapter;
 		MusicAdapter* mGenreMusicAdapter;
 		AlbumAdapter* mAlbumAdapter;
+		AlbumAdapter* mArtistAlbumAdapter;
 		ArtistAdapter* mArtistAdapter;
 		MainListAdapter* mMainListAdapter;
 		PlayListAdapter* mPlayListAdapter;

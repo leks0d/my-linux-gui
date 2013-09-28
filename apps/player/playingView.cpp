@@ -357,8 +357,8 @@ namespace mango
 		sampleRate = info[1];
 		sampleRate = sampleRate/1000.0;
 		
-		mstr->mSprintf("%dBit",info[0]);
-		mstr->mfloatSprintf("%.1fKHz/",sampleRate);
+		mstr->mSprintf("%dBit ",info[0]);
+		mstr->mfloatSprintf("%.1fKHz",sampleRate);
 		
 		
 		mAudioInfo->setTextString(mstr->mstr);
@@ -463,7 +463,9 @@ namespace mango
 				info = mPlayinglist->getPlayingItem();
 				if(info->isCue){
 					cur = mPlayinglist->getCurrent();
-					log_i("cur=%d,cueStart+duration=%d",cur,info->cueStart + info->duration);
+					
+					//log_i("cur=%d,cueStart+duration=%d",cur,info->cueStart + info->duration);
+					
 					if(cur > info->cueStart + info->duration){
 						mPlayinglist->callbackPlay();
 						ViewInit();

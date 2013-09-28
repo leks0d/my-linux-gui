@@ -856,8 +856,7 @@ namespace mango
 			}else{
 				mInfo.duration = song.len;
 			}
-			//strCopy(song.m_strname.string,mInfo.title);
-			//strCopy(song.m_strname.string,mInfo.name);
+
 			if(song.m_strname.string != NULL){
 				len = strlen(song.m_strname.string);
 				slqCheck(song.m_strname.string);
@@ -1127,7 +1126,7 @@ namespace mango
 					pt = pt->next;
 					arraylist->addMediaInfo(&(pt->info));
 					count++;
-				}			
+				}
 			}
 			
 			relese_db(info);
@@ -1148,8 +1147,10 @@ namespace mango
 			ptr = sql;
 			
 			//ptr += sprintf(ptr,"select * from music ");
-			if(where!=0)
+			if(where != NULL)
 				ptr += sprintf(ptr,"%s;",where);
+			else
+				return 0;
 
 			log_i("queryMusicArray:sql=%s",sql);
 			
