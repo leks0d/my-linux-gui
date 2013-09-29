@@ -366,31 +366,40 @@ static const char *PlayerLock = "playerlock";
 				if(needGapless&&mGapless>0&&mParticleplayer->setNextSongForGapless(playPath)){
 					
 					if(mParticleplayer->gaplessPlay(playPath)){log_i("gaplessPlay() success!");}
-					else{log_i("gaplessPlay() fail!");return -1;}
+					else{log_i("gaplessPlay() fail!");goto Exit;}
 					
 				}else{
 					gPlayer.openWm8740Mute();
-					if(mParticleplayer->stop()){log_i("stop() success!");}else{log_i("stop() fail!");return -1;}
-					if(mParticleplayer->setSource(playPath)){log_i("setSource() success!");}else{log_i("setSource() fail!");return -1;}
-					if(mParticleplayer->prepare()){log_i("prepare() success!");}else{log_i("prepare() fail!");return -1;}
+					if(mParticleplayer->stop()){log_i("stop() success!");}else{log_i("stop() fail!");goto Exit;}
+					if(mParticleplayer->setSource(playPath)){log_i("setSource() success!");}else{log_i("setSource() fail!");goto Exit;}
+					if(mParticleplayer->prepare()){log_i("prepare() success!");}else{log_i("prepare() fail!");goto Exit;}
 					//if(mParticleplayer->seekTo(mesc)){log_i("seekTo() success!");}else{log_i("seekTo() fail!");return -1;}
 					if(needStart)
-						if(mParticleplayer->start()){log_i("start() success!");}else{log_i("start() fail!");return -1;}
+						if(mParticleplayer->start()){log_i("start() success!");}else{log_i("start() fail!");goto Exit;}
 					//mango::Thread::sleep(600);
 					//gPlayer.closeWm8740Mute();
 					gPlayer.VolumeCheck();
-					mThread.create(Playinglist::CloseMuteRunnig,NULL);
+					
 										
 					if(getPlayingItem()->isCue){
-						mango::Thread::sleep(1000);
+						mango::Thread::sleep(1500);
 						mParticleplayer->seekTo(getPlayingItem()->cueStart);
+						mThread.create(Playinglist::CloseMuteRunnig,(void*)1000);
+					}else{
+						mThread.create(Playinglist::CloseMuteRunnig,(void*)600);
 					}
 				}
 				getPlayingItem()->isPlayed = 1;
 				setWakeLock();
+				return 0;
+Exit:
+				gPlayer.closeWm8740Mute();
+				return -1;
 			}
 			unsigned int Playinglist::CloseMuteRunnig(void *parameter){
-				mango::Thread::sleep(600);
+				int sleepTime = (int)parameter;
+				mango::Thread::sleep(sleepTime);
+				log_i("sleepTime=%d",sleepTime);
 				gPlayer.closeWm8740Mute();
 			}
 			int Playinglist::isItemExsit(mediainfo *info){
