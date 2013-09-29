@@ -222,7 +222,7 @@ int CCue::song_parser(int off,int index)
 		eoff=m_strbuff.Find(tags[1],ret1);//找到PERFORMER 这一行的换行符
 		if(eoff == -1){
 			return -1;
-		}else if(ret2 == -1 || ret2>=eoff-2){//如果符号没有找到，或者找的"在下一行
+		}else if(ret2 == -1 || ret2>=eoff-2){//如果符号没有找到，或者找的"在下一行,eoff-2是为了判断错误的情况:artist"\r\n
 			off1 = ret1+1;
 			off2 = eoff-1;
 		}else{
