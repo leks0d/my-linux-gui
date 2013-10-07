@@ -1003,7 +1003,7 @@ namespace mango
 			log_e("sqlite3_exec error : %s",sql);
 			log_e("sqlite3_exec pErrMsg : %s",pErrMsg);
 		}else
-			log_i("sqlite3_exec success : %s",sql);
+			//log_i("sqlite3_exec success : %s",sql);
 			;
 		return ret;	
 	}

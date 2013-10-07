@@ -47,8 +47,9 @@ namespace mango
 			atuoPoweroffCount = 0;
 		}
 		//log_i("PowerManagerCount=%d,poweroffTime=%d",atuoPoweroffCount,poweroffTime);
-		if(atuoPoweroffCount>=poweroffTime && poweroffTime != -1)
-			reboot(RB_POWER_OFF);
+		if(atuoPoweroffCount>=poweroffTime && poweroffTime != -1){
+			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,NM_POWER_OFF,0);
+		}
 	}
 
 	void PowerManager::resetCount(){
