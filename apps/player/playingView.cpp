@@ -575,7 +575,7 @@ namespace mango
 				gPlayer.mHeadestSwitch->resetSwicth();
 			}
 			if(gPlayer.bootLockCount){
-				if(gPlayer.bootLockCount == 1)
+				if(gPlayer.bootLockCount == 1 && gPowerManager && gPowerManager->poweroffTime<0)
 					gPlayer.setBootWakeLock(0);
 				gPlayer.bootLockCount--;
 			}
@@ -633,7 +633,7 @@ namespace mango
 
 	int PlayingView::onKeyDown(int keyCode, int flag)
 	{
-		switch(keyCode)	{
+		switch(keyCode){
 			case KEYCODE_BACK:
 				break;
 			case KEYCODE_PREV:

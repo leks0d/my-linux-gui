@@ -25,6 +25,11 @@ namespace mango
 		if(index>=0&&index<=4){
 			poweroffTime = power[index];
 			gSettingProvider.update(SETTING_AUTOPOWEROFF_ID,poweroffTime);
+			if(poweroffTime<0){
+				gPlayer.setBootWakeLock(0);
+			}else{
+				gPlayer.setBootWakeLock(1);
+			}
 		}
 	}
 

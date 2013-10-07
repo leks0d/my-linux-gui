@@ -4,12 +4,13 @@ namespace mango
 
 	class PowerManager
 	{	
+	public:	
 		int sleepTime;
 		int atuoCount;
 		int poweroffTime;
 		int atuoPoweroffCount;
 		int isSleep;
-	public:
+	
 		PowerManager();
 		void PowerManagerCount();
 		void resetCount();
