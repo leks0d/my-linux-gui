@@ -166,9 +166,10 @@ namespace particle
 		XAmillisecond millisecond = -1;
 		mMutex.lock();
 
-		if (mPlayer)
-			mPlayer->getPosition(&millisecond);
+	//	if (mPlayer)
+	//		mPlayer->getPosition(&millisecond);
 
+		millisecond = gMediaServiceData->mCurrentPosition;
 		mMutex.unlock();
 		return millisecond;
 	}
@@ -230,7 +231,6 @@ namespace particle
 	{
 		bool success;
 
-		log_i("MediaPlayerService::stop");
 		mMutex.lock();
 		success = mediaDeinit();
 		mMutex.unlock();
@@ -546,6 +546,7 @@ namespace particle
 
 		//particle::addLogRule(LOG_ALL, NULL, NULL);
 		gMediaServiceData->mIsPlaying = false;
+		gMediaServiceData->mCurrentPosition = 0;
 
 		do
 		{
@@ -670,14 +671,6 @@ namespace particle
 	bool MediaPlayerService::mediaDeinit()
 	{
 		LOGI("MediaPlayerService::mediaDeinit Enter");
-		
-		int position = 0,isplay = 0;
-		
-		if(mPlayer){
-			mPlayer->setIsPlayingAddress(&isplay);
-			mPlayer->setCurrentPositionAddress(&position);
-			log_i("MediaPlayerService::mediaDeinit set 0");
-		}
 
 		if (mPlayer)
 		{

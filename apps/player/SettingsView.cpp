@@ -118,7 +118,7 @@ namespace mango
 			||gSessionLocal.getLangId() == LANGID_PU)
 			mAdvanceListAdapter->mLayoutleft = 20;
 		else
-			mAdvanceListAdapter->mLayoutleft = 100;
+			mAdvanceListAdapter->mLayoutleft = 80;
 		
 		mTitle->setTextResoure(STR_SETTING_ADVANCED);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);

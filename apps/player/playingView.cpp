@@ -438,17 +438,22 @@ namespace mango
 					break;
 				case NM_SEEKBAR_UP:{
 						mediainfo *info;
-						
-						info = mPlayinglist->getPlayingItem();
-						if(info->isCue){
-							int seek;
-							seek = mSeekBar->getProgress() + info->cueStart;
-							if(seek<info->cueStart+info->duration)
-								mPlayinglist->seekTo(seek);
-							else
-								log_i("inval seek posistion seek=%d,cueStart+duration=%d",seek,info->cueStart+info->duration);
-						}else{
-							mPlayinglist->seekTo(mSeekBar->getProgress());
+						int cur;
+						cur = mPlayinglist->getCurrent();
+						if(cur<2000)
+							break;
+						else{
+							info = mPlayinglist->getPlayingItem();
+							if(info->isCue){
+								int seek;
+								seek = mSeekBar->getProgress() + info->cueStart;
+								if(seek<info->cueStart+info->duration)
+									mPlayinglist->seekTo(seek);
+								else
+									log_i("inval seek posistion seek=%d,cueStart+duration=%d",seek,info->cueStart+info->duration);
+							}else{
+								mPlayinglist->seekTo(mSeekBar->getProgress());
+							}
 						}
 					}
 					isNeedFresh = 1;

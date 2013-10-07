@@ -382,8 +382,11 @@ static const char *PlayerLock = "playerlock";
 					
 										
 					if(getPlayingItem()->isCue){
+						log_i("Cue seekTo start.");
 						mango::Thread::sleep(1000);
+						log_i("Cue seekTo cueStart=%d",getPlayingItem()->cueStart);
 						mParticleplayer->seekTo(getPlayingItem()->cueStart);
+						log_i("Cue seekTo complete.");
 						mThread.create(Playinglist::CloseMuteRunnig,(void*)1000);
 					}else{
 						mThread.create(Playinglist::CloseMuteRunnig,(void*)600);
