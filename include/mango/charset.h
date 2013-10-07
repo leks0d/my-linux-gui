@@ -28,6 +28,7 @@ namespace mango
 #define LANGID_RU		0x0006
 #define LANGID_LA		0x0007
 #define LANGID_PU		0x0008
+#define LANGID_UNKNOW		0xF000
 
 	class Charset : public Object
 	{

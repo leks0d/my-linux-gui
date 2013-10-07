@@ -100,7 +100,10 @@ namespace mango
 				break;
 			case LANGID_SIMPLIFIED:
 			case LANGID_JAPANESE:	
-				font = 2;
+				font = 1;
+				break;
+			case LANGID_UNKNOW:
+				font = 1;
 				break;
 			default:
 				font = 0;
