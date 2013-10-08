@@ -24,6 +24,9 @@ namespace mango
 			particle::MediaPlayerInterface*  mParticleplayer;
 			mediainfo *mplaylist;
 			Thread mThread;
+			CString mPlayingPath;
+			int mIsCue;
+			int mCueStart;
 			int len;
 			int mCurrent;
 			int mMax;
@@ -48,8 +51,8 @@ namespace mango
 			int moveRandom();		
 			int startPlay();
 			int startPlayPosition(int mesc,bool needStart,bool needGapless);
-			void playNext();
-			void playPrev();
+			void playNext(bool needstart = true);
+			void playPrev(bool needstart = true);
 			void checkPlayintList();
 			void savePlayintList();
 			int playPauseOrStart();

@@ -675,15 +675,18 @@ namespace mango
 		switch(id)
 		{
 		case PLAYING_IDB_NEXT:
-			mPlayinglist->playNext();
+			mPlayinglist->playNext(mPlayinglist->isPlaying());
 			ViewInit();
-			log_i("PLAYING_IDB_NEXT complete.");
 			break;
 		case PLAYING_IDB_PREV:
-			if(mPlayinglist->getCurrent()>5000)
-				mPlayinglist->seekTo(0);
-			else
-				mPlayinglist->playPrev();
+			if(mPlayinglist->isPlaying()){
+				if(mPlayinglist->getCurrent()>5000)
+					mPlayinglist->seekTo(0);
+				else
+					mPlayinglist->playPrev();
+			}else{
+				mPlayinglist->playPrev(false);
+			}
 			ViewInit();
 			break;
 		case PLAYING_IDB_PLAY:{

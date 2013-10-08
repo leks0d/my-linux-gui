@@ -21,6 +21,8 @@ public:
 	int Mid(int start,int len,CString& out);
 	CString& operator=(CString& cstring);
 	CString& operator=(const char *str);
+	bool operator==(const char *str);
+	bool operator!=(const char *str);
 public:
 	char *string;
 	int mlen;

@@ -293,20 +293,24 @@ static const char *PlayerLock = "playerlock";
 					mCurrent = pos;
 			}
 
-			void Playinglist::playNext(){
+			void Playinglist::playNext(bool needstart){
 				int ret;
 				if(playMode != MODE_PLAY_RANDOM){
 					ret = moveToNext();
 				}else
 					ret = moveRandom();
-				if(ret)
+				if(ret&&needstart)
 					startPlay();
+				else
+					stopPlayer();
 			}
-			void Playinglist::playPrev(){
+			void Playinglist::playPrev(bool needstart){
 				int ret;
-				if(moveToPrev())
-				startPlay();
-			}			
+				if(moveToPrev()&&needstart)
+					startPlay();
+				else
+					stopPlayer();
+			}
 			mediainfo* Playinglist::getPlayingItem(){
 				if(len == 0)
 					return NULL;
@@ -319,19 +323,17 @@ static const char *PlayerLock = "playerlock";
 
 			int Playinglist::playMediaInfo(mediainfo *info){
 				int pos;
-				log_i("Playinglist::startPlay");
+				
 				pos = isItemExsit(info);
-				log_i("Playinglist::isItemExsit=%d",pos);
+				
 				if(pos>=0){
 					moveToPosition(pos);
-					log_i("Playinglist::moveToPosition");
 				}else{
 					addItem(info);
-					log_i("Playinglist::addItem");			
 					moveToLast();
-					log_i("Playinglist::moveToLast");	
 				}
-				startPlay();
+				
+				return startPlay();
 			}
 			int Playinglist::randomInt(int n){
 				long random;
@@ -339,9 +341,9 @@ static const char *PlayerLock = "playerlock";
 				random = rand();
 				return random%n;
 			}
-
+			
 			int Playinglist::startPlay(){
-				startPlayPosition(0,true,true);
+				return startPlayPosition(0,true,true);
 			}
 			
 			int Playinglist::startPlayPosition(int mesc,bool needStart,bool needGapless){
@@ -353,21 +355,39 @@ static const char *PlayerLock = "playerlock";
 					PlayerInit();
 					Environment::openMute();
 				}
+				
 				if(mParticleplayer == NULL)
 					return -1;
 				
+				if(getPlayingItem() == NULL)
+					return -1;
+				
 				char *playPath = getPlayingItem()->path;
+				
+				if(getPlayingItem()->isCue == 0 
+					&& mPlayingPath != NULL 
+					&& mPlayingPath == playPath){
+					return -2;
+				}else if(getPlayingItem()->isCue == mIsCue 
+					&& mCueStart == getPlayingItem()->cueStart 
+					&& mPlayingPath == playPath){
+					return -2;
+				}
+
+				mPlayingPath = playPath;
+				mIsCue = getPlayingItem()->isCue;
+				mCueStart = getPlayingItem()->cueStart;
 
 				if(playPath == NULL || !FileAttr::FileExist(playPath))
-					return -1;
+					return -3;
 				
 				log_i("Playinglist::startPlayPosition needStart=%d, %d/%d:%s",needStart,mCurrent,len,playPath);
 				
 				if(needGapless&&mGapless>0&&mParticleplayer->setNextSongForGapless(playPath)){
-					
+				
 					if(mParticleplayer->gaplessPlay(playPath)){log_i("gaplessPlay() success!");}
 					else{log_i("gaplessPlay() fail!");return -1;}
-					
+				
 				}else{
 					gPlayer.openWm8740Mute();
 					if(mParticleplayer->stop()){log_i("stop() success!");}else{log_i("stop() fail!");goto Exit;}
@@ -379,8 +399,7 @@ static const char *PlayerLock = "playerlock";
 					//mango::Thread::sleep(600);
 					//gPlayer.closeWm8740Mute();
 					gPlayer.VolumeCheck();
-					
-										
+								
 					if(getPlayingItem()->isCue){
 						log_i("Cue seekTo start.");
 						mango::Thread::sleep(1000);
@@ -391,13 +410,14 @@ static const char *PlayerLock = "playerlock";
 					}else{
 						mThread.create(Playinglist::CloseMuteRunnig,(void*)600);
 					}
+				
 				}
 				getPlayingItem()->isPlayed = 1;
 				setWakeLock();
 				return 0;
 Exit:
 				gPlayer.closeWm8740Mute();
-				return -1;
+				return -4;
 			}
 			unsigned int Playinglist::CloseMuteRunnig(void *parameter){
 				int sleepTime = (int)parameter;
@@ -576,7 +596,6 @@ Exit:
 			int gaplessEn;
 			int EqValue[8];
 			
-			
 			if(mParticleplayer == NULL)
 				return;
 
@@ -669,6 +688,7 @@ Exit:
 			if(mParticleplayer != NULL){
 				mParticleplayer->stop();
 			}
+			inPause = 0;
 			releaseWakeLock();
 		}
 		void Playinglist::clearAll(){

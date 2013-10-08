@@ -803,9 +803,11 @@ namespace mango
 							break;
 						case 0x1100:
 							mPlayinglist->moveToPosition(record->m_lvItem.iItem);
-							mPlayinglist->startPlay();
-							mPlayingListAdapter->refresh();
-							//gPlayer.showPlayingView();
+							if(mPlayinglist->startPlay()==0){
+								mPlayingListAdapter->refresh();
+							}else{
+								gPlayer.showPlayingView();
+							}
 							break;
 						case 0x1300:
 						case 0x1410:
@@ -920,7 +922,6 @@ namespace mango
 					if(mPlayinglist == NULL)
 						mPlayinglist = new Playinglist();
 					mPlayinglist->clearAll();
-					
 
 					mediaprovider::slqFormatOut(parent,sqlParent);
 					ptr = where = new char[300];

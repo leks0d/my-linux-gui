@@ -488,6 +488,29 @@ CString& CString::operator=(const char *str){
 	Format("%s",str);
 	return *this;
 }
+bool CString::operator==(const char *str){
+	int ret = 0;
+
+	if(str == NULL){
+		if(string == NULL)
+			return true;
+		else
+			return false;
+	}else if(string == NULL){
+		return false;
+	}
+
+	ret = strcmp(string,str);
+
+	if(ret == 0){
+		return true;
+	}else{
+		return false;
+	}
+}
+bool CString::operator!=(const char *str){
+	return !(*this == str);
+}
 CStringArray::CStringArray(){
 	mList = NULL;
 	mLen = mMax = 0;
@@ -507,11 +530,11 @@ int CStringArray::addCString(CString& cstr){
 		if(mMax == 0){
 			mMax = 8;
 		}else{
-			mMax*=2; 
+			mMax*=2;
 		}
 
 		temp = new CString[mMax];
-
+		
 		for(i=0;i<mLen;i++){
 			temp[i] = mList[i];
 		}
