@@ -86,7 +86,7 @@ static const char *PlayerLock = "playerlock";
 				
 				for(i=0;i<count;i++){
 					info = getItem(i);
-					log_i("updateInPlay mplayinglist[%d].id=%d",i,info->id);
+					//log_i("updateInPlay mplayinglist[%d].id=%d",i,info->id);
 					gmediaprovider.updateInPlay(i+1,info->id);
 				}
 				if(getCount()>0){

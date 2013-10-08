@@ -226,8 +226,9 @@ namespace mango
 			}
 		}
 #else
-		log_i("tag currentinfo->img_path=0x%x:%s",currentinfo->img_path,currentinfo->img_path);
-		mMSkBitmap->createFile(currentinfo->img_path);		
+		//log_i("tag currentinfo->img_path=0x%x:%s",currentinfo->img_path,currentinfo->img_path);
+		mMSkBitmap->createFile(currentinfo->img_path);
+		//BitmapFactory::decodeFile(mMSkBitmap,"/mnt/sdcard/cover.jpg",109,109);
 #endif
 
 		//log_i("tag");
@@ -378,7 +379,7 @@ namespace mango
 	}
 	unsigned int PlayingView::shutdownRunnig(void *parameter){
 		gPlayer.shutDown();
-		Thread::sleep(2000);
+		Thread::sleep(1000);
 		reboot(RB_POWER_OFF);
 	}
 	int PlayingView::onDestroy()

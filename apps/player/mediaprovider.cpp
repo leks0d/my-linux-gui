@@ -996,7 +996,7 @@ namespace mango
 		
 		if(db == 0)
 			return SQLITE_ERROR;
-		log_i("sqlite3_exec");
+		//log_i("sqlite3_exec");
 		ret = sqlite3_exec( db, sql, callback, arg, &pErrMsg );
 		
 		if(ret != SQLITE_OK){
