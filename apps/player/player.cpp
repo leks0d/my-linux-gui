@@ -322,7 +322,7 @@ namespace mango
 			mShutDownView->invalidateRect();
 			mShutDownView->setFocus();		
 		}
-		shutDown();
+		//shutDown();
 	}
 	void Player::shutDown(){	
 		mPlayinglist->stopPlayer();

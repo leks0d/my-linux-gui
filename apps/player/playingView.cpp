@@ -377,6 +377,7 @@ namespace mango
 			return 0;
 	}
 	unsigned int PlayingView::shutdownRunnig(void *parameter){
+		gPlayer.shutDown();
 		Thread::sleep(2000);
 		reboot(RB_POWER_OFF);
 	}

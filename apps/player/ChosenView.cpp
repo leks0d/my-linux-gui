@@ -107,8 +107,19 @@ namespace mango
 
 	unsigned int ChosenView::PoweroffRunnig(void *parameter){
 		ChosenView *chosen = (ChosenView *)parameter;
+		long start,dur,sleep;
+
+		start = Time::getMillisecond();
+		gPlayer.shutDown();
+		dur = Time::getMillisecond()-start;
+
+		sleep = 1000*2 - dur;
+
+		if(sleep>0)
+			mango::Thread::sleep(sleep);
+
+		log_i("sleep=%ld",sleep);
 		
-		mango::Thread::sleep(1000*2);
 		chosen->dispatchEvent();
 	}
 	void ChosenView::dispatchEvent(){
