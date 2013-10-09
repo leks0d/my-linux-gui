@@ -140,7 +140,7 @@ namespace mango
 		static int getMusicIcon(char* name);
 		virtual ~MediaView(void);
 		int onTouchDispatch(int x,int y, int action);
-		static int getArrayInfoFromFile(char *file,ArrayMediaInfo& array);
+		static int getArrayInfoFromFile(char *file,ArrayMediaInfo& array,CString& cover);
 	public:
 		virtual int onCreate();
 		virtual int onDestroy();

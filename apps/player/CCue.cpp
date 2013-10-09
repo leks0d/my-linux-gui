@@ -546,6 +546,11 @@ int CStringArray::addCString(CString& cstr){
 	mLen++;
 	return mLen;
 }
+int CStringArray::addString(char *str){
+	CString cstr;
+	cstr = str;
+	addCString(cstr);
+}
 int CStringArray::getCString(int index,CString& out){
 	if(index<mLen && index>=0){
 		out = mList[index];
@@ -556,4 +561,20 @@ int CStringArray::getCString(int index,CString& out){
 }
 int CStringArray::getCount(){
 	return mLen;
+}
+bool CStringArray::isEmpty(){
+	if(mLen<=0)
+		return true;
+	else
+		return false;
+}
+bool CStringArray::isExiteStr(char *str){
+	int i;
+
+	for(i=0;i<mLen;i++){
+		if(mList[i] == str)
+			return true;
+	}
+
+	return false;
 }

@@ -203,4 +203,12 @@ namespace mango
 		system(cmd);
 	}
 
+	bool Environment::sdcardNeedScanner(){
+		char *bootfile = "/mnt/boot";
+		bool ret = FileAttr::FileExist(bootfile);
+		if(!ret)
+			mkdir(bootfile,0777);
+		return ret;
+	}
+
 };

@@ -65,7 +65,27 @@ namespace mango
 		strcpy(type,file+i+1);
 		strlwr(type);
 		return type;
-	}	
+	}
+	static char * getfiletype(char *file,char *type){
+		int i,len = 0;
+		//char type[10];
+		if(file == 0)
+			return 0;
+		len = strlen(file);
+		i = len-1;
+		while(*(file+i) != '.'){
+			//log_i("*(file+i)=%c\n",*(file+i))
+			i--;
+			if(i==0)
+				break;
+		}
+		if(len-i>5||i == 0)
+			return 0;
+		strcpy(type,file+i+1);
+		strlwr(type);
+		return type;
+	}
+
 	MediaListView::MediaListView(void)
 	{
 
@@ -963,7 +983,7 @@ namespace mango
 		return 0;
 	}
 
-	int MediaView::getArrayInfoFromFile(char *path,ArrayMediaInfo& array){
+	int MediaView::getArrayInfoFromFile(char *path,ArrayMediaInfo& array,CString& cover){
 		char direct[255];
 		int     fileAttribute;
 		File    file;
@@ -996,6 +1016,9 @@ namespace mango
 					continue;
 				mediaprovider::FilePathToInfo(direct,info);
 				array.addMediaInfo(&info);
+			}else if(isPictureFile(de->d_name)){
+				if(cover == NULL)
+					cover = direct;
 			}
 		}
 
@@ -1514,7 +1537,10 @@ namespace mango
 		canvas.drawTextResource(mTextRes[index],x,y+13);
 	}
 	int MediaView::getMusicIcon(char* name){
-		char *type = getfiletype(name);
+		char type[10];
+		
+		getfiletype(name,type);
+		
 		if(strcmp(type,"mp3") == 0){
 			return IDP_LISTICON_MUSIC;
 		}else if(strcmp(type,"aac") == 0){

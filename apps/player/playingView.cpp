@@ -593,7 +593,8 @@ namespace mango
 			gPlayer.showUsmConnectView();
 			mPlayinglist->stopPlayer();
 		}else if(code == SDCARD_MOUNT){
-			gPlayer.showSdcardInsertView();
+			if(Environment::sdcardNeedScanner())
+				gPlayer.showSdcardInsertView();
 		}else if(code == SDCARD_START_UNMOUNT){
 			mPlayinglist->stopForSdcardEject();
 		}else if(code == SDCARD_UNMOUNT){

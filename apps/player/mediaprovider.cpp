@@ -280,6 +280,25 @@ namespace mango
 		strlwr(type);
 		return type;
 	}
+	static char * getfiletype(char *file,char *type){
+		int i,len = 0;
+		//char type[10];
+		if(file == 0)
+			return 0;
+		len = strlen(file);
+		i = len-1;
+		while(*(file+i) != '.'){
+			//log_i("*(file+i)=%c\n",*(file+i))
+			i--;
+			if(i==0)
+				break;
+		}
+		if(len-i>5||i == 0)
+			return 0;
+		strcpy(type,file+i+1);
+		strlwr(type);
+		return type;
+	}
 	static void getFileTitle(char *file,char *title){
 		char *temp;
 		int i,len;
@@ -409,9 +428,11 @@ namespace mango
 	void mediaprovider::ScannerDirectory(char* file){
 		ArrayMediaInfo array;
 		mediainfo info;
+		CString cover,albumImg;
 		int count,i;
+		
 		memset(&info,0,sizeof(mediainfo));
-		count = MediaView::getArrayInfoFromFile(file,array);
+		count = MediaView::getArrayInfoFromFile(file,array,cover);
 		
 		mMutex.lock();
 		
@@ -419,15 +440,13 @@ namespace mango
 			char *dirpath;
 			dirpath = array.getMediaInfo(i)->path;
 			if(!music_exsit_db(dirpath)){
-				log_i("getmediainfo info");
-				getmediainfo(array.getMediaInfo(i)->path,&info);
-				log_i("inster info");
+				
+				getmediainfo(array.getMediaInfo(i)->path,&info,cover,albumImg);
 				
 				if(!cueCheck(info.path,&info)){
 					insert("music",&info);
 				}
-				
-				log_i("safefreeMediainfo info");
+
 				safefreeMediainfo(&info);
 			}
 		}
@@ -475,20 +494,20 @@ namespace mango
 	int mediaprovider::sendMsgStart(){
 		log_i("sendMsgStart:show MediaScannerView");
 		//gPlayer.showMediaScannerView();
-		//scanTime = Time::getMillisecond();
+		scanTime = Time::getMillisecond();
 		getWakeLock();
 		gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,MEDIA_SCANNER_START,0);
 	}
 	int mediaprovider::sendMsgEnd(){
-		log_i("sendMsgEnd:dismissView MediaScannerView");
 		//gPlayer.dismissView(gPlayer.mMediaScannerView);
-		//int dur = Time::getMillisecond() - scanTime;
+		int dur = Time::getMillisecond() - scanTime;
+		log_i("sendMsgEnd:dismissView MediaScannerView,Time:%dms",dur);
 		//if(dur<50)
 		//	mango::Thread::sleep(500);
 		releaseWakeLock();
 		gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,MEDIA_SCANNER_END,0);
 	}
-	int mediaprovider::getmediainfo(char *path,mediainfo *info)
+	int mediaprovider::getmediainfo(char *path,mediainfo *info,CString& cover,CString& genImg)
 	{
 		ID3INFO m_id3(path);
 		char *value;
@@ -604,76 +623,17 @@ namespace mango
 		if (m_id3.GetTags(METADATA_KEY_DURATION, value)){
 			info->duration = str_to_int(value);
 		}
-#if 0
-		if(m_id3.PicValid() >= 0)//save picture
-		{
-			log_i("m_id3.PicValid() m_id3.piclength=%d",m_id3.piclength);
-			
-			if(m_id3.piclength > 0){
-				char *imgPath,*fileTitle;
-#if DECODE_IMG
-				SkBitmap *skBitmap;
-				
-				skBitmap = new SkBitmap();	
-				
-				bool ret = SkImageDecoder::DecodeMemory(m_id3.picdata,m_id3.piclength,skBitmap,
-					SkBitmap::kRGB_565_Config,SkImageDecoder::kDecodePixels_Mode);
-			
-				if(ret){		
-					log_i("skBitmap->width()=%d,skBitmap->height()=%d",skBitmap->width(),skBitmap->height());
-					int len = skBitmap->width()*skBitmap->height()*skBitmap->bytesPerPixel();
-#else
-					int len = m_id3.piclength;
-#endif						
-					FILE *fb;
-
-					imgPath = new char[255];
-					fileTitle = new char[strlen(info->name)];
-					
-					getFileTitle(info->name,fileTitle);
-					genImgPath(fileTitle,imgPath);
-					
-					
-					fb = fopen(imgPath, "wb");
-					if(fb>0){
-#if DECODE_IMG							
-						int ret = fwrite((unsigned char *)skBitmap->getPixels(),1,len,fb);
-#else
-						int ret = fwrite((unsigned char *)m_id3.picdata, 1, m_id3.piclength, fb);
-#endif						
-						if(ret == len){
-							int pathlen = strlen(imgPath);
-							info->img_path = new char[pathlen+1];
-							memcpy(info->img_path,imgPath,pathlen+1);
-							log_i("album img save sucess.");
-						}else
-							log_i("fwrite fail,ret=%d",ret);
-						
-						fclose(fb);
-					}else{
-						log_i("fopen %s fail.",imgPath);
-					}
-
-					
-					delete imgPath;
-					delete fileTitle;
-#if DECODE_IMG					
-				}else{
-					log_i("SkImageDecoder::DecodeMemory fail.");
-				}
-#endif				
-			}
-		}else{
-			log_i("m_id3 not PicValid()");
-		}
-#else
-		if(m_id3.PicValid() >= 0){
-			if(m_id3.piclength > 0){
+		
+		if(m_id3.PicValid() >= 0 || (cover!=NULL && genImg==NULL)){
+			if(m_id3.piclength > 0 || cover!=NULL){
 				char *imgPath,*fileTitle;
 				MSkBitmap mMSkBitmap;
 				
-				BitmapFactory::decodeBuffer(&mMSkBitmap,(void*)m_id3.picdata,m_id3.piclength,109,109);
-
+				if(m_id3.piclength > 0)
+					BitmapFactory::decodeBuffer(&mMSkBitmap,(void*)m_id3.picdata,m_id3.piclength,109,109);
+				else if(cover!=NULL)
+					BitmapFactory::decodeFile(&mMSkBitmap,cover.getString(),109,109);
+				
 				imgPath = new char[255];
 				fileTitle = new char[strlen(info->name)];
 					
@@ -686,13 +646,22 @@ namespace mango
 					int pathlen = strlen(imgPath);
 					info->img_path = new char[pathlen+1];
 					memcpy(info->img_path,imgPath,pathlen+1);
+					if(cover!=NULL){
+						genImg = imgPath;
+					}
 					log_i("album img save sucess.");
 				}else
-					log_i("fwrite fail,ret=%d",ret);				
+					log_i("fwrite fail,ret=%d",ret);
 			}
 		}
-#endif
+		else if(cover!=NULL && genImg!=NULL){
+			int pathlen = strlen(genImg.getString());
+			info->img_path = new char[pathlen+1];
+			memcpy(info->img_path,genImg.getString(),pathlen+1);		
+		}
+
 		delete value;
+		
 		return 0;
 	}
 
@@ -737,14 +706,16 @@ namespace mango
 	}
 	int mediaprovider::filescanner(char *path)
 	{	
-		int		count = 0;
+		int		count,i;
 		char direct[255];
-		int     fileAttribute;
 		File    file;
 		mediainfo info;
 		String str;
 		DIR* d;
 		struct dirent* de;
+		CStringArray musicList;
+		CStringArray cueList;
+		CStringArray pictureList;
 
 		memset(&info,0,sizeof(mediainfo));
 		//log_i("opendir DT_DIR :%s\n",path);
@@ -757,27 +728,17 @@ namespace mango
 			strcpy(direct,path);
 			strcat(direct,"/");
 			strcat(direct,de->d_name);
-			//log_i("scan DT_DIR=%d :%s,de->d_type=%d",DT_DIR,direct,de->d_type);
 			
-//			if (de->d_type == DT_DIR || de->d_type == 0 ) {	
 			if(File::isDirect(direct)){
-#if 0				
-				if (name_len == 1 && de->d_name[0] == '.') continue;
-            	if (name_len == 2 && de->d_name[0] == '.' &&
-                de->d_name[1] == '.') continue;
-#endif
 				if (de->d_name[0] == '.'){
-					//log_i("scan DT_DIR continue");
 					continue;
 				}
-				//if(File::isDirect(direct))
 				filescanner(direct);
 				count++;
 			}
 			else if(ismusic(de->d_name)&&(de->d_name[0]!='.')&&(!music_exsit_db(direct)))
 			{
-				ArrayMediaInfo array;
-				
+#if 0
 				getmediainfo(direct,&info);
 				
 				if(!cueCheck(direct,&info)){
@@ -785,10 +746,34 @@ namespace mango
 				}
 				safefreeMediainfo(&info);
 				count++;
+#endif
+				musicList.addString(direct);
+			}else if((de->d_name[0]!='.')&&isCueFile(de->d_name)){
+				cueList.addString(direct);
+			}else if(isPictureFile(de->d_name)){
+				pictureList.addString(direct);
 			}
 		}
+		CString cover,genImg;
+		
+		pictureList.getCString(0,cover);
+	
+		for(i=0;i<musicList.getCount();i++){
+			CString path;
+			
+			musicList.getCString(i,path);
+			
+			getmediainfo(path.getString(),&info,cover,genImg);
+
+			if(!cueCheck(direct,&info)){
+				insert("music",&info);
+			}
+
+			safefreeMediainfo(&info);
+		}
+
 		safefreeMediainfo(&info);
-		closedir(d);	
+		closedir(d);
 		
 		return 0;
 	}

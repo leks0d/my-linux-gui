@@ -181,7 +181,7 @@ namespace mango
 		int externVolumeScanner(char *path);
 		int sendMsgStart();
 		int sendMsgEnd();
-		int getmediainfo(char *path,mediainfo *info);
+		int getmediainfo(char *path,mediainfo *info,CString& cover,CString& genImg);
 		static unsigned int VolumeScannerRunnig(void *parameter);
 		static unsigned int FileScannerRunnig(void *parameter);
 		static unsigned int FileCheckRunnig(void *parameter);
@@ -243,16 +243,39 @@ namespace mango
 		
 	};
 #endif
-static char * getfiletype(char *file);
+static char * getfiletype(char *file,char *type);
+static int fileTypeMatch(char *file,const char *music_type[])
+{
+	char type[10];
+//	const char *music_type[] = {"mp3","wav","flac","aac","ogg","ape","m4a","wma","aif","aiff","\0"};
+	const char **mtype;
+
+	mtype = music_type;
+
+	getfiletype(file,type);
+
+	if(type == 0)
+		return 0;
+
+	while(*mtype != "\0"){
+		if(strcmp(*mtype,type) == 0){
+			return 1;
+		}
+		mtype++;
+	}
+
+	return 0;
+}
 
 static int ismusic(char *file)
 {
-	char *type;
+#if 0
+	char type[10];
 	const char *music_type[] = {"mp3","wav","flac","aac","ogg","ape","m4a","wma","aif","aiff","\0"};
 	const char **mtype;
 	mtype = music_type;
 	//log_i("getfiletype filename:%s\n",file);
-	type = getfiletype(file);
+	getfiletype(file,type);
 	//log_i("getfiletype :%s\n",type);
 	if(type == 0)
 		return 0;
@@ -262,9 +285,14 @@ static int ismusic(char *file)
 		mtype++;
 	}
 	return 0;
+#else
+	const char *music_type[] = {"mp3","wav","flac","aac","ogg","ape","m4a","wma","aif","aiff","\0"};
+	return fileTypeMatch(file,music_type);
+#endif		
 }
 static int isCueFile(char *file)
 {
+#if 0
 	char *type;
 	const char *music_type[] = {"cue","\0"};
 	const char **mtype;
@@ -284,9 +312,14 @@ static int isCueFile(char *file)
 	}
 	
 	return 0;
-
+#endif	
+	const char *music_type[] = {"cue","\0"};
+	return fileTypeMatch(file,music_type);
 }
-
+static int isPictureFile(char* file){
+	const char *music_type[] = {"jpg","png","bmp","\0"};
+	return fileTypeMatch(file,music_type);
+}
 
 extern mediaprovider gmediaprovider;
 
