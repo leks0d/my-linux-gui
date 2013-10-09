@@ -208,6 +208,8 @@ namespace mango
 		int music_exsit_db(char *path);
 		void getWakeLock();
 		void releaseWakeLock();
+		void stopMediaScanner();
+		bool mediaCanStop();
 		static char* slqFormatOut(char *arg,char *out);
 		static char* slqFormat(char *arg);
 		static char* slqCheck(char *arg);
@@ -221,6 +223,8 @@ namespace mango
 		bool isWakeLock;
 		int mCurrentTimes;
 		int scanTime;
+		bool scannerStop;
+		bool scanCanStop;
 		Thread mScannerThread;
 		Thread mFileScanThread;
 		Thread mFileCheckThread;

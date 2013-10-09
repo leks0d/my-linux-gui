@@ -380,6 +380,8 @@ namespace mango
 		db = 0;
 		scanPath = NULL;
 		mCurrentTimes = 0;
+		scannerStop = true;
+		scanCanStop = false;
 		isWakeLock = false;
 	}
 
@@ -460,6 +462,7 @@ namespace mango
 		log_i("-------------mediascanner checkfile %s",path);
 		checkfile();
 		log_i("-------------mediascanner filescanner %s",path);
+		scannerStop = false;
 		filescanner(path);
 		log_i("-------------mediascanner albumImageSync");
 		albumImageSync();
@@ -482,13 +485,15 @@ namespace mango
 			ScanInfo *info = (ScanInfo*)parameter;
 			mediaprovider *media = info->media;
 			char *path = info->path;
-
+			
+			media->scanCanStop = true;
 			media->sendMsgStart();
 			
 			media->mediascanner(path);
 			
 			media->sendMsgEnd();
-				
+			media->scanCanStop = false;
+			
 			return 0;
 	}
 	int mediaprovider::sendMsgStart(){
@@ -704,14 +709,21 @@ namespace mango
 
 		log_i("info.title=0x%x",info.title);
 	}
+	void mediaprovider::stopMediaScanner(){
+		log_i("stopMediaScanner");
+		scannerStop = true;
+	}
+	bool mediaprovider::mediaCanStop(){
+		return scanCanStop;
+	}
 	int mediaprovider::filescanner(char *path)
-	{	
+	{
 		int		count,i;
-		char direct[255];
+		char 	direct[255];
 		File    file;
+		String 	str;
+		DIR* 	d;
 		mediainfo info;
-		String str;
-		DIR* d;
 		struct dirent* de;
 		CStringArray musicList;
 		CStringArray cueList;
@@ -730,23 +742,12 @@ namespace mango
 			strcat(direct,de->d_name);
 			
 			if(File::isDirect(direct)){
-				if (de->d_name[0] == '.'){
+				if (scannerStop || de->d_name[0] == '.'){
 					continue;
 				}
 				filescanner(direct);
 				count++;
-			}
-			else if(ismusic(de->d_name)&&(de->d_name[0]!='.')&&(!music_exsit_db(direct)))
-			{
-#if 0
-				getmediainfo(direct,&info);
-				
-				if(!cueCheck(direct,&info)){
-					insert("music",&info);
-				}
-				safefreeMediainfo(&info);
-				count++;
-#endif
+			}else if(ismusic(de->d_name)&&(de->d_name[0]!='.')&&(!music_exsit_db(direct))){
 				musicList.addString(direct);
 			}else if((de->d_name[0]!='.')&&isCueFile(de->d_name)){
 				cueList.addString(direct);

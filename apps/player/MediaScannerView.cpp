@@ -39,6 +39,9 @@ namespace mango
 		mScannerButton->setTextColor(COLOR_GRAY);
 		mScannerButton->setTextSize(16);
 		mScannerButton->setTextLayoutType(TEXT_LAYOUT_CENTER);
+
+		rect.setEx(280, 0, 41, 22);
+		mBack = new Button(SETTING_BACK, TEXT("mBack"), this, &rect, 0);
 		
 		initView();
 		setFocus(this);
@@ -48,6 +51,14 @@ namespace mango
 	void MediaScannerView::initView()
 	{
 		mScannerButton->setTextResoure(STR_MEDIA_SCANNING);
+		mBack->setNormalImageId(IDP_SETTING_BACK);
+		mBack->setPressedImageId(IDP_SETTING_BACK_SEC);
+		if(gmediaprovider.mediaCanStop()){
+			mBack->setShowState(SW_NORMAL);
+		}else{
+			mBack->setShowState(SW_HIDE);
+		}
+		
 	}
 
 	int MediaScannerView::onDestroy()
@@ -66,7 +77,10 @@ namespace mango
 	int MediaScannerView::onNotify(View* fromView, int code, void* parameter)
 	{
 		if(fromView == NULL && code == NM_DISPLAY){
-			mpx=0;
+			initView();
+		}else if(fromView == mBack && code == NM_CLICK){
+			gmediaprovider.stopMediaScanner();
+			mScannerButton->setTextResoure(STR_MEDIA_STOPPING);
 		}
 		return 0;
 	}
