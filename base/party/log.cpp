@@ -208,9 +208,11 @@ namespace mango
 			break;
 		}
 
-
-		sprintf(mLogText, "%s(%d) : %s : ", functionName, line, typeName);
-
+#if 0
+		sprintf(mLogText, "%s(%d):%s:", functionName, line, typeName);
+#else
+		sprintf(mLogText, "%s(%d):", functionName, line);
+#endif
 		len = strlen(mLogText);
 		vsprintf(mLogText + len, format, argList); 
 		len = strlen(mLogText);

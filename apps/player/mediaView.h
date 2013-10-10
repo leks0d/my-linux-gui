@@ -1,6 +1,18 @@
 
 namespace mango
 {
+	class PositionManage{
+		private:
+			CStringArray mPathList;
+			CStringArray mPositionList;
+		public:
+			PositionManage(){}
+			void savePosition(char *path ,int pos);
+			void savePosition(PTCHAR path ,int pos);
+			int getPosition(char *path);
+			int getPosition(PTCHAR path);
+	};
+
 	class SettingListAdapter : public BaseAdapter
 	{
 	public:
@@ -216,6 +228,7 @@ namespace mango
 		int     mOrderMenuShow;
 		char    *mNeedPlayPath;
 		int     mCurrentPlaylistId;
+		PositionManage mPositionManage;
 	};
 
 

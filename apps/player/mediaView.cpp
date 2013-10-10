@@ -382,14 +382,17 @@ namespace mango
 			initRootDirect();
 			return;
 		}
+		
+		
 		mListView->deleteAllItems();
 		fillDirectoryFile(mCurrentPath);
 		mListView->sort();
-		mListView->invalidateRect();
+		
+		mListView->setZoneY(mPositionManage.getPosition(mCurrentPath),false);
 		
 		mTitle->setTextResoure(STR_FILE_LIST);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
-		mTitle->invalidateRect();	
+		mTitle->invalidateRect();
 		setMainState(0x1210);
 	}
 	void MediaView::initRootDirect(){
@@ -689,6 +692,7 @@ namespace mango
 
 	void MediaView::backToParentDirectory()
 	{
+		mPositionManage.savePosition(mCurrentPath,mListView->getZoneY());
 		File::pathRemoveFileSpec(mCurrentPath);
 		renewFillViewList();
 	}
@@ -715,6 +719,8 @@ namespace mango
 				case LIST_PARAM_FILE:
 					if (index & FILE_ATTRIBUTE_DIRECTORY)
 					{
+						mPositionManage.savePosition(mCurrentPath,mListView->getZoneY());
+						
 						File::pathAddBackslash(mCurrentPath);
 						String::lstrcat(mCurrentPath, record->m_lvItem.pszText);
 						renewFillViewList();
@@ -1565,5 +1571,54 @@ namespace mango
 			return IDP_MUSIC_AAC;
 		}else
 			return IDP_MUSIC_ICON;
+	}
+
+	void PositionManage::savePosition(char* path,int pos){
+		int ret;
+
+		ret = mPathList.isExiteStr(path);
+		log_i("mPathList.isExiteStr(%s),ret=%d",path,ret);
+		if(ret>=0){
+			mPositionList.setInteger(ret,pos);
+		}else{
+			mPathList.addString(path);
+			mPositionList.addInteger(pos);
+			log_i("PositionManage,savePosition:pos=%d,path=%s",pos,path);
+		}
+	}
+	void PositionManage::savePosition(PTCHAR path ,int pos){
+		char string[300];
+		Charset::wideCharToMultiByte(CP_UTF8, path, String::lstrlen(path), string, 300);
+		savePosition(string,pos);
+	}
+	int PositionManage::getPosition(char* path){
+		int i,count;
+		CString cstr;
+		
+		count = mPathList.getCount();
+
+		for(i=0;i<count;i++){
+			if(mPathList.getCString(i,cstr) == i){
+				if(cstr == path){
+					int val;
+					CString cval;
+					
+					mPositionList.getCString(i,cval);
+					
+					if(cval.toIneger(&val)){
+						log_i("PositionManage,getPosition:val=%d,path=%s",val,path);
+						return val;
+					}else{
+						log_i("PositionManage getPosition fail,%s",path);
+						return 0;
+					}
+				}
+			}
+		}
+	}
+	int PositionManage::getPosition(PTCHAR path){
+		char string[300];
+		Charset::wideCharToMultiByte(CP_UTF8, path, String::lstrlen(path), string, 300);
+		return getPosition(string);
 	}
 };

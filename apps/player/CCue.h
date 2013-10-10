@@ -17,10 +17,12 @@ public:
 	int Find(const char *tag,int offset);
 	int getLen();
 	char* getString();
+	int toIneger(int *val);
 	char* Mid(int start,int len);
 	int Mid(int start,int len,CString& out);
 	CString& operator=(CString& cstring);
 	CString& operator=(const char *str);
+	CString& operator=(int n);
 	bool operator==(const char *str);
 	bool operator!=(const char *str);
 public:
@@ -33,10 +35,12 @@ public:
 	~CStringArray();
 	int addCString(CString& cstr);
 	int addString(char *str);
+	void addInteger(int val);
+	int setInteger(int index,int val);
 	int getCString(int index,CString& out);
 	int getCount();
 	bool isEmpty();
-	bool isExiteStr(char *str);
+	int isExiteStr(char *str);
 private:
 	CString *mList;
 	int mLen;

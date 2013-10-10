@@ -410,8 +410,10 @@ void CString::Format(const char *format,const char *path){
 	char *ptr;
 	int len = 0;
 	
-	if(path == NULL){
-		safeDelete(string);
+	safeDelete(string);
+	
+	if(path == NULL)
+	{
 		mlen = 0;
 		return;
 	}
@@ -478,6 +480,15 @@ int CString::Mid(int start,int len,CString& out){
 	
 	return 0;
 }
+//ret:0-fail,1-sucess.
+int CString::toIneger(int *val){
+	int ret = 0;
+	if(string){
+		log_i("string=%s",string);
+		ret = sscanf(string,"%d",val);
+	}
+	return ret;
+}
 CString& CString::operator=(CString& cstring){
 	//log_i("---0x%x",cstring.getString());
 	Format("%s",cstring.getString());
@@ -485,6 +496,15 @@ CString& CString::operator=(CString& cstring){
 	return *this;
 }
 CString& CString::operator=(const char *str){
+	Format("%s",str);
+	return *this;
+}
+CString& CString::operator=(int n){
+	char *ptr,str[50];
+
+	ptr = str;
+	sprintf(ptr,"%d",n);
+	log_i("str=%s",str);
 	Format("%s",str);
 	return *this;
 }
@@ -551,6 +571,19 @@ int CStringArray::addString(char *str){
 	cstr = str;
 	addCString(cstr);
 }
+void CStringArray::addInteger(int val){
+	CString cstr;
+	cstr = val;
+	addCString(cstr);
+}
+int CStringArray::setInteger(int index,int val){
+	log_i("setInteger");
+	if(index<mLen && index>=0){
+		mList[index] = val;
+	}else{
+		return -1;
+	}
+}
 int CStringArray::getCString(int index,CString& out){
 	if(index<mLen && index>=0){
 		out = mList[index];
@@ -568,13 +601,13 @@ bool CStringArray::isEmpty(){
 	else
 		return false;
 }
-bool CStringArray::isExiteStr(char *str){
+int CStringArray::isExiteStr(char *str){
 	int i;
 
 	for(i=0;i<mLen;i++){
 		if(mList[i] == str)
-			return true;
+			return i;
 	}
 
-	return false;
+	return -1;
 }
