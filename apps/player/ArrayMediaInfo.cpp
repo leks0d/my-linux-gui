@@ -58,7 +58,6 @@ namespace mango
 			}
 			log_i("ArrayMediaInfo sort by %d,len=%d",sortby,len);
 			for(count = len;count>1;count--){
-				//log_i("sort count=%d---------------------",count);
 				for(i=0;i<count-1;i++){
 					if(compare(&mplaylist[i],&mplaylist[i+1],sortby) > 0){
 						info = mplaylist[i];
@@ -66,7 +65,7 @@ namespace mango
 						mplaylist[i+1] = info;
 					}
 				}
-			}	
+			}
 		}
 		bool ArrayMediaInfo::needSortByTrack(){
 			int i,count = 0;
@@ -84,20 +83,28 @@ namespace mango
 		int ArrayMediaInfo::compare(mediainfo *first,mediainfo *end,int sortby){
 			int ret=0;
 			
-			if(sortby == 0){
+			if(sortby == 0){//order by name
 				if(first->name_key == NULL)
 					ret = -1;
 				else if(end->name_key ==NULL)
 					ret = 1;
 				else
 					ret = strcmp(first->name_key,end->name_key);
-			}else if(sortby == 1){
+			}else if(sortby == 1){//order by track
 				//ret = strcmp(first->name,end->name);
 				if(ret == 0){
 					if(first->track < end->track){
-						ret = -1;
+						if(first->track != 0)	//zero order in the end.
+							ret = -1;
+						else
+							ret = 1;
 					}else if(first->track > end->track){
-						ret = 1;
+						if(end->track!=0)		//zero order in the end.
+							ret = 1;
+						else
+							ret = -1;
+					}else{
+						ret = strcmp(first->name_key,end->name_key);
 					}
 				}
 			}

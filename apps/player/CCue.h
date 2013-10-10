@@ -69,7 +69,7 @@ typedef struct song_t
 	CString m_strpath;
 }song_t;
 
-class CCue  
+class CCue
 {
 public:
 	CCue();

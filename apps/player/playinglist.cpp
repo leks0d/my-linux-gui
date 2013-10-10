@@ -366,11 +366,13 @@ static const char *PlayerLock = "playerlock";
 				
 				if(getPlayingItem()->isCue == 0 
 					&& mPlayingPath != NULL 
-					&& mPlayingPath == playPath){
+					&& mPlayingPath == playPath
+					&& isPlaying()){
 					return -2;
 				}else if(getPlayingItem()->isCue == mIsCue 
 					&& mCueStart == getPlayingItem()->cueStart 
-					&& mPlayingPath == playPath){
+					&& mPlayingPath == playPath
+					&& isPlaying()){
 					return -2;
 				}
 

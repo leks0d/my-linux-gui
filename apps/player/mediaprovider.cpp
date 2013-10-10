@@ -842,7 +842,7 @@ namespace mango
 			}else{
 				mInfo.duration = song.len;
 			}
-
+			mInfo.track = i+1;
 			if(song.m_strname.string != NULL){
 				len = strlen(song.m_strname.string);
 				slqCheck(song.m_strname.string);

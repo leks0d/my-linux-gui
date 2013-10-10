@@ -31,6 +31,7 @@ namespace mango
 		mOperateMuiscListAdapter = NULL;
 		mPlayListAdapter = NULL;
 		mType = 0;
+		mStart = 0;
 		memset(&mCurrentInfo,0,sizeof(mCurrentInfo));
 	}
 
@@ -82,7 +83,11 @@ namespace mango
 		mTitle->setTextString(mCurrentInfo.name);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 
-		initOperateMuiscList();
+		if(mStart){
+			initPlayList();
+		}else{
+			initOperateMuiscList();
+		}
 	}
 	void MusicOperateView::initPlayList(){
 		mListView->deleteAllItems();

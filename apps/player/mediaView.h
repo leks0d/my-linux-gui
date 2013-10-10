@@ -153,6 +153,7 @@ namespace mango
 		virtual ~MediaView(void);
 		int onTouchDispatch(int x,int y, int action);
 		static int getArrayInfoFromFile(char *file,ArrayMediaInfo& array,CString& cover);
+		void setMediaViewDisplay(int type);
 	public:
 		virtual int onCreate();
 		virtual int onDestroy();

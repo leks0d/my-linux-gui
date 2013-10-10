@@ -57,16 +57,18 @@ namespace mango
 		mPlayButton->setPressedImageId(IDP_PLAYING_PLAY_ACTIVE);
 		mPlayButton->onCreate();
 
-		rect.setEx(290, 30, 40, 22);
+		rect.setEx(290, 28, 40, 22);
 		mPlayModeButton = new Button(PLAYING_IDB_PLAY_MODE, TEXT("mPlayModeButton"), this, &rect, 0);
-				
+		
+		rect.setEx(250, 28, 40, 22);
+		mAddToPlaylistButton = new Button(PLAYING_IDB_ADD_TO_PLAYLIST, TEXT("mAddToPlaylistButton"), this, &rect, 0);
+		
 		rect.setEx(6, 30, 109, 109);
 		mAlbumImage = new ImageView(PLAYING_IDB_ALBUM_IMAGE, TEXT("mAlbumImage"), this, &rect, 0);
 		mAlbumImage->setImageResoure(IDP_MUSICINFO_ICON);
 		mAlbumImage->setBitmapAlps(true);
 		
 		rect.setEx(left, 32, 120, 20);
-		
 		mAudioInfo = new TextView(PLAYING_IDB_MUSIC_NAME, TEXT("mAudioInfo"), this, &rect, 0);
 		mAudioInfo->setTextColor(COLOR_GRAY);
 		mAudioInfo->setTextSize(15);
@@ -189,9 +191,11 @@ namespace mango
 			mAudioInfo->setTextString(NULL);
 			mAlbum->setTextString(NULL);
 			mArtist->setTextString(NULL);
+			mAddToPlaylistButton->setNormalImageId(-1);
+			mAlbumImage->setMSkBitmap(NULL);
 			return;
 		}
-
+		mAddToPlaylistButton->setNormalImageId(IDP_PLAYING_MUSIC_ADD_PLAYLIST);
 #if 0
 		if( (currentinfo->img_path == NULL) || (strcmp(currentinfo->img_path,"(null)") == 0)){
 			mMSkBitmap->release();
@@ -720,6 +724,15 @@ namespace mango
 			mPlayinglist->setPlayMode(mode);
 			updatePlayMode();
 			break;
+			}
+		case PLAYING_IDB_ADD_TO_PLAYLIST:{
+				mediainfo info,*pinfo;
+				pinfo = mPlayinglist->getPlayingItem();
+				if(pinfo){
+					info = *pinfo;
+					gPlayer.showMusicOperateView(info,0,1);
+				}
+				break;
 			}
 		}
 		log_i("onCommand id = %d end",id);

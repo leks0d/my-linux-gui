@@ -56,6 +56,7 @@ namespace mango
 		PLAYING_IDB_PREV,
 		PLAYING_IDB_PLAY,
 		PLAYING_IDB_PLAY_MODE,
+		PLAYING_IDB_ADD_TO_PLAYLIST,
 		PLAYING_IDB_MUSIC,
 		PLAYING_IDB_SETTING,
 		PLAYING_IDB_VOLUME,
@@ -67,6 +68,10 @@ namespace mango
 		MEDIA_ORDER_ALBUM,
 		MEDIA_ORDER_ARTIST,
 		MEDIA_ORDER_TIME,
+	};
+	enum{
+		MEDIAVIEW_DISPLAY_TYPE_SDCARD = 1,
+		MEDIAVIEW_DISPLAY_TYPE_ADD_TO_PLAYLIST,
 	};
 
 	class PlayerEventInterface : public UseEventInterface{
@@ -159,7 +164,7 @@ namespace mango
 		int main();
 		int initSettings();
 		int showPlayingView();
-		int showMediaView();
+		int showMediaView(int type=-1);
 		int showSettingsView();
 		int showMusicInfoView();
 		int showMusicInfoView(mediainfo* info);
@@ -173,7 +178,7 @@ namespace mango
 		int showMediaScannerView();
 		int showSdcardInsertView();
 		int showMusicOperateView(mediainfo& info);
-		int showMusicOperateView(mediainfo& info,int type);
+		int showMusicOperateView(mediainfo& info,int type,int start=0);
 		int showKeyLockView();
 		int showChosenView(int type);
 		int showPlaylistOperateView(PlayListItem& info);

@@ -81,7 +81,7 @@ namespace mango
 				gmediaprovider.externVolumeScanner("/mnt/external_sd");
 				gPlayer.dismissView(this);
 			}else if(view == mDirectButton){
-				gPlayer.showMediaView();
+				gPlayer.showMediaView(MEDIAVIEW_DISPLAY_TYPE_SDCARD);
 			}
 		}
 		return 0;

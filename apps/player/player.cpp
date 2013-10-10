@@ -155,7 +155,7 @@ namespace mango
 
 		return 0;
 	}
-	int Player::showMediaView()
+	int Player::showMediaView(int type)
 	{
 		if (mMeidaView == NULL) {
 			mMeidaView = new MediaView (TEXT("Media"), NULL, NULL, 0, SW_NORMAL);
@@ -165,6 +165,7 @@ namespace mango
 		}
 
 		if (mMeidaView)	{
+			mMeidaView->setMediaViewDisplay(type);
 			mMeidaView->invalidateRect();
 			mMeidaView->setFocus();
 		}
@@ -366,11 +367,13 @@ namespace mango
 			log_i("---");
 		}
 	}
-	int Player::showMusicOperateView(mediainfo& info,int type){
+	int Player::showMusicOperateView(mediainfo& info,int type,int start){
 		if(mMusicOperateView == NULL){
 			mMusicOperateView = new MusicOperateView(TEXT("MusicOperate"), NULL, NULL, 0, type, SW_NORMAL);
+			mMusicOperateView->setOperateViewStart(start);
 			mMusicOperateView->onCreate();
 		}else{
+			mMusicOperateView->setOperateViewStart(start);
 			mMusicOperateView->setType(type);
 			gSession.mViewZAxis.bringViewToTop(mMusicOperateView);
 		}

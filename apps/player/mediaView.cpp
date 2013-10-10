@@ -1031,7 +1031,17 @@ namespace mango
 		closedir(d);
 		return array.getCount();
 	}
-
+	void MediaView::setMediaViewDisplay(int type){
+		switch(type){
+			case MEDIAVIEW_DISPLAY_TYPE_SDCARD:
+				String::copy(mCurrentPath, TEXT("/mnt/external_sd"));
+				renewFillViewList();
+				break;
+			case MEDIAVIEW_DISPLAY_TYPE_ADD_TO_PLAYLIST:
+				
+				break;
+		}
+	}
 	int MediaView::onKeyDown(int keyCode, int flag)
 	{
 		switch(keyCode)

@@ -25,6 +25,7 @@ namespace mango
 		MusicOperateView(const TCHAR* title, View* parent, Rect* rect, int style, int type,int show);
 		MusicOperateView(const TCHAR* title, View* parent, Rect* rect, int style, int show = SW_NORMAL);
 		virtual ~MusicOperateView(void);
+		void setOperateViewStart(int n){mStart = n;}
 		void setMusicInfo(mediainfo& info){mCurrentInfo = info;initView();}
 		void initView();
 		void initOperateMuiscList();
@@ -65,6 +66,7 @@ namespace mango
 		int 	mpx;
 		int 	mpy;
 		int 	mType;
+		int 	mStart;
 	};
 
 };

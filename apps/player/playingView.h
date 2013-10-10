@@ -106,6 +106,7 @@ class KeyCount{
 		Button*  mPrevButton;
 		Button*  mPlayButton;
 		Button*  mPlayModeButton;
+		Button*  mAddToPlaylistButton;
 		ImageView* mAlbumImage;
 		
 		Button*  mVolumeButton;
