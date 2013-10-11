@@ -15,6 +15,7 @@ namespace mango
 	#define SETTING_AUTOSLEEP_ID		8
 	#define SETTING_LANGUAGE_ID		9
 	#define SETTING_AUTOPOWEROFF_ID	10
+	#define SETTING_SCANSDCARDSTATE_ID	11
 
 	#define SETTING_DEFAULT_VOLUME	170
 
@@ -28,6 +29,7 @@ namespace mango
 	#define SETTING_AUTOSLEEP_NAME		"autosleepTime"
 	#define SETTING_LANGUAGE_NAME 	 	"languageId"
 	#define SETTING_AUTOPOWEROFF_NAME  	"autopoweroffTime"
+	#define SETTING_SCANSDCARDSTATE_NAME  		"scanSdcardState"
 
 	#define EQ_CUSTOM_ID		0
 	#define EQ_POP_ID			1

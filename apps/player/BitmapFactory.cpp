@@ -117,17 +117,28 @@ namespace mango
 	void Environment::space_info(char *path,int& toatl,int& avail,int& free)
 	{
 		struct statfs sfs;
-
+		long start;
+		start = Time::getMillisecond();
+		
 		memset(&sfs,0,sizeof(struct statfs));
 		statfs(path,&sfs);
-
-		log_i("sfs.f_blocks=%lu,sfs.f_bsize=0x%x",sfs.f_blocks,sfs.f_bsize);
+	
+		//log_i("sfs.f_blocks=%lu,sfs.f_bsize=0x%x",sfs.f_blocks,sfs.f_bsize);
 		toatl = sfs.f_blocks * sfs.f_bsize/1024;
 		avail = sfs.f_bavail * sfs.f_bsize/1024;
 		free = sfs.f_bfree * sfs.f_bsize/1024;
-		log_i("toatl=%d,avail=%d,free=%d",toatl,avail,free);
+		//log_i("toatl=%d,avail=%d,free=%d",toatl,avail,free);
+		log_i("space_info space Time:%d",Time::getMillisecond()-start);
 	}
+	int Environment::getSdcardCheckState(){
+		int state,toatl,avail,free;
+		
+		Environment::space_info("/mnt/external_sd",toatl,avail,free);
 
+		state = toatl+avail+free;
+
+		return state;
+	}
 	void Environment::memSizeToStr(int size, char *space){
 		float sizeG,sizeK;
 		sizeK = size;

@@ -14,6 +14,7 @@ namespace mango
 		public:	
 			static void space_info(char *path,int& toatl,int& avail,int& free);
 			static void memSizeToStr(int size, char *space);
+			static int getSdcardCheckState();
 			static void recovery();
 			static void install();
 			static void reboot();

@@ -996,7 +996,7 @@ namespace mango
 
 	int mediaprovider::insert(char *table,mediainfo *info)
 	{
-		char *ptr,sql[1024];
+		char *ptr,sql[1024*3];
 		log_i("tag");
 		ptr = sql;
 		ptr += sprintf(ptr,"insert into %s (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ",

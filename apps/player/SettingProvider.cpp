@@ -61,6 +61,7 @@ namespace mango
 		insert(SETTING_AUTOSLEEP_ID,30,SETTING_AUTOSLEEP_NAME);
 		insert(SETTING_LANGUAGE_ID,0,SETTING_LANGUAGE_NAME);
 		insert(SETTING_AUTOPOWEROFF_ID,60*20,SETTING_AUTOPOWEROFF_NAME);
+		insert(SETTING_SCANSDCARDSTATE_ID,0,SETTING_SCANSDCARDSTATE_NAME);
 		insert(100,100,"reserve");
 	}
 	void SettingProvider::dbclose(){
@@ -181,7 +182,6 @@ namespace mango
 			/**value = readVolume();
 			if(*value<=255||*value>=0)
 				return 1;*/
-			
 		}
 
 		ptr = sql;
@@ -192,15 +192,19 @@ namespace mango
 		if(ret != SQLITE_OK){
 			log_e("sqlite3_exec error : %s\n",pErrMsg);			
 		}
-		*value = array->getItem(0);
-		if(id == SETTING_VOLUME_ID){
-			*value-=300;
-			if(*value<0){
-				*value = 170;
+		if(value == NULL)
+			return array->getItem(0);
+		else{
+			*value = array->getItem(0);
+			if(id == SETTING_VOLUME_ID){
+				*value-=300;
+				if(*value<0){
+					*value = 170;
+				}
 			}
-		}		
-		log_i("SettingProvider::query array=%d",array->getCount());
-		return array->getCount();
+			log_i("SettingProvider::query array=%d",array->getCount());
+			return array->getCount();
+		}
 	}
 
 	int SettingProvider::EqQuery(int id,int *value){
