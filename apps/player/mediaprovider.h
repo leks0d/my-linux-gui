@@ -38,7 +38,7 @@ namespace mango
 									album_key TEXT,\
 									genre TEXT,\
 									genre_key TEXT,\
-									track TEXT,\
+									track INTEGER,\
 									img_path TEXT,\
 									add_time INTEGER,\
 									duration INTEGER,\

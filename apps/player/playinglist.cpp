@@ -380,7 +380,7 @@ static const char *PlayerLock = "playerlock";
 				mIsCue = getPlayingItem()->isCue;
 				mCueStart = getPlayingItem()->cueStart;
 
-				if(playPath == NULL || !FileAttr::FileExist(playPath))
+				if(playPath == NULL || !FileAttr::FileExist(playPath) || Environment::get_file_size(playPath)<10)
 					return -3;
 				
 				log_i("Playinglist::startPlayPosition needStart=%d, %d/%d:%s",needStart,mCurrent,len,playPath);

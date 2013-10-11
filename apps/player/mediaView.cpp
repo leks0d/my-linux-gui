@@ -606,7 +606,7 @@ namespace mango
 			mAlbumMusicAdapter = new MusicAdapter(mListView,ADAPTER_PLAYING); 
 		}
 
-		ptr += sprintf(ptr,"where album='%s' ",info->album,info->artist);
+		ptr += sprintf(ptr,"where album='%s' order by track,name_key",info->album);
 
 		mAlbumMusicAdapter->setWhere(where);
 		
@@ -1323,7 +1323,7 @@ namespace mango
 		canvas.setTextSize(16);
 		//canvas.drawText(info->name,strlen(info->title),x,y+5);
 		yrect.setEx(x,y+5,296-x+12,40);
-		canvas.drawText(info->name,strlen(info->title),yrect,0 );
+		canvas.drawText(info->name,strlen(info->name),yrect,0 );
 		canvas.setTextColor(RGB(255,255,255));
 		canvas.setTextSize(12);
 		//canvas.drawText(info->artist,strlen(info->artist),x,y+28);

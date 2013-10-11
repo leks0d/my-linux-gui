@@ -51,8 +51,10 @@ namespace mango
 	void MediaScannerView::initView()
 	{
 		mScannerButton->setTextResoure(STR_MEDIA_SCANNING);
-		mBack->setNormalImageId(IDP_SETTING_BACK);
-		mBack->setPressedImageId(IDP_SETTING_BACK_SEC);
+		//mBack->setNormalImageId(IDP_SETTING_BACK);
+		//mBack->setPressedImageId(IDP_SETTING_BACK_SEC);
+		mBack->setNormalImageId(IDP_MEDIA_SCAN_STOP);
+		mBack->setPressedImageId(IDP_MEDIA_SCAN_STOP);
 		if(gmediaprovider.mediaCanStop()){
 			mBack->setShowState(SW_NORMAL);
 		}else{

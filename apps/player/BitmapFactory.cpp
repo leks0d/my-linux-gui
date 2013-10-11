@@ -222,4 +222,16 @@ namespace mango
 		return ret;
 	}
 
+	unsigned long Environment::get_file_size(const char *path)  
+	{  
+	    unsigned long filesize = -1;      
+	    struct stat statbuff;  
+	    if(path==NULL || stat(path, &statbuff) < 0){  
+	        return filesize;  
+	    }else{
+	        filesize = statbuff.st_size;  
+	    }
+		log_i("filesize=%d,path=%s",filesize,path);
+	    return filesize;  
+	}
 };
