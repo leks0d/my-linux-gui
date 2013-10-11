@@ -461,11 +461,11 @@ namespace mango
 
 		fread(buffer, 1, 20, file);
 		buffer[19] = '\0';
-		log_i ("%s", buffer);
+		//log_i ("%s", buffer);
 		sscanf(buffer, "%d,%d,%d\n", &currentVolume, &minVolume, &maxVolume);
 
 		fclose(file);
-		log_i("Player::getVolume currentVolume=%d",currentVolume);
+		//log_i("Player::getVolume currentVolume=%d",currentVolume);
 		return currentVolume;
 #endif
 		return 0;

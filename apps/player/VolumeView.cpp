@@ -83,7 +83,7 @@ namespace mango
 		while (1) {
 			Thread::sleep(VOLUME_REFRESH);
 			
-			log_i("VolumeView::VolumeRunning isKeyDown=%d,mDownKeyCode=%d",iVolume->isKeyDown,iVolume->mDownKeyCode);
+			log_i("isKeyDown=%d,mDownKeyCode=%d",iVolume->isKeyDown,iVolume->mDownKeyCode);
 
 			if(iVolume->isKeyDown){
 				
@@ -140,7 +140,6 @@ namespace mango
 
 	int VolumeView::onPaint(Canvas& canvas)
 	{
-		log_i("MediaView::onPaint");
 		canvas.drawImageResource(IDP_SETTING_BGD,0,0,false);
 		canvas.drawImageResource(IDP_VULUME_ICON_BK,(320-204)/2,(240-204)/2,true);
 		drawVolumeImage(canvas, (320-204)/2,(240-204)/2, mVolume);
@@ -168,6 +167,7 @@ namespace mango
 				case KEYCODE_VOLUMEDOWN:
 					isKeyDown = 0;
 					mDownKeyCode = keyCode;
+					log_i("-------------------isKeyUP------------------------");
 					break;
 			}
 		}else if(action == VM_KEYDOWN){
@@ -176,6 +176,7 @@ namespace mango
 				case KEYCODE_VOLUMEDOWN:
 					isKeyDown = 1;
 					mDownKeyCode = keyCode;
+					log_i("-------------------isKeyDOWN------------------------");
 					break;
 			}	
 		}
