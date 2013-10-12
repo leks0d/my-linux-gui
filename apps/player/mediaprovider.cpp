@@ -552,6 +552,8 @@ namespace mango
 		memset(value, 0, 256);
 		if (m_id3.GetTags(METADATA_KEY_CD_TRACK_NUMBER, value)){
 			info->track = str_to_int(value);
+		}else{
+			info->track = 1000;
 		}
 /*------------------------------album---------------------------------------*/		
 		memset(value, 0, 256);

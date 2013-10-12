@@ -40,7 +40,7 @@ namespace mango
 		mScannerButton->setTextSize(16);
 		mScannerButton->setTextLayoutType(TEXT_LAYOUT_CENTER);
 
-		rect.setEx(280, 0, 41, 22);
+		rect.setEx(286, 0, 41, 22);
 		mBack = new Button(SETTING_BACK, TEXT("mBack"), this, &rect, 0);
 		
 		initView();
@@ -51,10 +51,10 @@ namespace mango
 	void MediaScannerView::initView()
 	{
 		mScannerButton->setTextResoure(STR_MEDIA_SCANNING);
-		//mBack->setNormalImageId(IDP_SETTING_BACK);
-		//mBack->setPressedImageId(IDP_SETTING_BACK_SEC);
-		mBack->setNormalImageId(IDP_MEDIA_SCAN_STOP);
-		mBack->setPressedImageId(IDP_MEDIA_SCAN_STOP);
+		mBack->setNormalImageId(IDP_MEDIA_SCAN_STOP_D);
+		mBack->setPressedImageId(IDP_MEDIA_SCAN_STOP_D);
+		//mBack->setNormalImageId(IDP_MEDIA_SCAN_STOP);
+		//mBack->setPressedImageId(IDP_MEDIA_SCAN_STOP);
 		if(gmediaprovider.mediaCanStop()){
 			mBack->setShowState(SW_NORMAL);
 		}else{

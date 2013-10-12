@@ -66,12 +66,14 @@ namespace mango
 		Mstring* mstr;
 		int volume;
 		
-		mstr = new Mstring(5);
+		mstr = new Mstring(10);
 		volume = vol;
 		mVolume = vol;
 		mstr->mSprintf("%d",volume);
 		
 		mVolumeText->setTextString(mstr->mstr);
+
+		delete mstr;
 	}
 	
 	unsigned int VolumeView::VolumeRunning(void* p){

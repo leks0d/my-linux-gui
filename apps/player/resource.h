@@ -21,7 +21,7 @@ Notes:
 																
 Revision History:												
 																
-   2013-10-11 17:6:17 Created by Fibo Lu						
+   2013-10-11 17:37:43 Created by Fibo Lu						
 																
 --*/															
 																
@@ -187,7 +187,7 @@ Revision History:
 #define IDP_LISTITEM_BGD_SEC		0x03E3
 #define IDP_LISTITEM_NO_SEC			0x03E4
 #define IDP_LISTITEM_SEC			0x03E5
-#define IDP_MEDIA_SCAN_STOP			0x03E6
+#define IDP_MEDIA_SCAN_STOP_D		0x03E6
 #define IDP_MUSICINFO_ICON			0x03E7
 #define IDP_MUSIC_WMA				0x03E8
 #define IDP_MUSIC_WAV				0x03E9

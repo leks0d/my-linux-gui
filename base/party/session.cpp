@@ -751,11 +751,11 @@ namespace mango
 #else
 		ppszfilename[0] = MANGO_ROOT"font/msyh.ttf";
 		ppszfilename[1] = MANGO_ROOT"font/arial.ttf";
-		ppszfilename[2] = MANGO_ROOT"font/DroidSans.ttf";
+	//	ppszfilename[2] = MANGO_ROOT"font/DroidSans.ttf";
 #endif
 //		ft_ex_meminit (malloc (ift_ex_mem_size), ift_ex_mem_size) ;
 
-		ft_ex_TrueTypeInit ((char **)ppszfilename, 3); //2) ;
+		ft_ex_TrueTypeInit ((char **)ppszfilename, 2); //2) ;
 	}
 
 
