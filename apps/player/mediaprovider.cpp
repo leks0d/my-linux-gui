@@ -1197,6 +1197,17 @@ namespace mango
 		db = 0;
 		
 	}
+	int mediaprovider::queryMusicNum(){
+		char *ptr,sql[256];
+		IntegerArray array;
+		
+		ptr = sql;
+		ptr += sprintf(ptr,"select count(_id) as num from music");
+		
+		exec(sql,&array,SettingProvider::sql_callback);
+
+		return array.getItem(0);
+	}
 	mediaprovider gmediaprovider;
 };
 

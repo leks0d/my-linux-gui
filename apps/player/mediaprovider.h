@@ -210,6 +210,7 @@ namespace mango
 		void releaseWakeLock();
 		void stopMediaScanner();
 		bool mediaCanStop();
+		int queryMusicNum();
 		static char* slqFormatOut(char *arg,char *out);
 		static char* slqFormat(char *arg);
 		static char* slqCheck(char *arg);

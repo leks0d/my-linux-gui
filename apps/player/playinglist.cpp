@@ -82,6 +82,11 @@ static const char *PlayerLock = "playerlock";
 				int i,count = getCount();
 				mediainfo *info;
 				log_i("--------------------savePlayintList-----------");
+				if(count == gmediaprovider.queryMusicNum()){
+					log_i("when all music in playinglist.");
+					gmediaprovider.updateInPlay(1);
+					return;
+				}
 				gmediaprovider.updateInPlay(0);
 				
 				for(i=0;i<count;i++){
