@@ -599,7 +599,29 @@ typedef struct tagCTRL_LISTVIEW_LAYOUT
 		int mId;
 		int mYoffset;
 	};
+	class ListBarControl{
+		private:
+			bool isBarTouch;
+			int barTouchStartY;
 
+			int displayLen;
+			int offset;
+			int drawLen;
+			int drawOffset;
+			int mCount;
+		public:
+			ListBarControl();
+			
+			void drawListBar(Canvas& canvas,int listOffset,int count);
+
+			bool isPointOnBar(int x,int y);
+			
+			int touchYtoDrawoffset(int y);	
+
+			bool barTouchUp();
+
+			bool isBarOnTouch(){return isBarTouch;}
+	};
 
 	class ListView : public View
 	{
@@ -782,7 +804,6 @@ typedef struct tagCTRL_LISTVIEW_LAYOUT
 		//恢复反白显示项 至正常模式
 		void resumeSelectedRecord(bool update = false);
 
-		
 
 	private:
 		LIST_HEAD	mRecordHead; //正序
@@ -812,6 +833,7 @@ typedef struct tagCTRL_LISTVIEW_LAYOUT
 		int mListViewBackgound;
 		BaseAdapter* mListAdapter;
 		GestureDetector mGestureDetector;
+		ListBarControl mListBarControl;
 	} ;
 
 

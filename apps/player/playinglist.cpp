@@ -538,7 +538,9 @@ Exit:
 					playNext();
 					break;
 				case MDOE_PLAY_REPEAT:
-					startPlay();
+					if(startPlay() == -2){
+						seekTo(0);
+					}
 					break;
 			}
 		}

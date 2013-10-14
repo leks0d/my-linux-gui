@@ -826,7 +826,79 @@ namespace mango
 
 		return true;
 	}
+	ListBarControl::ListBarControl(){
+		displayLen = 240-21;//53*4;
+		isBarTouch = false;
+		barTouchStartY = 0;
+	}
+	bool ListBarControl::isPointOnBar(int x,int y){
+		int touchLen;
+		
+		if(mCount < 10)
+			return false;
+		
+		touchLen = drawLen;
 
+		
+		if(touchLen<80)
+			touchLen = 80;
+		
+		if(y > drawOffset && y < drawOffset+touchLen && x>286){
+			isBarTouch = true;
+			barTouchStartY = y;
+		}else{
+			isBarTouch = false;
+			barTouchStartY = 0;
+		}
+		
+		return isBarTouch;
+	}
+	int ListBarControl::touchYtoDrawoffset(int y){
+		int yShift = 0;
+		
+		if(isBarTouch){
+			int movY = barTouchStartY - y;
+			yShift = movY * ((mCount-4)*53)/(displayLen-drawLen);
+			barTouchStartY = y;
+		}
+		
+		return yShift;
+	}
+	bool ListBarControl::barTouchUp(){
+		bool temp = isBarTouch; 
+		isBarTouch = false; 
+		log_i("barTouchUp");
+		return temp;
+	}
+	void ListBarControl::drawListBar(Canvas& canvas,int listOffset,int count){
+		if(count < 10)
+			return;
+		
+		mCount = count;
+		offset = -listOffset;
+		drawLen = 4*displayLen/count;
+		drawOffset = offset*(displayLen-drawLen)/((count-4)*53);
+
+#if 0
+		if(drawOffset>displayLen-drawLen){
+			drawOffset = displayLen-drawLen;
+		}else if(drawOffset<0){
+			drawOffset = 0;
+		}
+#endif
+
+		Rect rect;
+		Brush brush;
+
+		if(isBarTouch)
+			brush.set(0,COLOR_ORANGE);
+		else
+			brush.set(0,COLOR_WHITE);
+		
+		rect.setEx(315,drawOffset,3,drawLen);
+
+		canvas.fillRect(rect, brush);
+	}
 
 	//paint list item
 	bool ListView::paintListRecord (Canvas& canvas, LISTVIEW_RECORD* record, bool eraseBk)
@@ -848,6 +920,7 @@ namespace mango
 			if(mItemBackground>0)
 				canvas.drawImageResource(mItemBackground, 12, rect.top,true);			
 		}
+		mListBarControl.drawListBar(canvas,mZonePoint.y,getItemCount());
 		canvas.setTextColor(RGB (255, 255, 255)) ;
 		
 		if (lvitem->mask & LVIF_ADAPTER){
@@ -1024,14 +1097,14 @@ namespace mango
 		setCapture(this);
 
 		validateGesture = mGestureDetector.onMsg(&ySpeed, &yShift, TSMM_YDIRECTION);
-
-		mFocusedRecord = getRecordFromPoint (pt);
-		if (mFocusedRecord)
-		{
-			mFocusedTime = (unsigned int)Time::getMillisecond();
-			mSelectedRecord = mFocusedRecord ; 
+		if(!mListBarControl.isPointOnBar(x,y)){
+			mFocusedRecord = getRecordFromPoint (pt);
+			if (mFocusedRecord)
+			{
+				mFocusedTime = (unsigned int)Time::getMillisecond();
+				mSelectedRecord = mFocusedRecord ; 
+			}		
 		}
-		//invalidateRect(NULL);
 		cartoonDisplay();
 		mTouchDownPosition.set(x, y);
 		mTouchMove = false;
@@ -1066,8 +1139,14 @@ namespace mango
 			mTouchPrevPosition.set(x, y);
 		}
 #else
-		if (validateGesture)
-			cartoonDrag(yShift);
+		if (validateGesture){
+			if(mListBarControl.isBarOnTouch())
+				cartoonDrag(mListBarControl.touchYtoDrawoffset(y));
+			else{
+				cartoonDrag(yShift);
+			}
+			log_i("x=%d,y=%d,yShift=%d",x,y,yShift);
+		}
 #endif
 		return 0 ;
 	}
@@ -1119,9 +1198,11 @@ namespace mango
 		}
 
 #endif
-		if(mSelectedIndex == -1)
+		if(mSelectedIndex == -1){
+			if(mListBarControl.barTouchUp())
+				invalidateRect(NULL);
 			cartoonTropic() ;
-		else
+		}else
 			invalidateRect(NULL);
 		
 		mFocusedRecord = NULL ;
