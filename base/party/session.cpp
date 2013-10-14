@@ -457,6 +457,7 @@ namespace mango
 			}else{
 				lowVolCount = 0;
 			}
+			capacity = (voltage_now-3500000)*100/(4250000 - 3500000);
 			if(voltage_now>4250000){
 				capacity = capacity&0xFF;
 			}

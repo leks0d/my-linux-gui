@@ -554,7 +554,7 @@ namespace mango
 						batteryIcon = IDP_BATTERY_40;
 					else if(val<70)
 						batteryIcon = IDP_BATTERY_60;
-					else if(val<95)
+					else if(val<90)
 						batteryIcon = IDP_BATTERY_80;
 					else
 						batteryIcon = IDP_BATTERY_100;
