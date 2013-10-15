@@ -110,7 +110,7 @@ namespace mango
 	}
 	void PlayList::genPlaylistName(char* name,int len){
 		int i,count;
-		char *ptr,where[255];
+		char *ptr,where[1024];
 
 		i=1;
 		ptr = where;

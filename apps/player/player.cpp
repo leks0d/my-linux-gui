@@ -350,6 +350,7 @@ namespace mango
 		}
 	}
 	int Player::showMusicOperateView(mediainfo& info){
+#if 0		
 		if(mMusicOperateView == NULL){
 			mMusicOperateView = new MusicOperateView(TEXT("MusicOperate"), NULL, NULL, 0, SW_NORMAL);
 			mMusicOperateView->onCreate();
@@ -366,6 +367,8 @@ namespace mango
 			mMusicOperateView->setFocus();
 			log_i("---");
 		}
+#endif
+		showMusicOperateView(info,OPERATE_TYPE_MUSIC_NORMAL);	
 	}
 	int Player::showMusicOperateView(mediainfo& info,int type,int start){
 		if(mMusicOperateView == NULL){
@@ -427,6 +430,18 @@ namespace mango
 		if (mPlaylistOperateView){
 			mPlaylistOperateView->invalidateRect();
 			mPlaylistOperateView->setFocus();
+		}
+	}
+	void Player::showGroupOperateView(){
+		if (mGroupOperateView == NULL) {
+			mGroupOperateView = new GroupOperateView(TEXT("GroupOperate"), NULL, NULL, 0, SW_NORMAL);
+			mGroupOperateView->onCreate();
+		}else {
+			gSession.mViewZAxis.bringViewToTop(mGroupOperateView);
+		}
+		if (mGroupOperateView){
+			mGroupOperateView->invalidateRect();
+			mGroupOperateView->setFocus();		
 		}
 	}
 	void Player::dismissView(View *view){

@@ -193,6 +193,7 @@ namespace mango
 		void showOrderByMenu();
 		void dismissOrderByMenu();
 		bool menuIsShow();
+		void initGroupView(char *artist,char *album,char *genre);
 	public:
 		MediaListView*  mListView;
 		TextView* mTitle;

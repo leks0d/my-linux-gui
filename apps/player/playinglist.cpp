@@ -91,14 +91,9 @@ static const char *PlayerLock = "playerlock";
 				
 				for(i=0;i<count;i++){
 					info = getItem(i);
-					//log_i("updateInPlay mplayinglist[%d].id=%d",i,info->id);
 					gmediaprovider.updateInPlay(i+1,info->id);
 				}
 				if(getCount()>0){
-					/*mediainfo* item = getPlayingItem();
-					if(item != NULL){
-						gSettingProvider.update(SETTING_PLAYPOS_ID,item->id);
-					}*/
 					gSettingProvider.update(SETTING_PLAYPOS_ID,mCurrent);
 				}
 			}

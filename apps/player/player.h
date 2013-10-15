@@ -31,6 +31,7 @@
 #include "KeyLockView.h"
 #include "ChosenView.h"
 #include "PlaylistOperateView.h"
+#include "GroupOperateView.h"
 
 
 namespace mango
@@ -182,6 +183,7 @@ namespace mango
 		int showKeyLockView();
 		int showChosenView(int type);
 		int showPlaylistOperateView(PlayListItem& info);
+		void showGroupOperateView();
 		void dismissView(View *view);
 		int  getVolume(void);
 		void setVolume(int volume);
@@ -199,6 +201,7 @@ namespace mango
 		void setBootWakeLock(int en);
 		void shutDown();
 		void VolumeCheck();
+		
 	public:
 		MediaView*  mMeidaView;
 		PlayingView* mPlayingView;
@@ -210,6 +213,7 @@ namespace mango
 		VolumeView* mVolumeView;
 		EqSettingsView* mEqSettingsView;
 		ShutDownView* mShutDownView;
+		GroupOperateView* mGroupOperateView;
 		MediaScannerView *mMediaScannerView;
 		SdcardInsertView *mSdcardInsertView;
 		MusicOperateView *mMusicOperateView;

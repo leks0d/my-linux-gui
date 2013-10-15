@@ -556,7 +556,7 @@ namespace mango
 	}
 	void MediaView::initArtistAlbumMusicList(char* artist,char* album){
 		int count,i;
-		char *ptr,where[255];
+		char *ptr,where[1024];
 		ArrayMediaInfo *mediaList;
 		
 		ptr = where;
@@ -593,7 +593,7 @@ namespace mango
 
 	void MediaView::initAlbumMusicList(mediainfo* info){
 		int count,i;
-		char *ptr,where[255];
+		char *ptr,where[1024];
 		ArrayMediaInfo *mediaList;
 
 		ptr = where;
@@ -616,7 +616,7 @@ namespace mango
 
 	void MediaView::initArtistMusicList(char* key,char* value,int state){
 		int count,i;
-		char *ptr,where[255];
+		char *ptr,where[1024];
 		ArrayMediaInfo *mediaList;
 
 		ptr = where;
@@ -639,10 +639,45 @@ namespace mango
 
 		setMainState(state);
 	}
-	
+	void MediaView::initGroupView(char *artist,char *album,char *genre){
+		int count,i;
+		char *ptr,sql[1024];
+
+		ptr = sql;
+		
+		mListView->deleteAllItems();
+
+		if(mArtistMusicAdapter == NULL){
+			
+			mArtistMusicAdapter = new MusicAdapter(mListView,ADAPTER_PLAYING); 
+		}
+
+		ptr += sprintf(ptr,"where ");
+
+		if(artist)
+			ptr += sprintf(ptr,"artist='%s' ",artist);
+
+		if(album){
+			if(artist)
+				ptr += sprintf(ptr,"and album='%s' ",album);
+			else
+				ptr += sprintf(ptr,"album='%s' ",album);
+		}
+
+		if(genre){
+			if(artist||album)
+				ptr += sprintf(ptr,"and genre='%s' ",genre);
+			else
+				ptr += sprintf(ptr,"genre='%s' ",genre);
+		}
+		gPlayer.showGroupOperateView();
+		gPlayer.mGroupOperateView->mArrayMediaInfo.clear();
+		gmediaprovider.queryMusicArray(sql,&(gPlayer.mGroupOperateView->mArrayMediaInfo));
+		
+	}
 	void MediaView::initGenreMusicList(char* key,char* value,int state){
 		int count,i;
-		char *ptr,where[255];
+		char *ptr,where[1024];
 		ArrayMediaInfo *mediaList;
 
 		ptr = where;
@@ -714,6 +749,16 @@ namespace mango
 				return 0;
 			type = (int)(record->m_lvItem.paramType);
 			index = (int)(record->m_lvItem.lParam);
+			
+			Point pt =  mListView->getTouchPrevPosition();
+			int iconRight = LIST_MUSIC_ICON_LEFT+40;
+			bool iconClick = false;
+			
+			if(pt.x > LIST_MUSIC_ICON_LEFT+40)
+				;
+			else if(pt.x > LIST_MUSIC_ICON_LEFT-10)
+				iconClick = true;
+			
 			log_i("MediaView::onNotify m_lvItem.paramType = %d,getMainState()=0x%x",type,getMainState());
 			switch(type){
 				case LIST_PARAM_FILE:
@@ -864,10 +909,16 @@ namespace mango
 								break;
 							}
 						case 0x1400:
-							initAlbumMusicList(mAlbumAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem));
+							if(iconClick)
+								initGroupView(0,mAlbumAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->album,0);
+							else
+								initAlbumMusicList(mAlbumAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem));
 							break;
 						case 0x1700:
-							initGenreMusicList("genre",mGenreAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->genre,0x1710);
+							if(iconClick)
+								initGroupView(0,0,mGenreAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->genre);
+							else
+								initGenreMusicList("genre",mGenreAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->genre,0x1710);
 							break;
 						case 0x1600:{
 								Point pt =  mListView->getTouchPrevPosition();
@@ -891,10 +942,16 @@ namespace mango
 								break;
 							}
 						case 0x1500:
-							//initArtistMusicList("artist",mArtistAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->artist,0x1510);
-							initArtistAlbumList(mArtistAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->artist);
+							if(iconClick)
+								initGroupView(mArtistAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->artist,0,0);
+							else
+								initArtistAlbumList(mArtistAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->artist);
 							break;
 						case 0x1510:
+							if(iconClick)
+							initGroupView(mArtistAlbumAdapter->getArtist(),
+								mArtistAlbumAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->album,0);
+							else
 							initArtistAlbumMusicList(mArtistAlbumAdapter->getArtist(),
 								mArtistAlbumAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->album);
 							break;
@@ -1210,7 +1267,7 @@ namespace mango
 		mMusicArrayList = new ArrayMediaInfo();
 	}
 	void MusicAdapter::setMusicOrderby(int order){
-		char *ptr,where[255];
+		char *ptr,where[1024];
 		char *orderby;
 		int count,i;
 		
@@ -1362,7 +1419,7 @@ namespace mango
 	}
 	void AlbumAdapter::refresh(){
 		int count,i;
-		char *ptr,where[255];
+		char *ptr,where[1024];
 		
 		ptr = where;
 		
@@ -1434,7 +1491,7 @@ namespace mango
 	}
 	void GenreAdapter::refresh(){
 		int count,i;
-		char *ptr,where[255];
+		char *ptr,where[1024];
 		ptr = where;
 		sprintf(ptr,"group by genre");
 		
@@ -1486,7 +1543,7 @@ namespace mango
 	}
 	void ArtistAdapter::refresh(){
 		int count,i;
-		char *ptr,where[255];
+		char *ptr,where[1024];
 		ptr = where;
 		sprintf(ptr,"group by artist order by artist_key");
 		
@@ -1597,8 +1654,8 @@ namespace mango
 		}
 	}
 	void PositionManage::savePosition(PTCHAR path ,int pos){
-		char string[300];
-		Charset::wideCharToMultiByte(CP_UTF8, path, String::lstrlen(path), string, 300);
+		char string[500];
+		Charset::wideCharToMultiByte(CP_UTF8, path, String::lstrlen(path), string, 500);
 		savePosition(string,pos);
 	}
 	int PositionManage::getPosition(char* path){
@@ -1627,8 +1684,8 @@ namespace mango
 		}
 	}
 	int PositionManage::getPosition(PTCHAR path){
-		char string[300];
-		Charset::wideCharToMultiByte(CP_UTF8, path, String::lstrlen(path), string, 300);
+		char string[500];
+		Charset::wideCharToMultiByte(CP_UTF8, path, String::lstrlen(path), string, 500);
 		return getPosition(string);
 	}
 };
