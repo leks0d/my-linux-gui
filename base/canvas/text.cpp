@@ -230,7 +230,15 @@ namespace mango
 		return TRUE ;
 	}
 
-
+static int isChatTh(WCHAR	 wChar){
+	int ret = 0;
+	if((wChar>=0x0E34&&wChar<=0x0E3A)||(wChar>=0x0E47&&wChar<=0x0E4E)||(wChar==0x0E31)){
+		ret = 1; 
+	}else if(wChar==0x0E33){
+		ret = 2;
+	}
+	return ret;
+}
 
 	int Canvas::drawSingleLineText(Rect& clipRect, int x, int y, const TCHAR* lpString, int cbString)
 	{
@@ -240,6 +248,7 @@ namespace mango
 		WCHAR			wChar	;
 		LPBYTE			pbyCharBits ;
 		int				iCharWidth ;
+		int 			oCharWidth ;
 
 		if ((!lpString) || ((cbString <= 0) && (cbString != -1)))
 			return x ;
@@ -256,8 +265,7 @@ namespace mango
 				break ;
 
 			cbString = cbString > 0 ? cbString - 1 : cbString ; 
-
-
+			
 			pbyCharBits = mFont->getCharBmp(wChar, &size, &dyExtra) ;
 			iCharWidth = mFont->getWidth(wChar) ;
 
@@ -270,7 +278,14 @@ namespace mango
 			dxExtra = (iCharWidth - size.cx) / 2 ;
 
 			rcChar.setEx(x + dxExtra, y + dyExtra, size.cx, size.cy);
-			rect.setEx(x + dxExtra, y + dyExtra, size.cx, size.cy);
+			
+			if(isChatTh(wChar) == 1)
+				rect.setEx(x + dxExtra - oCharWidth, y + dyExtra, size.cx, size.cy);
+			else if(isChatTh(wChar) == 2)
+				rect.setEx(x + dxExtra - oCharWidth, y + dyExtra, size.cx, size.cy);
+			else
+				rect.setEx(x + dxExtra, y + dyExtra, size.cx, size.cy);
+			
 			if (rect.intersect(clipRect))
 			{
 				TextBitBlt_8_To_32(mBitmap->getBits(), mBitmap->getWidth(), \
@@ -278,11 +293,19 @@ namespace mango
 					pbyCharBits, size.cx, rect.left - rcChar.left, rect.top - rcChar.top, \
 					mBkMode, mTextColor, mBkColor);
 			}
-
-			x += iCharWidth + mCharExtra;
+			
+			if(isChatTh(wChar) == 1)
+				x;
+			else if(isChatTh(wChar) == 2)
+				x += size.cx/2 + mCharExtra;
+			else
+				x += iCharWidth + mCharExtra;
+			
+			oCharWidth = iCharWidth;
+			
 			if (x > clipRect.right)
 				break ;
-
+			
 		} while (1) ;
 
 		return x ;
