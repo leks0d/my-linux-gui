@@ -876,9 +876,15 @@ namespace mango
 		
 		mCount = count;
 		offset = -listOffset;
+		
 		drawLen = 4*displayLen/count;
+		
+		if(drawLen <10)
+			drawLen = 10;
+		
 		drawOffset = offset*(displayLen-drawLen)/((count-4)*53);
 
+		
 #if 0
 		if(drawOffset>displayLen-drawLen){
 			drawOffset = displayLen-drawLen;
