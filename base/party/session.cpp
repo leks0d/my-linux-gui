@@ -461,6 +461,7 @@ namespace mango
 			if(voltage_now>4250000){
 				capacity = capacity&0xFF;
 			}
+			capacity = (capacity&0xFF)|charge<<8;
 			if(mUseEventInterface != NULL)
 				mUseEventInterface->onKeyDispatch(capacity,VM_CAPACITY,0);				
 
