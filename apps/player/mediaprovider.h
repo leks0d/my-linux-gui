@@ -211,6 +211,7 @@ namespace mango
 		void stopMediaScanner();
 		bool mediaCanStop();
 		int queryMusicNum();
+		int queryAllMusicId(void* array);
 		static char* slqFormatOut(char *arg,char *out);
 		static char* slqFormat(char *arg);
 		static char* slqCheck(char *arg);

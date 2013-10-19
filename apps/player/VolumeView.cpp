@@ -27,6 +27,7 @@ namespace mango
 		mpx = mpy = NULL;
 		isNeedPaint = 1;
 		closeCount = VOLUME_TIME;
+		setThreadState(false);
 	}
 
 	VolumeView::~VolumeView(void)
@@ -58,7 +59,7 @@ namespace mango
 
 		setFocus(this);
 		invalidateRect();
-		isShow = 1;
+
 		return 0;
 	}
 
@@ -79,6 +80,8 @@ namespace mango
 	unsigned int VolumeView::VolumeRunning(void* p){
 		VolumeView* iVolume = (VolumeView*)p;
 		int vol,closeCount;
+
+		iVolume->setThreadState(true);
 		
 		closeCount = VOLUME_TIME;
 		vol = -1;
@@ -113,10 +116,10 @@ namespace mango
 					break;
 			}			
 		}
-		iVolume->isShow = 0;
 		gSettingProvider.update(SETTING_VOLUME_ID,gPlayer.getVolume());
 		gMessageQueue.post(iVolume,VM_NOTIFY,NM_DISMISS,0);
 		
+		iVolume->setThreadState(false);
 	}
 	
 	void VolumeView::initView()
@@ -132,7 +135,10 @@ namespace mango
 		
 		mVolumeText->setTextString(mstr->mstr);
 
-		mVolumeThread.create(VolumeRunning,this);
+		if(getThreadState() == false)
+			mVolumeThread.create(VolumeRunning,this);
+		else
+			log_i("Volume Thread running");
 	}
 
 	int VolumeView::onDestroy()
@@ -155,6 +161,7 @@ namespace mango
 			initView();
 		}else if(fromView == NULL && code == NM_DISMISS){
 			gPlayer.dismissView(this);
+			isShow = 0;
 		}else if(code == NM_KEY_LOCK){
 			isKeyDown = 0;
 		}
@@ -376,5 +383,22 @@ namespace mango
 		canvas.drawBitmap(destImageBuffer, x0, y0, width, height);
 		releaseVolumeImage();
 		safeFree(destImageBuffer);
+	}
+
+	bool VolumeView::getThreadState(){
+		bool ret;
+
+		mThreadMutex.lock();
+		
+		ret = isThreadRunning;
+
+		mThreadMutex.unlock();
+		
+		return ret;
+	}
+	void VolumeView::setThreadState(bool run){
+		mThreadMutex.lock();
+		isThreadRunning = run;
+		mThreadMutex.unlock();
 	}
 };

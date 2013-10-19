@@ -1208,6 +1208,17 @@ namespace mango
 
 		return array.getItem(0);
 	}
+	int mediaprovider::queryAllMusicId(void *arg){
+		char *ptr,sql[256];
+		IntegerArray *array;
+		array = (IntegerArray *)arg;
+		ptr = sql;
+		ptr += sprintf(ptr,"select _id from music");
+		
+		exec(sql,array,SettingProvider::sql_callback);
+		
+		return array->getCount();
+	}
 	mediaprovider gmediaprovider;
 };
 

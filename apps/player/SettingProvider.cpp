@@ -295,7 +295,7 @@ namespace mango
 		if(len>=mMax){
 			int *temp;
 			if(mMax == 0)
-				mMax = 16;
+				mMax = 100;
 			else
 				mMax*=2;
 			temp = new int[mMax];

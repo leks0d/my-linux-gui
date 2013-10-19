@@ -222,6 +222,7 @@ namespace mango
 		ChosenView *mChosenView;
 		PlaylistOperateView *mPlaylistOperateView;
 		Mutex muteMutex;
+		Mutex volumeMutex;
 		int muteCount;
 		
 		PlayerEventInterface* mPlayerEventInterface;

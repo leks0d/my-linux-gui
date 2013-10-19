@@ -44,6 +44,7 @@ namespace mango
 			void initPlayintList();
 			int playMediaInfo(mediainfo *info);
 			int isItemExsit(mediainfo *info);
+			int isItemExsitAudioId(int id);
 			void moveToLast();
 			int moveToNext();
 			int moveToPrev();

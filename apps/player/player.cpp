@@ -66,7 +66,8 @@ namespace mango
 		gSession.setUseEventInterface((UseEventInterface*)mPlayerEventInterface);
 
 		showPlayingView();
-
+		openCodecPower(false);
+		openCodecPower(true);
 		gPowerManager = new PowerManager();
 		
 		mSocketDetect = new SocketDetect();
@@ -489,24 +490,20 @@ namespace mango
 
 	void Player::setVolume(int volume)
 	{
-#ifndef WIN32
 		FILE* file;
 		char buffer[20];
 		int ret;
 		
+		volumeMutex.lock();
+		
 		file  = fopen("/dev/codec_volume", "wt");
-		if (file == NULL) {
-			log_e("/dev/codec_volume");
-			return;
+		if (file != NULL) {
+			sprintf(buffer, "%d", volume);
+			ret = fwrite(buffer, 1, strlen(buffer) + 1, file);	
+			fclose(file);
 		}
-
-		sprintf(buffer, "%d", volume);
-
-
-		ret = fwrite(buffer, 1, strlen(buffer) + 1, file);
-		log_i ("setVolume:%s,ret=%d",buffer,ret);
-		fclose(file);
-#endif
+		
+		volumeMutex.unlock();
 	}
 	void Player::ioctrlBrightness(int cmd,int* brightness){
 		int fd=0;

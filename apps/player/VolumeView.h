@@ -38,6 +38,8 @@ namespace mango
 		void drawVolumeImage(Canvas& canvas, int x, int y, int volume);
 		inline int getQuadrant(int angle);
 		inline int getQuadrant(int x, int y);
+		bool getThreadState();
+		void setThreadState(bool run);
 	public:
 		MediaListView*  mListView;
 		mediainfo mCurrentInfo;
@@ -50,6 +52,7 @@ namespace mango
 		TextView* mBrightnessValue;
 		int isShow;
 		Thread mVolumeThread;
+
 	private:
 		int		mMode;					//menu菜单 媒体库index 收藏夹 或 浏览路径
 		int		mPath;
@@ -64,6 +67,8 @@ namespace mango
 		int isKeyDown;
 		int mDownKeyCode;
 		int closeCount;
+		bool isThreadRunning;
+		Mutex mThreadMutex;
 	};
 
 };

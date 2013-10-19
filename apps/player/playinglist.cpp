@@ -80,22 +80,36 @@ static const char *PlayerLock = "playerlock";
 
 			void Playinglist::savePlayintList(){
 				int i,count = getCount();
+				int pos;
 				mediainfo *info;
-				log_i("--------------------savePlayintList-----------");
-				if(count == gmediaprovider.queryMusicNum()){
-					log_i("when all music in playinglist.");
-					gmediaprovider.updateInPlay(1);
-					return;
-				}
-				gmediaprovider.updateInPlay(0);
+				IntegerArray array;
 				
-				for(i=0;i<count;i++){
-					info = getItem(i);
-					gmediaprovider.updateInPlay(i+1,info->id);
+				log_i("--------------------savePlayintList-----------");
+				
+				if(count > gmediaprovider.queryMusicNum()/2){
+					gmediaprovider.updateInPlay(1);
+					gmediaprovider.queryAllMusicId((void*)&array);
+					
+					count = array.getCount();
+					
+					for(i=0;i<count;i++){
+						pos = isItemExsitAudioId(array.getItem(i));
+						if(pos<0)
+							gmediaprovider.updateInPlay(0,array.getItem(i));	
+					}
+				}else{
+					gmediaprovider.updateInPlay(0);
+				
+					for(i=0;i<count;i++){
+						info = getItem(i);
+						gmediaprovider.updateInPlay(i+1,info->id);
+					}
 				}
+				
 				if(getCount()>0){
 					gSettingProvider.update(SETTING_PLAYPOS_ID,mCurrent);
 				}
+				
 			}
 			void Playinglist::removeItem(int n){
 				int i;
@@ -440,7 +454,15 @@ Exit:
 				}
 				return -1;
 			}
-			
+			int Playinglist::isItemExsitAudioId(int id){
+				int i;
+				for(i=0;i<len;i++){
+					if(mplaylist[i].id == id){
+						return i;
+					}
+				}
+				return -1;
+			}
 			Playinglist::~Playinglist(){
 				len = 0;
 				mCurrent = 0;
