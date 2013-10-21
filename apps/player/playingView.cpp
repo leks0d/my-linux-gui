@@ -544,7 +544,7 @@ namespace mango
 				if(charge==1 && val!=100){
 					batteryIcon=IDP_BATTERY_CHAGER;
 				}else{
-					if(val<5)
+					if(val<10)
 						batteryIcon = IDP_BATTERY_0;
 					else if(val<15)
 						batteryIcon = IDP_BATTERY_10;
@@ -554,7 +554,7 @@ namespace mango
 						batteryIcon = IDP_BATTERY_40;
 					else if(val<70)
 						batteryIcon = IDP_BATTERY_60;
-					else if(val<90)
+					else if(val<80)
 						batteryIcon = IDP_BATTERY_80;
 					else
 						batteryIcon = IDP_BATTERY_100;
@@ -580,8 +580,8 @@ namespace mango
 				updatePlayButtonIcon();
 				gPlayer.mHeadestSwitch->resetSwicth();
 			}
-			if(gPlayer.bootLockCount){
-				if(gPlayer.bootLockCount == 1 && gPowerManager && gPowerManager->poweroffTime<0)
+			if(gPlayer.bootLockCount>0){
+				if(gPlayer.bootLockCount == 1)
 					gPlayer.setBootWakeLock(0);
 				gPlayer.bootLockCount--;
 			}
