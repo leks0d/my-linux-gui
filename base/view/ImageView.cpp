@@ -38,7 +38,7 @@ namespace mango
 			return 0;
 		
 		if(mMSkBitmap!=NULL && mMSkBitmap->isVaild()){
-			canvas.drawBitmap(mMSkBitmap->mBits,mStartX,mStartY,mMSkBitmap->width,mMSkBitmap->height);
+			canvas.drawBitmap(mMSkBitmap->mBits,mStartX,mStartY,mMSkBitmap->width,mMSkBitmap->height,false);
   		}else if (resId > 0 && ResType == 1){
 			canvas.drawImageResource(resId, mStartX, mStartY,mAlps);
 		} 

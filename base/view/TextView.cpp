@@ -32,6 +32,8 @@ namespace mango
 		mVisiable = true;
 		showIcon = false;
 		mIconRes = 0;
+		mSelectBgdResId = 0;
+		mNormalBgdResId = 0;
 	}
 
 

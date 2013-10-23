@@ -142,6 +142,9 @@ namespace mango
 		mPlayListMemAdapter = NULL;
 		mGenreAdapter = NULL;
 		mGenreMusicAdapter = NULL;
+		mGenreArtistAdapter = NULL;
+		mGenreArtistAlbumAdapter = NULL;
+		mGenreArtistAlbumMusicAdapter = NULL;
 		
 		mNeedPlayPath = NULL;
 		mOrderMenuShow = 0;
@@ -590,6 +593,62 @@ namespace mango
 		
 		setMainState(0x1700);
 	}
+	void MediaView::initGenreArtistList(char* genre){
+		
+		mListView->deleteAllItems();
+		
+		if(mGenreArtistAdapter == NULL){
+			mGenreArtistAdapter = new ArtistAdapter(mListView,ADAPTER_ALBUM); 
+		}
+		if(genre!=NULL)
+			mGenreArtistAdapter->setGenre(genre);
+		mGenreArtistAdapter->refresh();
+		mListView->setZoneY(mGenreArtistAdapter->getYoffset(),false);
+		mTitle->setTextResoure(STR_GENRE_LIST);
+		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
+		mTitle->invalidateRect();
+		
+		setMainState(0x1710);
+	}
+	void MediaView::initGenreArtistAlbumList(char* genre,char* artist){
+		mListView->deleteAllItems();
+		
+		if(mGenreArtistAlbumAdapter == NULL){
+			mGenreArtistAlbumAdapter = new AlbumAdapter(mListView,ADAPTER_ALBUM); 
+		}
+		if(genre!=NULL)
+			mGenreArtistAlbumAdapter->setGenre(genre);
+		if(artist!=NULL)
+			mGenreArtistAlbumAdapter->setArtist(artist);
+		else
+			mGenreArtistAlbumAdapter->refresh();
+		mListView->setZoneY(mGenreArtistAlbumAdapter->getYoffset(),false);
+		mTitle->setTextResoure(STR_GENRE_LIST);
+		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
+		mTitle->invalidateRect();
+		
+		setMainState(0x1711);
+	}
+	void MediaView::initGenreArtistAlbumMusicList(char* genre,char* artist,char* album){
+		int count,i;
+		char *ptr,where[1024];
+		ArrayMediaInfo *mediaList;
+		
+		ptr = where;
+		mediaList = new ArrayMediaInfo();
+		
+		mListView->deleteAllItems();
+		
+		if(mGenreArtistAlbumMusicAdapter == NULL){
+			mGenreArtistAlbumMusicAdapter = new MusicAdapter(mListView,ADAPTER_PLAYING); 
+		}
+		
+		ptr += sprintf(ptr,"where genre='%s' and artist='%s' and album='%s' ",genre,artist,album);
+		
+		mGenreArtistAlbumMusicAdapter->setWhere(where);
+		mTitle->setTextResoure(STR_GENRE_LIST);
+		setMainState(0x1712);
+	}
 
 	void MediaView::initAlbumMusicList(mediainfo* info){
 		int count,i;
@@ -698,13 +757,8 @@ namespace mango
 	}	
 	bool MediaView::isRootDirectory()
 	{
-#ifdef WIN32
-		if (String::lstrcmpi(mCurrentPath, TEXT("E:")) == 0)
-			return true;
-#else
 		if (String::lstrcmpi(mCurrentPath, TEXT("/mnt")) == 0)
 			return true;
-#endif
 		return false;
 	}
 	bool MediaView::isVolumRootpath(char *path){
@@ -884,7 +938,7 @@ namespace mango
 						case 0x1410:
 						case 0x1511:
 						case 0x1610:
-						case 0x1710:{
+						case 0x1712:{
 								Point pt =  mListView->getTouchPrevPosition();
 								int iconRight = LIST_MUSIC_ICON_LEFT+40;
 								MusicAdapter *adapter;
@@ -918,7 +972,25 @@ namespace mango
 							if(iconClick)
 								initGroupView(0,0,mGenreAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->genre);
 							else
-								initGenreMusicList("genre",mGenreAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->genre,0x1710);
+								//initGenreMusicList("genre",mGenreAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->genre,0x1710);
+								initGenreArtistList(mGenreAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->genre);
+								break;
+						case 0x1710:
+							if(iconClick)
+								initGroupView(mGenreArtistAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->artist,
+								0,mGenreArtistAdapter->getGenre());
+							else
+								initGenreArtistAlbumList(mGenreArtistAdapter->getGenre(),
+									mGenreArtistAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->artist);
+							break;
+						case 0x1711:
+							if(iconClick)
+								initGroupView(mGenreArtistAdapter->getGenre(),
+								mGenreArtistAlbumAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->album,
+								mGenreArtistAdapter->getGenre());
+							else
+								initGenreArtistAlbumMusicList(mGenreArtistAdapter->getGenre(),mGenreArtistAlbumAdapter->getArtist(),
+									mGenreArtistAlbumAdapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem)->album);
 							break;
 						case 0x1600:{
 								Point pt =  mListView->getTouchPrevPosition();
@@ -1151,6 +1223,12 @@ namespace mango
 			case 0x1710:
 				initGenreList();
 				break;
+			case 0x1711:
+				initGenreArtistList();
+				break;
+			case 0x1712:
+				initGenreArtistAlbumList();
+				break;
 			case 0x1511:
 				initArtistAlbumList(NULL);
 				break;
@@ -1236,7 +1314,7 @@ namespace mango
 		x = x+40;
 		//canvas.drawText(info->name,strlen(info->title),x,y+5);
 		yrect.setEx(x,y+5,308-x,30);
-		canvas.drawText(info->name,strlen(info->title),yrect,0);
+		canvas.drawText(info->title,strlen(info->title),yrect,0);
 		
 		canvas.setTextColor(RGB(255,255,255));
 		canvas.setTextSize(12);
@@ -1380,7 +1458,7 @@ namespace mango
 		canvas.setTextSize(16);
 		//canvas.drawText(info->name,strlen(info->title),x,y+5);
 		yrect.setEx(x,y+5,296-x+12,40);
-		canvas.drawText(info->name,strlen(info->name),yrect,0 );
+		canvas.drawText(info->title,strlen(info->title),yrect,0 );
 		canvas.setTextColor(RGB(255,255,255));
 		canvas.setTextSize(12);
 		//canvas.drawText(info->artist,strlen(info->artist),x,y+28);
@@ -1417,14 +1495,28 @@ namespace mango
 			refresh();
 		}
 	}
+	void AlbumAdapter::setGenre(char* genre){
+		mGenre = genre;
+	}
 	void AlbumAdapter::refresh(){
 		int count,i;
 		char *ptr,where[1024];
 		
 		ptr = where;
+
+		if(mGenre!=NULL || mArtist != NULL)
+			ptr+=sprintf(ptr,"where");
 		
-		if(mArtist != NULL)
-			ptr+=sprintf(ptr,"where artist='%s'",mArtist);
+		if(mGenre!=NULL)
+			ptr+=sprintf(ptr," genre='%s' ",mGenre.string);
+		
+		if(mArtist!=NULL){
+			
+			if(mGenre!=NULL)
+				ptr+=sprintf(ptr," and ");
+			
+			 ptr+=sprintf(ptr," artist='%s' ",mArtist);
+		}
 		
 		ptr+=sprintf(ptr," group by album order by album_key");
 		
@@ -1541,10 +1633,16 @@ namespace mango
 		
 		mMusicArrayList = new ArrayMediaInfo();
 	}
+	void ArtistAdapter::setGenre(char *str){
+		mGenre = str;
+	}
 	void ArtistAdapter::refresh(){
 		int count,i;
 		char *ptr,where[1024];
 		ptr = where;
+
+		if(mGenre != NULL)
+			ptr += sprintf(ptr,"where genre='%s' ",mGenre.string);
 		sprintf(ptr,"group by artist order by artist_key");
 		
 		mlist->setListAdapter(this);

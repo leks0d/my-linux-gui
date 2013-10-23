@@ -96,7 +96,9 @@ namespace mango
 		void refresh();
 		void setWhere(char* where);
 		void setArtist(char* art);
+		void setGenre(char* genre);
 		char* getArtist();
+		char* getGenre(){return mGenre.string;}
 		virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);
 		virtual int getCount(){return 0;}
 		virtual void* getItem(int index){return 0;}
@@ -106,6 +108,7 @@ namespace mango
 		MSkBitmap *mMSkBitmap;
 		char* sqlWhere;
 		char* mArtist;
+		CString mGenre;
 	};
 	class GenreAdapter : public AlbumAdapter
 	{
@@ -125,11 +128,14 @@ namespace mango
 		~ArtistAdapter(void){}
 		ArtistAdapter(ListView* list,int id);
 		void refresh();
+		void setGenre(char *str);
+		char* getGenre(){return mGenre.string;}
 		virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);
 		virtual int getCount(){return 0;}
 		virtual void* getItem(int index){return 0;}
 		ListView* mlist;
-		ArrayMediaInfo *mMusicArrayList;	
+		ArrayMediaInfo *mMusicArrayList;
+		CString mGenre;
 	};
 
 	class MediaListView : public ListView
@@ -181,7 +187,10 @@ namespace mango
 		void initArtistList();
 		void initArtistAlbumList(char* artist);
 		void initArtistAlbumMusicList(char* artist,char* album);
+		void initGenreArtistAlbumMusicList(char* artist,char* album,char* genre);
 		void initGenreList();
+		void initGenreArtistList(char* genre = NULL);
+		void initGenreArtistAlbumList(char* genre=NULL,char* artist=NULL);
 		void initAlbumMusicList(mediainfo* info);
 		void initArtistMusicList(char* key,char* value,int state);
 		void initGenreMusicList(char* key,char* value,int state);
@@ -215,6 +224,9 @@ namespace mango
 		PlayListAdapter* mPlayListAdapter;
 		MusicAdapter* mPlayListMemAdapter;
 		GenreAdapter* mGenreAdapter;
+		ArtistAdapter* mGenreArtistAdapter;
+		AlbumAdapter* mGenreArtistAlbumAdapter;
+		MusicAdapter* mGenreArtistAlbumMusicAdapter;
 		
 		ImageView* mOrderMenuBk;
 		TextView* mOrderByTitle;

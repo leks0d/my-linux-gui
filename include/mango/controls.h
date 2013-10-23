@@ -76,7 +76,7 @@ namespace mango
 			for(i = 0;i<count;i++){
 				int r = bit[i]&0x00FF0000;
 				int b = bit[i]&0x000000FF;
-				mBits[i] = (bit[i]&0xFF00FF00) | (r>>16) | (b<<16);
+				mBits[i] = (bit[i]&0xFF00FF00) | (r>>16) | (b<<16) | 0xFF000000;
 			}
 			
 			width = w;

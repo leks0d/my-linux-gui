@@ -553,7 +553,7 @@ namespace mango
 		if (m_id3.GetTags(METADATA_KEY_CD_TRACK_NUMBER, value)){
 			info->track = str_to_int(value);
 		}else{
-			info->track = 1000;
+			info->track = 10000;
 		}
 /*------------------------------album---------------------------------------*/		
 		memset(value, 0, 256);
@@ -768,7 +768,7 @@ namespace mango
 			
 			getmediainfo(path.getString(),&info,cover,genImg);
 
-			if(!cueCheck(direct,&info)){
+			if(!cueCheck(info.path,&info)){
 				insert("music",&info);
 			}
 
@@ -795,6 +795,7 @@ namespace mango
 	}
 	void mediaprovider::getCuePath(char* src,char * out){
 		if(src){
+			//log_i("in=%s",src);
 			int len = strlen(src);
 			int i; 
 			for(i=len-1;i>0;i--){
@@ -803,7 +804,7 @@ namespace mango
 			}
 			memcpy(out,src,i+1);
 			strcat(out,"cue");
-			log_i("out=%s",out);
+			//log_i("out=%s",out);
 		}
 	}
 	bool mediaprovider::loadCueFile(char* path,mediainfo *info){
@@ -931,7 +932,7 @@ namespace mango
 				//remove(infolist[i].img_path);
 				del("music",id);
 				
-				log_i("del file in db:%s",infolist[i].path);
+				//log_i("del file in db:%s",infolist[i].path);
 				
 			}else if(infolist[i].times > mCurrentTimes){
 				mCurrentTimes = infolist[i].times;

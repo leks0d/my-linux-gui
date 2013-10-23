@@ -687,8 +687,23 @@ namespace mango
 			break;
 		case PLAYING_IDB_PREV:
 			if(mPlayinglist->isPlaying()){
-				if(mPlayinglist->getCurrent()>5000)
-					mPlayinglist->seekTo(0);
+				int cur,des;
+
+				mediainfo* info;
+				info =mPlayinglist->getPlayingItem();
+				
+				if(info){
+					if(info->isCue){
+						cur = mPlayinglist->getCurrent() - info->cueStart;
+						des = info->cueStart;
+					}else{
+						cur = mPlayinglist->getCurrent();
+						des = 0;
+					}
+				}
+					
+				if(cur>5000)
+					mPlayinglist->seekTo(des);
 				else
 					mPlayinglist->playPrev();
 			}else{
