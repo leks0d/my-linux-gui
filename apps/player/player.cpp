@@ -750,8 +750,10 @@ namespace mango
 			if(gPowerManager!=NULL)
 				gPowerManager->PowerManagerCount();
 		}else if(keyCode == KEYCODE_SHORT_POWER&&action == VM_KEYUP){
-			if(gPowerManager!=NULL)
+			if(gPowerManager!=NULL){
+				log_i("SHORT_POWER setPowerState()");
 				gPowerManager->setPowerState();
+			}
 		}else if(keyCode == KEYCODE_LONG_POWER&&action == VM_KEYDOWN){
 			//gPlayer.showShutDownView();
 			gPlayer.showChosenView(ChosenView::CHOSEN_POWEROFF);

@@ -204,7 +204,7 @@ void SocketDetect::DetectRun(void){
 			}else
 				log_i("usb unknow");
 			if(result > 0)
-		   		gPowerManager->setPowerState(POWER_STATE_ON);
+		   		gPowerManager->setPowerState(0);
 			
 			log_i("set power state POWER_STATE_ON");
 			if(mPlayerEventInterface != NULL)

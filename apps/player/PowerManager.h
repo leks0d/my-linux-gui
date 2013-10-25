@@ -13,6 +13,7 @@ namespace mango
 	
 		PowerManager();
 		void PowerManagerCount();
+		void initAutoSleepTime();
 		void resetCount();
 		void setPowerState();
 		void setPowerState(int n);

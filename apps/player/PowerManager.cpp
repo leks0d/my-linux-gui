@@ -10,13 +10,30 @@ namespace mango
 	
 	PowerManager::PowerManager(){
 		isSleep = 0;
-		gSettingProvider.query(SETTING_AUTOSLEEP_ID,&sleepTime);
+		
+		initAutoSleepTime();
+
 		gSettingProvider.query(SETTING_AUTOPOWEROFF_ID,&poweroffTime);
+		
 		atuoCount = 0;
 		atuoPoweroffCount = 0;
 		setPowerState(0);
 	}
+	void PowerManager::initAutoSleepTime(){
+		int i;
+		int num = 3;
+		
+		for(i=0;i<num;i++){
+			gSettingProvider.query(SETTING_AUTOSLEEP_ID,&sleepTime);
+			if(getAutoSleepTime()>0)
+				break;
+		}
+		
+		if(num>=3)
+			sleepTime = time[0];
 
+		log_i("setPowerState sleepTime=%d.",sleepTime);
+	}
 	void PowerManager::setAutoSleepTime(int index){
 		sleepTime = time[index];
 		gSettingProvider.update(SETTING_AUTOSLEEP_ID,sleepTime);
@@ -35,18 +52,21 @@ namespace mango
 
 	void PowerManager::PowerManagerCount(){
 		atuoCount++;
-		if(atuoCount>=sleepTime&&(!isSleep))
+		if(atuoCount>=sleepTime&&(!isSleep)){
+			log_i("setPowerState autosleep time out.");
 			setPowerState();
+		}
 		
 		atuoPoweroffCount++;
 		if(mPlayinglist->isPlaying()){
 			atuoPoweroffCount = 0;
 		}
+		
 		if(gPlayer.mPlayingView != NULL && 
 			(gPlayer.mPlayingView->isUsmCon || gPlayer.mPlayingView->isMediaScanning)){
 			atuoPoweroffCount = 0;
 		}
-		//log_i("PowerManagerCount=%d,poweroffTime=%d",atuoPoweroffCount,poweroffTime);
+		
 		if(atuoPoweroffCount>=poweroffTime && poweroffTime != -1){
 			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,NM_POWER_OFF,0);
 		}
@@ -81,8 +101,7 @@ namespace mango
 		
 		if(write(fd,pm_states[isSleep],strlen(pm_states[isSleep])) == -1){
 			log_i("setPowerState write fail.");
-		}else
-			log_i("setPowerState write sucess.");
+		}
 		if(isSleep == 0){
 			gSession.invalidateScreen(NULL);
 		}
@@ -100,6 +119,8 @@ namespace mango
 			"mem"
 		};
 		
+		log_i("direct setPowerState n=%d",n);
+		
 		atuoCount = 0;
 
 		isSleep = n;
@@ -110,14 +131,13 @@ namespace mango
 		
 		if(write(fd,pm_states[isSleep],strlen(pm_states[isSleep])) == -1){
 			log_i("setPowerState write fail.");
-		}else
-			log_i("setPowerState write sucess.");
+		}
 		
 		close(fd);
 	}
 
 	int PowerManager::getAutoSleepTime(){
-		int i;
+		int i = -1;
 		for(i = 0;i<len;i++){
 			if(sleepTime == time[i])
 				break;
