@@ -122,6 +122,8 @@ class KeyCount{
 		TextView* mAudioInfo;
 		TextView* mMusicName;
 		StaticView* mMusicNameStatic;
+		StaticView* mArtistNameStatic;
+		StaticView* mAlbumNameStatic;
 		TextView* mArtist;
 		TextView* mAlbum;
 		

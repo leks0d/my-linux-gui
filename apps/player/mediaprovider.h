@@ -252,7 +252,7 @@ namespace mango
 static char * getfiletype(char *file,char *type);
 static int fileTypeMatch(char *file,const char *music_type[])
 {
-	char type[10];
+	char type[10]={0};
 //	const char *music_type[] = {"mp3","wav","flac","aac","ogg","ape","m4a","wma","aif","aiff","\0"};
 	const char **mtype;
 
@@ -263,7 +263,7 @@ static int fileTypeMatch(char *file,const char *music_type[])
 	if(type == 0)
 		return 0;
 
-	while(*mtype != "\0"){
+	while(**mtype != '\0'){
 		if(strcmp(*mtype,type) == 0){
 			return 1;
 		}

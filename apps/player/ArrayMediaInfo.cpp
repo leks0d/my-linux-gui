@@ -71,7 +71,7 @@ namespace mango
 			int i,count = 0;
 
 			for(i=0;i<len;i++){
-				if(mplaylist[i].track>0)
+				if(mplaylist[i].track<1000)
 					count++;
 			}
 
@@ -89,9 +89,9 @@ namespace mango
 				else if(end->name_key ==NULL)
 					ret = 1;
 				else
-					ret = strcmp(first->name_key,end->name_key);
+					ret = strcmp(first->title_key,end->title_key);
 			}else if(sortby == 1){//order by track
-				//ret = strcmp(first->name,end->name);
+				ret = strcmp(first->album_key,end->album_key);
 				if(ret == 0){
 					if(first->track < end->track){
 						if(first->track != 0)	//zero order in the end.
@@ -104,7 +104,7 @@ namespace mango
 						else
 							ret = -1;
 					}else{
-						ret = strcmp(first->name_key,end->name_key);
+						ret = strcmp(first->title_key,end->title_key);
 					}
 				}
 			}

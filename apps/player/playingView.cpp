@@ -84,6 +84,18 @@ namespace mango
 		mMusicNameStatic->setTextSize(23);
 		mMusicNameStatic->setTextBkRes(IDP_PLAYING_MUSICNAME_BK);
 		
+		rect.setEx(left, 90, 190, 25);
+		mArtistNameStatic = new StaticView(TEXT("mArtist"), this, &rect, 0);
+		mArtistNameStatic->setTextColor(RGB(154,154,154));
+		mArtistNameStatic->setTextSize(16);
+		mArtistNameStatic->setTextBkRes(IDP_PLAYING_MUSICNAME_BK);
+
+		rect.setEx(left, 115, 190, 30);
+		mAlbumNameStatic = new StaticView(TEXT("mArtist"), this, &rect, 0);
+		mAlbumNameStatic->setTextColor(RGB(154,154,154));
+		mAlbumNameStatic->setTextSize(16);
+		mAlbumNameStatic->setTextBkRes(IDP_PLAYING_MUSICNAME_BK);
+		/*
 		rect.setEx(left, 85, 190, 20);
 		mArtist = new TextView(PLAYING_IDB_MUSIC_NAME, TEXT("mArtist"), this, &rect, 0);
 		mArtist->setTextColor(RGB(154,154,154));
@@ -92,7 +104,7 @@ namespace mango
 		rect.setEx(left, 105, 190, 20);
 		mAlbum = new TextView(PLAYING_IDB_MUSIC_NAME, TEXT("mAlbum"), this, &rect, 0);
 		mAlbum->setTextColor(RGB(154,154,154));
-		mAlbum->setTextSize(16);
+		mAlbum->setTextSize(16);*/
 		
 		rect.setEx(volumeX, 0, 20, 21);
 		mVolumeButton = new  Button(13, TEXT("mVolumeButton"), this, &rect, 0);
@@ -189,8 +201,8 @@ namespace mango
 			mMusicName->setTextResoure(STR_NO_MUSIC);
 			mMusicNameStatic->setTextResoure(STR_NO_MUSIC);
 			mAudioInfo->setTextString(NULL);
-			mAlbum->setTextString(NULL);
-			mArtist->setTextString(NULL);
+			mAlbumNameStatic->setTextString(NULL);
+			mArtistNameStatic->setTextString(NULL);
 			mAddToPlaylistButton->setNormalImageId(-1);
 			mAlbumImage->setMSkBitmap(NULL);
 			return;
@@ -242,9 +254,9 @@ namespace mango
 		//log_i("tag 0x%x",currentinfo->title);
 		mMusicNameStatic->setTextString(currentinfo->title);
 		//log_i("tag");
-		mArtist->setTextString(currentinfo->artist);
+		mArtistNameStatic->setTextString(currentinfo->artist);
 		//log_i("tag");
-		mAlbum->setTextString(currentinfo->album);
+		mAlbumNameStatic->setTextString(currentinfo->album);
 		//log_i("tag");
 		
 		duration = mPlayinglist->getDuration();

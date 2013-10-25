@@ -504,7 +504,7 @@ namespace mango
 		if(mMusicAdapter == NULL){
 			mMusicAdapter = new MusicAdapter(mListView,ADAPTER_PLAYING);
 		}
-		mMusicAdapter->refresh();
+		mMusicAdapter->setMusicOrderby(MEDIA_ORDER_TILE);
 
 		mTitle->setTextResoure(STR_MUSIC_LIST);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
@@ -1462,7 +1462,7 @@ namespace mango
 		canvas.setTextColor(RGB(255,255,255));
 		canvas.setTextSize(12);
 		//canvas.drawText(info->artist,strlen(info->artist),x,y+28);
-		yrect.setEx(x,y+28,296-x+12,40);
+		yrect.setEx(x,y+28,296-x+12,20);
 		canvas.drawText(info->artist,strlen(info->artist),yrect,0 );
 	}
 
