@@ -388,8 +388,14 @@ static const char *PlayerLock = "playerlock";
 					&& mPlayingPath == playPath
 					&& isPlaying()){
 					return -2;
+				}else if(getPlayingItem()->isCue == 1 
+					&& mCueStart != getPlayingItem()->cueStart 
+					&& mPlayingPath == playPath
+					&& isPlaying()){
+					if(mParticleplayer->seekTo(getPlayingItem()->cueStart)){log_i("seekTo() success!");}else{log_i("seekTo() fail!");return -1;}
+					return 0;
 				}
-
+				
 				mPlayingPath = playPath;
 				mIsCue = getPlayingItem()->isCue;
 				mCueStart = getPlayingItem()->cueStart;
@@ -409,14 +415,14 @@ static const char *PlayerLock = "playerlock";
 					if(mParticleplayer->stop()){log_i("stop() success!");}else{log_i("stop() fail!");goto Exit;}
 					if(mParticleplayer->setSource(playPath)){log_i("setSource() success!");}else{log_i("setSource() fail!");goto Exit;}
 					if(mParticleplayer->prepare()){log_i("prepare() success!");}else{log_i("prepare() fail!");goto Exit;}
-					//if(mParticleplayer->seekTo(mesc)){log_i("seekTo() success!");}else{log_i("seekTo() fail!");return -1;}
+					//if(mParticleplayer->seekTo(15*1000)){log_i("seekTo() success!");}else{log_i("seekTo() fail!");return -1;}
 					if(needStart)
 						if(mParticleplayer->start()){log_i("start() success!");}else{log_i("start() fail!");goto Exit;}
-					//mango::Thread::sleep(600);
-					//gPlayer.closeWm8740Mute();
+					
 					gPlayer.VolumeCheck();
-								
-					if(getPlayingItem()->isCue){
+					
+					if(getPlayingItem()->isCue)
+					{
 						log_i("Cue seekTo start.");
 						mango::Thread::sleep(1000);
 						log_i("Cue seekTo cueStart=%d",getPlayingItem()->cueStart);
@@ -600,7 +606,7 @@ Exit:
 			int i;
 			if(mParticleplayer != NULL){
 				for(i=0;i<8;i++){
-					log_i("equalizerSetBandLevel:i=%d,val=%d",i,val[i]);
+					//log_i("equalizerSetBandLevel:i=%d,val=%d",i,val[i]);
 					mParticleplayer->equalizerSetBandLevel(i,val[i]);
 				}
 			}
@@ -648,6 +654,7 @@ Exit:
 				mParticleplayer->setGaplessDuration(GaplessValue[gaplessEn]);
 			gSettingProvider.update(SETTING_GAPLESS_ID,gaplessEn);
 			mGapless = gaplessEn;
+			log_i("GaplessValue[%d]=%d",mGapless,GaplessValue[mGapless]);
 		}
 
 		void Playinglist::setPlayMode(int mode){

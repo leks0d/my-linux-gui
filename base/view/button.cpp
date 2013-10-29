@@ -58,11 +58,16 @@ namespace mango
 
 	int Button::onTouchUp(int x, int y, int flag)
 	{
+		Rect rect;
+		
 		mPressed = false;
 		invalidateRect();
 		//log_i("onTouchUp postMessage VM_COMMAND:%d",mId);
-		postMessage(getParent(), VM_COMMAND, mId, (unsigned int)this);
-		getParent()->onNotify(this,NM_CLICK,NULL);
+		getRect(rect);
+		if(x <= rect.getWidth() && y <= rect.getHight()){
+			postMessage(getParent(), VM_COMMAND, mId, (unsigned int)this);
+			getParent()->onNotify(this,NM_CLICK,NULL);
+		}
 		return 0;
 	}
 

@@ -210,11 +210,6 @@ namespace mango
 
 			if (gSessionLocal.mResource.loatBitmap(id, &imageHeader, resourceBuffer, RESOURCE_MAX_BYTES) <= 0)
 				break;
-
-			if(width<imageHeader.m_iWidth)
-				imageHeader.m_iWidth = width;
-			if(hight<imageHeader.m_iHeight)
-				imageHeader.m_iHeight = hight;
 			
 			viewToCanvas(x, y);
 			getClipRect(rcClip);
@@ -223,7 +218,7 @@ namespace mango
 			if (!rcClip.intersect(rcBmp))
 				break ;
 
-			bitBlt_32(mBitmap->getBits(), mBitmap->getWidth(), rcClip.left,  rcClip.top,  rcClip.right - rcClip.left, rcClip.bottom - rcClip.top, \
+			bitBlt_32(mBitmap->getBits(), mBitmap->getWidth(), rcClip.left,  rcClip.top,  width, hight, \
 				resourceBuffer, imageHeader.m_iWidth, rcClip.left - x, rcClip.top -y, \
 				alpha ? SRCALPHADSTALPHA : SRCCOPY, 255, NULL) ;
 

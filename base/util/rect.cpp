@@ -57,6 +57,7 @@ namespace mango
 
 	bool Rect::ptIn(int x, int y)
 	{
+		//log_i("[%d,%d,%d][%d,%d,%d]",left,right,x,top,bottom,y);
 		if ((x < left) || (x >= right))
 			return false;
 		else if ((y < top) || (y >= bottom))

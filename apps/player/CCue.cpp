@@ -301,6 +301,8 @@ int CCue::songs_parser()
 	for (i=0;i<m_total_song-1;i++)
 	{
 		m_songs[i].len = m_songs[i+1].star - m_songs[i].star;
+		if(m_songs[i].len > 1000)
+			m_songs[i].len -= 1000;
 	}
 	
 	m_songs[m_total_song-1].len = 0;

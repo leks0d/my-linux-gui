@@ -331,6 +331,6 @@ namespace mango
 						{1,2,1,-1,-1,0,0,2},
 						{1,2,-1,-1,-2,0,0,3}
 						};
-	int GaplessValue[3]={0,5000,1000};
+	int GaplessValue[3]={0,5000,10000};
 }
 

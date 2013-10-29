@@ -464,7 +464,7 @@ namespace mango
 	{
 #ifndef WIN32
 		FILE* file;
-		char buffer[20];
+		char buffer[20]={0};
 		int currentVolume;
 		int maxVolume;
 		int minVolume;
@@ -491,7 +491,7 @@ namespace mango
 	void Player::setVolume(int volume)
 	{
 		FILE* file;
-		char buffer[20];
+		char buffer[20]={0};
 		int ret;
 		
 		volumeMutex.lock();

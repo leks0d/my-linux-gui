@@ -62,8 +62,6 @@ namespace mango
 		mHome->setNormalImageId(IDP_MUSIC_HOME);
 		mHome->setPressedImageId(IDP_MUSIC_HOME_SEC);
 		mHome->onCreate();
-
-
 		
 		initMainList();
 
@@ -126,9 +124,9 @@ namespace mango
 		setMainState(0x1400);
 	}
 	void SettingsView::initMainList(){
-		int img[]={IDP_SETTING_EQ,IDP_SETTING_PLAYORDER,IDP_SETTING_GAPLESS,IDP_SETTING_MUSICINFO,IDP_SETTING_ADVANCED};
-		int imgsec[]={IDP_SETTING_EQ_S,IDP_SETTING_PLAYORDER_S,IDP_SETTING_GAPLESS_S,IDP_SETTING_MUSICINFO_S,IDP_SETTING_ADVANCED_S};
-		int text[]={STR_SETTING_EQ,STR_SETTING_PLAYOODER,STR_SETTING_GAPLESS,STR_SETTING_MUSICINFO,STR_SETTING_ADVANCED};
+		int img[]={IDP_SETTING_EQ,IDP_SETTING_PLAYORDER,IDP_SETTING_GAPLESS,IDP_SETTING_MUSICINFO,IDP_SETTING_ADVANCED,0};
+		int imgsec[]={IDP_SETTING_EQ_S,IDP_SETTING_PLAYORDER_S,IDP_SETTING_GAPLESS_S,IDP_SETTING_MUSICINFO_S,IDP_SETTING_ADVANCED_S,0};
+		int text[]={STR_SETTING_EQ,STR_SETTING_PLAYOODER,STR_SETTING_GAPLESS,STR_SETTING_MUSICINFO,STR_SETTING_ADVANCED,0};
 		int i,count = 5;
 		
 		mListView->deleteAllItems();
@@ -290,6 +288,8 @@ namespace mango
 							gPlayer.showMusicInfoView(mPlayinglist->getPlayingItem());	break;
 						case 4:
 							initAdvanceList();	break;
+						case 5:
+							gPlayer.showPointDrawView();	break;
 					}
 					break;
 				case 0x1200:

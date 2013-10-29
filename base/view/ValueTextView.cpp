@@ -23,6 +23,8 @@ namespace mango
 		mContextColor = RGB(180,180,180);
 		mSize = 16;
 		mPress = 0;
+		mNormalBgdResId = 0;
+		mSelectBgdResId = 0;
 	}
 
 	ValueTextView::~ValueTextView(void)

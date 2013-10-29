@@ -184,7 +184,7 @@ namespace particle
 			pos = mSeek->setPosition(millisecond, 0);
 
 		mMutex.unlock();
-		return pos;
+		return pos==0;
 	}
 
 
@@ -619,9 +619,10 @@ namespace particle
 			if (mOutMinSampleRate > 0)
 				mPlayer->setOutMinSampleRate(mOutMinSampleRate);
 
-			if (mGaplessDuration > 0)
+			if (mGaplessDuration > 0){
 				mPlayer->setGaplessDuration(mGaplessDuration);
-
+				log_i("mPlayer->setGaplessDuration(%d)",mGaplessDuration);
+			}
 
 			if (mAudioChunnel != 0)
 				mPlayer->selectAudioChunnel(mAudioChunnel);

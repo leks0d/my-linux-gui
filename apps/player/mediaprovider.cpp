@@ -811,11 +811,11 @@ namespace mango
 		CCue mCCue;
 		ArrayMediaInfo *list;
 		int i,count,ret;
-
-		log_i("file = %s",path);
 		
 		ret = mCCue.file_load(path);	
 		count = mCCue.m_total_song;
+		
+		log_i("ret=%d,file=%s",ret,path);
 		
 		if(ret<0 || count<=0)
 			return false;

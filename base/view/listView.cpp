@@ -837,13 +837,13 @@ namespace mango
 		if(mCount < 10)
 			return false;
 		
-		touchLen = drawLen;
+		touchLen = drawLen/2;
 
 		
-		if(touchLen<80)
-			touchLen = 80;
+		if(touchLen<300)
+			touchLen = 300;
 		
-		if(y > drawOffset && y < drawOffset+touchLen && x>286){
+		if(y > drawOffset - touchLen && y < drawOffset + touchLen && x > 300){
 			isBarTouch = true;
 			barTouchStartY = y;
 		}else{
@@ -1151,7 +1151,7 @@ namespace mango
 			else{
 				cartoonDrag(yShift);
 			}
-			log_i("x=%d,y=%d,yShift=%d",x,y,yShift);
+			//log_i("x=%d,y=%d,yShift=%d",x,y,yShift);
 		}
 #endif
 		return 0 ;

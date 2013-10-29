@@ -108,14 +108,17 @@ namespace mango
 		Brush pbrush(RGB(255, 255, 255));
 		int i;
 		
-		if(isNeedPaint){
+		//if(isNeedPaint){
 			isNeedPaint = 0;
 			rect.setEx(0, 0, 320, 240);
 			canvas.fillRect(rect, brush);
 			
-		}
+			rect.setEx(300, 0, 1, 240);
+			canvas.fillRect(rect, pbrush);
+		//}
+		
 		for(i=0;i<count;i++){
-			rect.setEx(mpx[i], mpy[i], 2, 2);
+			rect.setEx(mpx[i], mpy[i], 1, 1);
 			canvas.fillRect(rect, pbrush);
 		}
 		
