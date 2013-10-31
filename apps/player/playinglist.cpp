@@ -558,7 +558,7 @@ Exit:
 			switch(playMode){
 				case MODE_PLAY_ORDER:
 					if(len>0 && mCurrent==(len - 1)){
-						stopPlayer();		
+						stopPlayer();	
 						break;
 					}
 				case MODE_PLAY_LOOP:
@@ -566,8 +566,9 @@ Exit:
 					playNext();
 					break;
 				case MDOE_PLAY_REPEAT:
+					stopPlayer();
 					if(startPlay() == -2){
-						seekTo(0);
+						seekTo(600);
 					}
 					break;
 			}

@@ -576,7 +576,7 @@ namespace mango
     	info.xoffset = 0;
     	info.yoffset = 0;
     	info.activate = 0;
-		info.yres_virtual = 480;
+		info.yres_virtual = SCREEN_CY * 2;
 		info.bits_per_pixel = 32;
 		
 //		if(ioctl(mfbDevice, FBIOPUT_VSCREENINFO, &info)==-1)

@@ -11,8 +11,7 @@ namespace mango
 	PowerManager::PowerManager(){
 		isSleep = 0;
 		
-		initAutoSleepTime();
-
+		gSettingProvider.query(SETTING_AUTOSLEEP_ID,&sleepTime);
 		gSettingProvider.query(SETTING_AUTOPOWEROFF_ID,&poweroffTime);
 		
 		atuoCount = 0;
@@ -29,7 +28,7 @@ namespace mango
 				break;
 		}
 		
-		if(num>=3)
+		if(i>=3)
 			sleepTime = time[0];
 
 		log_i("setPowerState sleepTime=%d.",sleepTime);
