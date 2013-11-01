@@ -22,6 +22,7 @@ namespace mango
 			static void sync();
 			static bool sdcardNeedScanner();
 			static unsigned long get_file_size(const char *path);
+			static bool isSDcardExist();
 	};
 	
 };

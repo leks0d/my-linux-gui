@@ -47,7 +47,10 @@ namespace mango
 		mDirectButton->setTextSize(16);
 		mDirectButton->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mDirectButton->setBackGround(IDP_LISTITEM_BGD,IDP_LISTITEM_BGD_SEC);
-		
+
+		rect.setEx(286, 0, 41, 22);
+		mBack = new Button(SETTING_BACK, TEXT("mBack"), this, &rect, 0);
+
 		initView();
 		setFocus(this);
 		invalidateRect();
@@ -57,6 +60,9 @@ namespace mango
 	{
 		mDirectButton->setTextResoure(STR_SDCARD_BROWSE);
 		mScannerButton->setTextResoure(STR_SDCARD_SCANNER);
+
+		mBack->setNormalImageId(IDP_MEDIA_SCAN_STOP_D);
+		mBack->setPressedImageId(IDP_MEDIA_SCAN_STOP_D);
 	}
 
 	int SdcardInsertView::onDestroy()
@@ -83,6 +89,8 @@ namespace mango
 			}else if(view == mDirectButton){
 				gPlayer.showMediaView(MEDIAVIEW_DISPLAY_TYPE_SDCARD);
 			}
+		}else if(fromView == mBack && code == NM_CLICK){
+			gPlayer.dismissView(this);
 		}
 		return 0;
 	}

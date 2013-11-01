@@ -871,10 +871,11 @@ namespace mango
 		return temp;
 	}
 	void ListBarControl::drawListBar(Canvas& canvas,int listOffset,int count){
+		mCount = count;
 		if(count < 10)
 			return;
 		
-		mCount = count;
+		
 		offset = -listOffset;
 		
 		drawLen = 4*displayLen/count;

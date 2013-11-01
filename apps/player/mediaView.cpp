@@ -571,7 +571,7 @@ namespace mango
 			mArtistMusicAdapter = new MusicAdapter(mListView,ADAPTER_PLAYING); 
 		}
 		
-		ptr += sprintf(ptr,"where artist = '%s' and album = '%s' ",artist,album);
+		ptr += sprintf(ptr,"where artist = '%s' and album = '%s' order by track,title_key",artist,album);
 		
 		mArtistMusicAdapter->setWhere(where);
 		
@@ -643,7 +643,7 @@ namespace mango
 			mGenreArtistAlbumMusicAdapter = new MusicAdapter(mListView,ADAPTER_PLAYING); 
 		}
 		
-		ptr += sprintf(ptr,"where genre='%s' and artist='%s' and album='%s' ",genre,artist,album);
+		ptr += sprintf(ptr,"where genre='%s' and artist='%s' and album='%s' order by track,title_key",genre,artist,album);
 		
 		mGenreArtistAlbumMusicAdapter->setWhere(where);
 		mTitle->setTextResoure(STR_GENRE_LIST);

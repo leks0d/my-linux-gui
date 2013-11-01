@@ -34,6 +34,7 @@ namespace mango
 		mIconRes = 0;
 		mSelectBgdResId = 0;
 		mNormalBgdResId = 0;
+		mSelectDisBgdResId = 0;
 	}
 
 
@@ -65,8 +66,12 @@ namespace mango
 		else
 			canvas.setTextColor(mColor);
 
-		if(mSelect)
-			canvas.	drawImageResource(mSelectBgdResId,0,0);
+		if(mSelect){
+			if(mEnable)
+				canvas.	drawImageResource(mSelectBgdResId,0,0);
+			else
+				canvas.	drawImageResource(mSelectDisBgdResId,0,0);
+		}
 		if(!mEnable)
 			canvas.setTextColor(RGB(120,120,120));
 		

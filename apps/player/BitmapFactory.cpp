@@ -234,4 +234,8 @@ namespace mango
 		log_i("filesize=%d,path=%s",filesize,path);
 	    return filesize;  
 	}
+	bool Environment::isSDcardExist(){
+		char *path = "/dev/block/mmcblk0p1";
+		return FileAttr::FileExist(path);
+	}
 };

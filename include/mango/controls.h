@@ -245,6 +245,7 @@ namespace mango
 			void setTextLayoutType(int layout);
 			void setTextSelect(int n){ if(n!=mSelect){mSelect=n;invalidateRect();} }
 			void setTextEnable(int n){ if(n!=mEnable){mEnable=n;invalidateRect();} }
+			void setTextDisSectBgd(int n){mSelectDisBgdResId=n;}
 			void computeLeft(Canvas *canvas);
 			void getTextString(char *string);
 			void setBackGround(int nor,int sec){mNormalBgdResId=nor,mSelectBgdResId=sec;};
@@ -265,6 +266,7 @@ namespace mango
 			COLORREF mSelectColor;
 			int mNormalBgdResId;
 			int mSelectBgdResId;
+			int mSelectDisBgdResId;
 			int mSelect;
 			int mEnable;
 			int mSize;

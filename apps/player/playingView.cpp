@@ -16,6 +16,7 @@ namespace mango
 		isNeedFreshOld = 0;
 		isUsmCon = 0;
 		isMediaScanning = 0;
+		isUsbShare = 0;
 	}
 
 
@@ -540,33 +541,29 @@ namespace mango
 			}
 		}
 		else if(code == NM_BATTERY_UPDATE){
-			int val = (unsigned int)parameter&0xFF;
-			int charge = ((unsigned int)parameter&0xF00)>>8;
+			int val = (unsigned int)parameter&0xFFFF;
+			int charge = ((unsigned int)parameter&0xF0000)>>16;
 			int batteryIcon = IDP_BATTERY_0;
 			bool isSpdifIn;
 			bool isHeadestIn;
+
+			//log_i("voltage_now val=%d",val);
+					
 			if((mBattery != val || isCharge!=charge) && isNeedFresh){
-				/*
-				Mstring* mstr;	
-				mstr = new Mstring(10);
-				mstr->mSprintf("%d%%",(unsigned int)parameter);
-				mBatteryText->setTextString(mstr->mstr);
-				mstr->clear();
-				*/
 				if(charge==1 && val!=100){
 					batteryIcon=IDP_BATTERY_CHAGER;
 				}else{
-					if(val<10)
+					if(val<3600)
 						batteryIcon = IDP_BATTERY_0;
-					else if(val<15)
+					else if(val<3700)
 						batteryIcon = IDP_BATTERY_10;
-					else if(val<30)
+					else if(val<3790)
 						batteryIcon = IDP_BATTERY_20;
-					else if(val<50)
+					else if(val<3880)
 						batteryIcon = IDP_BATTERY_40;
-					else if(val<70)
+					else if(val<3980)
 						batteryIcon = IDP_BATTERY_60;
-					else if(val<80)
+					else if(val<4100)
 						batteryIcon = IDP_BATTERY_80;
 					else
 						batteryIcon = IDP_BATTERY_100;
@@ -602,13 +599,24 @@ namespace mango
 		else if(code == FLASH_MOUNT){
 			isUsmCon = 0;
 			gPlayer.dismissView(gPlayer.mUsmConnectView);
-			mPlayinglist->checkPlayintList();
+			if(Environment::isSDcardExist()){
+				isUsbShare = 1;
+				log_i("FLASH_MOUNT SDcardExist set isUsbShare.");	
+			}else{
+				mPlayinglist->checkPlayintList();
+				log_i("FLASH_MOUNT SDcard not Exist check playinglist.");	
+			}
 			gmediaprovider.externVolumeScanner("/mnt/sdcard");	
 		}else if(code == FLASH_UNMOUNT){
 			isUsmCon = 1;
 			gPlayer.showUsmConnectView();
 			mPlayinglist->stopPlayer();
 		}else if(code == SDCARD_MOUNT){
+			if(isUsbShare){
+				isUsbShare = 0;
+				mPlayinglist->checkPlayintList();
+				log_i("SDCARD_MOUNT isUsbShare checkPlayintList().");
+			}
 			if(Environment::sdcardNeedScanner())
 				gPlayer.showSdcardInsertView();
 		}else if(code == SDCARD_START_UNMOUNT){
@@ -616,7 +624,7 @@ namespace mango
 		}else if(code == SDCARD_UNMOUNT){
 			gPlayer.dismissView(gPlayer.mSdcardInsertView);
 			mPlayinglist->checkPlayintList();
-			ViewInit();
+			//ViewInit();
 			gmediaprovider.externFileCheck();
 		}else if(code == MEDIA_SCANNER_START){
 			isMediaScanning = 1;

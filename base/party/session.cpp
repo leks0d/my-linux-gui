@@ -445,8 +445,9 @@ namespace mango
 			int voltage_now = 0;
 			
 			sscanf(chagerbuf,"%d",&voltage_now);
-			//log_i("voltage_now = %d,lowVolCount=%d",voltage_now,lowVolCount);
-			//voltage_now = 3300*1000;
+			
+			//voltage_now = 4200*1000;
+			
 			close(fd);
 			memset(chagerbuf,0,20);
 
@@ -457,11 +458,11 @@ namespace mango
 			}else{
 				lowVolCount = 0;
 			}
-			capacity = (voltage_now-3500000)*100/(4250000 - 3500000);
-			if(voltage_now>4250000){
-				capacity = capacity&0xFF;
-			}
-			capacity = (capacity&0xFF)|charge<<8;
+			capacity = voltage_now/1000;//(voltage_now-3500000)*100/(4350000 - 3500000);
+			//log_i("voltage_now = %d,capacity=%d",voltage_now,capacity);
+
+			capacity = (capacity&0xFFFF)|charge<<16;
+			
 			if(mUseEventInterface != NULL)
 				mUseEventInterface->onKeyDispatch(capacity,VM_CAPACITY,0);				
 

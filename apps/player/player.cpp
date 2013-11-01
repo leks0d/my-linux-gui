@@ -66,8 +66,7 @@ namespace mango
 		gSession.setUseEventInterface((UseEventInterface*)mPlayerEventInterface);
 
 		showPlayingView();
-		openCodecPower(false);
-		openCodecPower(true);
+
 		gPowerManager = new PowerManager();
 		
 		mSocketDetect = new SocketDetect();
@@ -448,16 +447,20 @@ namespace mango
 	void Player::dismissView(View *view){
 		View *displayView;
 		
-		if(view != NULL&&view == gSession.mViewZAxis.getDisplayingView()){
-			log_i("dismissView:%s",view->name);
-			gSession.mViewZAxis.bringViewToBottom(view);
-			displayView = gSession.mViewZAxis.getDisplayingView();
-			displayView->invalidateRect();
-			displayView->setFocus();
-			if(displayView!=NULL)
-				log_i("dimiss view and show view:%s",displayView->name);
-			gMessageQueue.post(displayView,VM_NOTIFY,NM_DISPLAY,0);
-		}
+		if(view == NULL)
+			return;
+		
+		log_i("dismissView:%s",view->name);
+		
+		gSession.mViewZAxis.bringViewToBottom(view);
+		
+		displayView = gSession.mViewZAxis.getDisplayingView();
+		displayView->invalidateRect();
+		displayView->setFocus();
+		gMessageQueue.post(displayView,VM_NOTIFY,NM_DISPLAY,0);
+		
+		if(displayView!=NULL)
+			log_i("dimiss view and show view:%s",displayView->name);		
 	}
 	
 	int  Player::getVolume(void)

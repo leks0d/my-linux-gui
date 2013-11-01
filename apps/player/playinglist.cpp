@@ -47,7 +47,8 @@ static const char *PlayerLock = "playerlock";
 				log_i("-------------Playinglist::initPlayintList");
 				pinfo = new ArrayMediaInfo();
 				
-				count = gmediaprovider.queryMusicArray("order by inplay",pinfo);
+				count = gmediaprovider.queryMusicArray(" order by inplay",pinfo);
+				count = pinfo->getCount();
 				
 				for(i=0;i<count;i++){
 					info = pinfo->getMediaInfo(i);
@@ -55,7 +56,7 @@ static const char *PlayerLock = "playerlock";
 						addItem(pinfo->getMediaInfo(i));
 					}
 				}
-				//checkPlayintList();
+				safeDelete(pinfo);
 				gSettingProvider.query(SETTING_PLAYMODE_ID,&playMode);
 				gSettingProvider.query(SETTING_PLAYPOS_ID,&playpost);
 				gSettingProvider.query(SETTING_GAPLESS_ID,&mGapless);

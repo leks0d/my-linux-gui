@@ -68,6 +68,7 @@ namespace mango
 			mEqMode[i]->setTextSize(14);
 			mEqMode[i]->setTextLayoutType(TEXT_LAYOUT_CENTER);
 			mEqMode[i]->setTextResoure(eqMode[i]);
+			mEqMode[i]->setTextDisSectBgd(IDP_EQ_MODE_BGD_DS);
 		}
 
 		for(i=0;i<8;i++){
