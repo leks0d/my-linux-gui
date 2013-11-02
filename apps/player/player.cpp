@@ -84,6 +84,8 @@ namespace mango
 		gAlarmManager->setAlarmWakeup(6);
 #endif
 		holdKeyProbe();
+		log_i("end");
+
 		//openOrCloseMute(true);
 		//Environment::openMute();
 		return messageLoop();
@@ -577,11 +579,11 @@ namespace mango
 		gSession.setHoldKeyState(state);
 
 		if(state){
-			gPlayer.dismissView(gPlayer.mKeyLockView);
+			dismissView(mKeyLockView);
 		}else{
-			gPlayer.showKeyLockView();	
+			showKeyLockView();	
 		}		
-		
+		log_i("end");
 		return state;
 	}
 	void Player::spdifProbe(){

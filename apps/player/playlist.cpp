@@ -85,7 +85,7 @@ namespace mango
 	{
 		ArrayPlayListItem* array = (ArrayPlayListItem*)use;
 		PlayListItem item;
-		
+		log_i("argc=%d,szColName=%s",argc,*szColName);
 		item.setId(mediaprovider::str_to_int(*argv++));
 		item.setName(*argv++);
 		item.setRemark(*argv);

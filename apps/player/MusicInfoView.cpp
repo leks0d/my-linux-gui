@@ -108,7 +108,7 @@ namespace mango
 		mSimpleBps->onCreate();
 //====================last path ==========		
 
-		rect.setEx(left0, 185, 320-14, 20);
+		rect.setEx(left0, 185, 318-14, 20);
 		mMusicPath = new ValueTextView(SETTING_BACK, TEXT("mMusicPath"), this, &rect, 0);
 		mMusicPath->setTextResoure(STR_MUSIC_PATH);
 		mMusicPath->onCreate();
@@ -137,7 +137,7 @@ namespace mango
 		}else{
 			firstLeft = 20;
 		}
-		infoWidth = 320 - firstLeft;
+		infoWidth = 318 - firstLeft;
 		
 		rect.setEx(firstLeft, 36, infoWidth, 20);
 		mFilename->setRect(rect);

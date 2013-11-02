@@ -32,7 +32,7 @@ namespace mango
 		int volumeX = 143 ;
 		Rect rect;
 		log_i("PlayingView::onCreate()");
-
+		//return 0;
 		rect.setEx(10, 2, 60, 16);
 		mEqState = new TextView(-1, TEXT("mVolumeText"), this, &rect, 0);
 		mEqState->setTextSize(13);
@@ -453,7 +453,23 @@ namespace mango
 				case NM_SEEKBAR_DOWM:
 					isNeedFresh = 0;
 					break;
-				case NM_SEEKBAR_MOVE:				
+				case NM_SEEKBAR_MOVE:
+					if(mSeekBar!=NULL){
+						Mstring* mstr;
+						int progress = mSeekBar->getProgress();
+						mediainfo *info = mPlayinglist->getPlayingItem();
+						
+						if(progress<0)
+							progress = 0;
+						if(progress>mSeekBar->getMax())
+							progress=mSeekBar->getMax();
+						
+						mstr = new Mstring(20);
+						mstr->clear();
+						mstr->setPlayTime(progress);
+						mTimeText->setTextString(mstr->mstr);
+						delete mstr;
+					}
 					break;
 				case NM_SEEKBAR_UP:{
 						mediainfo *info;
@@ -553,17 +569,17 @@ namespace mango
 				if(charge==1 && val!=100){
 					batteryIcon=IDP_BATTERY_CHAGER;
 				}else{
-					if(val<3600)
+					if(val<3660)
 						batteryIcon = IDP_BATTERY_0;
-					else if(val<3700)
+					else if(val<3730)
 						batteryIcon = IDP_BATTERY_10;
-					else if(val<3790)
+					else if(val<3780)
 						batteryIcon = IDP_BATTERY_20;
-					else if(val<3880)
+					else if(val<3830)
 						batteryIcon = IDP_BATTERY_40;
-					else if(val<3980)
+					else if(val<3950)
 						batteryIcon = IDP_BATTERY_60;
-					else if(val<4100)
+					else if(val<4080)
 						batteryIcon = IDP_BATTERY_80;
 					else
 						batteryIcon = IDP_BATTERY_100;
