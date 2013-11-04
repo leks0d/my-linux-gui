@@ -959,9 +959,20 @@ namespace mango
 	int mediaprovider::initialize(void){
 		int ret = 0;
 		char *pErrMsg = 0;
-
-		exec(MUSIC_TABLE_CREATE,0,0);
 		
+		ret = sqlite3_open(TABLE_PATH,&db);
+		
+		if(ret != SQLITE_OK){
+			log_e("sqlite3_exec open error path: %s\n",TABLE_PATH);
+			return ret;
+		}
+		
+		ret = sqlite3_exec( db, MUSIC_TABLE_CREATE, 0, 0, &pErrMsg );
+		
+		if(ret != SQLITE_OK){
+			log_e("sqlite3_exec error : %s\n",MUSIC_TABLE_CREATE);			
+		}
+
 		PlayList::createTable();
 			
 		return ret;
@@ -971,14 +982,11 @@ namespace mango
 	{
 		int ret = 0;
 		char *pErrMsg = 0;
-		sqlite3 *mdb = NULL;
-
-		ret = sqlite3_open(TABLE_PATH,&mdb);
-		if(ret != SQLITE_OK){
+		
+		if(db == 0)
 			return SQLITE_ERROR;
-		}
 		//log_i("sqlite3_exec");
-		ret = sqlite3_exec( mdb, sql, callback, arg, &pErrMsg );
+		ret = sqlite3_exec( db, sql, callback, arg, &pErrMsg );
 		
 		if(ret != SQLITE_OK){
 			log_e("sqlite3_exec error : %s",sql);
@@ -986,9 +994,6 @@ namespace mango
 		}else
 			//log_i("sqlite3_exec success : %s",sql);
 			;
-		
-		sqlite3_close(mdb);
-		
 		return ret;	
 	}
 
@@ -1113,7 +1118,7 @@ namespace mango
 				}
 			}
 			
-			//relese_db(info);
+			relese_db(info);
 			log_i("MusicArray count=%d",count);
 			return count;
 		}
@@ -1156,7 +1161,7 @@ namespace mango
 				}			
 			}
 			
-//			relese_db(info);
+			relese_db(info);
 			log_i("MusicArray count=%d",count);
 			return count;
 		}

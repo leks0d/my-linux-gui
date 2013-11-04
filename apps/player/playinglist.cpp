@@ -56,12 +56,12 @@ static const char *PlayerLock = "playerlock";
 						addItem(pinfo->getMediaInfo(i));
 					}
 				}
-				safeDelete(pinfo);
+				//checkPlayintList();
 				gSettingProvider.query(SETTING_PLAYMODE_ID,&playMode);
 				gSettingProvider.query(SETTING_PLAYPOS_ID,&playpost);
 				gSettingProvider.query(SETTING_GAPLESS_ID,&mGapless);
 				
-				log_i("playpost = %d",playpost);
+				log_i("playpost = %d,countd",playpost);
 				moveToPosition(playpost);
 			}
 
