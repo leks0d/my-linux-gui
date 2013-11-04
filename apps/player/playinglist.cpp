@@ -436,6 +436,8 @@ static const char *PlayerLock = "playerlock";
 					}
 				
 				}
+				if(needGapless&&mGapless>0)
+					mParticleplayer->setNextSongForGapless(playPath);
 				getPlayingItem()->isPlayed = 1;
 				setWakeLock();
 				return 0;
