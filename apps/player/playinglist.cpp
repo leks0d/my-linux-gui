@@ -47,7 +47,7 @@ static const char *PlayerLock = "playerlock";
 				log_i("-------------Playinglist::initPlayintList");
 				pinfo = new ArrayMediaInfo();
 				
-				count = gmediaprovider.queryMusicArray(" order by inplay",pinfo);
+				count = gmediaprovider.queryMusicArray("order by inplay",pinfo);
 				count = pinfo->getCount();
 				
 				for(i=0;i<count;i++){
@@ -426,7 +426,12 @@ static const char *PlayerLock = "playerlock";
 					{
 						if(getPlayingItem()->cueStart>1000){
 							mango::Thread::sleep(1000);
-							mParticleplayer->seekTo(getPlayingItem()->cueStart);
+							
+							if(mParticleplayer->seekTo(getPlayingItem()->cueStart)){
+								log_i("seekTo() cueStart=%d",getPlayingItem()->cueStart);
+							}else{
+								log_i("seekTo fail.");
+							}
 							mThread.create(Playinglist::CloseMuteRunnig,(void*)1000);
 						}else{
 							mThread.create(Playinglist::CloseMuteRunnig,(void*)600);
@@ -437,7 +442,8 @@ static const char *PlayerLock = "playerlock";
 				
 				}
 				if(needGapless&&mGapless>0)
-					mParticleplayer->setNextSongForGapless(playPath);
+					mParticleplayer->setNextSongForGapless(playPath);//(getItem(mCurrent+1)->path);
+				log_i("gapless no change");
 				getPlayingItem()->isPlayed = 1;
 				setWakeLock();
 				return 0;
