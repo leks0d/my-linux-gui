@@ -129,6 +129,13 @@ namespace mango
 	{
 		if(fromView == NULL && code == NM_DISPLAY){
 			initView();
+		}else if(fromView == NULL && code == NM_CHOSEN_CALLBY){
+			int i;
+			int count = mArrayMediaInfo.getCount();
+			for(i=0;i<count;i++){
+				remove(mArrayMediaInfo.getMediaInfo(i)->path);
+				gmediaprovider.del(0,mArrayMediaInfo.getMediaInfo(i)->id);
+			}
 		}else if(fromView == mBack && NM_CLICK){
 			gPlayer.dismissView(this);
 		}else if(fromView == mHome && NM_CLICK){
@@ -158,14 +165,9 @@ namespace mango
 								initPlayList();
 								break;
 							case 2:{
-									int i;
-									int count = mArrayMediaInfo.getCount();
-									for(i=0;i<count;i++){
-										remove(mArrayMediaInfo.getMediaInfo(i)->path);
-										gmediaprovider.del(0,mArrayMediaInfo.getMediaInfo(i)->id);
-									}
-									break;
-								}
+								gPlayer.showChosenView(ChosenView::CHOSEN_DELETFILE,this);
+								break;
+							}
 						}
 						if(index!=1)
 							gPlayer.dismissView(this);

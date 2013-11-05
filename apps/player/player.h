@@ -181,7 +181,7 @@ namespace mango
 		int showMusicOperateView(mediainfo& info);
 		int showMusicOperateView(mediainfo& info,int type,int start=0);
 		int showKeyLockView();
-		int showChosenView(int type);
+		int showChosenView(int type,View *call=NULL);
 		int showPlaylistOperateView(PlayListItem& info);
 		void showGroupOperateView();
 		void dismissView(View *view);

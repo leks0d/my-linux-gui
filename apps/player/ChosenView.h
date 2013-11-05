@@ -9,6 +9,7 @@ namespace mango
 		const static int CHOSEN_RECOVERY = 2;
 		const static int CHOSEN_SYSTEMUPDATE = 3;
 		const static int CHOSEN_DELETFILE = 4;
+		
 	public:
 		ChosenView(void);
 		ChosenView(const TCHAR* title, View* parent, Rect* rect, int style, int show = SW_NORMAL);
@@ -16,6 +17,7 @@ namespace mango
 		void initView();
 		void dispatchEvent();
 		void setType(int type){mType = type; invalidateRect();}
+		void setCallView(View *view);
 	public:
 		virtual int onCreate();
 		virtual int onDestroy();
@@ -52,6 +54,7 @@ namespace mango
 		int mpx;
 		int mpy;
 		int mType;
+		View *mCallView;
 	};
 
 };

@@ -57,6 +57,7 @@ namespace mango
 #define NM_POWER_OFF 				20
 #define NM_REMOVE_FROM_PLAYLIST 	21
 #define NM_KEY_LOCK 				22
+#define NM_CHOSEN_CALLBY 			23
 
 	class View : public Object
 	{

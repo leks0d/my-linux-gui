@@ -143,6 +143,10 @@ namespace mango
 	{
 		if(fromView == NULL && code == NM_DISPLAY){
 			initView();
+		}else if(fromView == NULL && code == NM_CHOSEN_CALLBY){
+			gmediaprovider.del(NULL,mCurrentInfo.id);
+			remove(mCurrentInfo.path);
+			mPlayinglist->removeItem(mPlayinglist->isItemExsit(&mCurrentInfo));			
 		}else if(fromView == mBack && NM_CLICK){
 			gPlayer.dismissView(this);
 		}else if(fromView == mHome && NM_CLICK){
@@ -178,9 +182,7 @@ namespace mango
 								if(mType == OPERATE_TYPE_MUSIC_PLAYLIST){
 									gMessageQueue.post(gPlayer.mMeidaView,VM_NOTIFY,NM_REMOVE_FROM_PLAYLIST,mCurrentInfo.id);
 								}else{
-									gmediaprovider.del(NULL,mCurrentInfo.id);
-									remove(mCurrentInfo.path);
-									mPlayinglist->removeItem(mPlayinglist->isItemExsit(&mCurrentInfo));
+									gPlayer.showChosenView(ChosenView::CHOSEN_DELETFILE,this);
 								}
 								break;
 						}

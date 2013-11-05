@@ -406,13 +406,15 @@ namespace mango
 			gMessageQueue.post(gPlayer.mVolumeView,VM_NOTIFY,NM_KEY_LOCK,0);
 		}
 	}
-	int Player::showChosenView(int type){
+	int Player::showChosenView(int type,View* call){
 		if(mChosenView == NULL){
 			mChosenView = new ChosenView(TEXT("mChosenView"), NULL, NULL, 0, SW_NORMAL);
 			mChosenView->setType(type);
+			mChosenView->setCallView(call);
 			mChosenView->onCreate();
 		}else{
 			mChosenView->setType(type);
+			mChosenView->setCallView(call);
 			gSession.mViewZAxis.bringViewToTop(mChosenView);
 		}
 		

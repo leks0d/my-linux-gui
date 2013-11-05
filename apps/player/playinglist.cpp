@@ -37,6 +37,8 @@ static const char *PlayerLock = "playerlock";
 				inPause = 0;
 				mParticleplayer = NULL;
 				isWakeLock = 0;
+
+				clearPlay();
 			}
 
 			void Playinglist::initPlayintList(){
@@ -158,7 +160,11 @@ static const char *PlayerLock = "playerlock";
 				mplaylist[len].isPlayed = 0;
 				len++;
 			}
-			
+			void Playinglist::clearPlay(){
+				mIsCue = 0;
+				mPlayingPath = "null";
+				mCueStart = 0;
+			}
 			void Playinglist::mediaInfoCpy(int des,mediainfo *src){
 				//log_i("enter src=0x%x",src);
 				memset(&mplaylist[des],0,sizeof(mediainfo));
@@ -572,11 +578,14 @@ Exit:
 						break;
 					}
 				case MODE_PLAY_LOOP:
+					if(len>0 && mCurrent==(len - 1)){
+						clearPlay();
+					}
 				case MODE_PLAY_RANDOM:	
 					playNext();
 					break;
 				case MDOE_PLAY_REPEAT:
-					stopPlayer();
+					clearPlay();
 					if(startPlay() == -2){
 						seekTo(600);
 					}

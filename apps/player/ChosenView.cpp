@@ -98,6 +98,10 @@ namespace mango
 				titleres = STR_SYSTEM_UPDATE;
 				noticeres = STR_SYSTEM_UPDATE_MSG;
 				break;
+			case CHOSEN_DELETFILE:
+				titleres = STR_OPERATE_DELETE;
+				noticeres = STR_FILE_DELETE_MESSAGE;
+				break;
 		}
 		mBrightnessValue->setTextResoure(noticeres);
 		mTitle->setTextResoure(titleres);
@@ -133,7 +137,13 @@ namespace mango
 			case CHOSEN_SYSTEMUPDATE:
 				Environment::install();
 				break;
+			case CHOSEN_DELETFILE:
+				gMessageQueue.post(mCallView,VM_NOTIFY,NM_CHOSEN_CALLBY,1);
+				break;
 		}
+	}
+	void ChosenView::setCallView(View *view){
+		mCallView = view;
 	}
 
 	int ChosenView::onDestroy()
@@ -160,8 +170,13 @@ namespace mango
 		}else if(fromView == mHome){
 			gPlayer.showPlayingView();
 		}else if(parameter == mMyMusicText){
-			gPlayer.showShutDownView();
-			mPoweroffThread.create(ChosenView::PoweroffRunnig,(void * )this);
+			if(mType == CHOSEN_DELETFILE){
+				dispatchEvent();
+				gPlayer.dismissView(this);
+			}else{
+				gPlayer.showShutDownView();
+				mPoweroffThread.create(ChosenView::PoweroffRunnig,(void * )this);
+			}
 		}else if(parameter == mSettingText){
 			gPlayer.dismissView(this);
 		}
