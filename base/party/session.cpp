@@ -865,14 +865,14 @@ namespace mango
 			"E:\\EmluatorStore\\C\\turnip\\codepage\\c_950.bin",
 			"E:\\EmluatorStore\\C\\turnip\\codepage\\c_932.bin",
 #else
-			MANGO_ROOT"codepage/c_936.bin",//0
-			MANGO_ROOT"codepage/c_950.bin",//1
-			MANGO_ROOT"codepage/c_932.bin",//2
-			MANGO_ROOT"codepage/c_949_kr.bin",//3
-			MANGO_ROOT"codepage/c_874_th.bin",//4
-			MANGO_ROOT"codepage/c_866_ru.bin",//5
-			MANGO_ROOT"codepage/c_850_la.bin",//7
-			MANGO_ROOT"codepage/c_860_pu.bin",//8
+			MANGO_ROOT"codepage/c_936.bin",		///0 
+			MANGO_ROOT"codepage/c_950.bin",		///1 
+			MANGO_ROOT"codepage/c_932.bin",		///2
+			MANGO_ROOT"codepage/c_949_kr.bin",	///3 
+			MANGO_ROOT"codepage/c_874_th.bin",	///4 
+			MANGO_ROOT"codepage/c_866_ru.bin",	///5 
+			MANGO_ROOT"codepage/c_850_la.bin",	///6 
+			MANGO_ROOT"codepage/c_860_pu.bin",	///7 
 #endif
 		} ;
 
@@ -899,6 +899,8 @@ namespace mango
 			path = conCodePageFileName[5] ;
 			break ;
 		case LANGID_LA:
+		case 9:
+		case 10:
 			path = conCodePageFileName[6] ;
 			break ;
 		case LANGID_PU:

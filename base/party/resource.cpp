@@ -45,7 +45,11 @@ namespace mango
 		DWORD dwOffset ;
 		RESOURCEDATA_ITEM Item ;
 		short* readbuf,i;
-
+		int debug = 0;
+		
+		if(id == 0x0046)
+			debug = 1;
+		
 		do
 		{
 			if (mFile == NULL || id < mHeader.m_dwStringStartItem ||language >= mHeader.m_dwLanguages)
@@ -76,7 +80,9 @@ namespace mango
 			readbuf = new short[255];
 			fseek (mFile, Item.m_dwOffset + mHeader.m_dwOffsetOfData , SEEK_SET);
 			fread (readbuf, 1, Item.m_dwBytes, mFile) ;
-
+			if(debug){
+				log_i("SEEK_SET=0x%x",Item.m_dwOffset + mHeader.m_dwOffsetOfData);
+			}
 			for(i=0;i<Item.m_dwBytes/2;i++){
 				buffer[i] = readbuf[i];
 				buffer[i] &= 0x00ffff;

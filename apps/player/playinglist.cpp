@@ -399,7 +399,12 @@ static const char *PlayerLock = "playerlock";
 					&& mCueStart != getPlayingItem()->cueStart 
 					&& mPlayingPath == playPath
 					&& isPlaying()){
+					
 					if(mParticleplayer->seekTo(getPlayingItem()->cueStart)){log_i("seekTo() success!");}else{log_i("seekTo() fail!");return -1;}
+
+					mPlayingPath = playPath;
+					mIsCue = getPlayingItem()->isCue;
+					mCueStart = getPlayingItem()->cueStart;					
 					return 0;
 				}
 				
