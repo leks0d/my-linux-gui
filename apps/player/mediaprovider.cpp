@@ -698,12 +698,12 @@ namespace mango
 
 		while(1){
 			sprintf(ptr,"%s/%s_%d_%d",IMG_PATH,title,ti,inf);
+			slqCheck(path);
 			if(FileAttr::FileExist(path)){
 				inf++;
 				memset(ptr,0,strlen(ptr));
 			}else{
 				log_i("genImgPath:%s",path);
-				slqCheck(path);
 				break;
 			}
 		}
