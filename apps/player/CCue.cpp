@@ -486,7 +486,7 @@ int CString::Mid(int start,int len,CString& out){
 int CString::toIneger(int *val){
 	int ret = 0;
 	if(string){
-		log_i("string=%s",string);
+		//log_i("string=%s",string);
 		ret = sscanf(string,"%d",val);
 	}
 	return ret;
@@ -550,7 +550,7 @@ int CStringArray::addCString(CString& cstr){
 		int i,count;
 		
 		if(mMax == 0){
-			mMax = 8;
+			mMax = 32;
 		}else{
 			mMax*=2;
 		}
@@ -579,7 +579,7 @@ void CStringArray::addInteger(int val){
 	addCString(cstr);
 }
 int CStringArray::setInteger(int index,int val){
-	log_i("setInteger");
+	//log_i("setInteger");
 	if(index<mLen && index>=0){
 		mList[index] = val;
 	}else{
@@ -612,4 +612,18 @@ int CStringArray::isExiteStr(char *str){
 	}
 
 	return -1;
+}
+CStringArray& CStringArray::operator=(CStringArray& cStringArray){
+	int i,count;
+
+	this->~CStringArray();
+	count = cStringArray.getCount();
+	
+	for(i=0;i<count;i++){
+		CString cstr;
+		cStringArray.getCString(i,cstr);
+		addCString(cstr);
+		//log_i("%s",cstr.string);
+	}
+	return *this;
 }

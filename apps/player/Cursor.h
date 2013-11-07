@@ -1,38 +1,39 @@
-
-#include "player.h"
-
 namespace mango
 {
 	class CursorItem{
-		private:	
-			CString mKey;
-			CString mValue;
+		public:
+			CStringArray mKey;
+			CStringArray mValue;
+			int mLen;
 		public:
 			CursorItem();
-			CursorItem(char* key,char* value);
-			CursorItem(char* key,int val);
-			void setKey(char *key){}
-			void setValueString(const char* value){}
-			void setValueInteger(int value){}
-			CString& getKey(){return mKey;}
-			CString& getValue(){return mValue;}
-			CursorItem& operator=(CursorItem& item);
 			~CursorItem();
+			void addItem(CString& key,CString& value);
+			void addItem(char* key,char* value);
+			bool getValue(char* key,CString& outValue);
+			CursorItem& operator=(CursorItem& cursorItem);
 	};
 	
 	class Cursor{
-		private:
+		public:
 			CursorItem* mList;
-			int mLen;
 			int mMax;
 		public:
+			int mLen;
+		public:
 			Cursor();
-			void addItem(CursorItem& item);
-			CursorItem& getItem(int index);
-			int getCount();
 			~Cursor();
+			int addCursorItem(CursorItem& item);
+			bool getValueCstring(int i,char* key,CString& outCStr);
 	};
-	
+	class CursorMediaInfo{
+		public:
+			mediainfo mInfo;
+			CursorMediaInfo();
+			~CursorMediaInfo();
+			void setCursorItem(CursorItem& cursorItem);
+	};
+
 };
 
 

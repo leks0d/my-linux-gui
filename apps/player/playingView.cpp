@@ -613,15 +613,16 @@ namespace mango
 			mKeyCount.TriggerKey();
 		}
 		else if(code == FLASH_MOUNT){
-			isUsmCon = 0;
-			gPlayer.dismissView(gPlayer.mUsmConnectView);
-			if(Environment::isSDcardExist()){
+			if(Environment::isSDcardExist()&&isUsmCon==1){
 				isUsbShare = 1;
 				log_i("FLASH_MOUNT SDcardExist set isUsbShare.");	
 			}else{
 				mPlayinglist->checkPlayintList();
 				log_i("FLASH_MOUNT SDcard not Exist check playinglist.");	
-			}
+			}			
+			isUsmCon = 0;
+			gPlayer.dismissView(gPlayer.mUsmConnectView);
+
 			gmediaprovider.externVolumeScanner("/mnt/sdcard");	
 		}else if(code == FLASH_UNMOUNT){
 			isUsmCon = 1;

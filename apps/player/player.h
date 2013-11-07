@@ -4,9 +4,11 @@
 #include <sys/reboot.h>
 #include "mango.h"
 #include "resource.h"
+#include "mediainfo.h"
 #include "SocketDetect.h"
 #include "AlarmManager.h"
 #include "CCue.h"
+#include "Cursor.h"
 #include "mediaprovider.h"
 #include "ArrayMediaInfo.h"
 #include "playlist.h"

@@ -64,6 +64,7 @@ LOCAL_SRC_FILES += KeyLockView.cpp
 LOCAL_SRC_FILES += ChosenView.cpp
 LOCAL_SRC_FILES += playlist.cpp
 LOCAL_SRC_FILES += CCue.cpp
+LOCAL_SRC_FILES += Cursor.cpp
 LOCAL_SRC_FILES += PlaylistOperateView.cpp
 LOCAL_SRC_FILES += GroupOperateView.cpp
 

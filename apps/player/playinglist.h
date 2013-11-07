@@ -42,6 +42,7 @@ namespace mango
 			mediainfo *getPlayingItem();
 			mediainfo *getItem(int index);
 			void initPlayintList();
+			void cursorInit();
 			int playMediaInfo(mediainfo *info);
 			int isItemExsit(mediainfo *info);
 			int isItemExsitAudioId(int id);

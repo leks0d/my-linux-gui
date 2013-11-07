@@ -66,7 +66,33 @@ static const char *PlayerLock = "playerlock";
 				log_i("playpost = %d,countd",playpost);
 				moveToPosition(playpost);
 			}
+			void Playinglist::cursorInit(){
+				int i,playpost;
+				Cursor cur;
+				
+				gmediaprovider.queryCursor("where inplay>0 order by inplay",&cur);
 
+				for(i=0;i<cur.mLen;i++){
+					int inplay;
+					CString cstr;
+					cur.getValueCstring(i,"inplay",cstr);
+					
+					if(cstr.toIneger(&inplay)>0){
+						if(inplay>0){
+							CursorMediaInfo curMedia;
+							curMedia.setCursorItem(cur.mList[i]);
+							addItem(&curMedia.mInfo);
+						}
+					}
+					
+				}
+				
+				gSettingProvider.query(SETTING_PLAYMODE_ID,&playMode);
+				gSettingProvider.query(SETTING_PLAYPOS_ID,&playpost);
+				gSettingProvider.query(SETTING_GAPLESS_ID,&mGapless);
+				
+				moveToPosition(playpost);		
+			}
 			void Playinglist::checkPlayintList(){
 				int i;
 				for(i=0;i<getCount();i++){

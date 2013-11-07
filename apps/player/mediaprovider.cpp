@@ -8,6 +8,21 @@ namespace mango
 	static void strlwr(char *string);
 	static char * getfiletype(char *file);
 	static char* getstr(char *arg);
+
+	static int cursor_sql_callback(void * use, int argc, char ** argv, char ** szColName)
+	{
+		int i;
+		Cursor *cur;
+		CursorItem item;
+		
+		cur = (Cursor *)use;
+
+		for(i=0;i<argc;i++){
+			item.addItem(*szColName++,*argv++);
+		}
+		cur->addCursorItem(item);
+		return 0;
+	}
 	
 	static int _sql_callback(void * use, int argc, char ** argv, char ** szColName)
 	{
@@ -1165,8 +1180,22 @@ namespace mango
 			log_i("MusicArray count=%d",count);
 			return count;
 		}
+	int mediaprovider::queryCursor(char *where, Cursor* cur){
+			char *ptr,sql[1024];
+			int count = 0;
+			
+			log_i("-------queryCursor");
+			
+			ptr = sql;
+			
+			ptr += sprintf(ptr,"select * from music ");
+			if(where!=0)
+				ptr += sprintf(ptr,"%s;",where);
 
-	
+			log_i("queryMusicArray:sql=%s",sql);
+			
+			return exec(sql,cur,cursor_sql_callback);		
+	}
 	int mediaprovider::del(char *table,int id){
 		char *ptr,sql[256];
 		ptr = sql;

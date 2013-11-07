@@ -41,6 +41,7 @@ public:
 	int getCount();
 	bool isEmpty();
 	int isExiteStr(char *str);
+	CStringArray& operator=(CStringArray& cStringArray);
 private:
 	CString *mList;
 	int mLen;

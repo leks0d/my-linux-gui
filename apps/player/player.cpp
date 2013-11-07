@@ -56,8 +56,8 @@ namespace mango
 		gmediaprovider.initialize();
 
 		mPlayinglist = new Playinglist();
-		mPlayinglist->initPlayintList();		
-		
+		//mPlayinglist->initPlayintList();		
+		mPlayinglist->cursorInit();
 		//mango::Thread::sleep(1000 * 3);
 		
 		mSpdifSwitch = new PlayerSwitch();
