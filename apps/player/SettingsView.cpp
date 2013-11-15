@@ -227,7 +227,7 @@ namespace mango
 		int text[]={STR_LANGUAGE_EN,STR_LANGUAGE_CN,STR_LANGUAGE_JA,STR_LANGUAGE_JAP,STR_LANGUAGE_KR,
 			STR_LANGUAGE_TH,STR_LANGUAGE_RU,STR_LANGUAGE_SP,STR_LANGUAGE_PU,STR_LANGUAGE_DE,
 			STR_LANGUAGE_FR};
-		int i,count = 9;
+		int i,count = 11;
 		
 		if(mLanguageListAdapter == NULL){
 			mListView->deleteAllItems();

@@ -457,7 +457,7 @@ static const char *PlayerLock = "playerlock";
 					if(needStart)
 						if(mParticleplayer->start()){log_i("start() success!");}else{log_i("start() fail!");goto Exit;}
 					
-					gPlayer.VolumeCheck();
+					
 					
 					if(getPlayingItem()->isCue)
 					{
@@ -471,16 +471,17 @@ static const char *PlayerLock = "playerlock";
 							}
 							mThread.create(Playinglist::CloseMuteRunnig,(void*)1000);
 						}else{
-							mThread.create(Playinglist::CloseMuteRunnig,(void*)600);
+							mThread.create(Playinglist::CloseMuteRunnig,(void*)200);
 						}
 					}else{
-						mThread.create(Playinglist::CloseMuteRunnig,(void*)600);
+						mThread.create(Playinglist::CloseMuteRunnig,(void*)200);
 					}
+					gPlayer.VolumeCheck();
 				
 				}
-				if(needGapless&&mGapless>0)
-					mParticleplayer->setNextSongForGapless(playPath);//(getItem(mCurrent+1)->path);
-				log_i("gapless no change");
+				//if(needGapless&&mGapless>0)
+				//	mParticleplayer->setNextSongForGapless(playPath);//(getItem(mCurrent+1)->path);
+				//log_i("gapless no change");
 				getPlayingItem()->isPlayed = 1;
 				setWakeLock();
 				return 0;

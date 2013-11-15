@@ -474,6 +474,7 @@ namespace mango
 				case NM_SEEKBAR_UP:{
 						mediainfo *info;
 						int cur;
+						isNeedFresh = 1;
 						cur = mPlayinglist->getCurrent();
 						if(cur<2000)
 							break;
@@ -491,7 +492,7 @@ namespace mango
 							}
 						}
 					}
-					isNeedFresh = 1;
+					
 					break;
 			}
 		}else if(code == NM_SEEK_UPDATE){
