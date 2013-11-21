@@ -86,6 +86,7 @@ class KeyCount{
 		void ViewInit(void);
 		static unsigned int SeekBarRunnig(void *parameter);
 		static unsigned int shutdownRunnig(void *parameter);
+		static unsigned int updateSDcardRunnig(void *parameter);
 		void updatePlayMode();
 		void updatePlayButtonIcon();
 		void updateAudioInfo();
@@ -132,6 +133,7 @@ class KeyCount{
 		
 		Thread mSeekBarUpdateThread;
 		Thread mShutdowmThread;
+		Thread mUpdateSDcardThread;
 		int isNeedFresh;
 		int isNeedFreshOld; //backup when sleep in and sleep out
 		int mVolume;

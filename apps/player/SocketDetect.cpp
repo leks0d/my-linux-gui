@@ -20,9 +20,11 @@ namespace mango
 	SocketDetect::SocketDetect(void){
 /********************开机检测SD card 状态，判断是否需要扫描*************************/		
 		if(!FileAttr::FileExist(sdcardState)){
-			Environment::sdcardNeedScanner();
+			Environment::sdcardNeedScanner();	//not SD card ,create file.
+		}else{
+			log_i("exist Sdcard ,don't create file.");	//exist Sdcard ,don't create file.
 		}
-/********************************************************************************************/
+/************如果开机时没有没有SD卡，创建boot文件，有则不创建************************/
 	}
 
 	SocketDetect::~SocketDetect(void){

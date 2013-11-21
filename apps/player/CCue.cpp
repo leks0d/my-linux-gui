@@ -506,8 +506,8 @@ CString& CString::operator=(int n){
 
 	ptr = str;
 	sprintf(ptr,"%d",n);
-	log_i("str=%s",str);
 	Format("%s",str);
+	
 	return *this;
 }
 bool CString::operator==(const char *str){

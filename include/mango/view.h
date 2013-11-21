@@ -58,6 +58,10 @@ namespace mango
 #define NM_REMOVE_FROM_PLAYLIST 	21
 #define NM_KEY_LOCK 				22
 #define NM_CHOSEN_CALLBY 			23
+#define SDCARD_FILE_CHECK 		24
+
+#define SDCARD_PATH 	"/mnt/external_sd"
+#define FLASH_PATH 	"/mnt/sdcard"
 
 	class View : public Object
 	{

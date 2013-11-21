@@ -143,6 +143,21 @@ namespace mango
 		}
 	}
 
+	static int cursor_sql_callback(void * use, int argc, char ** argv, char ** szColName)
+	{
+		int i;
+		Cursor *cur;
+		CursorItem item;
+		
+		cur = (Cursor *)use;
+
+		for(i=0;i<argc;i++){
+			item.addItem(*szColName++,*argv++);
+		}
+		cur->addCursorItem(item);
+		return 0;
+	}
+
 	struct Musicdb{
 		mediainfo info;
 		struct Musicdb *next;;
@@ -180,7 +195,7 @@ namespace mango
 		int updateInPlay(int value,int id =-1);
 		int del(char *table,int id);
 		virtual ~mediaprovider(void);
-		int checkfile();
+		int checkfile(const char* dir = NULL);
 		void genImgPath(char *title,char *path);
 		int music_exsit_db(char *path);
 		void getWakeLock();

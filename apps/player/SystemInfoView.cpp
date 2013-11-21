@@ -127,7 +127,7 @@ namespace mango
 		updateTotalMem();
 	}
 	void SystemInfoView::updateTotalMem(){
-		int total,avail,free;
+		__u32 total,avail,free;
 		char iSpaceAll[10],iSpaceAvail[10],espaceAll[10],eSpaceAvail[10];
 		char external[20],internal[20],*ptr;
 		char *ipath = "/mnt/sdcard";

@@ -20,7 +20,7 @@ namespace mango
 		mValue.addString(value);
 		mLen++;
 	}
-	bool CursorItem::getValue(char* key,CString& outValue){
+	bool CursorItem::getValue(const char* key,CString& outValue){
 		int i;
 		bool ret;
 

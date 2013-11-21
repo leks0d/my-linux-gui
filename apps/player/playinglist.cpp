@@ -93,16 +93,20 @@ static const char *PlayerLock = "playerlock";
 				
 				moveToPosition(playpost);		
 			}
-			void Playinglist::checkPlayintList(){
+			void Playinglist::checkPlayintList(const char *dir){
 				int i;
 				for(i=0;i<getCount();i++){
-					if(access(getItem(i)->path,F_OK) != 0){
-						removeItem(i);
-						if(mCurrent>i)
-							mCurrent--;
-						else if(mCurrent == i)
-							mCurrent = 0;
-						i--;
+					CString path;
+					path = getItem(i)->path;
+					if(dir == NULL || ( path.Find(dir,0) == 0) ){
+						if(access(path.string,F_OK) != 0){
+							removeItem(i);
+							if(mCurrent>i)
+								mCurrent--;
+							else if(mCurrent == i)
+								mCurrent = 0;
+							i--;
+						}
 					}
 				}
 			}
@@ -169,7 +173,7 @@ static const char *PlayerLock = "playerlock";
 					mediainfo *temp;
 
 					if(mMax == 0)
-						mMax = 16;
+						mMax = 100;
 					else
 						mMax*=2;
 					

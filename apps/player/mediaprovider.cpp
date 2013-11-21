@@ -8,21 +8,6 @@ namespace mango
 	static void strlwr(char *string);
 	static char * getfiletype(char *file);
 	static char* getstr(char *arg);
-
-	static int cursor_sql_callback(void * use, int argc, char ** argv, char ** szColName)
-	{
-		int i;
-		Cursor *cur;
-		CursorItem item;
-		
-		cur = (Cursor *)use;
-
-		for(i=0;i<argc;i++){
-			item.addItem(*szColName++,*argv++);
-		}
-		cur->addCursorItem(item);
-		return 0;
-	}
 	
 	static int _sql_callback(void * use, int argc, char ** argv, char ** szColName)
 	{
@@ -414,7 +399,7 @@ namespace mango
 
 		info = new ScanInfo();
 		info->media = this;
-		//info->path = "(null)";
+		info->path = "/mnt/external_sd";
 
 		mFileCheckThread.create(mediaprovider::FileCheckRunnig, info);
 	}
@@ -431,14 +416,14 @@ namespace mango
 			
 			media->sendMsgEnd();
 				
-			return 0;		
+			return 0;
 	}
 	unsigned int mediaprovider::FileCheckRunnig(void *parameter){
 		ScanInfo *info = (ScanInfo*)parameter;
 		mediaprovider *media = info->media;
 		
 		media->sendMsgStart();
-		media->checkfile();
+		media->checkfile(info->path);
 		//Thread::sleep(2000);
 		media->sendMsgEnd();
 	}
@@ -475,7 +460,7 @@ namespace mango
 	{
 		mMutex.lock();
 		log_i("-------------mediascanner checkfile %s",path);
-		checkfile();
+		checkfile(path);
 		log_i("-------------mediascanner filescanner %s",path);
 		scannerStop = false;
 		filescanner(path);
@@ -929,13 +914,19 @@ namespace mango
 		out = new char[len+1];
 		memcpy(out,src,len+1);
 	}
-	int mediaprovider::checkfile(){
+	int mediaprovider::checkfile(const char *dir){
+		char sql[100],sp;
 		mediainfo *infolist;
 		int count,i;
-		
+
+		sp = sql;
 		mCurrentTimes = 0;
-		
-		count = querymusic(0,&infolist);
+		if(dir == NULL){
+			count = querymusic(0,&infolist);
+		}else{
+			sprintf(sp,"path like '%s/%%'",dir);
+			count = querymusic(sql,&infolist);
+		}
 		
 		for(i=0;i<count;i++){
 			

@@ -10,7 +10,7 @@ namespace mango
 			~CursorItem();
 			void addItem(CString& key,CString& value);
 			void addItem(char* key,char* value);
-			bool getValue(char* key,CString& outValue);
+			bool getValue(const char* key,CString& outValue);
 			CursorItem& operator=(CursorItem& cursorItem);
 	};
 	

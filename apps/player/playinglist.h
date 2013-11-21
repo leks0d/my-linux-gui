@@ -55,7 +55,7 @@ namespace mango
 			int startPlayPosition(int mesc,bool needStart,bool needGapless);
 			void playNext(bool needstart = true);
 			void playPrev(bool needstart = true);
-			void checkPlayintList();
+			void checkPlayintList(const char* dir = NULL);
 			void savePlayintList();
 			int playPauseOrStart();
 			void callbackPlay();

@@ -114,7 +114,7 @@ namespace mango
 		}		
 	}
 
-	void Environment::space_info(char *path,int& toatl,int& avail,int& free)
+	void Environment::space_info(char *path,__u32& toatl,__u32& avail,__u32& free)
 	{
 		struct statfs sfs;
 		long start;
@@ -130,15 +130,68 @@ namespace mango
 		//log_i("toatl=%d,avail=%d,free=%d",toatl,avail,free);
 		log_i("space_info space Time:%d",Time::getMillisecond()-start);
 	}
-	int Environment::getSdcardCheckState(){
-		int state,toatl,avail,free;
+	__u32 Environment::getSdcardAvailSpace(){
+		__u32 state,toatl,avail,free;
 		
 		Environment::space_info("/mnt/external_sd",toatl,avail,free);
 
-		state = toatl+avail+free;
-
-		return state;
+		return avail;
 	}
+
+	int Environment::getSdcardCid(char *cid){
+		FILE* file;
+		char buffer[64]={0};
+		
+		file  = fopen("/dev/codec_volume", "rt");
+		
+		if (file == NULL) {
+			memset(cid,0,64);
+			memcpy(cid,"null",4);
+			log_e("/dev/codec_volume");
+			return -1;
+		}
+		
+		fread(buffer, 1, 64, file);
+		
+		log_i("buffer='%s'",buffer);
+		
+		memcpy(cid,buffer,64);
+		
+		fclose(file);
+		
+		return 1;
+	}
+
+	int  Environment::updateSDcard(){
+		char buf[64];
+		
+		getSdcardCid(buf);
+		
+		return gSettingProvider.updateSDcard(getSdcardAvailSpace(),buf);
+	}
+	bool Environment::isSDcardChange(){
+		Cursor cur;
+		bool isChange = true;
+		CString cId,sp,csp;
+		char buf[64];
+		
+		gSettingProvider.queryCursor(SETTING_SCANSDCARDSTATE_ID,&cur);
+		
+		cur.getValueCstring(0,"value",sp);
+		cur.getValueCstring(0,"name",cId);
+
+		log_i("valeu=%s,name=%s",sp.string,cId.string);
+		
+		csp = getSdcardAvailSpace();
+		getSdcardCid(buf);
+		
+		if(cId == buf && sp == csp.string){
+			isChange = false;
+		}
+		log_i("isChange = %d",isChange);
+		return isChange;
+	}
+
 	void Environment::memSizeToStr(int size, char *space){
 		float sizeG,sizeK;
 		sizeK = size;

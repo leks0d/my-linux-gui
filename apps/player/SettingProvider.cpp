@@ -138,6 +138,24 @@ namespace mango
 		}
 		return vol;
 	}
+	int SettingProvider::updateSDcard(__u32 value,char* buf){
+		int ret = 0;
+		char *pErrMsg = 0;
+		char *ptr,sql[1024];
+		
+		ptr = sql;
+		sprintf(ptr,"update settings set value=%d,name='%s' where _id=%d",value,buf,SETTING_SCANSDCARDSTATE_ID);
+		
+		ret = sqlite3_exec(db,sql,0,0,&pErrMsg);
+		
+		if(ret != SQLITE_OK){
+			log_e("sqlite3_exec error : %s\n",pErrMsg);
+		}else{
+			log_i("sqlite3_exec sucess:%s",sql);
+		}
+		
+		return ret;
+	}
 
 	int SettingProvider::update(int id,int value){
 		int ret = 0;
@@ -168,6 +186,22 @@ namespace mango
 		sprintf(ptr,"update settings set value=100 where _id=100");
 		sqlite3_exec(db,safe,0,0,&pErrMsg);
 		
+		return ret;
+	}
+	int SettingProvider::queryCursor(int id,Cursor *cur){
+		int ret = 0;
+		char *pErrMsg = 0;
+		char *ptr,sql[1024];
+
+		ptr = sql;
+		sprintf(ptr,"select * from settings where _id=%d",id);
+		
+		ret = sqlite3_exec(db,sql,cursor_sql_callback,(void*)cur,&pErrMsg);
+			
+		if(ret != SQLITE_OK){
+			log_e("sqlite3_exec error : %s\n",pErrMsg);			
+		}
+
 		return ret;
 	}
 

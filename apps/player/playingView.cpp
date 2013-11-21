@@ -399,6 +399,15 @@ namespace mango
 		Thread::sleep(1000);
 		reboot(RB_POWER_OFF);
 	}
+	unsigned int PlayingView::updateSDcardRunnig(void *parameter){
+		int p = (int)parameter;
+		if(p == 1){
+			if(Environment::isSDcardChange())
+				gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,SDCARD_FILE_CHECK,0);
+		}
+			
+		Environment::updateSDcard();
+	}
 	int PlayingView::onDestroy()
 	{
 		if (mPrevButton)
@@ -614,35 +623,35 @@ namespace mango
 			mKeyCount.TriggerKey();
 		}
 		else if(code == FLASH_MOUNT){
-			if(Environment::isSDcardExist()&&isUsmCon==1){
-				isUsbShare = 1;
-				log_i("FLASH_MOUNT SDcardExist set isUsbShare.");	
-			}else{
-				mPlayinglist->checkPlayintList();
-				log_i("FLASH_MOUNT SDcard not Exist check playinglist.");	
-			}			
+			mPlayinglist->checkPlayintList(FLASH_PATH);
+			
+			if(isUsmCon == 1){
+				gmediaprovider.externVolumeScanner("/mnt/sdcard");
+			}
 			isUsmCon = 0;
 			gPlayer.dismissView(gPlayer.mUsmConnectView);
-
-			gmediaprovider.externVolumeScanner("/mnt/sdcard");	
 		}else if(code == FLASH_UNMOUNT){
 			isUsmCon = 1;
 			gPlayer.showUsmConnectView();
 			mPlayinglist->stopPlayer();
 		}else if(code == SDCARD_MOUNT){
-			if(isUsbShare){
-				isUsbShare = 0;
-				mPlayinglist->checkPlayintList();
-				log_i("SDCARD_MOUNT isUsbShare checkPlayintList().");
-			}
-			if(Environment::sdcardNeedScanner())
+			int firstMount = 0;
+			
+			mPlayinglist->checkPlayintList(SDCARD_PATH);
+
+			if(Environment::sdcardNeedScanner()){
 				gPlayer.showSdcardInsertView();
+			}else{	//not exist boot file,mean to boot up with existing SD and first mount.
+				if(Environment::isSDcardChange())
+					firstMount = 1;
+			}
+			mUpdateSDcardThread.create(updateSDcardRunnig,(void*)firstMount);
+			
 		}else if(code == SDCARD_START_UNMOUNT){
 			mPlayinglist->stopForSdcardEject();
 		}else if(code == SDCARD_UNMOUNT){
 			gPlayer.dismissView(gPlayer.mSdcardInsertView);
 			mPlayinglist->checkPlayintList();
-			//ViewInit();
 			gmediaprovider.externFileCheck();
 		}else if(code == MEDIA_SCANNER_START){
 			isMediaScanning = 1;
@@ -671,6 +680,9 @@ namespace mango
 			//reboot(RB_POWER_OFF);
 			log_i("RB_POWER_OFF");
 			mShutdowmThread.create(PlayingView::shutdownRunnig, this);
+		}
+		else if(code == SDCARD_FILE_CHECK){
+			gmediaprovider.externFileCheck();
 		}
 		return 0;
 	}
