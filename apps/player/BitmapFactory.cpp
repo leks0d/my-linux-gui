@@ -128,7 +128,7 @@ namespace mango
 		avail = sfs.f_bavail * sfs.f_bsize/1024;
 		free = sfs.f_bfree * sfs.f_bsize/1024;
 		//log_i("toatl=%d,avail=%d,free=%d",toatl,avail,free);
-		log_i("space_info space Time:%d",Time::getMillisecond()-start);
+		log_i("space_info space Time:%dms",Time::getMillisecond()-start);
 	}
 	__u32 Environment::getSdcardAvailSpace(){
 		__u32 state,toatl,avail,free;
@@ -141,19 +141,22 @@ namespace mango
 	int Environment::getSdcardCid(char *cid){
 		FILE* file;
 		char buffer[64]={0};
+		size_t ret;
 		
-		file  = fopen("/dev/codec_volume", "rt");
+		file  = fopen("/sys/devices/platform/rk29_sdmmc.0/mmc_host/mmc0/mmc0:0002/cid", "rt");
 		
 		if (file == NULL) {
 			memset(cid,0,64);
 			memcpy(cid,"null",4);
-			log_e("/dev/codec_volume");
 			return -1;
 		}
 		
-		fread(buffer, 1, 64, file);
+		ret = fread(buffer, 1, 64, file);
+
+		if(ret>=33)
+			buffer[32] = '\0';
 		
-		log_i("buffer='%s'",buffer);
+		log_i("buffer='%s',ret=%ld",buffer,ret);
 		
 		memcpy(cid,buffer,64);
 		
@@ -291,4 +294,29 @@ namespace mango
 		char *path = "/dev/block/mmcblk0p1";
 		return FileAttr::FileExist(path);
 	}
+	void Environment::MD5(char* data,CString& out){
+		MD5_CTX ctx;
+		char *mddata;
+		unsigned char md[16];
+		char buf[33]={'\0'};
+		char tmp[3]={'\0'};
+		int i;
+		
+		if(data == NULL){
+			mddata = "";
+		}else{
+			mddata = data;
+		}
+		
+		MD5_Init(&ctx);
+		MD5_Update(&ctx,mddata,strlen(mddata));
+		MD5_Final(md,&ctx);
+		
+		for( i=0; i<16; i++ ){
+			sprintf(tmp,"%02X",md[i]);
+			strcat(buf,tmp);
+		}
+		out = buf;
+	}
+	
 };

@@ -16,7 +16,7 @@ namespace mango
 		isNeedFreshOld = 0;
 		isUsmCon = 0;
 		isMediaScanning = 0;
-		isUsbShare = 0;
+		isSdcardShare = 0;
 	}
 
 
@@ -401,11 +401,12 @@ namespace mango
 	}
 	unsigned int PlayingView::updateSDcardRunnig(void *parameter){
 		int p = (int)parameter;
+		
 		if(p == 1){
 			if(Environment::isSDcardChange())
 				gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,SDCARD_FILE_CHECK,0);
 		}
-			
+		
 		Environment::updateSDcard();
 	}
 	int PlayingView::onDestroy()
@@ -627,6 +628,8 @@ namespace mango
 			
 			if(isUsmCon == 1){
 				gmediaprovider.externVolumeScanner("/mnt/sdcard");
+			}else{
+				ViewInit();
 			}
 			isUsmCon = 0;
 			gPlayer.dismissView(gPlayer.mUsmConnectView);
@@ -637,19 +640,24 @@ namespace mango
 		}else if(code == SDCARD_MOUNT){
 			int firstMount = 0;
 			
-			mPlayinglist->checkPlayintList(SDCARD_PATH);
-
 			if(Environment::sdcardNeedScanner()){
 				gPlayer.showSdcardInsertView();
-			}else{	//not exist boot file,mean to boot up with existing SD and first mount.
-				if(Environment::isSDcardChange())
-					firstMount = 1;
+			}else{		//not exist boot file,mean to boot up with existing SD and first mount.
+				firstMount = 1;
 			}
-			mUpdateSDcardThread.create(updateSDcardRunnig,(void*)firstMount);
+
+			if(isSdcardShare && firstMount)
+				mPlayinglist->checkPlayintList(SDCARD_PATH);
+
+			if(isSdcardShare)
+				gmediaprovider.externFileCheck();
 			
+			mUpdateSDcardThread.create(updateSDcardRunnig,(void*)firstMount);
+			isSdcardShare = 0;
 		}else if(code == SDCARD_START_UNMOUNT){
 			mPlayinglist->stopForSdcardEject();
 		}else if(code == SDCARD_UNMOUNT){
+			isSdcardShare = 0;
 			gPlayer.dismissView(gPlayer.mSdcardInsertView);
 			mPlayinglist->checkPlayintList();
 			gmediaprovider.externFileCheck();
@@ -674,15 +682,13 @@ namespace mango
 				isNeedFresh = 0;
 			}
 			log_i("isNeedFresh = %d",isNeedFresh);
-		}
-		else if(code == NM_POWER_OFF){
+		}else if(code == NM_POWER_OFF){
 			gPlayer.showShutDownView();
-			//reboot(RB_POWER_OFF);
-			log_i("RB_POWER_OFF");
 			mShutdowmThread.create(PlayingView::shutdownRunnig, this);
-		}
-		else if(code == SDCARD_FILE_CHECK){
+		}else if(code == SDCARD_FILE_CHECK){
 			gmediaprovider.externFileCheck();
+		}else if(code == SDCARD_SHARE_UNMOUNT){
+			isSdcardShare = 1;
 		}
 		return 0;
 	}

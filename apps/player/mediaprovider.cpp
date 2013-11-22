@@ -394,15 +394,6 @@ namespace mango
 
 		mScannerThread.create(mediaprovider::FileScannerRunnig, info);
 	}
-	void mediaprovider::externFileCheck(){
-		ScanInfo *info;
-
-		info = new ScanInfo();
-		info->media = this;
-		info->path = "/mnt/external_sd";
-
-		mFileCheckThread.create(mediaprovider::FileCheckRunnig, info);
-	}
 	unsigned int mediaprovider::FileScannerRunnig(void *parameter){
 			ScanInfo *info = (ScanInfo*)parameter;
 			mediaprovider *media = info->media;
@@ -417,15 +408,6 @@ namespace mango
 			media->sendMsgEnd();
 				
 			return 0;
-	}
-	unsigned int mediaprovider::FileCheckRunnig(void *parameter){
-		ScanInfo *info = (ScanInfo*)parameter;
-		mediaprovider *media = info->media;
-		
-		media->sendMsgStart();
-		media->checkfile(info->path);
-		//Thread::sleep(2000);
-		media->sendMsgEnd();
 	}
 	void mediaprovider::ScannerDirectory(char* file){
 		ArrayMediaInfo array;
@@ -456,6 +438,25 @@ namespace mango
 		mMutex.unlock();
 	}
 
+	void mediaprovider::externFileCheck(){
+		ScanInfo *info;
+
+		info = new ScanInfo();
+		info->media = this;
+		strcpy(info->path,SDCARD_PATH);
+
+		mFileCheckThread.create(mediaprovider::FileCheckRunnig, info);
+	}
+	unsigned int mediaprovider::FileCheckRunnig(void *parameter){
+		ScanInfo *info = (ScanInfo*)parameter;
+		mediaprovider *media = info->media;
+		
+		media->sendMsgStart();
+		media->mMutex.lock();
+		media->checkfile(info->path);
+		media->mMutex.unlock();
+		media->sendMsgEnd();
+	}
 	int mediaprovider::mediascanner(char *path)
 	{
 		mMutex.lock();
@@ -498,17 +499,13 @@ namespace mango
 	}
 	int mediaprovider::sendMsgStart(){
 		log_i("sendMsgStart:show MediaScannerView");
-		//gPlayer.showMediaScannerView();
 		scanTime = Time::getMillisecond();
 		getWakeLock();
 		gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,MEDIA_SCANNER_START,0);
 	}
 	int mediaprovider::sendMsgEnd(){
-		//gPlayer.dismissView(gPlayer.mMediaScannerView);
 		int dur = Time::getMillisecond() - scanTime;
 		log_i("sendMsgEnd:dismissView MediaScannerView,Time:%dms",dur);
-		//if(dur<50)
-		//	mango::Thread::sleep(500);
 		releaseWakeLock();
 		gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,MEDIA_SCANNER_END,0);
 	}
@@ -617,13 +614,13 @@ namespace mango
 		}
 		slqCheck(value);
 		len = strlen(value)+1;
-			
+		
 		info->genre = new char[len];
 		memcpy(info->genre,value,len);
-
+		
 		info->genre_key = new char[len];
 		strlwr(value,info->genre_key);
-
+		
 /*--------------------------------duration--------------------------------------------*/
 
 		memset(value, 0, 256);
@@ -643,12 +640,12 @@ namespace mango
 				
 				imgPath = new char[255];
 				fileTitle = new char[strlen(info->name)];
-					
+				
 				getFileTitle(info->name,fileTitle);
 				genImgPath(fileTitle,imgPath);
-					
+				
 				int ret = mMSkBitmap.saveToFile(imgPath);
-
+				
 				if(ret == 1){
 					int pathlen = strlen(imgPath);
 					info->img_path = new char[pathlen+1];
@@ -915,7 +912,7 @@ namespace mango
 		memcpy(out,src,len+1);
 	}
 	int mediaprovider::checkfile(const char *dir){
-		char sql[100],sp;
+		char sql[100],*sp;
 		mediainfo *infolist;
 		int count,i;
 

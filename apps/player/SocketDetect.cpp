@@ -10,7 +10,7 @@
 #define UNIX_MSG_SDCARD_UNMOUNT   "Volume sdcard /mnt/external_sd state changed from 1 (Idle-Unmounted) to 0 (No-Media)"
 #define UNIX_MSG_SDCARD_MOUNT   "Volume sdcard /mnt/external_sd state changed from 3 (Checking) to 4 (Mounted)"
 #define UNIX_MSG_SDCARD_START_UMOUNT "Volume sdcard /mnt/external_sd state changed from 4 (Mounted) to 5 (Unmounting)"
-
+#define UNIX_MSG_SDCARD_SHARE		"Volume sdcard /mnt/external_sd state changed from 1 (Idle-Unmounted) to 7 (Shared-Unmounted)"
 namespace mango
 {
 	const char HEADSET_STATE_PATH[]= "/sys/class/switch/h2w/state";
@@ -203,6 +203,9 @@ void SocketDetect::DetectRun(void){
 			}else if(strcmp(recv,UNIX_MSG_SDCARD_START_UMOUNT)==0){
 				log_i("sdcard start unmounting");
 				result = SDCARD_START_UNMOUNT;
+			}else if(strcmp(recv,UNIX_MSG_SDCARD_SHARE)==0){
+				log_i("sdcard start share");
+				result = SDCARD_SHARE_UNMOUNT;
 			}else
 				log_i("usb unknow");
 			if(result > 0)

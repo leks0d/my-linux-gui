@@ -35,7 +35,7 @@ namespace mango
 		Rect rect;
 		int firstLeft = 98;
 		
-		rect.setEx(0,150,320,25);
+		rect.setEx(0,150,320,35);
 		mUsbState = new TextView(SETTING_BACK, TEXT("mBack"), this, &rect, 0);
 		mUsbState->setTextColor(COLOR_WHITE);
 		mUsbState->setTextSize(25);

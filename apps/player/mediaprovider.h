@@ -229,7 +229,7 @@ namespace mango
 		public:
 			mediaprovider* media;
 			char path[255];
-			ScanInfo(){log_i("new ScanInfo")}
+			ScanInfo(){memset(path,0,255);}
 	};
 #if 0
 	class SkiaTest{

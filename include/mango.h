@@ -43,6 +43,7 @@ extern "C" {
 #endif
 
 #include "../base/canvas/freetype/src/expansion/ft_ex_truetype.h"
+#include "../base/canvas/freetype/src/base/md5.h"
 
 #ifdef __cplusplus
 }

@@ -25,5 +25,6 @@ namespace mango
 		int times;
 		int isCue;
 		int cueStart;
+		char *md5;
 	}mediainfo;
 };
