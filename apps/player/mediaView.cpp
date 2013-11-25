@@ -1380,12 +1380,9 @@ namespace mango
 		}else{
 			count = gmediaprovider.queryArrayMedia(mSql,mMusicArrayList);
 		}
-		if(count>=0)
-			rePaintList();
-		else{
-			mlist->deleteAllItems();
-			mlist->invalidateRect();
-		}
+
+		rePaintList();
+		
 	}
 	void MusicAdapter::setListData(ArrayMediaInfo* info){
 		if(info!=NULL){

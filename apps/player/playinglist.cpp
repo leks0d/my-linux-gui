@@ -84,7 +84,6 @@ static const char *PlayerLock = "playerlock";
 							addItem(&curMedia.mInfo);
 						}
 					}
-					
 				}
 				
 				gSettingProvider.query(SETTING_PLAYMODE_ID,&playMode);
@@ -173,7 +172,7 @@ static const char *PlayerLock = "playerlock";
 					mediainfo *temp;
 
 					if(mMax == 0)
-						mMax = 100;
+						mMax = ARRAY_LIST_NUM;
 					else
 						mMax*=2;
 					

@@ -550,7 +550,7 @@ int CStringArray::addCString(CString& cstr){
 		int i,count;
 		
 		if(mMax == 0){
-			mMax = 32;
+			mMax = ARRAY_LIST_NUM;
 		}else{
 			mMax*=2;
 		}

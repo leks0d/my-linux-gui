@@ -35,6 +35,7 @@
 #include "PlaylistOperateView.h"
 #include "GroupOperateView.h"
 
+#define ARRAY_LIST_NUM 100
 
 namespace mango
 {	

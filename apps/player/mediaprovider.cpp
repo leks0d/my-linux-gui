@@ -43,7 +43,8 @@ namespace mango
 		data->info.inPlay = mediaprovider::str_to_int(*(argv++));
 		data->info.times = mediaprovider::str_to_int(*(argv++));
 		data->info.isCue = mediaprovider::str_to_int(*(argv++));
-		data->info.cueStart = mediaprovider::str_to_int(*(argv));
+		data->info.cueStart = mediaprovider::str_to_int(*(argv++));
+		data->info.md5 = getstr(*(argv));
 		data->next = 0;
 		
 #if SQLITE_LOG
@@ -321,18 +322,23 @@ namespace mango
 
 	int mediaprovider::music_exsit_db(char *path){
 		mediainfo *infolist;
+		CString md5;
 		int count,i;
 		char *ptr,sql[1024];
 		char sqlPath[300];
-
-		slqFormatOut(path,sqlPath);
+		
 		ptr = sql;
+#if 1
+		Environment::MD5(path,md5);
+		ptr += sprintf(ptr,"md5 = '%s'",md5.string);
+#else
+		slqFormatOut(path,sqlPath);
 		ptr += sprintf(ptr,"path = '%s'",sqlPath);
-		count = querymusic(sql,&infolist);
+#endif
 
+		count = querymusic(sql,&infolist);
 		if(count>0)
 			free(infolist);
-		
 		return count;
 	}
 	void mediaprovider::mTimesSync(){
@@ -351,7 +357,7 @@ namespace mango
 			mCurrentTimes = array.getMediaInfo(0)->times+1;
 	}
 	void mediaprovider::albumImageSync(){
-		char *ptr,sql[1024];
+		char *ptr,sql[4024];
 		ArrayMediaInfo array;
 		int i,count;
 		
@@ -362,14 +368,14 @@ namespace mango
 
 		count = array.getCount();
 		
-		for(i=1;i<count;i++){
+		for(i=1;i<count;i++){	//'(null)' is first,so start at 1.
 			mediainfo *info = array.getMediaInfo(i);
 			
-			memset(sql,0,1024);
+			memset(sql,0,4024);
 			ptr = sql;
 			
 			ptr += sprintf(ptr,"update music set img_path='%s'\
-				where album='%s' and artist='%s' and img_path='(null)'",
+ where album='%s' and artist='%s' and img_path='(null)'",
 				info->img_path,info->album,info->artist);
 			
 			exec(sql,0,0);
@@ -451,6 +457,7 @@ namespace mango
 		ScanInfo *info = (ScanInfo*)parameter;
 		mediaprovider *media = info->media;
 		
+		log_i("------------info->path=%s",info->path);
 		media->sendMsgStart();
 		media->mMutex.lock();
 		media->checkfile(info->path);
@@ -512,6 +519,7 @@ namespace mango
 	int mediaprovider::getmediainfo(char *path,mediainfo *info,CString& cover,CString& genImg)
 	{
 		ID3INFO m_id3(path);
+		CString md5;
 		char *value;
 		char *filename;
 		int len,charCount;
@@ -529,6 +537,13 @@ namespace mango
 //-----------------------------
 		info->path = new char[len*2];
 		slqFormatOut(path,info->path);
+
+		Environment::MD5(path,md5);
+		info->md5 = new char[33];
+		memset(info->md5,0,33);
+		memcpy(info->md5,md5.string,32);
+//		log_i("path='%s'",path);
+//		log_i("md5=%s",md5.string);
 //**************************
 
 		len = strlen(filename)+1;
@@ -974,6 +989,8 @@ namespace mango
 		
 		if(ret != SQLITE_OK){
 			log_e("sqlite3_exec error : %s\n",MUSIC_TABLE_CREATE);			
+		}else{
+			log_i("MUSIC_TABLE_CREATE : %s\n",MUSIC_TABLE_CREATE);	
 		}
 
 		PlayList::createTable();
@@ -1005,15 +1022,15 @@ namespace mango
 		char *ptr,sql[1024*3];
 		log_i("tag");
 		ptr = sql;
-		ptr += sprintf(ptr,"insert into %s (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ",
+		ptr += sprintf(ptr,"insert into %s (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ",
 			table,MUSIC_PTAH,MUSIC_NAME,MUSIC_NAME_KEY,MUSIC_TITLE,MUSIC_TITLE_KEY,MUSIC_ART,MUSIC_ART_KEY,
 			MUSIC_ALBUM,MUSIC_ALBUM_KEY,"genre","genre_key",MUSIC_TRACK,MUSIC_ART_IMG,MUSIC_ADD_TIME,
-			MUSIC_DURATION,MUSIC_IN_PLAY,MUSIC_TIMES,"iscue","cuestart");
+			MUSIC_DURATION,MUSIC_IN_PLAY,MUSIC_TIMES,"iscue","cuestart","md5");
 		log_i("tag");
-		ptr += sprintf(ptr,"values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%d','%s','%d','%d','%d','%d','%d','%d');",
+		ptr += sprintf(ptr,"values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%d','%s','%d','%d','%d','%d','%d','%d','%s');",
 				info->path,info->name,info->name_key,info->title,info->title_key,info->artist,
 				info->artist_key,info->album,info->album_key,info->genre,info->genre_key,info->track,info->img_path,
-				info->add_time,info->duration,info->inPlay,info->times,info->isCue,info->cueStart);
+				info->add_time,info->duration,info->inPlay,info->times,info->isCue,info->cueStart,info->md5);
 		log_i("tag");
 		exec(sql,0,0);
 		log_i("tag");

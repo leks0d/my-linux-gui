@@ -62,7 +62,7 @@ namespace mango
 			int i,count;
 			
 			if(mMax == 0){
-				mMax = 100;
+				mMax = ARRAY_LIST_NUM;
 			}else{
 				mMax*=2;
 			}
@@ -195,6 +195,12 @@ namespace mango
 		item.getValue("cuestart",out);
 		if(out.toIneger(&mInfo.cueStart) == 0){
 			log_i("CursorMediaInfo error");
+		}
+		item.getValue("md5",out);
+		if(out != NULL){
+			len = strlen(out.string)+1;
+			mInfo.md5 = new char[len];
+			memcpy(mInfo.md5,out.string,len);
 		}
 	}
 

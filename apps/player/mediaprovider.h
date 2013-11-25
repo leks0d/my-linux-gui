@@ -25,28 +25,29 @@ namespace mango
 	#define MUSIC_IN_PLAY "inplay"
 	#define MUSIC_TIMES "times"
 
-	#define MUSIC_TABLE_CREATE "CREATE TABLE IF NOT EXISTS music(\
-									_id INTEGER PRIMARY KEY autoincrement,\
-									path TEXT,\
-									name TEXT,\
-									name_key TEXT,\
-									title TEXT,\
-									title_key TEXT,\
-									artist TEXT,\
-									artist_key TEXT,\
-									album TEXT,\
-									album_key TEXT,\
-									genre TEXT,\
-									genre_key TEXT,\
-									track INTEGER,\
-									img_path TEXT,\
-									add_time INTEGER,\
-									duration INTEGER,\
-									inplay INTEGER,\
-									times INTEGER,\
-									iscue INTEGER,\
-									cuestart INTEGER\
-									);"
+#define MUSIC_TABLE_CREATE "CREATE TABLE IF NOT EXISTS music(\
+_id INTEGER PRIMARY KEY autoincrement,\
+path TEXT,\
+name TEXT,\
+name_key TEXT,\
+title TEXT,\
+title_key TEXT,\
+artist TEXT,\
+artist_key TEXT,\
+album TEXT,\
+album_key TEXT,\
+genre TEXT,\
+genre_key TEXT,\
+track INTEGER,\
+img_path TEXT,\
+add_time INTEGER,\
+duration INTEGER,\
+inplay INTEGER,\
+times INTEGER,\
+iscue INTEGER,\
+cuestart INTEGER,\
+md5 TEXT\
+);"
 	#define IMG_PATH "/mnt/sdcard/.album_img"
 	
 
