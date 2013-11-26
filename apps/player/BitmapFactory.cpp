@@ -114,7 +114,7 @@ namespace mango
 		}		
 	}
 
-	void Environment::space_info(char *path,__u32& toatl,__u32& avail,__u32& free)
+	void Environment::space_info(const char *path,__u32& toatl,__u32& avail,__u32& free)
 	{
 		struct statfs sfs;
 		long start;
@@ -203,11 +203,11 @@ namespace mango
 	}
 
 	void Environment::recovery(){
-		char *COMMAND_FILE = "/cache/recovery/command";
-		char *cmd_data = "--wipe_data";
-		char *cmd_cache = "--wipe_cache";
-		char *cmd_all = "--wipe_all";
-		char *reboot = "reboot recovery";
+		const char *COMMAND_FILE = "/cache/recovery/command";
+		const char *cmd_data = "--wipe_data";
+		const char *cmd_cache = "--wipe_cache";
+		const char *cmd_all = "--wipe_all";
+		const char *reboot = "reboot recovery";
 		FILE* file;
 		int ret;
 		
@@ -229,12 +229,12 @@ namespace mango
 		system(reboot);
 	}
 	void Environment::install(){
-		char *COMMAND_FILE = "/cache/recovery/command";
-		char *cmd_data = "--wipe_data";
-		char *cmd_cache = "--wipe_cache";
-		char *cmd_all = "--wipe_all";
-		char *cmd_update = "--update_rkimage=/mnt/sdcard/update.img";
-		char *reboot = "reboot recovery";
+		const char *COMMAND_FILE = "/cache/recovery/command";
+		const char *cmd_data = "--wipe_data";
+		const char *cmd_cache = "--wipe_cache";
+		const char *cmd_all = "--wipe_all";
+		const char *cmd_update = "--update_rkimage=/mnt/sdcard/update.img";
+		const char *reboot = "reboot recovery";
 		FILE* file;
 		int ret;
 		
@@ -256,22 +256,52 @@ namespace mango
 		system(reboot);
 	}
 	void Environment::reboot(){
-		char *cmd = "reboot";
+		const char *cmd = "reboot";
 		system(cmd);
 	}
 
 	void Environment::openMute(){
-		char *cmd = "./system/bin/muteopen";
+		const char *cmd = "./system/bin/muteopen";
 		system(cmd);
 	}
 
 	void Environment::sync(){
-		char *cmd = "./system/bin/sync";
+		const char *cmd = "./system/bin/sync";
 		system(cmd);
+	}
+	void Environment::logcat(){
+		Thread thread;
+		thread.create(Environment::logcatRunnig,NULL);
+	}
+	unsigned int Environment::logcatRunnig(void *parameter){
+		char cmd[100],file[100];
+		int i = 0,ret;
+		
+		system("logcat -c");
+		
+		while(1){
+			if(FileAttr::FileExist("/mnt/sdcard/.album_img")){
+				break;
+			}else{
+				Thread::sleep(1000);
+			}
+		}
+		
+		while(1){
+			sprintf(file,"/mnt/sdcard/audio_%d.log",i);
+			if(!FileAttr::FileExist(file))
+				break;
+			i++;
+		}
+		
+		sprintf(cmd,"./system/bin/logcat -v time > %s",file);
+		
+		ret = system(cmd);
+		log_i("logcat end ret=%d",ret);
 	}
 
 	bool Environment::sdcardNeedScanner(){
-		char *bootfile = "/mnt/boot";
+		const char *bootfile = "/mnt/boot";
 		bool ret = FileAttr::FileExist(bootfile);
 		if(!ret)
 			mkdir(bootfile,0777);
@@ -291,7 +321,7 @@ namespace mango
 	    return filesize;  
 	}
 	bool Environment::isSDcardExist(){
-		char *path = "/dev/block/mmcblk0p1";
+		const char *path = "/dev/block/mmcblk0p1";
 		return FileAttr::FileExist(path);
 	}
 	void Environment::MD5(char* data,CString& out){

@@ -12,7 +12,7 @@ namespace mango
 
 	class Environment{
 		public:	
-			static void space_info(char *path,__u32& toatl,__u32& avail,__u32& free);
+			static void space_info(const char *path,__u32& toatl,__u32& avail,__u32& free);
 			static void memSizeToStr(int size, char *space);
 			static __u32 getSdcardAvailSpace();
 			static int getSdcardCid(char *cid);
@@ -23,6 +23,8 @@ namespace mango
 			static void reboot();
 			static void openMute();
 			static void sync();
+			static void logcat();
+			static unsigned int logcatRunnig(void *parameter);
 			static bool sdcardNeedScanner();
 			static unsigned long get_file_size(const char *path);
 			static bool isSDcardExist();

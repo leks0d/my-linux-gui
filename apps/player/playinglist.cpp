@@ -540,12 +540,17 @@ Exit:
 
 			int Playinglist::getCurrent(){
 				int cur;
+				unsigned long t,s;
+
+				t = Time::getMicrosecond();
+				
 				if(mParticleplayer!=NULL){
 					cur = mParticleplayer->getCurrentPosition();
 				}else{
 					cur = 0;
 				}
-				//log_i("Playinglist::getCurrentPosition cur=%d",cur);
+				s = Time::getMicrosecond()-t;
+				log_i("cur=%d,spec=%ld",cur,s);
 				return cur;
 			}
 

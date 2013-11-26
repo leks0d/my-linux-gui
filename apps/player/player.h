@@ -150,7 +150,7 @@ namespace mango
 				return 0;			
 			return access(path,F_OK) == 0;
 		}
-		static int FileExist(char *str){
+		static int FileExist(const char *str){
 			if(str == NULL)
 				return 0;
 			return access(str,F_OK) == 0;

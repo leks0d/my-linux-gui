@@ -9,15 +9,44 @@ namespace mango
 		mKey.~CStringArray();
 		mValue.~CStringArray();
 	}
+	void CursorItem::setValue(const char* key,CString& value){
+		int i;
+		bool ret = false;
+		
+		for(i=0;i<mLen;i++){
+			CString cstr;
+			mKey.getCString(i,cstr);
+			if(cstr == key){
+				mValue.setCString(i,value);
+				ret = true;
+				break;
+			}
+		}
+	}
+	void CursorItem::setValue(const char* key,const char* value){
+		CString cstr;
+		cstr = value;
+		setValue(key,cstr);
+	}
+	void CursorItem::setValue(const char* key,int value){
+		CString cstr;
+		cstr = value;
+		setValue(key,cstr);
+	}
 	void CursorItem::addItem(CString& key,CString& value){
 		mKey.addCString(key);
 		mValue.addCString(value);	
 		mLen++;
 	}
-	void CursorItem::addItem(char* key,char* value){
+	void CursorItem::addItem(const char* key,const char* value){
 		//log_i("key=%s,val=%s",key,value);
 		mKey.addString(key);
 		mValue.addString(value);
+		mLen++;
+	}
+	void CursorItem::addItem(const char* key,int value){
+		mKey.addString(key);
+		mValue.addInteger(value);
 		mLen++;
 	}
 	bool CursorItem::getValue(const char* key,CString& outValue){
@@ -80,7 +109,7 @@ namespace mango
 		mLen++;
 		return mLen;
 	}
-	bool Cursor::getValueCstring(int i,char* key,CString& outCStr){
+	bool Cursor::getValueCstring(int i,const char* key,CString& outCStr){
 		
 		if(i<0 && i>=mLen)
 			return false;

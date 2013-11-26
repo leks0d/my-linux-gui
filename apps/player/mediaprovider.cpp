@@ -4,6 +4,7 @@
 
 namespace mango
 {
+	unsigned long t0=0,t1=0,t2=0;
 
 	static void strlwr(char *string);
 	static char * getfiletype(char *file);
@@ -135,11 +136,16 @@ namespace mango
 	static char* getstr(char *arg){
 		int len;
 		char *str;
-		
-		len = strlen(arg)+1;
-		str = (char*)malloc(len);
-		memcpy(str,arg,len);
-		
+
+		if(arg == NULL){
+			len = 7;
+			str = (char*)malloc(len);
+			memcpy(str,"(null)",len);
+		}else{		
+			len = strlen(arg)+1;
+			str = (char*)malloc(len);
+			memcpy(str,arg,len);
+		}
 		return str;
 	}
 
@@ -464,6 +470,7 @@ namespace mango
 		media->mMutex.unlock();
 		media->sendMsgEnd();
 	}
+#if 0
 	int mediaprovider::mediascanner(char *path)
 	{
 		mMutex.lock();
@@ -477,6 +484,48 @@ namespace mango
 		log_i("-------------mediascanner end %s",path);
 		mMutex.unlock();
 	}
+#else
+	int mediaprovider::mediascanner(char *path)
+	{
+		int i;
+		unsigned long t0,t1,t2,t3,tt0,tt1,tt2,tt3,tt4;
+		AudioFileArray fileArray;
+		
+		mMutex.lock();
+
+		checkfile(path);
+
+		scannerStop = false;
+
+		tt0 = Time::getMicrosecond();
+		
+		fileArray.startScanFile(path,true);
+
+		tt1 = Time::getMicrosecond();
+			
+		for(i=0;i<fileArray.mLen;i++){
+			CursorItem curItem;
+			analyzeAudioID3(curItem,fileArray.mList[i]);
+			if(!cueCheckCursor(curItem)){
+				insertCursorItem(curItem);
+			}
+		}
+		
+		tt2 = Time::getMicrosecond();
+		
+		albumImageSync();
+
+		tt3 = Time::getMicrosecond();
+
+		t0 = tt1 - tt0;
+		t1 = tt2 - tt1;
+		t2 = tt3 - tt2;
+
+		log_i("time,t0=%ldms,t1=%ldms,t2=%ldms,t3=%ldms",t0/1000,t1/1000,t2/1000,t3/1000);
+
+		mMutex.unlock();
+	}
+#endif
 	int mediaprovider::externVolumeScanner(char *path){
 		ScanInfo *info;
 		char *file;
@@ -513,9 +562,136 @@ namespace mango
 	int mediaprovider::sendMsgEnd(){
 		int dur = Time::getMillisecond() - scanTime;
 		log_i("sendMsgEnd:dismissView MediaScannerView,Time:%dms",dur);
+		log_i("t0=%ldms,t1=%ldms,t2=%ldms",t0/1000,t1/1000,t2/1000);
 		releaseWakeLock();
 		gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,MEDIA_SCANNER_END,0);
 	}
+	int mediaprovider::analyzeAudioID3(CursorItem& item,AudioFileInfo& info){
+		ID3INFO m_id3(info.path.string);
+		char *value;
+		char *filename,sqlStr[1024],sqlStr_[1024];
+		CString md5;
+		
+		item.addItem("times",mCurrentTimes+1);
+		
+		value = (char*)malloc(256);
+		
+		filename = getfilename(info.path.string);
+		
+		slqFormatOut(info.path.string,sqlStr);
+		item.addItem("path",sqlStr);
+		
+		Environment::MD5(info.path.string,md5);	
+		item.addItem("md5",md5.string);
+		
+		slqFormatOut(filename,sqlStr);
+		item.addItem("name",sqlStr);
+		
+		strlwr(sqlStr,sqlStr_);
+		item.addItem("name_key",sqlStr_);
+
+		memset(value, 0, 256);
+		if (m_id3.GetTags(METADATA_KEY_TITLE, value)){
+			slqCheck(value);
+		}else{
+			getFileTitle(sqlStr,value);
+		}
+		item.addItem("title",value);
+		
+		strlwr(filename,sqlStr);
+		item.addItem("title_key",value);
+		
+
+		
+		item.addItem("inPlay",0);
+
+		memset(value, 0, 256);
+		if (m_id3.GetTags(METADATA_KEY_CD_TRACK_NUMBER, value)){
+			item.addItem("track",str_to_int(value));
+		}else{
+			item.addItem("track",1000);
+		}
+		
+		memset(value, 0, 256);
+		if (m_id3.GetTags(METADATA_KEY_ALBUM, value)){
+
+		}else{
+			getFileParentName(info.path.string,value);
+		}
+		slqCheck(value);
+		
+		item.addItem("album",value);
+		
+		strlwr(value,sqlStr);
+		item.addItem("album_key",sqlStr);
+		
+		memset(value, 0, 256);
+		if (m_id3.GetTags(METADATA_KEY_ARTIST, value)){
+			slqCheck(value);
+			item.addItem("artist",sqlStr);
+			strlwr(value,sqlStr);
+			item.addItem("artist_key",sqlStr);
+		}
+		
+		memset(value, 0, 256);
+		if (m_id3.GetTags(METADATA_KEY_GENRE, value)){
+		}else{
+			sprintf(value,"(null)");
+		}
+		slqCheck(value);
+		item.addItem("genre",value);
+
+		strlwr(value,sqlStr);
+		item.addItem("genre_key",value);
+		
+		memset(value, 0, 256);
+		if (m_id3.GetTags(METADATA_KEY_DURATION, value)){
+			item.addItem("duration",str_to_int(value));
+		}else
+			item.addItem("duration",0);
+		
+		if( m_id3.PicValid() >= 0 ){
+			CString imgpath;
+			MSkBitmap mMSkBitmap;
+			
+			genMd5ImgPath(md5,imgpath);
+			
+			if(FileAttr::FileExist(imgpath.string)){
+				item.addItem("img_path",imgpath.string);
+			}else{
+				if(m_id3.piclength > 0)
+					BitmapFactory::decodeBuffer(&mMSkBitmap,(void*)m_id3.picdata,m_id3.piclength,109,109);
+
+				int ret = mMSkBitmap.saveToFile(imgpath.string);
+				if(ret == 1)
+					item.addItem("img_path",imgpath.string);
+				else
+					item.addItem("img_path","(null)");
+			}
+		}else if(info.cover != NULL){
+			CString imgpath,coverMd5;
+			MSkBitmap mMSkBitmap;
+
+			Environment::MD5(info.cover.string,coverMd5);
+			genMd5ImgPath(coverMd5,imgpath);
+
+			if(FileAttr::FileExist(imgpath.string)){
+				item.addItem("img_path",imgpath.string);
+			}else{
+				BitmapFactory::decodeFile(&mMSkBitmap,info.cover.getString(),109,109);
+				
+				int ret = mMSkBitmap.saveToFile(imgpath.string);
+				if(ret == 1)
+					item.addItem("img_path",imgpath.string);
+				else
+					item.addItem("img_path","(null)");
+			}
+		}else{
+			item.addItem("img_path","(null)");
+		}
+			
+	}
+
 	int mediaprovider::getmediainfo(char *path,mediainfo *info,CString& cover,CString& genImg)
 	{
 		ID3INFO m_id3(path);
@@ -679,6 +855,7 @@ namespace mango
 			memcpy(info->img_path,genImg.getString(),pathlen+1);		
 		}
 
+
 		delete value;
 		
 		return 0;
@@ -705,6 +882,12 @@ namespace mango
 			}
 		}
 	}
+	void mediaprovider::genMd5ImgPath(CString& md5,CString& out){
+		char path[1024];
+		
+		sprintf(path,"%s/%s",IMG_PATH,md5.string);
+		out = path;
+	}
 	int mediaprovider::FilePathToInfo(char *path,mediainfo& info){
 		char* name;					
 							
@@ -730,6 +913,7 @@ namespace mango
 	bool mediaprovider::mediaCanStop(){
 		return scanCanStop;
 	}
+
 	int mediaprovider::filescanner(char *path)
 	{
 		int		count,i;
@@ -742,9 +926,12 @@ namespace mango
 		CStringArray musicList;
 		CStringArray cueList;
 		CStringArray pictureList;
+		unsigned long tt0,tt1,tt2,tt3;
 
 		memset(&info,0,sizeof(mediainfo));
-		//log_i("opendir DT_DIR :%s\n",path);
+
+		tt0 = Time::getMicrosecond();
+		
 		d = opendir(path);
 
 		while((de = readdir(d)) != NULL)
@@ -769,28 +956,55 @@ namespace mango
 				pictureList.addString(direct);
 			}
 		}
+		t0 += Time::getMicrosecond() - tt0;
+		
 		CString cover,genImg;
 		
 		pictureList.getCString(0,cover);
-	
+		
 		for(i=0;i<musicList.getCount();i++){
 			CString path;
 			
+			tt1 = Time::getMicrosecond();
+
 			musicList.getCString(i,path);
 			
 			getmediainfo(path.getString(),&info,cover,genImg);
+			
+			tt2 = Time::getMicrosecond();
+			t1 += (tt2-tt1);
 
 			if(!cueCheck(info.path,&info)){
 				insert("music",&info);
 			}
-
+			tt3 = Time::getMicrosecond();
+			
+			t2 += tt3 - tt2;
 			safefreeMediainfo(&info);
 		}
-
+		
+		
 		safefreeMediainfo(&info);
 		closedir(d);
 		
 		return 0;
+	}
+	bool mediaprovider::cueCheckCursor(CursorItem& item){
+		CString dir;
+		char cuePath[300];
+		bool ret = false;
+		CursorMediaInfo curMedia;
+
+		memset(cuePath,0,300);
+		item.getValue("path",dir);
+		getCuePath(dir.string,cuePath);
+		
+		if(FileAttr::FileExist(cuePath)){
+			curMedia.setCursorItem(item);
+			ret = loadCueFile(cuePath,&curMedia.mInfo);
+		}
+		
+		return ret;		
 	}
 	bool mediaprovider::cueCheck(char *direct,mediainfo *info){
 		char cuePath[300];
@@ -1036,7 +1250,45 @@ namespace mango
 		log_i("tag");
 		return 0;
 	}
+	int mediaprovider::insertCursorItem(CursorItem& item){
+		int i;
+		char *ptr,sql[1024*3];
+		
+		ptr = sql;
+		ptr += sprintf(ptr,"insert into music (");
+		
+		for(i=0;i<item.mKey.getCount();i++){
+			CString key;
+			
+			item.mKey.getCString(i,key);
+			
+			ptr += sprintf(ptr,"%s",key.string);
+			
+			if(item.mKey.getCount() != i + 1)
+				ptr += sprintf(ptr,",",key.string);
+		}
 
+		ptr += sprintf(ptr,") values(");
+
+		for(i=0;i<item.mValue.getCount();i++){
+			CString value;
+			
+			item.mValue.getCString(i,value);
+			
+			ptr += sprintf(ptr,"'%s'",value.string);
+			
+			if(item.mKey.getCount() != i + 1)
+				ptr += sprintf(ptr,",",value.string);
+		}
+
+		ptr += sprintf(ptr,");");
+
+		//log_i("%s",sql);
+		
+		exec(sql,0,0);
+		
+		return 0;
+	}
 	int mediaprovider::updateInPlay(int value,int id){
 		char *ptr,sql[1024];
 		
@@ -1253,6 +1505,94 @@ namespace mango
 		exec(sql,array,SettingProvider::sql_callback);
 		
 		return array->getCount();
+	}
+	AudioFileArray::AudioFileArray(){
+		mList = NULL;
+		mLen=mMax=0;
+		needStop = false;
+	}
+	AudioFileArray::~AudioFileArray(){
+		if(mList!=NULL){
+			delete[] mList;
+			mList = NULL;
+		}
+		mLen=mMax=0;
+	}
+	void AudioFileArray::addItem(AudioFileInfo& item){
+		if(mLen>=mMax){
+			AudioFileInfo *temp;
+			int i,count;
+			
+			if(mMax == 0){
+				mMax = ARRAY_LIST_NUM;
+			}else{
+				mMax*=2;
+			}
+		
+			temp = new AudioFileInfo[mMax];
+			
+			for(i=0;i<mLen;i++){
+				temp[i] = mList[i];
+			}
+		
+			delete[] mList;
+			mList = temp;
+		}
+		mList[mLen] = item;
+		mLen++;
+	}
+	
+	void AudioFileArray::startScanFile(const char *file,bool recursion){
+		this->~AudioFileArray();
+		needStop = false;
+		listFile(file,recursion);
+	}
+	
+	void AudioFileArray::listFile(const char *file,bool recursion){
+		int 	i;
+		DIR* 	d;
+		char 	direct[255];
+		struct dirent* de;
+		CString cover;
+		CStringArray musicList;
+		CStringArray cueList;
+		CStringArray pictureList;
+
+		d = opendir(file);
+
+		while((de = readdir(d)) != NULL)
+		{
+			int name_len = strlen(de->d_name);
+			
+			strcpy(direct,file);
+			strcat(direct,"/");
+			strcat(direct,de->d_name);
+			
+			if(File::isDirect(direct)){
+				if (needStop || de->d_name[0] == '.'){
+					continue;
+				}
+				if(recursion)
+					listFile(direct,recursion);
+			}else if(ismusic(de->d_name)&&(de->d_name[0]!='.')&&(!gmediaprovider.music_exsit_db(direct))){
+				musicList.addString(direct);
+			}else if((de->d_name[0]!='.')&&isCueFile(de->d_name)){
+				cueList.addString(direct);
+			}else if(isPictureFile(de->d_name)){
+				pictureList.addString(direct);
+			}
+		}
+
+		closedir(d);
+		
+		pictureList.getCString(0,cover);
+		
+		for(i=0;i<musicList.getCount();i++){
+			AudioFileInfo item;
+			musicList.getCString(i,item.path);
+			item.cover = cover;
+			addItem(item);
+		}
 	}
 	mediaprovider gmediaprovider;
 };

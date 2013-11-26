@@ -54,7 +54,7 @@ namespace mango
 		
 		//spdifProbe();
 		gmediaprovider.initialize();
-
+		
 		mPlayinglist = new Playinglist();
 		//mPlayinglist->initPlayintList();		
 		mPlayinglist->cursorInit();
@@ -101,6 +101,7 @@ namespace mango
 		else if(isBootLock){
 			if((!mPlayinglist->isPlaying()) && (mPlayinglist->inPause == 0))
 				Environment::openMute();
+				//gmediaprovider.externVolumeScanner("/mnt/external_sd");
 #ifdef NEED_SLEEP
 			if(wakeUnlock(BootUp) == 0)
 				isBootLock = 0;

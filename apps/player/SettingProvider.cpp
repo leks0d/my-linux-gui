@@ -88,7 +88,7 @@ namespace mango
 
 		return ret;
 	}
-	int SettingProvider::insert(int id,int value,char *str){
+	int SettingProvider::insert(int id,int value,const char *str){
 		int ret = 0;
 		char *pErrMsg = 0;
 		char *ptr,sql[1024];

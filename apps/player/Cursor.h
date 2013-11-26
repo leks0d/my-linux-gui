@@ -9,7 +9,11 @@ namespace mango
 			CursorItem();
 			~CursorItem();
 			void addItem(CString& key,CString& value);
-			void addItem(char* key,char* value);
+			void addItem(const char* key,const char* value);
+			void addItem(const char* key,int value);
+			void setValue(const char* key,CString& value);
+			void setValue(const char* key,const char* value);
+			void setValue(const char* key,int value);
 			bool getValue(const char* key,CString& outValue);
 			CursorItem& operator=(CursorItem& cursorItem);
 	};
@@ -24,7 +28,7 @@ namespace mango
 			Cursor();
 			~Cursor();
 			int addCursorItem(CursorItem& item);
-			bool getValueCstring(int i,char* key,CString& outCStr);
+			bool getValueCstring(int i,const char* key,CString& outCStr);
 	};
 	class CursorMediaInfo{
 		public:

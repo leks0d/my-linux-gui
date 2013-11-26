@@ -624,6 +624,7 @@ namespace mango
 			mKeyCount.TriggerKey();
 		}
 		else if(code == FLASH_MOUNT){
+			//Environment::logcat();
 			mPlayinglist->checkPlayintList(FLASH_PATH);
 			
 			if(isUsmCon == 1){

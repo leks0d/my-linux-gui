@@ -159,6 +159,30 @@ md5 TEXT\
 		return 0;
 	}
 
+	class AudioFileInfo{
+		public:
+		CString path;
+		CString cover;
+		AudioFileInfo(){};
+		AudioFileInfo& operator==(AudioFileInfo& item){
+			path = item.path;
+			cover = item.cover;
+			return *this;
+		}
+	};
+	class AudioFileArray{
+		public:
+		AudioFileInfo *mList;
+		int mLen,mMax;
+		bool needStop;
+		AudioFileArray();
+		~AudioFileArray();
+		void addItem(AudioFileInfo& item);
+		void listFile(const char *file,bool recursion);
+		void startScanFile(const char *file,bool recursion);
+		void stopScan();
+	};
+	
 	struct Musicdb{
 		mediainfo info;
 		struct Musicdb *next;;
@@ -174,6 +198,7 @@ md5 TEXT\
 		int sendMsgStart();
 		int sendMsgEnd();
 		int getmediainfo(char *path,mediainfo *info,CString& cover,CString& genImg);
+		int analyzeAudioID3(CursorItem& item,AudioFileInfo& info);
 		static unsigned int VolumeScannerRunnig(void *parameter);
 		static unsigned int FileScannerRunnig(void *parameter);
 		static unsigned int FileCheckRunnig(void *parameter);
@@ -183,12 +208,14 @@ md5 TEXT\
 		void albumImageSync();
 		void mTimesSync();
 		bool cueCheck(char *direct,mediainfo *info);
+		bool cueCheckCursor(CursorItem& item);
 		void getCuePath(char* src,char * out);
 		bool loadCueFile(char* path,mediainfo *info);
 		void strCopy(char *des,char *out);
 		int initialize(void);
 		int exec(char *sql,void *arg,int (*callback)(void*,int,char**,char**));
 		int insert(char *table,mediainfo *info);
+		int insertCursorItem(CursorItem& item);
 		int querymusic(char *where,mediainfo **info);
 		int queryMusicArray(char *where, void* array);
 		int queryArrayMedia(char *where, void *array);
@@ -198,6 +225,7 @@ md5 TEXT\
 		virtual ~mediaprovider(void);
 		int checkfile(const char* dir = NULL);
 		void genImgPath(char *title,char *path);
+		void genMd5ImgPath(CString& md5,CString& out);
 		int music_exsit_db(char *path);
 		void getWakeLock();
 		void releaseWakeLock();

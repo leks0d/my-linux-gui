@@ -34,9 +34,10 @@ public:
 	CStringArray();
 	~CStringArray();
 	int addCString(CString& cstr);
-	int addString(char *str);
+	int addString(const char *str);
 	void addInteger(int val);
 	int setInteger(int index,int val);
+	int setCString(int index,CString& cstr);
 	int getCString(int index,CString& out);
 	int getCount();
 	bool isEmpty();

@@ -812,7 +812,7 @@ namespace mango
 				;
 			else if(pt.x > LIST_MUSIC_ICON_LEFT-10)
 				iconClick = true;
-			
+
 			log_i("MediaView::onNotify m_lvItem.paramType = %d,getMainState()=0x%x",type,getMainState());
 			switch(type){
 				case LIST_PARAM_FILE:

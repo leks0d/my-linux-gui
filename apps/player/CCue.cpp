@@ -568,7 +568,7 @@ int CStringArray::addCString(CString& cstr){
 	mLen++;
 	return mLen;
 }
-int CStringArray::addString(char *str){
+int CStringArray::addString(const char *str){
 	CString cstr;
 	cstr = str;
 	addCString(cstr);
@@ -585,6 +585,13 @@ int CStringArray::setInteger(int index,int val){
 	}else{
 		return -1;
 	}
+}
+int CStringArray::setCString(int index,CString& cstr){
+	if(index<mLen && index>=0){
+		mList[index] = cstr;
+	}else{
+		return -1;
+	}	
 }
 int CStringArray::getCString(int index,CString& out){
 	if(index<mLen && index>=0){
