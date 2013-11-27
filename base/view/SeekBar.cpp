@@ -37,9 +37,23 @@ namespace mango
 		mProgress = n;
 		mSeekWidth = n*mWidth/mMax;
 		mThumbX = mSeekX+mSeekWidth-15;
+#if 1		
 		invalidateRect();	
+#else
+		cartoonDisplay();
+#endif
 	}
-	
+	void SeekBar::cartoonDisplay(){
+		Canvas* canvas;
+
+		canvas = getCanvas();
+		
+		onPaint(*canvas);
+
+		canvas->swapScreenFrontBuffer();
+		releaseCanvas();
+
+	}
 	int SeekBar::getProgress(){
 		return mProgress;
 	}

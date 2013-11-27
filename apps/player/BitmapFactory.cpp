@@ -301,7 +301,7 @@ namespace mango
 	}
 
 	bool Environment::sdcardNeedScanner(){
-		const char *bootfile = "/mnt/boot";
+		const char *bootfile = SDCARD_BOOT_PATH;
 		bool ret = FileAttr::FileExist(bootfile);
 		if(!ret)
 			mkdir(bootfile,0777);

@@ -60,9 +60,12 @@ namespace mango
 #define NM_CHOSEN_CALLBY 			23
 #define SDCARD_FILE_CHECK 		24
 #define SDCARD_SHARE_UNMOUNT		25
+#define MEDIA_SCANNER_PROGRESS 	26
 
 #define SDCARD_PATH 	"/mnt/external_sd"
 #define FLASH_PATH 	"/mnt/sdcard"
+#define SDCARD_BOOT_PATH 		"/mnt/boot"
+#define SDCARD_BLOCK_PATH 	"/dev/block/mmcblk0p1"
 
 	class View : public Object
 	{

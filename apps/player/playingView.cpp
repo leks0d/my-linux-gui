@@ -512,10 +512,14 @@ namespace mango
 				int cur;
 				
 				info = mPlayinglist->getPlayingItem();
+				
+				//log_i("iscue=%d",info->isCue);
+				
 				if(info->isCue){
 					cur = mPlayinglist->getCurrent();
 					
 					//log_i("cur=%d,cueStart+duration=%d",cur,info->cueStart + info->duration);
+					
 					
 					if(cur > info->cueStart + info->duration){
 						mPlayinglist->callbackPlay();
@@ -629,6 +633,9 @@ namespace mango
 			
 			if(isUsmCon == 1){
 				gmediaprovider.externVolumeScanner("/mnt/sdcard");
+			}else if(!FileAttr::FileExist(SDCARD_BLOCK_PATH)){
+				mUpdateSDcardThread.create(updateSDcardRunnig,(void*)1);
+				ViewInit();
 			}else{
 				ViewInit();
 			}

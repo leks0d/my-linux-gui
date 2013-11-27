@@ -30,7 +30,7 @@ namespace mango
 		Button* mBack;
 		Button* mHome;
 		ImageView* mDisplayIcon;
-		SeekBar* mBrightnessBar;
+		SeekBar* mSeekBar;
 		TextView* mScannerButton;
 		TextView* mDirectButton;
 	

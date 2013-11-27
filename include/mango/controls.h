@@ -326,6 +326,7 @@ class ValueTextView : public View
 			~SeekBar(void);
 			void setImageResoure(int bkgId,int seekId,int thumbId){mBkgImage=bkgId;mSeekImage=seekId;mThumbImage=thumbId;}
 			void setProgress(int n);
+			void cartoonDisplay();
 			int getProgress();
 			void setTouchX(int x);
 			void setMax(int n){mMax=n; if(mMax == 0) mMax = 1;log_i("SeekBar setMax = %d",mMax);}

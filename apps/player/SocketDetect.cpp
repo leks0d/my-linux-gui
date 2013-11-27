@@ -16,7 +16,7 @@ namespace mango
 	const char HEADSET_STATE_PATH[]= "/sys/class/switch/h2w/state";
 	const char  headName[]={"SWITCH_NAME=h2w"};
 	const char  headState[]={"SWITCH_STATE="};
-	char  sdcardState[]="/dev/block/mmcblk0p1";
+	char  sdcardState[]=SDCARD_BLOCK_PATH;
 	SocketDetect::SocketDetect(void){
 /********************开机检测SD card 状态，判断是否需要扫描*************************/		
 		if(!FileAttr::FileExist(sdcardState)){

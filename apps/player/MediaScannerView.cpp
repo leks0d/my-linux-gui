@@ -42,6 +42,10 @@ namespace mango
 
 		rect.setEx(286, 0, 41, 22);
 		mBack = new Button(SETTING_BACK, TEXT("mBack"), this, &rect, 0);
+
+		rect.setEx(0, 170, 307, 20);		
+		mSeekBar = new  SeekBar(-1, TEXT("mSeekBar"), this, &rect, 0);
+		mSeekBar->setImageResoure(IDP_SEEKBAR_BKG,IDP_SEEKBAR_SEEK,IDP_SEEKBAR_THUMB);
 		
 		initView();
 		setFocus(this);
@@ -60,7 +64,8 @@ namespace mango
 		}else{
 			mBack->setShowState(SW_HIDE);
 		}
-		
+		mSeekBar->setMax(100);
+		mSeekBar->setProgress(0);		
 	}
 
 	int MediaScannerView::onDestroy()
@@ -83,6 +88,9 @@ namespace mango
 		}else if(fromView == mBack && code == NM_CLICK){
 			gmediaprovider.stopMediaScanner();
 			mScannerButton->setTextResoure(STR_MEDIA_STOPPING);
+		}else if(fromView == NULL && code == MEDIA_SCANNER_PROGRESS){
+			int progress = (int)parameter;
+			mSeekBar->setProgress(progress);
 		}
 		return 0;
 	}

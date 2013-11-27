@@ -140,6 +140,10 @@ md5 TEXT\
 				des.img_path = new char[strlen(src->img_path)+1];
 				strcpy(des.img_path,src->img_path);
 			}
+			if(src->md5 != NULL){
+				des.md5 = new char[strlen(src->md5)+1];
+				strcpy(des.md5,src->md5);
+			}
 
 		}
 	}
@@ -182,7 +186,17 @@ md5 TEXT\
 		void startScanFile(const char *file,bool recursion);
 		void stopScan();
 	};
-	
+	class SdcardAudioData{
+		public:
+			sqlite3 * db;
+			CString dataPath;
+			CString datadir;
+			bool isSdcard;
+			SdcardAudioData(const char* path);
+			~SdcardAudioData();
+			bool queryFile(CursorItem& item,AudioFileInfo& info);
+			void copyData();
+	};
 	struct Musicdb{
 		mediainfo info;
 		struct Musicdb *next;;
@@ -197,6 +211,7 @@ md5 TEXT\
 		int externVolumeScanner(char *path);
 		int sendMsgStart();
 		int sendMsgEnd();
+		int sendMsgProgress(int progress);
 		int getmediainfo(char *path,mediainfo *info,CString& cover,CString& genImg);
 		int analyzeAudioID3(CursorItem& item,AudioFileInfo& info);
 		static unsigned int VolumeScannerRunnig(void *parameter);
@@ -223,7 +238,7 @@ md5 TEXT\
 		int updateInPlay(int value,int id =-1);
 		int del(char *table,int id);
 		virtual ~mediaprovider(void);
-		int checkfile(const char* dir = NULL);
+		int checkfile(const char* dir = NULL,bool display = false);
 		void genImgPath(char *title,char *path);
 		void genMd5ImgPath(CString& md5,CString& out);
 		int music_exsit_db(char *path);
