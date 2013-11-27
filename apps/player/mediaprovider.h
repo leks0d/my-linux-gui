@@ -206,7 +206,7 @@ md5 TEXT\
 	{
 	public:
 		mediaprovider(void);
-		int mediascanner(char *path);
+		int mediascanner(char *path,bool recursion);
 		int filescanner(char *path);
 		int externVolumeScanner(char *path);
 		int sendMsgStart();

@@ -366,19 +366,15 @@ namespace mango
 		return count;
 	}
 	void mediaprovider::mTimesSync(){
-		char *ptr,sql[1024];
-		ArrayMediaInfo array;
-		int i,count;
-
-		mCurrentTimes = 0;
+		char *ptr,sql[256];
+		IntegerArray array;
 		
 		ptr = sql;
-		ptr += sprintf(ptr,"order by times desc limit 1");
+		ptr += sprintf(ptr,"select times from music order by times desc limit 1");
 		
-		queryMusicArray(sql,&array);
-		
-		if(array.getCount()>=1)
-			mCurrentTimes = array.getMediaInfo(0)->times+1;
+		exec(sql,&array,SettingProvider::sql_callback);
+
+		mCurrentTimes = array.getItem(0) + 1;
 	}
 	void mediaprovider::albumImageSync(){
 		char *ptr,sql[4024];
@@ -431,10 +427,12 @@ namespace mango
 			
 			media->sendMsgStart();
 			
-			media->mTimesSync();
-			media->ScannerDirectory(path);
-			media->albumImageSync();
-			
+//			media->mTimesSync();
+//			media->ScannerDirectory(path);
+//			media->albumImageSync();
+
+			media->mediascanner(path,false);
+
 			media->sendMsgEnd();
 				
 			return 0;
@@ -492,18 +490,18 @@ namespace mango
 	int mediaprovider::mediascanner(char *path)
 	{
 		mMutex.lock();
-		log_i("-------------mediascanner checkfile %s",path);
+		log_i("------------- checkfile %s",path);
 		checkfile(path);
-		log_i("-------------mediascanner filescanner %s",path);
+		log_i("------------- filescanner %s",path);
 		scannerStop = false;
 		filescanner(path);
-		log_i("-------------mediascanner albumImageSync");
+		log_i("------------- albumImageSync");
 		albumImageSync();
-		log_i("-------------mediascanner end %s",path);
+		log_i("------------- end %s",path);
 		mMutex.unlock();
 	}
 #else
-	int mediaprovider::mediascanner(char *path)
+	int mediaprovider::mediascanner(char *path,bool recursion)
 	{
 		int i;
 		int progress = 0;		
@@ -512,14 +510,14 @@ namespace mango
 		SdcardAudioData sdcard(path);
 			
 		mMutex.lock();
-
-		checkfile(path);
-
+		
 		scannerStop = false;
-
+		checkfile(path);
+		mTimesSync();
+		
 		tt0 = Time::getMicrosecond();
 		
-		fileArray.startScanFile(path,true);
+		fileArray.startScanFile(path,recursion);
 
 		tt1 = Time::getMicrosecond();
 			
@@ -527,8 +525,11 @@ namespace mango
 			int p;
 			CursorItem curItem;
 			
-			if(!sdcard.queryFile(curItem,fileArray.mList[i]))
+			if(sdcard.queryFile(curItem,fileArray.mList[i])){
+				curItem.setValue("times",mCurrentTimes);
+			}else{
 				analyzeAudioID3(curItem,fileArray.mList[i]);
+			}
 			
 			if(!cueCheckCursor(curItem)){
 				insertCursorItem(curItem);
@@ -548,7 +549,9 @@ namespace mango
 		tt2 = Time::getMicrosecond();
 		
 		albumImageSync();
+		
 		sdcard.copyData();
+		
 		tt3 = Time::getMicrosecond();
 
 		t0 = tt1 - tt0;
@@ -580,7 +583,7 @@ namespace mango
 			media->scanCanStop = true;
 			media->sendMsgStart();
 			
-			media->mediascanner(path);
+			media->mediascanner(path,true);
 			
 			media->sendMsgEnd();
 			media->scanCanStop = false;
@@ -657,7 +660,6 @@ namespace mango
 			getFileParentName(info.path.string,value);
 		}
 		slqCheck(value);
-		
 		item.addItem("album",value);
 		
 		strlwr(value,sqlStr);
@@ -665,11 +667,14 @@ namespace mango
 		
 		memset(value, 0, 256);
 		if (m_id3.GetTags(METADATA_KEY_ARTIST, value)){
-			slqCheck(value);
-			item.addItem("artist",sqlStr);
-			strlwr(value,sqlStr);
-			item.addItem("artist_key",sqlStr);
+		}else{
+			sprintf(value,"(null)");
 		}
+		slqCheck(value);
+		item.addItem("artist",value);
+		
+		strlwr(value,sqlStr);
+		item.addItem("artist_key",sqlStr);
 		
 		memset(value, 0, 256);
 		if (m_id3.GetTags(METADATA_KEY_GENRE, value)){
@@ -1668,6 +1673,7 @@ namespace mango
 		}else{
 			isSdcard = false;
 		}
+		log_i("isSdcard=%d,%s",isSdcard,dataPath.string);
 	}
 	SdcardAudioData::~SdcardAudioData(){
 		if(db != NULL){
@@ -1719,15 +1725,17 @@ namespace mango
 	}
 	void SdcardAudioData::copyData(){
 		char cmd[300],ptr;
-
+		
+		log_i("%d",FileAttr::FileExist(dataPath.string));
+		
 		if(isSdcard && !FileAttr::FileExist(dataPath.string)){
 			if(!FileAttr::FileExist(datadir.string)){
-				sprintf(cmd,"./system/bin/mkdir %s",datadir.string);
+				sprintf(cmd,"./system/bin/mkdir '%s'",datadir.string);
 				log_i("%s",cmd);
 				system(cmd);
 			}
 				
-			sprintf(cmd,"./system/bin/busybox cp /data/mango.db %s",dataPath.string);
+			sprintf(cmd,"./system/bin/busybox cp /data/mango.db '%s'",dataPath.string);
 			log_i("%s",cmd);
 			system(cmd);
 			Environment::sync();

@@ -314,14 +314,9 @@ namespace mango
 						case 3:
 							gPlayer.showSystemInfoView(); break;
 						case 4:
-							//gPlayer.showPointDrawView(); 
-							//Environment::recovery();
 							gPlayer.showChosenView(ChosenView::CHOSEN_RECOVERY);
 							break;
 						case 5:
-							//gmediaprovider.mediascanner("/mnt/sdcard");
-							//gPlayer.showMediaView();
-							//Environment::install();
 							gPlayer.showChosenView(ChosenView::CHOSEN_SYSTEMUPDATE);
 							break;
 						}

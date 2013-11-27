@@ -488,6 +488,9 @@ int CString::toIneger(int *val){
 	if(string){
 		//log_i("string=%s",string);
 		ret = sscanf(string,"%d",val);
+	}else{
+		*val = 0;
+		ret = 1;
 	}
 	return ret;
 }
