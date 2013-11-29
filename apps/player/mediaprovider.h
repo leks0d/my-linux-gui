@@ -4,6 +4,7 @@
 
 namespace mango
 {	
+	#define DATA_INSERT_SDCARD
 	#define TABLE_PATH "/data/mango.db"
 
 	#define TABLE_NAME "music"
@@ -167,10 +168,12 @@ md5 TEXT\
 		public:
 		CString path;
 		CString cover;
+		CString md5;
 		AudioFileInfo(){};
 		AudioFileInfo& operator==(AudioFileInfo& item){
 			path = item.path;
 			cover = item.cover;
+			md5 = item.md5;
 			return *this;
 		}
 	};
@@ -192,9 +195,12 @@ md5 TEXT\
 			CString dataPath;
 			CString datadir;
 			bool isSdcard;
+			bool existBack;
+			int insertItemCount;
 			SdcardAudioData(const char* path);
 			~SdcardAudioData();
 			bool queryFile(CursorItem& item,AudioFileInfo& info);
+			void insertCursor(CursorItem& item);
 			void copyData();
 	};
 	struct Musicdb{

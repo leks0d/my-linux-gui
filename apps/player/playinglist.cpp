@@ -550,7 +550,7 @@ Exit:
 					cur = 0;
 				}
 				s = Time::getMicrosecond()-t;
-				log_i("cur=%d,spec=%ld",cur,s);
+				//log_i("cur=%d,spec=%ld",cur,s);
 				return cur;
 			}
 

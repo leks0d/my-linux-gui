@@ -68,6 +68,22 @@ namespace mango
 		//log_i("mLen=%d,key=%s,out=%s",mLen,key,outValue.string);
 		return ret;
 	}
+	bool CursorItem::removeItem(const char* key){
+		int i;
+		bool ret = false;
+		
+		for(i=0;i<mLen;i++){
+			CString cstr;
+			mKey.getCString(i,cstr);
+			if(cstr == key){
+				mKey.remove(i);
+				mValue.remove(i);
+				ret = true;
+				break;
+			}
+		}
+		return ret;		
+	}
 	CursorItem& CursorItem::operator=(CursorItem& cursorItem){
 		mKey = cursorItem.mKey;
 		mValue = cursorItem.mValue;
@@ -202,7 +218,7 @@ namespace mango
 		
 		item.getValue("add_time",out);
 		if(out.toIneger(&mInfo.add_time) == 0){
-			log_i("CursorMediaInfo error");
+			//log_i("CursorMediaInfo error");
 		}
 
 		item.getValue("duration",out);
@@ -219,11 +235,11 @@ namespace mango
 		}
 		item.getValue("iscue",out);
 		if(out.toIneger(&mInfo.isCue) == 0){
-			log_i("CursorMediaInfo error");
+			//log_i("CursorMediaInfo error");
 		}
 		item.getValue("cuestart",out);
 		if(out.toIneger(&mInfo.cueStart) == 0){
-			log_i("CursorMediaInfo error");
+			//log_i("CursorMediaInfo error");
 		}
 		item.getValue("md5",out);
 		if(out != NULL){

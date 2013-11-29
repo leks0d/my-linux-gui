@@ -547,6 +547,16 @@ CStringArray::~CStringArray(){
 	}
 	mLen = mMax = 0;
 }
+void CStringArray::remove(int val){
+	int i;
+	if(val>=0&&val<mLen){
+		for(i=val;i<mLen-1;i++){
+			mList[i] = mList[i+1];
+		}
+		mList[mLen-1] = NULL;
+		mLen--;
+	}
+}
 int CStringArray::addCString(CString& cstr){
 	if(mLen>=mMax){
 		CString *temp;

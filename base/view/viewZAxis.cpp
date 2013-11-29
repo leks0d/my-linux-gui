@@ -148,7 +148,7 @@ namespace mango
 		if(view == NULL)
 			return 0;
 		
-		log_i("ViewZAxis::add View:%s",view->name);
+		//log_i("ViewZAxis::add View:%s",view->name);
 		if(!view->getParent())
 			sendDmsMsgToShowingView();//当一个新的view要显示的时候，向正在显示的view发dismiss消息
 

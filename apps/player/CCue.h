@@ -36,6 +36,7 @@ public:
 	int addCString(CString& cstr);
 	int addString(const char *str);
 	void addInteger(int val);
+	void remove(int val);
 	int setInteger(int index,int val);
 	int setCString(int index,CString& cstr);
 	int getCString(int index,CString& out);

@@ -507,32 +507,36 @@ namespace mango
 		int progress = 0;		
 		unsigned long t0,t1,t2,t3,tt0,tt1,tt2,tt3,tt4;
 		AudioFileArray fileArray;
-		SdcardAudioData sdcard(path);
-			
+		SdcardAudioData sdcard(SDCARD_PATH);
+
 		mMutex.lock();
 		
 		scannerStop = false;
-		checkfile(path);
-		mTimesSync();
 		
 		tt0 = Time::getMicrosecond();
 		
+		checkfile(path);
+		mTimesSync();
 		fileArray.startScanFile(path,recursion);
 
 		tt1 = Time::getMicrosecond();
 			
 		for(i=0;i<fileArray.mLen;i++){
 			int p;
+			int existSDcard = 0;
 			CursorItem curItem;
 			
-			if(sdcard.queryFile(curItem,fileArray.mList[i])){
+			if(sdcard.existBack&&sdcard.queryFile(curItem,fileArray.mList[i])){
 				curItem.setValue("times",mCurrentTimes);
+				existSDcard = 1;
 			}else{
 				analyzeAudioID3(curItem,fileArray.mList[i]);
 			}
 			
 			if(!cueCheckCursor(curItem)){
 				insertCursorItem(curItem);
+				if(existSDcard == 0)
+					sdcard.insertCursor(curItem);
 			}
 			
 			p = (i+1)*100/fileArray.mLen;
@@ -550,7 +554,7 @@ namespace mango
 		
 		albumImageSync();
 		
-		sdcard.copyData();
+		//sdcard.copyData();
 		
 		tt3 = Time::getMicrosecond();
 
@@ -615,7 +619,7 @@ namespace mango
 		char sqlStr[1024]={0},filename[255]={0};
 		CString md5;
 		
-		item.addItem("times",mCurrentTimes+1);
+		item.addItem("times",mCurrentTimes);
 		
 		value = (char*)malloc(256);
 		
@@ -1334,9 +1338,6 @@ namespace mango
 		}
 
 		ptr += sprintf(ptr,");");
-
-		//log_i("%s",sql);
-		
 		exec(sql,0,0);
 		
 		return 0;
@@ -1643,6 +1644,7 @@ namespace mango
 			AudioFileInfo item;
 			musicList.getCString(i,item.path);
 			item.cover = cover;
+			Environment::MD5(item.path.string,item.md5);
 			addItem(item);
 		}
 	}
@@ -1650,39 +1652,47 @@ namespace mango
 		int ret;
 		char file[255];
 		char dir[255];
-		
-		sprintf(dir,"%s/.audio_data",path);
-		sprintf(file,"%s/.audio_data/audio.db",path);
+		char cmd[255];
 
-		if(FileAttr::FileExist(file)){
-			ret = sqlite3_open(file,&db);
+		insertItemCount = 0;
 			
-			if(ret != SQLITE_OK){
-				log_e("sqlite3_exec open error path: %s\n",TABLE_PATH);
-				db = NULL;
-			}
-		}else{
-			db = NULL;
-		}
-		
+		sprintf(dir,"%s/.audio_data",SDCARD_PATH);
+		sprintf(file,"%s/.audio_data/audio.db",SDCARD_PATH);
 		dataPath = file;
 		datadir = dir;
 		
 		if(dataPath.Find(SDCARD_PATH,0) == 0){
 			isSdcard = true;
-		}else{
-			isSdcard = false;
+			if(FileAttr::FileExist(file)){
+				sprintf(cmd,"./system/bin/busybox cp '%s' '%s'",file,SDCARD_DATA_PATH);
+				ret = system(cmd);
+				existBack = true;
+			}else{
+				remove(SDCARD_DATA_PATH);
+				existBack = false;
+			}
+			
+			ret = sqlite3_open(SDCARD_DATA_PATH,&db);
+
+			if(ret != SQLITE_OK){
+				log_e("sqlite3_exec open error path: %s\n",TABLE_PATH);
+				db = NULL;
+			}
+
+			ret = sqlite3_exec(db,MUSIC_TABLE_CREATE,NULL,NULL,NULL);
+			if(ret != SQLITE_OK){
+				log_e("MUSIC_TABLE_CREATE error");
+				db = NULL;
+			}			
+
 		}
-		log_i("isSdcard=%d,%s",isSdcard,dataPath.string);
-	}
-	SdcardAudioData::~SdcardAudioData(){
-		if(db != NULL){
-			sqlite3_close(db);
+		else{
 			db = NULL;
+			isSdcard = false;
 		}
 	}
 	bool SdcardAudioData::queryFile(CursorItem& item,AudioFileInfo& info){
-		int ret = 0;
+		bool ret;
 		char *pErrMsg = 0;
 		CString md5;
 		char *ptr,sql[1024],sqlPath[1024];
@@ -1690,12 +1700,10 @@ namespace mango
 		
 		if(db == NULL)
 			return false;
-		
-		Environment::MD5(info.path.string,md5);
 				
 		ptr = sql;
 		ptr += sprintf(ptr,"select * from music where ");
-		ptr += sprintf(ptr,"md5 = '%s'",md5.string);
+		ptr += sprintf(ptr,"md5 = '%s'",info.md5.string);
 		
 		sqlite3_exec(db,sql,cursor_sql_callback,(void*)&cur,&pErrMsg);
 		
@@ -1704,42 +1712,101 @@ namespace mango
 			int iscue = 0;
 			
 			cur.mList[0].getValue("iscue",val);
-			
 			if(val.toIneger(&iscue) && iscue){
 				log_i("iscue=%d return_false",iscue);
-				return false;
+				ret = false;
+			}else{
+				item = cur.mList[0];
+				
+				item.getValue("path",val);
+				mediaprovider::slqFormatOut(val.string,sqlPath);
+				item.setValue("path",sqlPath);
+				
+				item.removeItem("_id");
+				ret = true;
 			}
-			
-			item = cur.mList[0];
-			
-			item.getValue("path",val);
-			
-			mediaprovider::slqFormatOut(val.string,sqlPath);
-			
-			item.setValue("path",sqlPath);
-			return true;
+		}else{
+			ret = false;
 		}
-		else{
-			return false;
+		log_i("ret=%d,%s",ret,info.path.string);
+		return ret;
+	}
+	void SdcardAudioData::insertCursor(CursorItem& item){
+		int i,ret;
+		char *pErrMsg = 0;
+		char *ptr,sql[1024*3];
+
+		if(db == NULL)
+			return;
+			
+		ptr = sql;
+		ptr += sprintf(ptr,"insert into music (");
+		
+		for(i=0;i<item.mKey.getCount();i++){
+			CString key;
+			
+			item.mKey.getCString(i,key);
+			
+			ptr += sprintf(ptr,"%s",key.string);
+			
+			if(item.mKey.getCount() != i + 1)
+				ptr += sprintf(ptr,",",key.string);
 		}
+
+		ptr += sprintf(ptr,") values(");
+
+		for(i=0;i<item.mValue.getCount();i++){
+			CString value;
+			
+			item.mValue.getCString(i,value);
+			
+			ptr += sprintf(ptr,"'%s'",value.string);
+			
+			if(item.mKey.getCount() != i + 1)
+				ptr += sprintf(ptr,",",value.string);
+		}
+
+		ptr += sprintf(ptr,");");
+		
+		ret = sqlite3_exec(db,sql,NULL,NULL,&pErrMsg);
+			
+		if(ret != SQLITE_OK){
+			log_e("sqlite3_exec error : %s",sql);
+			log_e("sqlite3_exec pErrMsg : %s",pErrMsg);
+		}else{
+			log_i("--->");
+		}
+		insertItemCount++;
 	}
 	void SdcardAudioData::copyData(){
 		char cmd[300],ptr;
 		
-		log_i("%d",FileAttr::FileExist(dataPath.string));
+		log_i("isSdcard=%d;existBack=%d,insertItemCount=%d",isSdcard,existBack,insertItemCount);
 		
-		if(isSdcard && !FileAttr::FileExist(dataPath.string)){
+		if(isSdcard  
+			&& (!existBack || insertItemCount>0)	){
+			
 			if(!FileAttr::FileExist(datadir.string)){
 				sprintf(cmd,"./system/bin/mkdir '%s'",datadir.string);
 				log_i("%s",cmd);
 				system(cmd);
 			}
-				
-			sprintf(cmd,"./system/bin/busybox cp /data/mango.db '%s'",dataPath.string);
+
+			sprintf(cmd,"./system/bin/busybox cp '%s' '%s'",SDCARD_DATA_PATH,dataPath.string);
+			
 			log_i("%s",cmd);
 			system(cmd);
 			Environment::sync();
 		}
+
+	}
+	SdcardAudioData::~SdcardAudioData(){
+		if(db != NULL){
+			sqlite3_close(db);
+			db = NULL;
+		}
+		copyData();
+		log_i("---~SdcardAudioData()--");
 	}
 
 	mediaprovider gmediaprovider;

@@ -64,6 +64,7 @@ namespace mango
 
 #define SDCARD_PATH 	"/mnt/external_sd"
 #define FLASH_PATH 	"/mnt/sdcard"
+#define SDCARD_DATA_PATH 	"/data/mango-ex.db"
 #define SDCARD_BOOT_PATH 		"/mnt/boot"
 #define SDCARD_BLOCK_PATH 	"/dev/block/mmcblk0p1"
 
