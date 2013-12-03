@@ -298,7 +298,6 @@ static char * getfiletype(char *file,char *type);
 static int fileTypeMatch(char *file,const char *music_type[])
 {
 	char type[10]={0};
-//	const char *music_type[] = {"mp3","wav","flac","aac","ogg","ape","m4a","wma","aif","aiff","\0"};
 	const char **mtype;
 
 	mtype = music_type;
@@ -320,50 +319,12 @@ static int fileTypeMatch(char *file,const char *music_type[])
 
 static int ismusic(char *file)
 {
-#if 0
-	char type[10];
-	const char *music_type[] = {"mp3","wav","flac","aac","ogg","ape","m4a","wma","aif","aiff","\0"};
-	const char **mtype;
-	mtype = music_type;
-	//log_i("getfiletype filename:%s\n",file);
-	getfiletype(file,type);
-	//log_i("getfiletype :%s\n",type);
-	if(type == 0)
-		return 0;
-	while(*mtype!="\0"){
-		if(strcmp(*mtype,type) == 0)
-			return 1;
-		mtype++;
-	}
-	return 0;
-#else
-	const char *music_type[] = {"mp3","wav","flac","aac","ogg","ape","m4a","wma","aif","aiff","\0"};
+	const char *music_type[] = {"mp3","wav","flac","aac","ogg","ape","m4a","wma","aif","aiff","dsf","\0"};
 	return fileTypeMatch(file,music_type);
-#endif		
+
 }
 static int isCueFile(char *file)
 {
-#if 0
-	char *type;
-	const char *music_type[] = {"cue","\0"};
-	const char **mtype;
-	mtype = music_type;
-
-	type = getfiletype(file);
-
-	if(type == 0)
-		return 0;
-	
-	while(*mtype != "\0"){
-		
-		if(strcmp(*mtype,type) == 0)
-			return 1;
-		
-		mtype++;
-	}
-	
-	return 0;
-#endif	
 	const char *music_type[] = {"cue","\0"};
 	return fileTypeMatch(file,music_type);
 }
