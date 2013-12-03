@@ -436,7 +436,7 @@ namespace mango
 //			media->albumImageSync();
 
 			media->mediascanner(path,false);
-
+			
 			media->sendMsgEnd();
 				
 			return 0;
@@ -567,7 +567,7 @@ namespace mango
 		t2 = tt3 - tt2;
 
 		log_i("time,t0=%ldms,t1=%ldms,t2=%ldms,t3=%ldms",t0/1000,t1/1000,t2/1000,t3/1000);
-
+		Thread::sleep(100);
 		mMutex.unlock();
 	}
 #endif
