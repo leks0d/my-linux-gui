@@ -41,7 +41,7 @@ namespace mango
 
 		rect.setEx(45, 0, 230, 20);
 		mTitle = new TextView(SETTING_TITLE, TEXT("mTitle"), this, &rect, 0);
-		mTitle->setTextColor(RGB(255,255,255));
+		mTitle->setTextColor(COLOR_TEXT);
 		mTitle->onCreate();
 
 		rect.setEx(280, 0, 41, 22);
@@ -57,7 +57,7 @@ namespace mango
 
 		rect.setEx(165, 100, 30, 22);
 		mBrightnessValue = new TextView(SETTING_TITLE, TEXT("mTitle"), this, &rect, 0);
-		mBrightnessValue->setTextColor(RGB(255,255,255));
+		mBrightnessValue->setTextColor(COLOR_TEXT);
 		mBrightnessValue->onCreate();
 
 		rect.setEx(0, 140, 307, 20);		

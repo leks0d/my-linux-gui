@@ -2,20 +2,25 @@
 
 namespace mango
 {
-
+	#define MIN 60;
+	#define HOUR 60*60
+	
 	int time[]={30,60,2*60,5*60,10*60};
 	int len = 5;
 	int power[]={60*5,60*10,60*20,60*30,-1};
 	int plen = 4;
-	
+	int force[]={-1,HOUR,2*HOUR,4*HOUR};
+	int flen = 4;
 	PowerManager::PowerManager(){
 		isSleep = 0;
 		
 		gSettingProvider.query(SETTING_AUTOSLEEP_ID,&sleepTime);
 		gSettingProvider.query(SETTING_AUTOPOWEROFF_ID,&poweroffTime);
+		mForcePowerOffTime = readTime();
 		
 		atuoCount = 0;
 		atuoPoweroffCount = 0;
+		mForcePowerOffTimeCount = 0;
 		setPowerState(0);
 	}
 	void PowerManager::initAutoSleepTime(){
@@ -48,6 +53,16 @@ namespace mango
 			}
 		}
 	}
+	void PowerManager::setForcePoweroffTime(int index){
+		mForcePowerOffTime = force[index];
+		writeTime(mForcePowerOffTime);
+	}
+	void PowerManager::writeTime(int time){
+		write_int(FORCE_POWEROFF_FILE,time);
+	}
+	int PowerManager::readTime(){
+		return read_int(FORCE_POWEROFF_FILE);
+	}
 
 	void PowerManager::PowerManagerCount(){
 		atuoCount++;
@@ -57,6 +72,7 @@ namespace mango
 		}
 		
 		atuoPoweroffCount++;
+		mForcePowerOffTimeCount++;
 		if(mPlayinglist->isPlaying()){
 			atuoPoweroffCount = 0;
 		}
@@ -64,9 +80,13 @@ namespace mango
 		if(gPlayer.mPlayingView != NULL && 
 			(gPlayer.mPlayingView->isUsmCon || gPlayer.mPlayingView->isMediaScanning)){
 			atuoPoweroffCount = 0;
+			mForcePowerOffTimeCount = 0;
 		}
 		
 		if(atuoPoweroffCount>=poweroffTime && poweroffTime != -1){
+			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,NM_POWER_OFF,0);
+		}
+		if(mForcePowerOffTimeCount>=mForcePowerOffTime && mForcePowerOffTime != -1){
 			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,NM_POWER_OFF,0);
 		}
 	}
@@ -147,6 +167,14 @@ namespace mango
 		int i;
 		for(i = 0;i<plen;i++){
 			if(poweroffTime == power[i])
+				break;
+		}
+		return i;
+	}
+	int PowerManager::getForcePoweroffTime(){
+		int i;
+		for(i = 0;i<flen;i++){
+			if(mForcePowerOffTime== force[i])
 				break;
 		}
 		return i;

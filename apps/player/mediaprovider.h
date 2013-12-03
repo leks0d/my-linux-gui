@@ -4,6 +4,7 @@
 
 namespace mango
 {	
+	#define SQL_LEN		1024
 	#define DATA_INSERT_SDCARD
 	#define TABLE_PATH "/data/mango.db"
 
@@ -241,7 +242,9 @@ md5 TEXT\
 		int queryMusicArray(char *where, void* array);
 		int queryArrayMedia(char *where, void *array);
 		int queryCursor(char *where, Cursor* cur);
+		int querySqlCursor(char *sql, Cursor* cur);
 		int updateInPlay(int value,int id =-1);
+		int deleteMusicOnDir(const char *dir);
 		int del(char *table,int id);
 		virtual ~mediaprovider(void);
 		int checkfile(const char* dir = NULL,bool display = false);

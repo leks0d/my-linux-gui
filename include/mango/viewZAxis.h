@@ -30,6 +30,7 @@ namespace mango
 		View* getViewFromPoint(Point pt);
 
 		View* getDisplayingView();
+		View* getDisplayingViewNoLock();
 
 		bool isViewShowing(View *view);
 

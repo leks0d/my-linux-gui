@@ -46,7 +46,7 @@ namespace mango
 		
 		rect.setEx(45, 0, 230, 20);
 		mTitle = new TextView(SETTING_TITLE, TEXT("mTitle"), this, &rect, 0);
-		mTitle->setTextColor(RGB(255,255,255));
+		mTitle->setTextColor(COLOR_TEXT);
 		mTitle->onCreate();
 
 		
@@ -60,7 +60,7 @@ namespace mango
 		mModelNumber = new ValueTextView(SETTING_BACK, TEXT("mFilename"), this, &rect, 0);
 		mModelNumber->setTextResoure(STR_SYSTEM_INFO_MODEL);
 		mModelNumber->setTextSize(size);
-		mModelNumber->setTextColor(RGB(color,color,color));
+		mModelNumber->setTextColor(COLOR_TEXT);
 		mModelNumber->onCreate();
 		top+=dinner;
 		
@@ -68,7 +68,7 @@ namespace mango
 		mFirmwareVersion = new ValueTextView(SETTING_BACK, TEXT("mFilename"), this, &rect, 0);
 		mFirmwareVersion->setTextResoure(STR_SYSTEM_INFO_VERSION);
 		mFirmwareVersion->setTextSize(size);
-		mFirmwareVersion->setTextColor(RGB(color,color,color));
+		mFirmwareVersion->setTextColor(COLOR_TEXT);
 		mFirmwareVersion->onCreate();
 		top+=dinner;
 		
@@ -76,7 +76,7 @@ namespace mango
 		mStorageSpace = new ValueTextView(SETTING_BACK, TEXT("mFilename"), this, &rect, 0);
 		mStorageSpace->setTextResoure(STR_SYSTEM_INFO_INTERNAL);
 		mStorageSpace->setTextSize(size);
-		mStorageSpace->setTextColor(RGB(color,color,color));
+		mStorageSpace->setTextColor(COLOR_TEXT);
 		mStorageSpace->onCreate();
 		top+=dinner;
 		
@@ -84,7 +84,7 @@ namespace mango
 		mUesedSpace = new ValueTextView(SETTING_BACK, TEXT("mFilename"), this, &rect, 0);
 		mUesedSpace->setTextResoure(STR_SYSTEM_INFO_EXTERNAL);
 		mUesedSpace->setTextSize(size);
-		mUesedSpace->setTextColor(RGB(color,color,color));
+		mUesedSpace->setTextColor(COLOR_TEXT);
 		mUesedSpace->onCreate();
 		top+=dinner;
 /*		

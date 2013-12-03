@@ -60,7 +60,7 @@ namespace mango
 
 		rect.setEx(45, 0, 230, 20);
 		mTitle = new TextView(SETTING_TITLE, TEXT("operatemTitle"), this, &rect, 0);
-		mTitle->setTextColor(RGB(255,255,255));
+		mTitle->setTextColor(COLOR_TEXT);
 		mTitle->onCreate();
 
 		rect.setEx(280, 0, 41, 22);
@@ -259,7 +259,7 @@ namespace mango
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else
-			canvas.setTextColor(RGB(255,255,255));	
+			canvas.setTextColor(COLOR_TEXT);	
 		canvas.setTextSize(18);
 		canvas.drawTextResource(mTextRes[index],rect,DT_CENTER|DT_VCENTER);
 

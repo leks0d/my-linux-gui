@@ -5,31 +5,33 @@ namespace mango
 	#define SETTING_TABLE_PATH "/data/mangosetting.db"
 	#define SETTING_TABLE_NAME "settings"
 	
-	#define SETTING_BRIGHTNESS_ID 	1
-	#define SETTING_VOLUME_ID 		2
-	#define SETTING_PLAYMODE_ID 		3
-	#define SETTING_GAPLESS_ID 		4
-	#define SETTING_EQMODE_ID			5
-	#define SETTING_EQSTATE_ID		6
-	#define SETTING_PLAYPOS_ID		7
-	#define SETTING_AUTOSLEEP_ID		8
-	#define SETTING_LANGUAGE_ID		9
-	#define SETTING_AUTOPOWEROFF_ID	10
-	#define SETTING_SCANSDCARDSTATE_ID	11
+	#define SETTING_BRIGHTNESS_ID 			1
+	#define SETTING_VOLUME_ID 				2
+	#define SETTING_PLAYMODE_ID 				3
+	#define SETTING_GAPLESS_ID 				4
+	#define SETTING_EQMODE_ID					5
+	#define SETTING_EQSTATE_ID				6
+	#define SETTING_PLAYPOS_ID				7
+	#define SETTING_AUTOSLEEP_ID				8
+	#define SETTING_LANGUAGE_ID				9
+	#define SETTING_AUTOPOWEROFF_ID			10
+	#define SETTING_SCANSDCARDSTATE_ID		11
+	#define SETTING_FORCE_POWEROFF_ID		12
 
 	#define SETTING_DEFAULT_VOLUME	170
 
-	#define SETTING_BRIGHTNESS_NAME		"brightness"
-	#define SETTING_VOLUME_NAME			"volume"
-	#define SETTING_PLAYMODE_NAME 		"playmode"
-	#define SETTING_GAPLESS_NAME			"gapless"
-	#define SETTING_EQMODE_NAME			"eqmode"
-	#define SETTING_EQSTATE_NAME			"eqopenOrclose"
-	#define SETTING_PLAYPOS_NAME			"playposition"
-	#define SETTING_AUTOSLEEP_NAME		"autosleepTime"
-	#define SETTING_LANGUAGE_NAME 	 	"languageId"
-	#define SETTING_AUTOPOWEROFF_NAME  	"autopoweroffTime"
+	#define SETTING_BRIGHTNESS_NAME				"brightness"
+	#define SETTING_VOLUME_NAME					"volume"
+	#define SETTING_PLAYMODE_NAME 				"playmode"
+	#define SETTING_GAPLESS_NAME					"gapless"
+	#define SETTING_EQMODE_NAME					"eqmode"
+	#define SETTING_EQSTATE_NAME					"eqopenOrclose"
+	#define SETTING_PLAYPOS_NAME					"playposition"
+	#define SETTING_AUTOSLEEP_NAME				"autosleepTime"
+	#define SETTING_LANGUAGE_NAME 	 			"languageId"
+	#define SETTING_AUTOPOWEROFF_NAME  			"autopoweroffTime"
 	#define SETTING_SCANSDCARDSTATE_NAME  		"scanSdcardState"
+	#define SETTING_FORCE_POWEROFF_NAME			"forcePowerOff"
 
 	#define EQ_CUSTOM_ID		0
 	#define EQ_POP_ID			1

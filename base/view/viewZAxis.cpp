@@ -312,6 +312,17 @@ namespace mango
 		
 		return true;
 	}
+	View* ViewZAxis::getDisplayingViewNoLock(){
+		View *view,*prev;
+		
+		prev = view = getToppestItem();
+		while(view){
+			prev = view;
+			view = view->getParent();
+		}
+		
+		return prev;
+	}
 
 	View* ViewZAxis::getDisplayingView(){
 		View *view,*prev;
@@ -323,11 +334,13 @@ namespace mango
 			prev = view;
 			view = view->getParent();
 		}
+		/*
 		if(prev != NULL){
 			log_i("ViewZAxis::getDisplayingView() view->name=%s",prev->name);
 		}else{
 			log_i("ViewZAxis::getDisplayingView() prev = NULL.");
 		}
+		*/
 		mMutex.unlock();
 		
 		return prev;
@@ -498,9 +511,12 @@ namespace mango
 	{
 		View* view ;
 
+		
 		mMutex.lock() ;
 
-		view = getBottommestItem();
+		//view = getBottommestItem();
+		view = getDisplayingViewNoLock();
+		
 		while (view) {
 			if ((view->mShowState != SW_HIDE) && \
 				(view->mShowState != SW_MINIMIZE) && \

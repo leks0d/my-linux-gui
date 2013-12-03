@@ -43,6 +43,14 @@ namespace mango
 			PoweroffListAdapter(ListView* list,int id);
 			virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);
 	};
+	class ForcepoweroffListAdapter : public SettingListAdapter
+	{
+		public:
+			ForcepoweroffListAdapter(void){}
+			~ForcepoweroffListAdapter(void){}
+			ForcepoweroffListAdapter(ListView* list,int id);
+			virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);
+	};
 
 
 	class SettingsView: public View
@@ -70,6 +78,7 @@ namespace mango
 		void initAutoSleepList();
 		void initLanguageList();
 		void initAutoPoweroffList();
+		void initForcePoweroffList();
 		void setMainState(int state){ mainState = state;log_i("mainState = 0x%x",mainState);}
 		int getMainState(){return mainState;}
 		void backEvent();
@@ -86,6 +95,7 @@ namespace mango
 		AutoSleepListAdapter* mAutoSleepListAdapter;
 		LanguageListAdapter* mLanguageListAdapter;
 		PoweroffListAdapter* mPoweroffListAdapter;
+		ForcepoweroffListAdapter* mForcepoweroffListAdapter;
 	private:
 		int		mMode;					//menu菜单 媒体库index 收藏夹 或 浏览路径
 		int		mPath;

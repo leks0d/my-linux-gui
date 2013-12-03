@@ -567,13 +567,13 @@ int CStringArray::addCString(CString& cstr){
 		}else{
 			mMax*=2;
 		}
-
+		
 		temp = new CString[mMax];
 		
 		for(i=0;i<mLen;i++){
 			temp[i] = mList[i];
 		}
-
+		
 		delete[] mList;
 		mList = temp;
 	}

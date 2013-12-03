@@ -28,6 +28,7 @@ namespace mango
 		mAutoSleepListAdapter = NULL;
 		mPowerListAdapter = NULL;
 		mPoweroffListAdapter = NULL;
+		mForcepoweroffListAdapter = NULL;
 	}
 
 	SettingsView::~SettingsView(void)
@@ -54,7 +55,7 @@ namespace mango
 		
 		rect.setEx(45, 0, 230, 20);
 		mTitle = new TextView(SETTING_TITLE, TEXT("mTitle"), this, &rect, 0);
-		mTitle->setTextColor(RGB(255,255,255));
+		mTitle->setTextColor(COLOR_TEXT);
 		mTitle->onCreate();
 		
 		rect.setEx(280, 0, 41, 22);
@@ -150,8 +151,8 @@ namespace mango
 	void SettingsView::initPowerList(){
 		int img[]={0,0};
 		int imgsec[]={0,0};
-		int text[]={STR_POWER_SCREEN_OFF,STR_POWER_POWER_OFF};
-		int i,count = 2;
+		int text[]={STR_POWER_SCREEN_OFF,STR_POWER_POWER_OFF,STR_POWER_SLEEP};
+		int i,count = sizeof(text)/sizeof(text[0]);
 		
 		if(mPowerListAdapter == NULL){
 			mListView->deleteAllItems();
@@ -221,6 +222,26 @@ namespace mango
 		mTitle->invalidateRect();
 		setMainState(0x1432);
 	}
+	void SettingsView::initForcePoweroffList(){
+		int img[]={0,0,0,0};
+		int imgsec[]={0,0,0,0};
+		int text[]={STR_SLEEP_TIME_0,STR_SLEEP_TIME_1,STR_SLEEP_TIME_2,STR_SLEEP_TIME_3};
+		int i,count = sizeof(text)/sizeof(text[0]);
+		
+		if(mForcepoweroffListAdapter == NULL){
+			mListView->deleteAllItems();
+			mForcepoweroffListAdapter = new ForcepoweroffListAdapter(mListView,ADAPTER_PLAYING);
+			mForcepoweroffListAdapter->setData(img,imgsec,text,count);
+		}else
+			mForcepoweroffListAdapter->refresh();
+		
+		mTitle->setTextResoure(STR_POWER_POWER_OFF);
+		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
+		mTitle->invalidateRect();
+		setMainState(0x1433);
+
+	}
+
 	void SettingsView::initLanguageList(){
 		int img[]={0,0,0,0,0};
 		int imgsec[]={0,0,0,0,0};
@@ -335,6 +356,9 @@ namespace mango
 						case 1:
 							initAutoPoweroffList();
 							break;
+						case 2:
+							initForcePoweroffList();
+							break;
 					}
 					break;
 				case 0x1431:
@@ -344,6 +368,10 @@ namespace mango
 				case 0x1432:
 						gPowerManager->setAutoPoweroffTime(index);
 						mPoweroffListAdapter->refresh();
+						break;
+				case 0x1433:
+						gPowerManager->setForcePoweroffTime(index);
+						mForcepoweroffListAdapter->refresh();
 						break;
 				}
 			}
@@ -396,6 +424,7 @@ namespace mango
 				break;
 			case 0x1431:
 			case 0x1432:
+			case 0x1433:
 				initPowerList();
 				break;
 		}
@@ -476,7 +505,7 @@ namespace mango
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else
-			canvas.setTextColor(RGB(255,255,255));
+			canvas.setTextColor(COLOR_TEXT);
 		canvas.setTextSize(18);
 		canvas.drawTextResource(mTextRes[index],x,y+13);
 	}
@@ -502,7 +531,7 @@ namespace mango
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else
-			canvas.setTextColor(RGB(255,255,255));	
+			canvas.setTextColor(COLOR_TEXT);	
 		canvas.setTextSize(18);
 		canvas.drawTextResource(mTextRes[index],x,y+13);
 		x+=150;
@@ -533,7 +562,7 @@ namespace mango
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else
-			canvas.setTextColor(RGB(255,255,255));	
+			canvas.setTextColor(COLOR_TEXT);	
 		canvas.setTextSize(18);
 		canvas.drawTextResource(mTextRes[index],x,y+13);
 		x+=150;
@@ -565,7 +594,7 @@ namespace mango
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else
-			canvas.setTextColor(RGB(255,255,255));	
+			canvas.setTextColor(COLOR_TEXT);	
 		canvas.setTextSize(18);
 		canvas.drawTextResource(mTextRes[index],x,y+13);
 		x+=150;
@@ -596,7 +625,7 @@ namespace mango
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else
-			canvas.setTextColor(RGB(255,255,255));	
+			canvas.setTextColor(COLOR_TEXT);	
 		canvas.setTextSize(18);
 		canvas.drawTextResource(mTextRes[index],x,y+13);
 		x+=150;
@@ -626,11 +655,40 @@ namespace mango
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else
-			canvas.setTextColor(RGB(255,255,255));	
+			canvas.setTextColor(COLOR_TEXT);	
 		canvas.setTextSize(18);
 		canvas.drawTextResource(mTextRes[index],x,y+13);
 		x+=150;
 		if(index == gPowerManager->getPoweroffTime())
+			canvas.drawImageResource(IDP_LISTITEM_SEC,x,y+13);
+		else
+			canvas.drawImageResource(IDP_LISTITEM_NO_SEC,x,y+13);
+	}
+	ForcepoweroffListAdapter::ForcepoweroffListAdapter(ListView* list,int id)
+		: SettingListAdapter(list,id){
+
+	}
+	void ForcepoweroffListAdapter::PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec){
+		int	 x, y,index;
+		
+		x = rect.left;
+		y = rect.top;
+
+		index = lvitem->iItem;
+		x+=50;
+		if(isSec)
+			canvas.drawImageResource(mSecImgRes[index],x,y+10);
+		else
+			canvas.drawImageResource(mImgRes[index],x,y+10);
+		x+=33;
+		if(isSec)
+			canvas.setTextColor(RGB(255,149,0));
+		else
+			canvas.setTextColor(COLOR_TEXT);	
+		canvas.setTextSize(18);
+		canvas.drawTextResource(mTextRes[index],x,y+13);
+		x+=150;
+		if(index == gPowerManager->getForcePoweroffTime())
 			canvas.drawImageResource(IDP_LISTITEM_SEC,x,y+13);
 		else
 			canvas.drawImageResource(IDP_LISTITEM_NO_SEC,x,y+13);
@@ -656,7 +714,7 @@ namespace mango
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else
-			canvas.setTextColor(RGB(255,255,255));	
+			canvas.setTextColor(COLOR_TEXT);	
 		canvas.setTextSize(18);
 		canvas.drawTextResource(mTextRes[index],x,y+13);
 

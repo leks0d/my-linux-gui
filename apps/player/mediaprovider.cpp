@@ -95,20 +95,22 @@ namespace mango
 	static void getFileParentName(char *path,char *name ){
 		int i,len,start,end;
 		
-		len = strlen(path);
-		start = end = -1;
-		for(i=len-1;i>=0;i--){
-			if(path[i] == '/'){
-				if(end == -1){
-					end = i;
-				}else if(start == -1){
-					start = i+1;
-					break;
+		if(path!=NULL){
+			len = strlen(path);
+			start = end = -1;
+			for(i=len-1;i>=0;i--){
+				if(path[i] == '/'){
+					if(end == -1){
+						end = i;
+					}else if(start == -1){
+						start = i+1;
+						break;
+					}
 				}
 			}
-		}
-		if(start>=0&&end>0&&end-start>0){
-			memcpy(name,&path[start],end-start);
+			if(start>=0&&end>0&&end-start>0){
+				memcpy(name,&path[start],end-start);
+			}
 		}
 	}
 	int mediaprovider::str_to_int(char *arg){
@@ -138,12 +140,12 @@ namespace mango
 	static char* getstr(char *arg){
 		int len;
 		char *str;
-
+		
 		if(arg == NULL){
 			len = 7;
 			str = (char*)malloc(len);
 			memcpy(str,"(null)",len);
-		}else{		
+		}else{
 			len = strlen(arg)+1;
 			str = (char*)malloc(len);
 			memcpy(str,arg,len);
@@ -194,14 +196,12 @@ namespace mango
 			memset(ptr,0,len*2);
 			
 			while(*src){
-				
 				if(*src == '\''){
 					*ptr++ = *src;
 					*ptr = *src;
 				}else{
 					*ptr = *src;
 				}
-				
 				ptr++;src++;
 			}
 			*ptr = *src;
@@ -214,8 +214,8 @@ namespace mango
 		char *src;
 		
 		if(arg){
-			src = arg;	
-			while(*src){		
+			src = arg;
+			while(*src){
 				if(*src == '\''){
 					*src = '\`';
 				}
@@ -228,9 +228,10 @@ namespace mango
 	int mediaprovider::power_operation(int ary,int th){
 		int value ,i;
 		value = 1;
-		if(th == 0)
+		
+		if(th == 0){
 			return 1;
-		else{
+		}else{
 			for(i=0;i<th;i++)
 				value*=ary;
 		}
@@ -327,6 +328,9 @@ namespace mango
 	static void getFileTitle(char *file,char *title){
 		char *temp;
 		int i,len;
+		
+		if(file == NULL)
+			return;
 		
 		len = strlen(file);
 		temp = new char[len+1];
@@ -552,7 +556,7 @@ namespace mango
 		
 		tt2 = Time::getMicrosecond();
 		
-		albumImageSync();
+		//albumImageSync();
 		
 		//sdcard.copyData();
 		
@@ -616,12 +620,13 @@ namespace mango
 	int mediaprovider::analyzeAudioID3(CursorItem& item,AudioFileInfo& info){
 		ID3INFO m_id3(info.path.string);
 		char *value;
-		char sqlStr[1024]={0},filename[255]={0};
+		int len = 1024;
+		char sqlStr[1024]={0},filename[1024]={0};
 		CString md5;
 		
 		item.addItem("times",mCurrentTimes);
 		
-		value = (char*)malloc(256);
+		value = (char*)malloc(len);
 		
 		slqFormatOut(info.path.string,sqlStr);
 		item.addItem("path",sqlStr);
@@ -637,7 +642,7 @@ namespace mango
 		strlwr(filename,sqlStr);
 		item.addItem("name_key",sqlStr);
 
-		memset(value, 0, 256);
+		memset(value, 0, len);
 		if (m_id3.GetTags(METADATA_KEY_TITLE, value)){
 			slqCheck(value);
 		}else{
@@ -650,14 +655,14 @@ namespace mango
 		
 		item.addItem("inPlay",0);
 
-		memset(value, 0, 256);
+		memset(value, 0, len);
 		if (m_id3.GetTags(METADATA_KEY_CD_TRACK_NUMBER, value)){
 			item.addItem("track",str_to_int(value));
 		}else{
 			item.addItem("track",1000);
 		}
 		
-		memset(value, 0, 256);
+		memset(value, 0, len);
 		if (m_id3.GetTags(METADATA_KEY_ALBUM, value)){
 
 		}else{
@@ -669,7 +674,7 @@ namespace mango
 		strlwr(value,sqlStr);
 		item.addItem("album_key",sqlStr);
 		
-		memset(value, 0, 256);
+		memset(value, 0, len);
 		if (m_id3.GetTags(METADATA_KEY_ARTIST, value)){
 		}else{
 			sprintf(value,"(null)");
@@ -680,7 +685,7 @@ namespace mango
 		strlwr(value,sqlStr);
 		item.addItem("artist_key",sqlStr);
 		
-		memset(value, 0, 256);
+		memset(value, 0, len);
 		if (m_id3.GetTags(METADATA_KEY_GENRE, value)){
 		}else{
 			sprintf(value,"(null)");
@@ -691,7 +696,7 @@ namespace mango
 		strlwr(value,sqlStr);
 		item.addItem("genre_key",value);
 		
-		memset(value, 0, 256);
+		memset(value, 0, len);
 		if (m_id3.GetTags(METADATA_KEY_DURATION, value)){
 			item.addItem("duration",str_to_int(value));
 		}else
@@ -736,7 +741,9 @@ namespace mango
 		}else{
 			item.addItem("img_path","(null)");
 		}
-			
+
+		free(value);
+		value = NULL;
 	}
 
 	int mediaprovider::getmediainfo(char *path,mediainfo *info,CString& cover,CString& genImg)
@@ -1187,6 +1194,7 @@ namespace mango
 		out = new char[len+1];
 		memcpy(out,src,len+1);
 	}
+/*
 	int mediaprovider::checkfile(const char *dir,bool display){
 		char sql[100],*sp;
 		mediainfo *infolist;
@@ -1242,8 +1250,61 @@ namespace mango
 		
 		return 0;
 	}
+*/
+	int mediaprovider::checkfile(const char *dir,bool display){
+		int count,i,progress=0;
+		unsigned long t0,t1,tt0,tt1,tt2;
+		Cursor cur;
+		char sql[SQL_LEN];
 
-	
+		sprintf(sql,"select _id,path,times from music where path like '%s/%%'",dir);
+		
+		tt0 = Time::getMicrosecond();
+		
+		querySqlCursor(sql,&cur);
+		count = cur.mLen;
+
+		tt1 = Time::getMicrosecond();
+		
+		for(i=0;i<count;i++){
+			CString path;
+			CString timeStr;
+			int times = 0,p;
+			
+			cur.getValueCstring(i,"path",path);
+			cur.getValueCstring(i,"times",timeStr);
+			timeStr.toIneger(&times);
+
+			if(!FileAttr::FileExist(path.string)){
+				CString idStr;
+				int id = 0;
+				
+				cur.getValueCstring(i,"_id",idStr);
+				idStr.toIneger(&id);
+				
+				del("music",id);
+			}else if(times > mCurrentTimes){
+				mCurrentTimes = times;
+			}
+
+			if(display){
+				p = (i+1)*100/count;
+				
+				if(progress<p){
+					progress = p;
+					sendMsgProgress(progress);
+				}
+			}
+		}
+
+		tt2 = Time::getMicrosecond();
+		t0 = tt1 - tt0;
+		t1 = tt2 - tt1;
+		log_i("t0=%ldms,t1=%ld",t0/1000,t1/1000);
+		
+		if(!FileAttr::FileExist(IMG_PATH))
+			mkdir(IMG_PATH,0777);
+	}	
 	int mediaprovider::initialize(void){
 		int ret = 0;
 		char *pErrMsg = 0;
@@ -1353,7 +1414,11 @@ namespace mango
 
 		return exec(sql,0,0);
 	}
-	
+	int mediaprovider::deleteMusicOnDir(const char *dir){
+		char sql[1024];
+		sprintf(sql,"delete from music where path like '%s/%%'",dir);
+		return exec(sql,0,0);
+	}
 	int mediaprovider::querymusic(char *where, mediainfo **minfo)
 	{
 		char *ptr,sql[1024];
@@ -1505,6 +1570,11 @@ namespace mango
 			log_i("queryMusicArray:sql=%s",sql);
 			
 			return exec(sql,cur,cursor_sql_callback);		
+	}
+	int mediaprovider::querySqlCursor(char *sql, Cursor* cur){
+		log_i("queryMusicArray:sql=%s",sql);
+		return exec(sql,cur,cursor_sql_callback);	
+
 	}
 	int mediaprovider::del(char *table,int id){
 		char *ptr,sql[256];
@@ -1728,13 +1798,13 @@ namespace mango
 		}else{
 			ret = false;
 		}
-		log_i("ret=%d,%s",ret,info.path.string);
+		//log_i("ret=%d,%s",ret,info.path.string);
 		return ret;
 	}
 	void SdcardAudioData::insertCursor(CursorItem& item){
 		int i,ret;
 		char *pErrMsg = 0;
-		char *ptr,sql[1024*3];
+		char *ptr,sql[1024*5];
 
 		if(db == NULL)
 			return;

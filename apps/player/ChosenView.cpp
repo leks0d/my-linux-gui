@@ -41,7 +41,7 @@ namespace mango
 
 		rect.setEx(45, 0, 230, 20);
 		mTitle = new TextView(SETTING_TITLE, TEXT("mTitle"), this, &rect, 0);
-		mTitle->setTextColor(RGB(255,255,255));
+		mTitle->setTextColor(COLOR_TEXT);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mTitle->onCreate();
 
@@ -53,13 +53,13 @@ namespace mango
 
 		rect.setEx(0, 100, 320, 22);
 		mBrightnessValue = new TextView(SETTING_TITLE, TEXT("mTitle"), this, &rect, 0);
-		mBrightnessValue->setTextColor(RGB(255,255,255));
+		mBrightnessValue->setTextColor(COLOR_TEXT);
 		mBrightnessValue->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mBrightnessValue->onCreate();
 		
 		rect.setEx(0, 213, 115, 27);		
 		mMyMusicText = new  TextView(PLAYING_IDB_MUSIC, TEXT("mMyMusicText"), this, &rect, 0);
-		mMyMusicText->setTextColor(RGB(209,209,209));
+		mMyMusicText->setTextColor(COLOR_TEXT);
 		mMyMusicText->setTextSelectColor(COLOR_ORANGE);
 		mMyMusicText->setTextSize(16);
 		mMyMusicText->setTextResoure(STR_SYSTEM_ASK_YES);
@@ -68,7 +68,7 @@ namespace mango
 
 		rect.setEx(205, 213, 115, 27);		
 		mSettingText = new  TextView(PLAYING_IDB_SETTING, TEXT("mSettingText"), this, &rect, 0);
-		mSettingText->setTextColor(RGB(209,209,209));
+		mSettingText->setTextColor(COLOR_TEXT);
 		mSettingText->setTextSelectColor(COLOR_ORANGE);
 		mSettingText->setTextSize(16);
 		mSettingText->setTextResoure(STR_SYSTEM_ASK_NO);

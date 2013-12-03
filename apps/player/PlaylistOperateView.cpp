@@ -50,7 +50,7 @@ namespace mango
 
 		rect.setEx(45, 0, 230, 20);
 		mTitle = new TextView(SETTING_TITLE, TEXT("operatemTitle"), this, &rect, 0);
-		mTitle->setTextColor(RGB(255,255,255));
+		mTitle->setTextColor(COLOR_TEXT);
 		mTitle->onCreate();
 
 		rect.setEx(280, 0, 41, 22);

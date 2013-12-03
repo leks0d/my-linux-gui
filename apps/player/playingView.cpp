@@ -34,9 +34,9 @@ namespace mango
 		log_i("PlayingView::onCreate()");
 		//return 0;
 		rect.setEx(10, 2, 60, 16);
-		mEqState = new TextView(-1, TEXT("mVolumeText"), this, &rect, 0);
+		mEqState = new TextView(-1, TEXT("mEqStateText"), this, &rect, 0);
 		mEqState->setTextSize(13);
-		mEqState->setTextColor(RGB(255,255,255));
+		mEqState->setTextColor(COLOR_TEXT);
 		mEqState->setTextLayoutType(TEXT_LAYOUT_LEFT);
 		mEqState->onCreate();
 		
@@ -116,7 +116,7 @@ namespace mango
 		rect.setEx(volumeX+20, 2, 20, 16);
 		mVolumeText = new TextView(-1, TEXT("mVolumeText"), this, &rect, 0);
 		mVolumeText->setTextSize(13);
-		mVolumeText->setTextColor(RGB(255,255,255));
+		mVolumeText->setTextColor(COLOR_TEXT);
 		mVolumeText->setTextLayoutType(TEXT_LAYOUT_LEFT);
 		mVolumeText->onCreate();
 		
@@ -140,21 +140,21 @@ namespace mango
 		
 		rect.setEx(15, 166, 60, 15);		
 		mTimeText = new  TextView(-1, TEXT("playtimetext"), this, &rect, 0);
-		mTimeText->setTextColor(RGB(255,255,255));
+		mTimeText->setTextColor(COLOR_TEXT);
 		mTimeText->setTextSize(13);
 		mTimeText->setTextLayoutType(TEXT_LAYOUT_LEFT);
 		mTimeText->onCreate();
 		
 		rect.setEx(270, 166, 50, 15);		
 		mDurtionText = new  TextView(-1, TEXT("mDurtionText"), this, &rect, 0);
-		mDurtionText->setTextColor(RGB(255,255,255));
+		mDurtionText->setTextColor(COLOR_TEXT);
 		mDurtionText->setTextLayoutType(TEXT_LAYOUT_LEFT);
 		mDurtionText->setTextSize(13);
 		mDurtionText->onCreate();
 
 		rect.setEx(0, 213, 115, 27);		
 		mMyMusicText = new  TextView(PLAYING_IDB_MUSIC, TEXT("mMyMusicText"), this, &rect, 0);
-		mMyMusicText->setTextColor(RGB(209,209,209));
+		mMyMusicText->setTextColor(COLOR_TEXT);
 		mMyMusicText->setTextSelectColor(COLOR_ORANGE);
 		mMyMusicText->setTextSize(16);
 		mMyMusicText->setTextResoure(MUSIC_MY_MUSIC);
@@ -163,7 +163,7 @@ namespace mango
 
 		rect.setEx(205, 213, 115, 27);		
 		mSettingText = new  TextView(PLAYING_IDB_SETTING, TEXT("mSettingText"), this, &rect, 0);
-		mSettingText->setTextColor(RGB(209,209,209));
+		mSettingText->setTextColor(COLOR_TEXT);
 		mSettingText->setTextSelectColor(COLOR_ORANGE);
 		mSettingText->setTextSize(16);
 		mSettingText->setTextResoure(MUSIC_MUSIC_FUN);
@@ -633,9 +633,8 @@ namespace mango
 			
 			if(isUsmCon == 1){
 				gmediaprovider.externVolumeScanner("/mnt/sdcard");
-			}else if(!FileAttr::FileExist(SDCARD_BLOCK_PATH)){
-				mUpdateSDcardThread.create(updateSDcardRunnig,(void*)1);
-				ViewInit();
+			}else if(!FileAttr::FileExist(SDCARD_BLOCK_PATH)&&Environment::isSDcardChange()){
+				gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,SDCARD_UNMOUNT,0);
 			}else{
 				ViewInit();
 			}
@@ -667,8 +666,10 @@ namespace mango
 		}else if(code == SDCARD_UNMOUNT){
 			isSdcardShare = 0;
 			gPlayer.dismissView(gPlayer.mSdcardInsertView);
-			mPlayinglist->checkPlayintList();
-			gmediaprovider.externFileCheck();
+			mPlayinglist->checkPlayintList(SDCARD_PATH);
+			gmediaprovider.deleteMusicOnDir(SDCARD_PATH);
+			Environment::updateSDcard();
+			ViewInit();
 		}else if(code == MEDIA_SCANNER_START){
 			isMediaScanning = 1;
 			gPlayer.showMediaScannerView();

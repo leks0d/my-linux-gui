@@ -44,7 +44,7 @@ namespace mango
 		
 		rect.setEx(45, 0, 230, 20);
 		mTitle = new TextView(SETTING_TITLE, TEXT("mTitle"), this, &rect, 0);
-		mTitle->setTextColor(RGB(255,255,255));
+		mTitle->setTextColor(COLOR_TEXT);
 		mTitle->setTextResoure(STR_SETTING_MUSICINFO);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mTitle->onCreate();

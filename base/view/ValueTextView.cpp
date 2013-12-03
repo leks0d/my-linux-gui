@@ -19,8 +19,8 @@ namespace mango
 		mText = NULL;
 		resId = 0;
 		ResType = 0;
-		mValueColor = ARGB (255,255,255,255);
-		mContextColor = RGB(180,180,180);
+		mValueColor = COLOR_TEXT;
+		mContextColor = COLOR_TEXT_CONTEXT;
 		mSize = 16;
 		mPress = 0;
 		mNormalBgdResId = 0;

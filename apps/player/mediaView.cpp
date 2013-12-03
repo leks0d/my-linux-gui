@@ -185,13 +185,13 @@ namespace mango
 		
 		rect.setEx(45, 0, 230, 20);
 		mTitle = new TextView(SETTING_TITLE, TEXT("mTitle"), this, &rect, 0);
-		mTitle->setTextColor(RGB(255,255,255));
+		mTitle->setTextColor(COLOR_TEXT);
 		mTitle->setIconRes(IDP_ORDER_SEC);
 		mTitle->onCreate();
 
 		rect.setEx(orderTextX, orderTextY, orderDiv, 40);
 		mOrderByTitle = new TextView(MEDIA_ORDER_TILE, TEXT("mOrderByTitle"), this, &rect,0,SW_HIDE);
-		mOrderByTitle->setTextColor(RGB(255,255,255));
+		mOrderByTitle->setTextColor(COLOR_TEXT);
 		mOrderByTitle->setTextSelectColor(RGB(255,148,0));
 		mOrderByTitle->setTextResoure(STR_ORDERBY_TITLE);
 		mOrderByTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
@@ -199,7 +199,7 @@ namespace mango
 		orderTextX+=78;
 		rect.setEx(orderTextX, orderTextY, orderDiv, 40);
 		mOrderByAlbum = new TextView(MEDIA_ORDER_ALBUM, TEXT("mOrderByAlbum"), this, &rect,0,SW_HIDE);
-		mOrderByAlbum->setTextColor(RGB(255,255,255));
+		mOrderByAlbum->setTextColor(COLOR_TEXT);
 		mOrderByAlbum->setTextSelectColor(RGB(255,148,0));
 		mOrderByAlbum->setTextResoure(STR_ORDERBY_ALBUM);
 		mOrderByAlbum->setTextLayoutType(TEXT_LAYOUT_CENTER);
@@ -207,7 +207,7 @@ namespace mango
 		orderTextX+=78;
 		rect.setEx(orderTextX, orderTextY, orderDiv, 40);
 		mOrderByArtist = new TextView(MEDIA_ORDER_ARTIST, TEXT("mOrderByArtist"), this, &rect,0,SW_HIDE);
-		mOrderByArtist->setTextColor(RGB(255,255,255));
+		mOrderByArtist->setTextColor(COLOR_TEXT);
 		mOrderByArtist->setTextSelectColor(RGB(255,148,0));
 		mOrderByArtist->setTextResoure(STR_ORDERBY_ARTIST);
 		mOrderByArtist->setTextLayoutType(TEXT_LAYOUT_CENTER);
@@ -215,7 +215,7 @@ namespace mango
 		orderTextX+=78;
 		rect.setEx(orderTextX, orderTextY, orderDiv, 40);
 		mOrderByTime = new TextView(MEDIA_ORDER_TIME, TEXT("mOrderByTime"), this, &rect,0,SW_HIDE);
-		mOrderByTime->setTextColor(RGB(255,255,255));
+		mOrderByTime->setTextColor(COLOR_TEXT);
 		mOrderByTime->setTextSelectColor(RGB(255,148,0));
 		mOrderByTime->setTextResoure(STR_ORDERBY_TIME);
 		mOrderByTime->setTextLayoutType(TEXT_LAYOUT_CENTER);
@@ -1309,14 +1309,14 @@ namespace mango
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else
-			canvas.setTextColor(RGB(255,255,255));
+			canvas.setTextColor(COLOR_TEXT);
 		canvas.setTextSize(16);
 		x = x+40;
 		//canvas.drawText(info->name,strlen(info->title),x,y+5);
 		yrect.setEx(x,y+5,308-x,30);
 		canvas.drawText(info->title,strlen(info->title),yrect,0);
 		
-		canvas.setTextColor(RGB(255,255,255));
+		canvas.setTextColor(COLOR_TEXT);
 		canvas.setTextSize(12);
 		if(info->artist!=NULL){
 			//canvas.drawText(info->artist,strlen(info->artist),x,y+28);
@@ -1450,13 +1450,13 @@ namespace mango
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else
-			canvas.setTextColor(RGB(255,255,255));
+			canvas.setTextColor(COLOR_TEXT);
 		x= x+40;
 		canvas.setTextSize(16);
 		//canvas.drawText(info->name,strlen(info->title),x,y+5);
 		yrect.setEx(x,y+5,296-x+12,40);
 		canvas.drawText(info->title,strlen(info->title),yrect,0 );
-		canvas.setTextColor(RGB(255,255,255));
+		canvas.setTextColor(COLOR_TEXT);
 		canvas.setTextSize(12);
 		//canvas.drawText(info->artist,strlen(info->artist),x,y+28);
 		yrect.setEx(x,y+28,296-x+12,20);
@@ -1565,14 +1565,14 @@ namespace mango
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else
-			canvas.setTextColor(RGB(255,255,255));
+			canvas.setTextColor(COLOR_TEXT);
 		canvas.setTextSize(16);
 		x = x+40;
 		//canvas.drawText(info->album,strlen(info->album),x,y+5);
 		yrect.setEx(x,y+5,308-x,30);
 		canvas.drawText(info->album,strlen(info->album),yrect,0);
 		
-		canvas.setTextColor(RGB(255,255,255));
+		canvas.setTextColor(COLOR_TEXT);
 		canvas.setTextSize(12);
 		//canvas.drawText(info->artist,strlen(info->artist),x,y+28);
 		yrect.setEx(x,y+28,308-x,20);
@@ -1614,7 +1614,7 @@ namespace mango
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else
-			canvas.setTextColor(RGB(255,255,255));
+			canvas.setTextColor(COLOR_TEXT);
 		canvas.setTextSize(18);
 
 		x+=45;
@@ -1672,7 +1672,7 @@ namespace mango
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else
-			canvas.setTextColor(RGB(255,255,255));
+			canvas.setTextColor(COLOR_TEXT);
 		
 		canvas.setTextSize(18);
 
@@ -1681,7 +1681,7 @@ namespace mango
 		yrect.setEx(x,y+10,296+12-x,30);
 		canvas.drawText(info->artist,strlen(info->artist),yrect,0);
 		
-		canvas.setTextColor(RGB(255,255,255));
+		canvas.setTextColor(COLOR_TEXT);
 	}
 
 	void MainListAdapter::PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec){
@@ -1700,7 +1700,7 @@ namespace mango
 		if(isSec)
 			canvas.setTextColor(RGB(255,149,0));
 		else
-			canvas.setTextColor(RGB(255,255,255));	
+			canvas.setTextColor(COLOR_TEXT);	
 		canvas.setTextSize(18);
 		canvas.drawTextResource(mTextRes[index],x,y+13);
 	}

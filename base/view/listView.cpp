@@ -900,7 +900,7 @@ namespace mango
 		if(isBarTouch)
 			brush.set(0,COLOR_ORANGE);
 		else
-			brush.set(0,COLOR_WHITE);
+			brush.set(0,COLOR_LISTBAR);
 		
 		rect.setEx(315,drawOffset,3,drawLen);
 
@@ -1017,6 +1017,7 @@ namespace mango
 			rect.right -= 8 ;
 			rect.left = 55;
 			canvas.setTextSize(16);
+			canvas.setTextColor(COLOR_TEXT);
 			canvas.drawText(lvitem->pszText, -1, rect, DT_VCENTER | DT_END_ELLIPSIS);
 		}
 

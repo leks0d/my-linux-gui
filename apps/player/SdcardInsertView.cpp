@@ -36,14 +36,16 @@ namespace mango
 		
 		rect.setEx(10,130,300,50);
 		mScannerButton = new TextView(BUTTON_SCANNER, TEXT("mScannerButton"), this, &rect, 0);
-		mScannerButton->setTextColor(COLOR_GRAY);
+		mScannerButton->setTextColor(COLOR_TEXT);
+		mScannerButton->setTextSelectColor(COLOR_ORANGE);
 		mScannerButton->setTextSize(16);
 		mScannerButton->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mScannerButton->setBackGround(IDP_LISTITEM_BGD,IDP_LISTITEM_BGD_SEC);
 
 		rect.setEx(10,180,300,50);
 		mDirectButton = new TextView(BUTTON_BROWSER, TEXT("mDirectButton"), this, &rect, 0);
-		mDirectButton->setTextColor(COLOR_GRAY);
+		mDirectButton->setTextColor(COLOR_TEXT);
+		mDirectButton->setTextSelectColor(COLOR_ORANGE);
 		mDirectButton->setTextSize(16);
 		mDirectButton->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mDirectButton->setBackGround(IDP_LISTITEM_BGD,IDP_LISTITEM_BGD_SEC);
