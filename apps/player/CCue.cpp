@@ -405,7 +405,9 @@ CString::CString(){
 	mlen = 0;
 }
 CString::~CString(){
-	safeDelete(string);
+	if(string != NULL)
+		delete[] string;
+	string = NULL;
 	mlen = 0;
 }
 void CString::Format(const char *format,const char *path){

@@ -171,6 +171,7 @@ md5 TEXT\
 		CString cover;
 		CString md5;
 		AudioFileInfo(){};
+		~AudioFileInfo(){};
 		AudioFileInfo& operator==(AudioFileInfo& item){
 			path = item.path;
 			cover = item.cover;

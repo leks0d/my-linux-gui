@@ -6,8 +6,6 @@ namespace mango
 		mLen = 0;
 	}
 	CursorItem::~CursorItem(){
-		mKey.~CStringArray();
-		mValue.~CStringArray();
 	}
 	void CursorItem::setValue(const char* key,CString& value){
 		int i;

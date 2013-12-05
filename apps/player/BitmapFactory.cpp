@@ -39,8 +39,8 @@ namespace mango
 			mMSkBitmap->release();
 		}else{
 			int start,end;
-			SkBitmap skBitmap,*pskBitmap;
-			SkCanvas *skCanvas;
+			SkBitmap skBitmap,*pskBitmap = NULL;
+			SkCanvas *skCanvas = NULL;
 
 			start = Time::getMillisecond();
 			
@@ -52,7 +52,7 @@ namespace mango
 			bool ret = SkImageDecoder::DecodeFile(path,&skBitmap,SkBitmap::kARGB_8888_Config,SkImageDecoder::kDecodePixels_Mode);			
 
 			if(ret){
-				log_i("skBitmap->width()=%d,skBitmap->height()=%d",skBitmap.width(),skBitmap.height());
+				log_i("width=%d,height=%d",skBitmap.width(),skBitmap.height());
 
 				skCanvas = new SkCanvas(*pskBitmap);
 				SkIRect srcRect;
@@ -69,6 +69,10 @@ namespace mango
 				log_i("DecodeFile fail path=%s\n",path);
 				mMSkBitmap->release();
 			}
+			
+			safeDelete(skCanvas);
+			safeDelete(pskBitmap);
+
 			end = Time::getMillisecond() - start;
 			log_i("DecodeFile space time %dms",end);
 		}		
@@ -78,11 +82,11 @@ namespace mango
 		if( buf == NULL && size <= 0){
 			mMSkBitmap->release();
 		}else{
-			int start,end;
-			SkBitmap skBitmap,*pskBitmap;
-			SkCanvas *skCanvas;
+			//int start,end;
+			SkBitmap skBitmap,*pskBitmap = NULL;
+			SkCanvas *skCanvas = NULL;
 
-			start = Time::getMillisecond();
+			//start = Time::getMillisecond();
 			
 		    pskBitmap = new SkBitmap();
 		    pskBitmap->setConfig(SkBitmap::kARGB_8888_Config,w,h);
@@ -92,7 +96,7 @@ namespace mango
 			//bool ret = SkImageDecoder::DecodeFile(path,&skBitmap,SkBitmap::kARGB_8888_Config,SkImageDecoder::kDecodePixels_Mode);			
 			bool ret = SkImageDecoder::DecodeMemory(buf,size,&skBitmap,SkBitmap::kARGB_8888_Config,SkImageDecoder::kDecodePixels_Mode);
 			if(ret){
-				log_i("skBitmap->width()=%d,skBitmap->height()=%d",skBitmap.width(),skBitmap.height());
+				log_i("width=%d,height=%d",skBitmap.width(),skBitmap.height());
 
 				skCanvas = new SkCanvas(*pskBitmap);
 				SkIRect srcRect;
@@ -105,12 +109,17 @@ namespace mango
 
 				skCanvas->restore();
 				mMSkBitmap->create((int *)pskBitmap->getPixels(),pskBitmap->width(),pskBitmap->height());
+
 			}else{
-				//log_i("DecodeFile fail path=%s\n",path);
 				mMSkBitmap->release();
 			}
-			end = Time::getMillisecond() - start;
-			log_i("DecodeFile space time %dms",end);
+
+			safeDelete(skCanvas);
+			safeDelete(pskBitmap);
+			
+			//end = Time::getMillisecond() - start;
+			
+			//log_i("DecodeFile space time %dms",end);
 		}		
 	}
 
@@ -318,7 +327,7 @@ namespace mango
 	        filesize = statbuff.st_size;  
 	    }
 		log_i("filesize=%d,path=%s",filesize,path);
-	    return filesize;  
+	    return filesize;
 	}
 	bool Environment::isSDcardExist(){
 		const char *path = "/dev/block/mmcblk0p1";

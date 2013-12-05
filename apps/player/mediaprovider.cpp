@@ -510,6 +510,7 @@ namespace mango
 		int i;
 		int progress = 0;		
 		unsigned long t0,t1,t2,t3,tt0,tt1,tt2,tt3,tt4;
+		unsigned long ts,te,td=0,ts_,te_,td_=0;
 		AudioFileArray fileArray;
 		SdcardAudioData sdcard(SDCARD_PATH);
 
@@ -534,14 +535,20 @@ namespace mango
 				curItem.setValue("times",mCurrentTimes);
 				existSDcard = 1;
 			}else{
+				//ts = Time::getMicrosecond();
 				analyzeAudioID3(curItem,fileArray.mList[i]);
+				//te = Time::getMicrosecond();
+				//td += te - ts;
 			}
 			
+			//ts_ = Time::getMicrosecond();
 			if(!cueCheckCursor(curItem)){
 				insertCursorItem(curItem);
 				if(existSDcard == 0)
 					sdcard.insertCursor(curItem);
 			}
+			//te_ = Time::getMicrosecond();
+			//td_ += te_ - ts_;
 			
 			p = (i+1)*100/fileArray.mLen;
 			
@@ -558,15 +565,13 @@ namespace mango
 		
 		//albumImageSync();
 		
-		//sdcard.copyData();
-		
 		tt3 = Time::getMicrosecond();
 
 		t0 = tt1 - tt0;
 		t1 = tt2 - tt1;
 		t2 = tt3 - tt2;
 
-		log_i("time,t0=%ldms,t1=%ldms,t2=%ldms,t3=%ldms",t0/1000,t1/1000,t2/1000,t3/1000);
+		log_i("time,t0=%ldms,t1=%ldms,td_=%ldms,td=%ldms",t0/1000,t1/1000,td_/1000,td/1000);
 		Thread::sleep(100);
 		mMutex.unlock();
 	}
@@ -607,14 +612,14 @@ namespace mango
 	}
 	
 	int mediaprovider::sendMsgEnd(){
-		int dur = Time::getMillisecond() - scanTime;
 		log_i("sendMsgEnd:dismissView MediaScannerView,Time:%dms",dur);
-		//log_i("t0=%ldms,t1=%ldms,t2=%ldms",t0/1000,t1/1000,t2/1000);
+		int dur = Time::getMillisecond() - scanTime;
 		releaseWakeLock();
 		gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,MEDIA_SCANNER_END,0);
 		return 0;
 	}
 	int mediaprovider::sendMsgProgress(int progress){
+		log_i("progress = %d",progress);
 		gMessageQueue.post(gPlayer.mMediaScannerView,VM_NOTIFY,MEDIA_SCANNER_PROGRESS,progress);
 	}
 	int mediaprovider::analyzeAudioID3(CursorItem& item,AudioFileInfo& info){
@@ -713,7 +718,7 @@ namespace mango
 			}else{
 				if(m_id3.piclength > 0)
 					BitmapFactory::decodeBuffer(&mMSkBitmap,(void*)m_id3.picdata,m_id3.piclength,109,109);
-
+				
 				int ret = mMSkBitmap.saveToFile(imgpath.string);
 				if(ret == 1)
 					item.addItem("img_path",imgpath.string);
@@ -723,7 +728,7 @@ namespace mango
 		}else if(info.cover != NULL){
 			CString imgpath,coverMd5;
 			MSkBitmap mMSkBitmap;
-
+			
 			Environment::MD5(info.cover.string,coverMd5);
 			genMd5ImgPath(coverMd5,imgpath);
 
@@ -1045,11 +1050,10 @@ namespace mango
 	}
 	bool mediaprovider::cueCheckCursor(CursorItem& item){
 		CString dir;
-		char cuePath[300];
+		char cuePath[300]={0};
 		bool ret = false;
 		CursorMediaInfo curMedia;
-
-		memset(cuePath,0,300);
+		
 		item.getValue("path",dir);
 		getCuePath(dir.string,cuePath);
 		
@@ -1640,6 +1644,7 @@ namespace mango
 			mList = NULL;
 		}
 		mLen=mMax=0;
+		log_i("-");
 	}
 	void AudioFileArray::addItem(AudioFileInfo& item){
 		if(mLen>=mMax){
@@ -1779,22 +1784,16 @@ namespace mango
 		
 		if(cur.mLen > 0){
 			CString val;
-			int iscue = 0;
 			
-			cur.mList[0].getValue("iscue",val);
-			if(val.toIneger(&iscue) && iscue){
-				log_i("iscue=%d return_false",iscue);
-				ret = false;
-			}else{
-				item = cur.mList[0];
-				
-				item.getValue("path",val);
-				mediaprovider::slqFormatOut(val.string,sqlPath);
-				item.setValue("path",sqlPath);
-				
-				item.removeItem("_id");
-				ret = true;
-			}
+			item = cur.mList[0];
+			
+			item.getValue("path",val);
+			mediaprovider::slqFormatOut(val.string,sqlPath);
+			item.setValue("path",sqlPath);
+			
+			item.removeItem("_id");
+			
+			ret = true;
 		}else{
 			ret = false;
 		}
@@ -1843,8 +1842,6 @@ namespace mango
 		if(ret != SQLITE_OK){
 			log_e("sqlite3_exec error : %s",sql);
 			log_e("sqlite3_exec pErrMsg : %s",pErrMsg);
-		}else{
-			log_i("--->");
 		}
 		insertItemCount++;
 	}

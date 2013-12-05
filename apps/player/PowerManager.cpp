@@ -66,6 +66,11 @@ namespace mango
 
 	void PowerManager::PowerManagerCount(){
 		atuoCount++;
+		
+		if(gPlayer.mPlayingView != NULL &&gPlayer.mPlayingView->isMediaScanning){
+			atuoCount = 0;
+		}
+
 		if(atuoCount>=sleepTime&&(!isSleep)){
 			log_i("setPowerState autosleep time out.");
 			setPowerState();
