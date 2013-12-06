@@ -612,8 +612,8 @@ namespace mango
 	}
 	
 	int mediaprovider::sendMsgEnd(){
-		log_i("sendMsgEnd:dismissView MediaScannerView,Time:%dms",dur);
 		int dur = Time::getMillisecond() - scanTime;
+		log_i("sendMsgEnd:dismissView MediaScannerView,Time:%dms",dur);
 		releaseWakeLock();
 		gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,MEDIA_SCANNER_END,0);
 		return 0;

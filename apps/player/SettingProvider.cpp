@@ -101,19 +101,19 @@ namespace mango
 		sprintf(ptr,"insert into settings values(%d,%d,'%s')",id,value,str);
 		
 		ret = sqlite3_exec(db,sql,0,0,&pErrMsg);
-			
+		
 		if(ret != SQLITE_OK){
 			log_e("sqlite3_exec error : %s\n",pErrMsg);			
 		}
-
+		
 		return ret;	
 	}
 	void SettingProvider::saveVolume(int vol){
 		FILE *fd=NULL;
 		Mstring mstr(10);
-			
+		
 		mstr.mSprintf("%d.",vol);
-			
+		
 		fd = fopen(volumePath,"w");
 		
 		if(fd!=NULL){
@@ -128,7 +128,7 @@ namespace mango
 		FILE *fd=NULL;
 		char buf[10];
 		int vol = -1;
-			
+		
 		fd = fopen(volumePath,"r");
 		if(fd != NULL){
 			fread(buf,1,10,fd);
@@ -290,12 +290,12 @@ namespace mango
 			value[0],value[1],value[2],value[3],value[4],value[5],value[6],value[7],id);
 		
 		ret = sqlite3_exec(db,sql,0,0,&pErrMsg);
-
+		
 		if(ret != SQLITE_OK){
 			log_e("sqlite3_exec error : %s\n",pErrMsg);			
 		}else
 			log_i("sqlite3_exec success: %s\n",sql);	
-
+		
 		return ret;
 	}
 

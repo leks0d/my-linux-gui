@@ -41,21 +41,21 @@ namespace mango
 	#define EQ_BASS_ID			5
 	
 	#define SETTING_TABLE_CREATE "CREATE TABLE IF NOT EXISTS settings(\
-									_id INTEGER PRIMARY KEY,\
-									value INTEGER,\
-									name TEXT\
-									);"
+_id INTEGER PRIMARY KEY,\
+value INTEGER,\
+name TEXT\
+);"
 	#define EQDATA_TABLE_CREATE "CREATE TABLE IF NOT EXISTS eqdata(\
-									_id INTEGER PRIMARY KEY,\
-									val_0 INTEGER,\
-									val_1 INTEGER,\
-									val_2 INTEGER,\
-									val_3 INTEGER,\
-									val_4 INTEGER,\
-									val_5 INTEGER,\
-									val_6 INTEGER,\
-									val_7 INTEGER\
-									);"			
+_id INTEGER PRIMARY KEY,\
+val_0 INTEGER,\
+val_1 INTEGER,\
+val_2 INTEGER,\
+val_3 INTEGER,\
+val_4 INTEGER,\
+val_5 INTEGER,\
+val_6 INTEGER,\
+val_7 INTEGER\
+);"
 	class SettingProvider{
 		public:
 			SettingProvider(void);

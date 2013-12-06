@@ -3,10 +3,10 @@ namespace mango
 #define TABLE_PLAYLIST "playlist"
 		
 #define PLAYLIST_TABLE_CREATE "CREATE TABLE IF NOT EXISTS playlist(\
-										_id INTEGER PRIMARY KEY autoincrement,\
-										name TEXT,\
-										remark TEXT\
-										);"
+_id INTEGER PRIMARY KEY autoincrement,\
+name TEXT,\
+remark TEXT\
+);"
 		class PlayListItem{
 			public:
 				int id;
@@ -37,10 +37,10 @@ namespace mango
 #define TABLE_PLAYLIST_MEM "playlistmem"
 		
 #define PLAYLISTMEM_TABLE_CREATE "CREATE TABLE IF NOT EXISTS playlistmem(\
-										_id INTEGER PRIMARY KEY autoincrement,\
-										playlist_id INTEGER,\
-										audio_id INTEGER\
-										);" 
+_id INTEGER PRIMARY KEY autoincrement,\
+playlist_id INTEGER,\
+audio_id INTEGER\
+);" 
 		class PlayListMem{
 			public:
 				int id;

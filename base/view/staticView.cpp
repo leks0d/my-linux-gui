@@ -77,7 +77,7 @@ namespace mango
 		{
 			canvas.setTextColor(mColor);
 			canvas.setTextSize(mTextSize);
-			canvas.drawImageResource(mBkRes,0,0);
+			//canvas.drawImageResource(mBkRes,0,0);
 			if (mTitlePaintExtent.cx < rect.right - rect.left)
 				canvas.drawText(title, -1, rect, DT_SINGLELINE | DT_NOPREFIX);
 			else
