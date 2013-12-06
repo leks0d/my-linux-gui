@@ -75,7 +75,7 @@ namespace mango
 
 	int MediaScannerView::onPaint(Canvas& canvas)
 	{
-		canvas.drawImageResource(IDP_SETTING_BGD,0,0,false);
+		canvas.drawImageResource(IDP_PLAYING_BACKGROUND,0,0,false);
 		canvas.drawImageResource(IDP_USB_CONECT,120,50,true);	
 		return 0;
 	}

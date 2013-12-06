@@ -148,7 +148,7 @@ namespace mango
 
 	int VolumeView::onPaint(Canvas& canvas)
 	{
-		canvas.drawImageResource(IDP_SETTING_BGD,0,0,false);
+		canvas.drawImageResource(IDP_PLAYING_BACKGROUND,0,0,false);
 		canvas.drawImageResource(IDP_VULUME_ICON_BK,(320-204)/2,(240-204)/2,true);
 		drawVolumeImage(canvas, (320-204)/2,(240-204)/2, mVolume);
 		//drawVolumeImage(canvas, (320-204)/2,(240-204)/2, 255);

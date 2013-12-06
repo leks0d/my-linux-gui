@@ -2,14 +2,14 @@
 
 namespace mango
 {
-	#define MIN 60;
+	#define MIN 60
 	#define HOUR 60*60
 	
 	int time[]={30,60,2*60,5*60,10*60};
 	int len = 5;
 	int power[]={60*5,60*10,60*20,60*30,-1};
 	int plen = 4;
-	int force[]={-1,HOUR,2*HOUR,4*HOUR};
+	int force[]={-1,30*MIN,1*HOUR,2*HOUR};
 	int flen = 4;
 	PowerManager::PowerManager(){
 		isSleep = 0;
@@ -99,7 +99,7 @@ namespace mango
 	void PowerManager::resetCount(){
 		atuoCount = 0;
 		atuoPoweroffCount = 0;
-		//log_i("PowerManager::resetCount atuoCount=0");
+		mForcePowerOffTimeCount = 0;
 	}
 
 	void PowerManager::setPowerState(){

@@ -194,10 +194,13 @@ namespace mango
 	void StaticView::cartoonDisplay(void)
 	{
 		Canvas* canvas;
+		
+		getParent()->onPaint(*(getParent()->getCanvas()));
+		getParent()->releaseCanvas();
 
 		canvas = getCanvas();
 
-		if ((mStyle & VS_TRANSPARENT) && getParent())
+		if ( getParent())
 		{
 			Region  region(mRect);
 
@@ -207,7 +210,7 @@ namespace mango
 			canvas->renew(this);
 			canvas->select((Region*)0);
 		}
-	
+		
 		paint(*canvas);
 
 		canvas->swapScreenFrontBuffer();
@@ -226,7 +229,7 @@ namespace mango
 		{
 			canvas.setTextColor(mColor);
 			canvas.setTextSize(mTextSize);
-			canvas.drawImageResource(mBkRes,0,0);
+			//canvas.drawImageResource(mBkRes,0,0);
 			if (mTitlePaintExtent.cx < rect.right - rect.left)
 				canvas.drawText(title, -1, rect, DT_SINGLELINE | DT_NOPREFIX);
 			else

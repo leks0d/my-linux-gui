@@ -235,7 +235,7 @@ namespace mango
 		}else
 			mForcepoweroffListAdapter->refresh();
 		
-		mTitle->setTextResoure(STR_POWER_POWER_OFF);
+		mTitle->setTextResoure(STR_POWER_SLEEP);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mTitle->invalidateRect();
 		setMainState(0x1433);

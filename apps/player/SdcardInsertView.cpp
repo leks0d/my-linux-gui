@@ -74,7 +74,7 @@ namespace mango
 
 	int SdcardInsertView::onPaint(Canvas& canvas)
 	{
-		canvas.drawImageResource(IDP_SETTING_BGD,0,0,false);
+		canvas.drawImageResource(IDP_PLAYING_BACKGROUND,0,0,false);
 		canvas.drawImageResource(IDP_SDCARD_INSERT,120,40,true);
 		return 0;
 	}

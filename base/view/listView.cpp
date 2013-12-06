@@ -1425,7 +1425,20 @@ namespace mango
 		Brush brush(ARGB(255,255,255,255));
 		canvas.fillRect(redrawRect, brush);
 #else		
-		canvas.drawImageResource(mListViewBackgound,0,0);
+		//canvas.drawImageResource(mListViewBackgound,0,0);
+		//getParent()->onPaint(canvas);
+		if ( getParent())
+		{
+			Region  region(mRect);
+
+			canvas.renew(getParent());
+			canvas.select(&region);
+			getParent()->onPaint(canvas);
+			canvas.renew(this);
+			canvas.select((Region*)0);
+		}
+
+		//return 0 ;
 #endif
 		redrawZoneRect = redrawRect;
 		redrawZoneRect.offset(0, 0 - (mZonePoint.y + clientRect.top));
