@@ -512,7 +512,7 @@ namespace mango
 		unsigned long t0,t1,t2,t3,tt0,tt1,tt2,tt3,tt4;
 		unsigned long ts,te,td=0,ts_,te_,td_=0;
 		AudioFileArray fileArray;
-		SdcardAudioData sdcard(SDCARD_PATH);
+		SdcardAudioData sdcard(path);
 
 		mMutex.lock();
 		
@@ -571,6 +571,9 @@ namespace mango
 		t1 = tt2 - tt1;
 		t2 = tt3 - tt2;
 
+		if(fileArray.mLen == 0){
+			sendMsgProgress(100);
+		}
 		log_i("time,t0=%ldms,t1=%ldms,td_=%ldms,td=%ldms",t0/1000,t1/1000,td_/1000,td/1000);
 		Thread::sleep(100);
 		mMutex.unlock();
@@ -1025,7 +1028,7 @@ namespace mango
 			CString path;
 			
 			tt1 = Time::getMicrosecond();
-
+			
 			musicList.getCString(i,path);
 			
 			getmediainfo(path.getString(),&info,cover,genImg);
@@ -1062,7 +1065,7 @@ namespace mango
 			ret = loadCueFile(cuePath,&curMedia.mInfo);
 		}
 		
-		return ret;		
+		return ret;	
 	}
 	bool mediaprovider::cueCheck(char *direct,mediainfo *info){
 		char cuePath[300];
@@ -1728,6 +1731,7 @@ namespace mango
 		char file[255];
 		char dir[255];
 		char cmd[255];
+		CString scanDir;
 
 		insertItemCount = 0;
 			
@@ -1735,8 +1739,9 @@ namespace mango
 		sprintf(file,"%s/.audio_data/audio.db",SDCARD_PATH);
 		dataPath = file;
 		datadir = dir;
+		scanDir = path;
 		
-		if(dataPath.Find(SDCARD_PATH,0) == 0){
+		if(scanDir.Find(SDCARD_PATH,0) == 0){
 			isSdcard = true;
 			if(FileAttr::FileExist(file)){
 				sprintf(cmd,"./system/bin/busybox cp '%s' '%s'",file,SDCARD_DATA_PATH);
