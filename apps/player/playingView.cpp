@@ -428,7 +428,7 @@ namespace mango
 	{
 		Rect rect;
 		Brush brush(ARGB(255,25, 25, 25));
-		log_i("PlayingView::onPaint");
+		//log_i("PlayingView::onPaint");
 		
 		rect.setEx(0, 0, 320, 21);
 		canvas.drawImageResource(IDP_PLAYING_BACKGROUND, 0, 0, false);

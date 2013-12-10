@@ -165,15 +165,6 @@ namespace mango
 						break;
 					}
 				case 0x1200:{
-						/*PlayListItem item = mPlayListAdapter->mArrayPlayList.getItem(index);
-
-						if(item.id == -1){
-							PlayList::newPlaylist();
-							mPlayListAdapter->refresh();
-						}else{
-							PlayList::insertToPlaylist(item.id,mCurrentInfo.id);
-							gPlayer.dismissView(this);
-						}*/
 						break;
 					}
 			}

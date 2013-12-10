@@ -119,10 +119,21 @@ namespace mango
 	}
 	void SystemInfoView::initView()
 	{
+		char board[PROP_VALUE_MAX]={0};
+		
+		__system_property_get("ro.board.platform",board);
+		log_i("ro.board.platform=%s",board);
+		
 		mTitle->setTextResoure(STR_ADVANCE_SYSINFO);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
-		mModelNumber->setTextString("DX50");
-		mFirmwareVersion->setTextString("V1.2.6");
+		
+		if(strcmp(board,"rk2928")==0){
+			mModelNumber->setTextString("DX50");
+			mFirmwareVersion->setTextString("V1.2.6");
+		}else if(strcmp(board,"rk3026")==0){
+			mModelNumber->setTextString("DX51");
+			mFirmwareVersion->setTextString("V1.0.0");
+		}
 		
 		updateTotalMem();
 	}

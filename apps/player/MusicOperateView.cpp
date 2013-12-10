@@ -167,10 +167,6 @@ namespace mango
 							case 0:
 								mPlayinglist->playMediaInfo(&mCurrentInfo);
 								break;
-							//case 1:
-							//	if(mPlayinglist->isItemExsit(&mCurrentInfo)<0)
-							//		mPlayinglist->addItem(&mCurrentInfo);
-							//	break;
 							case 1:	
 								initPlayList();
 								break;
@@ -180,7 +176,7 @@ namespace mango
 								break;
 							case 3:
 								if(mType == OPERATE_TYPE_MUSIC_PLAYLIST){
-									gMessageQueue.post(gPlayer.mMeidaView,VM_NOTIFY,NM_REMOVE_FROM_PLAYLIST,mCurrentInfo.id);
+									gMessageQueue.post(gPlayer.mMeidaView,VM_NOTIFY,NM_REMOVE_FROM_PLAYLIST,(unsigned int)mCurrentInfo.md5);
 								}else{
 									gPlayer.showChosenView(ChosenView::CHOSEN_DELETFILE,this);
 								}
@@ -197,7 +193,7 @@ namespace mango
 							PlayList::newPlaylist();
 							mPlayListAdapter->refresh();
 						}else{
-							PlayList::insertToPlaylist(item.id,mCurrentInfo.id);
+							PlayList::insertToPlaylist(item.id,mCurrentInfo.md5);
 							gPlayer.dismissView(this);
 						}
 						break;

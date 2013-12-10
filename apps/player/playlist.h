@@ -39,17 +39,9 @@ remark TEXT\
 #define PLAYLISTMEM_TABLE_CREATE "CREATE TABLE IF NOT EXISTS playlistmem(\
 _id INTEGER PRIMARY KEY autoincrement,\
 playlist_id INTEGER,\
-audio_id INTEGER\
+audio_md5 TEXT\
 );" 
-		class PlayListMem{
-			public:
-				int id;
-				int playlist_id;
-				int audio_id;
-			public:
-				PlayListMem();
-				~PlayListMem();
-		};
+
 	
 		class PlayList{
 			public:
@@ -58,9 +50,9 @@ audio_id INTEGER\
 				static void newPlaylist();
 				static void genPlaylistName(char* name,int len);
 				static void queryPlaylist(ArrayPlayListItem& array,char *arg);
-				static void insertToPlaylist(int playlist_id,int audio_id);
-				static void delAudioFromPlaylist(int audio_id);
-				static void delAudioFromPlaylist(int playlist_id,int audio_id);
+				static void insertToPlaylist(int playlist_id,const char* md5);
+				static void delAudioFromPlaylist(const char* md5);
+				static void delAudioFromPlaylist(int playlist_id,const char* md5);
 				static void delPlaylist(int playlist_id);
 				static void queryPlaylistMem(ArrayMediaInfo& array,int playlist_id);
 		};

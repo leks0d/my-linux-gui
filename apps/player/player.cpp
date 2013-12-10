@@ -353,24 +353,6 @@ namespace mango
 		}
 	}
 	int Player::showMusicOperateView(mediainfo& info){
-#if 0		
-		if(mMusicOperateView == NULL){
-			mMusicOperateView = new MusicOperateView(TEXT("MusicOperate"), NULL, NULL, 0, SW_NORMAL);
-			mMusicOperateView->onCreate();
-		}else{
-			mMusicOperateView->setType(OPERATE_TYPE_MUSIC_NORMAL);
-			gSession.mViewZAxis.bringViewToTop(mMusicOperateView);
-		}
-		
-		log_i("---");
-		if (mMusicOperateView){
-			log_i("---");
-			mMusicOperateView->setMusicInfo(info);
-			mMusicOperateView->invalidateRect();
-			mMusicOperateView->setFocus();
-			log_i("---");
-		}
-#endif
 		showMusicOperateView(info,OPERATE_TYPE_MUSIC_NORMAL);	
 	}
 	int Player::showMusicOperateView(mediainfo& info,int type,int start){

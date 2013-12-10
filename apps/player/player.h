@@ -1,5 +1,6 @@
 #include <sys/time.h>
 #include <signal.h>
+#include <sys/system_properties.h>
 #include <sys/vfs.h>
 #include <sys/reboot.h>
 #include "mango.h"
@@ -34,6 +35,7 @@
 #include "ChosenView.h"
 #include "PlaylistOperateView.h"
 #include "GroupOperateView.h"
+
 
 #define ARRAY_LIST_NUM 100
 

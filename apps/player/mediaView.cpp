@@ -480,7 +480,7 @@ namespace mango
 		char *ptr,sql[255];
 
 		ptr = sql;
-		ptr+=sprintf(ptr,"select music.* from  music,playlistmem where playlistmem.playlist_id=%d and music._id=playlistmem.audio_id",
+		ptr+=sprintf(ptr,"select music.* from  music,playlistmem where playlistmem.playlist_id=%d and music.md5=playlistmem.audio_md5",
 			item.id);
 		
 		mListView->deleteAllItems();
@@ -1110,9 +1110,8 @@ namespace mango
 			}
 		}
 		else if(code == NM_REMOVE_FROM_PLAYLIST){
-			int id = (int)parameter;
-			PlayList::delAudioFromPlaylist(mCurrentPlaylistId,id);
-			//mPlayListMemAdapter.refresh();
+			char *md5 = (char *)parameter;
+			PlayList::delAudioFromPlaylist(mCurrentPlaylistId,md5);
 		}
 
 		return 0;

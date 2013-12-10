@@ -89,7 +89,6 @@ namespace mango
 		item.setId(mediaprovider::str_to_int(*argv++));
 		item.setName(*argv++);
 		item.setRemark(*argv);
-
 		
 		array->addItem(item);
 		//log_i("item.name = %s,len=%d",item.name,array->getCount());
@@ -145,28 +144,28 @@ namespace mango
 		gmediaprovider.exec(sql,&array,PlayList::sql_callback);
 		//log_i("array.getcount()=%d",array.getCount());
 	}
-	void PlayList::insertToPlaylist(int playlist_id,int audio_id){
+	void PlayList::insertToPlaylist(int playlist_id,const char* md5){
 		char *ptr,sql[255];
 
 		ptr = sql;
-		ptr+=sprintf(ptr,"insert into playlistmem (playlist_id,audio_id) values(%d,%d)",
-			playlist_id,audio_id);
+		ptr+=sprintf(ptr,"insert into playlistmem (playlist_id,audio_md5) values(%d,'%s')",
+			playlist_id,md5);
 		
 		gmediaprovider.exec(sql,0,0);
 	}
-	void PlayList::delAudioFromPlaylist(int audio_id){
+	void PlayList::delAudioFromPlaylist(const char* md5){
 		char *ptr,sql[255];
 		
 		ptr = sql;
-		ptr+=sprintf(ptr,"delete from playlistmem where audio_id=%d",audio_id);
+		ptr+=sprintf(ptr,"delete from playlistmem where audio_md5=%d",md5);
 		
 		gmediaprovider.exec(sql,0,0);	
 	}
-	void PlayList::delAudioFromPlaylist(int playlist_id, int audio_id){
+	void PlayList::delAudioFromPlaylist(int playlist_id,const char* md5){
 		char *ptr,sql[255];
 		
 		ptr = sql;
-		ptr+=sprintf(ptr,"delete from playlistmem where audio_id=%d and playlist_id=%d",audio_id,playlist_id);
+		ptr+=sprintf(ptr,"delete from playlistmem where audio_md5='%s' and playlist_id=%d",md5,playlist_id);
 		
 		gmediaprovider.exec(sql,0,0);	
 	}
@@ -189,7 +188,7 @@ namespace mango
 		
 		array.clear();
 		ptr = sql;
-		ptr+=sprintf(ptr,"select music.* from  music,playlistmem where playlistmem.playlist_id=%d and music._id=playlistmem.audio_id",
+		ptr+=sprintf(ptr,"select music.* from  music,playlistmem where playlistmem.playlist_id=%d and music.md5=playlistmem.audio_md5",
 			playlist_id);
 		
 		gmediaprovider.queryArrayMedia(sql,&array);

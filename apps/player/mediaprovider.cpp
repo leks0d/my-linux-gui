@@ -1364,14 +1364,14 @@ namespace mango
 			table,MUSIC_PTAH,MUSIC_NAME,MUSIC_NAME_KEY,MUSIC_TITLE,MUSIC_TITLE_KEY,MUSIC_ART,MUSIC_ART_KEY,
 			MUSIC_ALBUM,MUSIC_ALBUM_KEY,"genre","genre_key",MUSIC_TRACK,MUSIC_ART_IMG,MUSIC_ADD_TIME,
 			MUSIC_DURATION,MUSIC_IN_PLAY,MUSIC_TIMES,"iscue","cuestart","md5");
-
+		
 		ptr += sprintf(ptr,"values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%d','%s','%d','%d','%d','%d','%d','%d','%s');",
 				info->path,info->name,info->name_key,info->title,info->title_key,info->artist,
 				info->artist_key,info->album,info->album_key,info->genre,info->genre_key,info->track,info->img_path,
 				info->add_time,info->duration,info->inPlay,info->times,info->isCue,info->cueStart,info->md5);
-
+		
 		exec(sql,0,0);
-
+		
 		return 0;
 	}
 	int mediaprovider::insertCursorItem(CursorItem& item){
@@ -1589,8 +1589,6 @@ namespace mango
 		ptr += sprintf(ptr,"delete from music where _id=%d",id);
 		
 		exec(sql,0,0);
-		
-		PlayList::delAudioFromPlaylist(id);
 		
 		return 0;
 	}

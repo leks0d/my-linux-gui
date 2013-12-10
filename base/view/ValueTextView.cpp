@@ -91,7 +91,6 @@ namespace mango
 	void ValueTextView::setTextColor(COLORREF value,COLORREF context){
 		mValueColor = value;
 		mContextColor = context;
-		log_i("ValueTextView::setTextColor context=0x%x",context);
 		invalidateRect();
 	}
 

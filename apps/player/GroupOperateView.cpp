@@ -182,7 +182,7 @@ namespace mango
 						}else{
 							int i;
 							for(i=0;i<mArrayMediaInfo.getCount();i++)
-								PlayList::insertToPlaylist(item.id,mArrayMediaInfo.getMediaInfo(i)->id);
+								PlayList::insertToPlaylist(item.id,mArrayMediaInfo.getMediaInfo(i)->md5);
 							gPlayer.dismissView(this);
 						}
 						break;
