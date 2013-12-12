@@ -357,5 +357,18 @@ namespace mango
 		}
 		out = buf;
 	}
-	
+	void Environment::checkWallpaper(){
+		if(FileAttr::FileExist(WALLPAPER_FILE)){
+			BitmapFactory::decodeFile(&gWallpaperBitmap,WALLPAPER_FILE,320,240);
+		}else{
+			gWallpaperBitmap.release();
+		}
+	}
+	void Environment::drawWallpaper(Canvas& canvas){
+		if(gWallpaperBitmap.isVaild()){
+			canvas.drawBitmap(gWallpaperBitmap.mBits,0,0,gWallpaperBitmap.width,gWallpaperBitmap.height);
+		}else{
+			canvas.drawImageResource(IDP_PLAYING_BACKGROUND,0,0,false);
+		}
+	}
 };

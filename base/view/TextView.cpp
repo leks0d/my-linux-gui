@@ -35,6 +35,7 @@ namespace mango
 		mSelectBgdResId = 0;
 		mNormalBgdResId = 0;
 		mSelectDisBgdResId = 0;
+		onTouchFresh = true;
 	}
 
 
@@ -228,18 +229,21 @@ namespace mango
 	 	if(mEnable == 0)
 			return 0;
 	 	mPress = 1;
-		invalidateRect();
+		if(onTouchFresh)
+			invalidateRect();
 	 	return 0;
 	 }
 	 int TextView::onTouchUp(int x, int y, int flag){
 	 	if(mEnable == 0)
 			return 0;
 	 	mPress = 0;
-		invalidateRect();
-		//log_i("onTouchUp VM_COMMAND:mId=%d",mId);
+		
+		if(onTouchFresh)
+			invalidateRect();
+
 		postMessage(getParent(), VM_COMMAND, mId, (unsigned int)this);
 		postMessage(getParent(), VM_NOTIFY, VSEEKBAR_TEXTVIEW_UP, (unsigned int)this);
-		//log_i("VSEEKBAR_TEXTVIEW_UP=%d",VSEEKBAR_TEXTVIEW_UP);
+
 		return 0;
 	 }
 
@@ -281,6 +285,9 @@ namespace mango
 			mVisiable = visiable;
 			invalidateRect();
 		}
+	}
+	void TextView::setonTouchFresh(bool fresh){
+		onTouchFresh = fresh;
 	}
 
 };

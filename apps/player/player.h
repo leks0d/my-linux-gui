@@ -242,5 +242,5 @@ namespace mango
 	};
 	
 	extern Player  gPlayer;
-	
+	extern MSkBitmap gWallpaperBitmap;
 };

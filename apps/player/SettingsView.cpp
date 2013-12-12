@@ -84,7 +84,7 @@ namespace mango
 	int SettingsView::onPaint(Canvas& canvas)
 	{
 		log_i("MediaView::onPaint");
-		canvas.drawImageResource(IDP_PLAYING_BACKGROUND,0,0,false);
+		Environment::drawWallpaper(canvas);
 		canvas.drawImageResource(IDP_MUSIC_TITLEBAR,0,0,false);
 		return 0;
 	}
@@ -267,8 +267,8 @@ namespace mango
 	void SettingsView::initGaplessList(){
 		int img[]={0,0,0,0};
 		int imgsec[]={0,0,0,0};
-		int text[]={STR_GAPLESS_0,STR_GAPLESS_1,STR_GAPLESS_2};
-		int i,count = 3;
+		int text[]={STR_GAPLESS_0,STR_GAPLESS_Z,STR_GAPLESS_1,STR_GAPLESS_2};
+		int i,count = sizeof(text)/sizeof(text[0]);
 		
 		if(mGaplessListAdapter == NULL){
 			mListView->deleteAllItems();

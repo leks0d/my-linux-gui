@@ -40,6 +40,7 @@ namespace mango
 		mUsbState->setTextColor(COLOR_WHITE);
 		mUsbState->setTextSize(25);
 		mUsbState->setTextLayoutType(TEXT_LAYOUT_CENTER);
+		mUsbState->setonTouchFresh(false);
 		initView();
 		setFocus(this);
 		invalidateRect();
@@ -57,7 +58,8 @@ namespace mango
 
 	int UsmConnectView::onPaint(Canvas& canvas)
 	{
-		canvas.drawImageResource(IDP_PLAYING_BACKGROUND,0,0,false);
+		log_i(">>>>>>>>>USM");
+		Environment::drawWallpaper(canvas);
 		canvas.drawImageResource(IDP_USB_CONECT,120,50,true);
 		return 0;
 	}

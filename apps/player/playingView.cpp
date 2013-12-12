@@ -427,11 +427,10 @@ namespace mango
 	int PlayingView::onPaint(Canvas& canvas)
 	{
 		Rect rect;
-		Brush brush(ARGB(255,25, 25, 25));
-		//log_i("PlayingView::onPaint");
-		
+		Brush brush(ARGB(100,25, 25, 25));
+		log_i("PlayingView::onPaint");
+		Environment::drawWallpaper(canvas);
 		rect.setEx(0, 0, 320, 21);
-		canvas.drawImageResource(IDP_PLAYING_BACKGROUND, 0, 0, false);
 		canvas.fillRect(rect, brush);
 		canvas.drawImageResource(IDP_BACKGROUND_BOTTOM, 0, 211, false);
 
@@ -629,6 +628,8 @@ namespace mango
 		}
 		else if(code == FLASH_MOUNT){
 			//Environment::logcat();
+			Environment::checkWallpaper();
+			
 			mPlayinglist->checkPlayintList(FLASH_PATH);
 			
 			if(isUsmCon == 1){

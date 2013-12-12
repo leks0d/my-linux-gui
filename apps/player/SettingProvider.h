@@ -96,6 +96,6 @@ val_7 INTEGER\
 
 	extern SettingProvider gSettingProvider;
 	extern int EqValue[6][8];
-	extern int GaplessValue[3];
+	extern int GaplessValue[4];
 }
 

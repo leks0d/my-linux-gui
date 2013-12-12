@@ -67,6 +67,8 @@ namespace mango
 #define SDCARD_DATA_PATH 	"/data/mango-ex.db"
 #define SDCARD_BOOT_PATH 		"/mnt/boot"
 #define SDCARD_BLOCK_PATH 	"/dev/block/mmcblk0p1"
+#define WALLPAPER_DIR		"/mnt/sdcard/wallpaper"
+#define WALLPAPER_FILE		"/mnt/sdcard/wallpaper.png"
 
 	class View : public Object
 	{

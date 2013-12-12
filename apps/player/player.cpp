@@ -774,6 +774,7 @@ namespace mango
 	}
 	
 	Player  gPlayer;
+	MSkBitmap gWallpaperBitmap;
 };
 
 

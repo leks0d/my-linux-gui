@@ -253,6 +253,7 @@ namespace mango
 			void setVisiable(bool visiable);
 			void setIconRes(int res){mIconRes = res;}
 			void setShowIcon(bool show){showIcon = show;invalidateRect();}
+			void setonTouchFresh(bool fresh);
 			virtual int onPaint(Canvas& canvas);
 			virtual int onTouchDown(int x, int y, int flag);
 			virtual int onTouchUp(int x, int y, int flag);
@@ -280,6 +281,7 @@ namespace mango
 			bool showIcon;
 			int mIconX;
 			int mIconY;
+			bool onTouchFresh;
 	};
 
 

@@ -710,7 +710,7 @@ Exit:
 		void Playinglist::setGapless(int gapless){
 			int gaplessEn;
 			gaplessEn = gapless;
-			if(mParticleplayer!=NULL)
+			if(mParticleplayer!=NULL && gaplessEn>= 0)
 				mParticleplayer->setGaplessDuration(GaplessValue[gaplessEn]);
 			gSettingProvider.update(SETTING_GAPLESS_ID,gaplessEn);
 			mGapless = gaplessEn;
