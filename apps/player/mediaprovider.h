@@ -320,7 +320,7 @@ static int fileTypeMatch(const char *file,const char *music_type[])
 
 static int ismusic(const char *file)
 {
-	const char *music_type[] = {"mp3","wav","flac","aac","ogg","ape","m4a","wma","aif","aiff","\0"};
+	const char *music_type[] = {"mp3","wav","flac","aac","ogg","ape","m4a","wma","aif","aiff","dsf","\0"};
 	return fileTypeMatch(file,music_type);
 
 }

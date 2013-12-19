@@ -1,30 +1,29 @@
 
 #ifndef _INTERFACEID3_H
 #define _INTERFACEID3_H
-namespace mango
+//#define strnicmp strncasecmp
+
+
+static int strnicmp(const char *s1, const char *s2, int len)
 {
-
-
-static int strnicmp(const char* src,const char* arg,int len){
-	int slen;
-	char *temp;
-
-	temp = new char[len+1];
-	
-	if(src!=NULL){
-		slen = sizeof(src);
-		if(slen<len){
-			return -1;
-		}else{
-			memcpy(temp,src,len);
-			return strcmp(temp,arg);
-		}
-	}else{
-		return -1;
-	}
-
-	delete temp;
+    unsigned char c1, c2;
+    if(!len)
+        return 0;
+    do{
+        c1 = *s1++;
+        c2 = *s2++;
+        if (!c1 || !c2)
+            break;
+        if (c1 == c2)
+            continue;
+        c1 = tolower(c1);
+        c2 = tolower(c2);
+        if (c1 != c2)
+            break;
+    }while(--len);
+    return (int)c1 - (int)c2;
 }
+
 
 enum 
 {
@@ -55,6 +54,6 @@ public:
 	virtual int getTag(int id3, char **data);
 
 };
-};
+
 
 #endif

@@ -35,6 +35,10 @@
 #include "ChosenView.h"
 #include "PlaylistOperateView.h"
 #include "GroupOperateView.h"
+#include "InterfaceID3.h"
+#include "OggID3.h"
+#include "DsfID3.h"
+#include "AudioId3.h"
 
 
 #define ARRAY_LIST_NUM 100

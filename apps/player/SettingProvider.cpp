@@ -179,7 +179,8 @@ namespace mango
 		ret = sqlite3_exec(db,sql,0,0,&pErrMsg);
 			
 		if(ret != SQLITE_OK){
-			log_e("sqlite3_exec error : %s\n",pErrMsg);			
+			log_e("sqlite3_exec error : %s",pErrMsg);
+			log_i("sql=%s",sql);
 		}else
 			log_i("sqlite3_exec sucess:%s",sql);
 

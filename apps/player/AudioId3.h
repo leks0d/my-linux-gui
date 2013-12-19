@@ -1,19 +1,12 @@
-
-#ifndef _OGGID3_H
-#define _OGGID3_H
-
-#include "InterfaceID3.h"
-#include "OggID3.h"
-#include "DsfID3.h"
-#include "Id3info.h"
-
 namespace mango
 {
+
+
 class AudioId3
 {
 
 public:
-	AudioId3(const char* file);
+	AudioId3(char* file);
 	~AudioId3(void);
 
 public:
@@ -27,4 +20,3 @@ private:
 	ID3INFO *mFFmepgId3;
 };
 };
-#endif

@@ -1,5 +1,5 @@
 #include "player.h"
-#include "AudioId3.h"
+
 #define DECODE_IMG 0
 #define SQLITE_LOG 0
 
@@ -708,10 +708,11 @@ namespace mango
 		
 		memset(value, 0, len);
 		if (m_id3.GetTags(METADATA_KEY_DURATION, value)){
+			
 			item.addItem("duration",str_to_int(value));
-		}else
+		}else{
 			item.addItem("duration",0);
-		
+		}
 		if( m_id3.PicValid() >= 0 ){
 			CString imgpath;
 			MSkBitmap mMSkBitmap;

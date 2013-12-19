@@ -1,16 +1,7 @@
 #ifdef WIN32
 #include <Windows.h>
 #endif
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <memory.h>
-#include <string.h>
-
-#include "InterfaceID3.h"
-#include "OggID3.h"
-namespace mango
-{
+#include "player.h"
 
 #ifndef SAFE_DELETE
 #define SAFE_DELETE( x )  \
@@ -283,4 +274,4 @@ int OggID3::getTag(int id, char **data)
 	*data = mTagData[id];
 	return mTagDataSize[id];
 }
-};
+

@@ -66,7 +66,7 @@ namespace mango
 		strlwr(type);
 		return type;
 	}
-	static char * getfiletype(char *file,char *type){
+	static char * getfiletype(const char *file,char *type){
 		int i,len = 0;
 		//char type[10];
 		if(file == 0)

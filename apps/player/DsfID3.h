@@ -1,8 +1,4 @@
 
-#ifndef _DSFID3_H
-#define _DSFID3_H
-namespace mango
-{
 class DsfID3 : public InterfaceID3
 {
 public:
@@ -36,5 +32,3 @@ private:
 	char mTagNull[2];
 
 };
-};
-#endif

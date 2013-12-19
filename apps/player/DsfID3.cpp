@@ -1,16 +1,7 @@
 #ifdef WIN32
 #include <Windows.h>
 #endif
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <memory.h>
-#include <string.h>
-
-#include "InterfaceID3.h"
-#include "DsfID3.h"
-namespace mango
-{
+#include "player.h"
 #ifndef SAFE_DELETE
 #define SAFE_DELETE( x )  \
     if( NULL != x )       \
@@ -314,7 +305,7 @@ void DsfID3::analyseId3Buffer(char *buf, int size)
 int DsfID3::getTag(int id, char **data)
 {
 	*data = mTagNull;
-
+	
 	if (id >= DSFTAG_COUNT)
 		return -1;
 
@@ -322,6 +313,7 @@ int DsfID3::getTag(int id, char **data)
 		return mDuration;
 
 	*data = mTagData[id];
+
 	return mTagDataSize[id];
 }
 
@@ -430,4 +422,3 @@ int main(int argc, char *argv[])
 }
 
 #endif
-};

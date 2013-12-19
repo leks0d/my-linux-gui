@@ -397,6 +397,7 @@ namespace mango
 	unsigned int PlayingView::shutdownRunnig(void *parameter){
 		gPlayer.shutDown();
 		Thread::sleep(1000);
+		log_i("reboot(RB_POWER_OFF)");
 		reboot(RB_POWER_OFF);
 	}
 	unsigned int PlayingView::updateSDcardRunnig(void *parameter){

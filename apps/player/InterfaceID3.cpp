@@ -1,16 +1,7 @@
 #ifdef WIN32
 #include <Windows.h>
 #endif
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <memory.h>
-#include <string.h>
-
-#include "InterfaceID3.h"
-namespace mango
-{
-
+#include "player.h"
 InterfaceID3::InterfaceID3(void)
 {
 
@@ -196,4 +187,3 @@ int main(int argc, char *argv[])
 	return 0;
 }
 #endif
-};

@@ -1,8 +1,5 @@
 
-#ifndef _OGGID3_H
-#define _OGGID3_H
-namespace mango
-{
+
 class OggID3 : public InterfaceID3
 {
 
@@ -36,5 +33,3 @@ private:
 	char mTagNull[2];
 
 };
-};
-#endif
