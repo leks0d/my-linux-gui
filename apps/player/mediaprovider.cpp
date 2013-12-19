@@ -1,4 +1,5 @@
 #include "player.h"
+#include "AudioId3.h"
 #define DECODE_IMG 0
 #define SQLITE_LOG 0
 
@@ -306,7 +307,7 @@ namespace mango
 		strlwr(type);
 		return type;
 	}
-	static char * getfiletype(char *file,char *type){
+	static char * getfiletype(const char *file,char *type){
 		int i,len = 0;
 		//char type[10];
 		if(file == 0)
@@ -626,7 +627,8 @@ namespace mango
 		gMessageQueue.post(gPlayer.mMediaScannerView,VM_NOTIFY,MEDIA_SCANNER_PROGRESS,progress);
 	}
 	int mediaprovider::analyzeAudioID3(CursorItem& item,AudioFileInfo& info){
-		ID3INFO m_id3(info.path.string);
+//		ID3INFO m_id3(info.path.string);
+		AudioId3  m_id3(info.path.string);
 		char *value;
 		int len = 1024;
 		char sqlStr[1024]={0},filename[1024]={0};

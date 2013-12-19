@@ -67,6 +67,10 @@ LOCAL_SRC_FILES += CCue.cpp
 LOCAL_SRC_FILES += Cursor.cpp
 LOCAL_SRC_FILES += PlaylistOperateView.cpp
 LOCAL_SRC_FILES += GroupOperateView.cpp
+LOCAL_SRC_FILES += DsfID3.cpp
+LOCAL_SRC_FILES += InterfaceID3.cpp
+LOCAL_SRC_FILES += OggID3.cpp
+LOCAL_SRC_FILES += AudioId3.cpp
 
 LOCAL_CPPFLAGS:=\
 -I $(MY_ANDROID_SOURCE)/frameworks/base/core/jni/android/graphics\

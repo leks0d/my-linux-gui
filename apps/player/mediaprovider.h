@@ -295,8 +295,8 @@ md5 TEXT\
 		
 	};
 #endif
-static char * getfiletype(char *file,char *type);
-static int fileTypeMatch(char *file,const char *music_type[])
+static char * getfiletype(const char *file,char *type);
+static int fileTypeMatch(const char *file,const char *music_type[])
 {
 	char type[10]={0};
 	const char **mtype;
@@ -318,18 +318,27 @@ static int fileTypeMatch(char *file,const char *music_type[])
 	return 0;
 }
 
-static int ismusic(char *file)
+static int ismusic(const char *file)
 {
 	const char *music_type[] = {"mp3","wav","flac","aac","ogg","ape","m4a","wma","aif","aiff","\0"};
 	return fileTypeMatch(file,music_type);
 
 }
-static int isCueFile(char *file)
+static int isOGGFile(const char *file){
+	const char *music_type[] = {"ogg","\0"};
+	return fileTypeMatch(file,music_type);	
+}
+static int isDSFFile(const char *file){
+	const char *music_type[] = {"dsf","\0"};
+	return fileTypeMatch(file,music_type);	
+}
+
+static int isCueFile(const char *file)
 {
 	const char *music_type[] = {"cue","\0"};
 	return fileTypeMatch(file,music_type);
 }
-static int isPictureFile(char* file){
+static int isPictureFile(const char* file){
 	const char *music_type[] = {"jpg","png","bmp","\0"};
 	return fileTypeMatch(file,music_type);
 }

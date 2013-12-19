@@ -428,7 +428,7 @@ namespace mango
 	{
 		Rect rect;
 		Brush brush(ARGB(100,25, 25, 25));
-		log_i("PlayingView::onPaint");
+		//log_i("PlayingView::onPaint");
 		Environment::drawWallpaper(canvas);
 		rect.setEx(0, 0, 320, 21);
 		canvas.fillRect(rect, brush);
@@ -627,7 +627,7 @@ namespace mango
 			mKeyCount.TriggerKey();
 		}
 		else if(code == FLASH_MOUNT){
-			//Environment::logcat();
+			Environment::logcat();
 			Environment::checkWallpaper();
 			
 			mPlayinglist->checkPlayintList(FLASH_PATH);
@@ -693,6 +693,7 @@ namespace mango
 			}
 			log_i("isNeedFresh = %d",isNeedFresh);
 		}else if(code == NM_POWER_OFF){
+			log_i("----------NM_POWER_OFF");
 			gPlayer.showShutDownView();
 			mShutdowmThread.create(PlayingView::shutdownRunnig, this);
 		}else if(code == SDCARD_FILE_CHECK){

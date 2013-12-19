@@ -89,11 +89,18 @@ namespace mango
 		}
 		
 		if(atuoPoweroffCount>=poweroffTime && poweroffTime != -1){
+			log_i("send atuoPoweroff message.");
 			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,NM_POWER_OFF,0);
 		}
 		if(mForcePowerOffTimeCount>=mForcePowerOffTime && mForcePowerOffTime != -1){
+			log_i("send mForcePowerOff message.");
 			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,NM_POWER_OFF,0);
 		}
+
+		if(gPlayer.mPlayingView!=NULL)
+			log_i("atuoPoweroffCount=%d,mForcePowerOffTimeCount=%d,isUsmCon=%d,isMediaScanning=%d,isPlaying=%d\
+,poweroffTime=%d,mForcePowerOffTime=%d",atuoPoweroffCount,mForcePowerOffTimeCount,gPlayer.mPlayingView->isUsmCon,
+			gPlayer.mPlayingView->isMediaScanning,mPlayinglist->isPlaying(),poweroffTime,mForcePowerOffTime);
 	}
 
 	void PowerManager::resetCount(){

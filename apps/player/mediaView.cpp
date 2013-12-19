@@ -704,14 +704,14 @@ namespace mango
 		char *ptr,sql[1024];
 
 		ptr = sql;
-		
+/*		
 		mListView->deleteAllItems();
 
 		if(mArtistMusicAdapter == NULL){
 			
 			mArtistMusicAdapter = new MusicAdapter(mListView,ADAPTER_PLAYING); 
 		}
-
+*/
 		ptr += sprintf(ptr,"where ");
 
 		if(artist)
