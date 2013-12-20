@@ -6,7 +6,7 @@ namespace mango
 	const static char* volumePath = "/data/volume";
 	
 	SettingProvider::SettingProvider(){
-
+		db = NULL;
 	}
 	SettingProvider::~SettingProvider(){
 
@@ -67,11 +67,13 @@ namespace mango
 	}
 	void SettingProvider::dbclose(){
 		int value;
-		update(100,101);
-		
-		log_i("------------------SettingProvider close-----value=%d",value);
-		
-		sqlite3_close(db);
+
+		if(db!=NULL){
+			update(100,101);
+			log_i("------------------SettingProvider close-----value=%d",value);
+			sqlite3_close(db);
+			db = NULL;
+		}
 	}
 	int SettingProvider::insert(int id,int value){
 		int ret = 0;

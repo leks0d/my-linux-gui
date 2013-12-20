@@ -74,6 +74,7 @@ md5 TEXT\
 			safedelete(info->album);
 			safedelete(info->album_key);
 			safedelete(info->img_path);
+			safedelete(info->md5);
 			memset(info,0,sizeof(mediainfo));
 			//log_i("leave free mediainfo");
 		}

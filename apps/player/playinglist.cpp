@@ -268,6 +268,10 @@ static const char *PlayerLock = "playerlock";
 					mplaylist[des].img_path = new char[strlen(src->img_path)+1];
 					strcpy(mplaylist[des].img_path,src->img_path);
 				}
+				if(src->md5 != NULL){
+					mplaylist[des].md5 = new char[strlen(src->md5)+1];
+					strcpy(mplaylist[des].md5,src->md5);
+				}
 				//log_i("leave");
 			}
 			
