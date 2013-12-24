@@ -202,6 +202,7 @@ AudioId3::AudioId3(char* file)
 	
 	mInterfaceID3 = NULL;
 	mFFmepgId3 = NULL;
+	
 	f = fopen(file,"r");
 	if(f>0){
 		

@@ -486,9 +486,11 @@ static const char *PlayerLock = "playerlock";
 					gPlayer.VolumeCheck();
 				
 				}
-				if(needGapless&&mGapless>0)
-					mParticleplayer->setNextSongForGapless(playPath);//(getItem(mCurrent+1)->path);
-				//log_i("gapless no change");
+				
+				if(needGapless&&mGapless>0){
+					//mParticleplayer->setNextSongForGapless(playPath);//(getItem(mCurrent+1)->path);
+				}
+				
 				getPlayingItem()->isPlayed = 1;
 				setWakeLock();
 				return 0;

@@ -267,7 +267,7 @@ namespace mango
 	void SettingsView::initGaplessList(){
 		int img[]={0,0,0,0};
 		int imgsec[]={0,0,0,0};
-		int text[]={STR_GAPLESS_0,STR_GAPLESS_Z,STR_GAPLESS_1,STR_GAPLESS_2};
+		int text[]={STR_GAPLESS_0,STR_GAPLESS_ON};
 		int i,count = sizeof(text)/sizeof(text[0]);
 		
 		if(mGaplessListAdapter == NULL){
