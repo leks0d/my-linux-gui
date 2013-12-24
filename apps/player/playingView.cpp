@@ -245,6 +245,11 @@ namespace mango
 #else
 		//log_i("tag currentinfo->img_path=0x%x:%s",currentinfo->img_path,currentinfo->img_path);
 		mMSkBitmap->createFile(currentinfo->img_path);
+		if(!mMSkBitmap->isVaild()){
+			char sdcardPath[300]={"/mnt/external_sd/.audio_data/album_img/"};
+			strcat(sdcardPath,currentinfo->img_path + sizeof("/mnt/sdcard/.album_img"));
+			mMSkBitmap->createFile(sdcardPath);
+		}
 		//BitmapFactory::decodeFile(mMSkBitmap,"/mnt/sdcard/cover.jpg",109,109);
 #endif
 
@@ -628,7 +633,7 @@ namespace mango
 			mKeyCount.TriggerKey();
 		}
 		else if(code == FLASH_MOUNT){
-			Environment::logcat();
+			//Environment::logcat();
 			Environment::checkWallpaper();
 			
 			mPlayinglist->checkPlayintList(FLASH_PATH);

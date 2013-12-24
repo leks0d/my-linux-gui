@@ -5,6 +5,7 @@ namespace mango
 {
 	bool BitmapFactory::genBitmapFromFile(MSkBitmap* mMSkBitmap,char* path,int w,int h){
 		MSkBitmap mskBitmap;
+		bool ret = false;
 		
 		mskBitmap.createFile(path);
 		
@@ -32,7 +33,10 @@ namespace mango
 			
 			mMSkBitmap->createNormal((int *)pskBitmap->getPixels(),pskBitmap->width(),pskBitmap->height());
 			delete pskBitmap;
+
+			ret = true;
 		}
+		return ret;
 	}
 	bool BitmapFactory::decodeFile(MSkBitmap* mMSkBitmap,char* path,int w,int h){
 		if( (path == NULL) || (strcmp(path,"(null)") == 0)){

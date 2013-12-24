@@ -197,6 +197,8 @@ md5 TEXT\
 			sqlite3 * db;
 			CString dataPath;
 			CString datadir;
+			CStringArray imgBackArray;
+			CStringArray imgSrcArray;
 			bool isSdcard;
 			bool existBack;
 			int insertItemCount;
@@ -205,6 +207,8 @@ md5 TEXT\
 			bool queryFile(CursorItem& item,AudioFileInfo& info);
 			void insertCursor(CursorItem& item);
 			void copyData();
+			bool checkAlbumImage(CursorItem& item);
+			void albumImageBack();
 	};
 	struct Musicdb{
 		mediainfo info;
@@ -232,7 +236,7 @@ md5 TEXT\
 		void albumImageSync();
 		void mTimesSync();
 		bool cueCheck(char *direct,mediainfo *info);
-		bool cueCheckCursor(CursorItem& item);
+		bool cueCheckCursor(CursorItem& item,CString& pathStr);
 		void getCuePath(char* src,char * out);
 		bool loadCueFile(char* path,mediainfo *info);
 		void strCopy(char *des,char *out);
@@ -321,7 +325,7 @@ static int fileTypeMatch(const char *file,const char *music_type[])
 
 static int ismusic(const char *file)
 {
-	const char *music_type[] = {"mp3","wav","flac","aac","ogg","ape","m4a","wma","aif","aiff","dsf","\0"};
+	const char *music_type[] = {"mp3","wav","flac","aac","ogg","ape","m4a","wma","aif","aiff","\0"};
 	return fileTypeMatch(file,music_type);
 
 }

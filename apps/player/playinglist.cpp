@@ -453,7 +453,7 @@ static const char *PlayerLock = "playerlock";
 				if(needGapless&&mGapless>0&&mParticleplayer->setNextSongForGapless(playPath)){
 				
 					if(mParticleplayer->gaplessPlay(playPath)){log_i("gaplessPlay() success!");}
-					else{log_i("gaplessPlay() fail!");return -1;}
+					else{log_i("gaplessPlay() fail!");stopPlayer();return -1;}
 				
 				}else{
 					gPlayer.openWm8740Mute();

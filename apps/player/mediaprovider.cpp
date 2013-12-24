@@ -536,20 +536,17 @@ namespace mango
 				curItem.setValue("times",mCurrentTimes);
 				existSDcard = 1;
 			}else{
-				//ts = Time::getMicrosecond();
 				analyzeAudioID3(curItem,fileArray.mList[i]);
-				//te = Time::getMicrosecond();
-				//td += te - ts;
 			}
-			
-			//ts_ = Time::getMicrosecond();
-			if(!cueCheckCursor(curItem)){
+			if(sdcard.isSdcard){
+				sdcard.checkAlbumImage(curItem);
+			}
+			if(!cueCheckCursor(curItem,fileArray.mList[i].path)){
 				insertCursorItem(curItem);
+				
 				if(existSDcard == 0)
 					sdcard.insertCursor(curItem);
 			}
-			//te_ = Time::getMicrosecond();
-			//td_ += te_ - ts_;
 			
 			p = (i+1)*100/fileArray.mLen;
 			
@@ -564,7 +561,6 @@ namespace mango
 		
 		tt2 = Time::getMicrosecond();
 		
-		//albumImageSync();
 		
 		tt3 = Time::getMicrosecond();
 
@@ -1054,15 +1050,15 @@ namespace mango
 		
 		return 0;
 	}
-	bool mediaprovider::cueCheckCursor(CursorItem& item){
+	bool mediaprovider::cueCheckCursor(CursorItem& item,CString& pathStr){
 		CString dir;
 		char cuePath[300]={0};
 		bool ret = false;
 		CursorMediaInfo curMedia;
 		
 		item.getValue("path",dir);
-		getCuePath(dir.string,cuePath);
-		
+		getCuePath(pathStr.string,cuePath);
+
 		if(FileAttr::FileExist(cuePath)){
 			curMedia.setCursorItem(item);
 			ret = loadCueFile(cuePath,&curMedia.mInfo);
@@ -1105,7 +1101,7 @@ namespace mango
 		ret = mCCue.file_load(path);	
 		count = mCCue.m_total_song;
 		
-		log_i("ret=%d,file=%s",ret,path);
+		log_i("ret=%d,count=%d,file=%s",ret,count,path);
 		
 		if(ret<0 || count<=0)
 			return false;
@@ -1353,7 +1349,7 @@ namespace mango
 			log_e("sqlite3_exec error : %s",sql);
 			log_e("sqlite3_exec pErrMsg : %s",pErrMsg);
 		}else
-			log_i("sqlite3_exec success : %s",sql);
+			//log_i("sqlite3_exec success : %s",sql);
 			;
 		return ret;	
 	}
@@ -1850,6 +1846,7 @@ namespace mango
 			log_e("sqlite3_exec pErrMsg : %s",pErrMsg);
 		}
 		insertItemCount++;
+
 	}
 	void SdcardAudioData::copyData(){
 		char cmd[300],ptr;
@@ -1871,8 +1868,61 @@ namespace mango
 			system(cmd);
 			Environment::sync();
 		}
+		if(isSdcard){
+			albumImageBack();
+		}
 
 	}
+	bool SdcardAudioData::checkAlbumImage(CursorItem& item){
+		CString str;
+		bool ret = false;
+
+		item.getValue("img_path",str);
+		
+		char sdcardPath[300]={"/mnt/external_sd/.audio_data/album_img/"};
+		
+		if( FileAttr::FileExist(str.string) ){
+
+			strcat(sdcardPath,str.string + sizeof("/mnt/sdcard/.album_img"));
+
+			if(FileAttr::FileExist(sdcardPath)){
+				//log_i("exist %s",sdcardPath);
+			}else{
+				//log_i("not exist %s",sdcardPath);
+				imgBackArray.addString(sdcardPath);
+				imgSrcArray.addCString(str);
+			}
+			ret = true;
+		}else{
+			//log_i("not exist %s",str.string);
+			ret = false;
+		}
+		return ret;
+	}
+	
+	void SdcardAudioData::albumImageBack(){
+		int count = imgSrcArray.getCount();
+		int i = 0;
+
+		if(!FileAttr::FileExist(SDCARD_IMG))
+			mkdir(SDCARD_IMG,0644);
+		
+		for(i=0;i< count;i++){
+			char cmd[1024]={0},*exc;
+			CString src,des;
+			
+			exc = cmd;
+			
+			imgSrcArray.getCString(i,src);
+			imgBackArray.getCString(i,des);
+			
+			sprintf(exc,"busybox cp %s %s",src.string,des.string);
+			log_i("%s",exc);
+			system(exc);
+		}
+		
+	}
+
 	SdcardAudioData::~SdcardAudioData(){
 		if(db != NULL){
 			sqlite3_close(db);

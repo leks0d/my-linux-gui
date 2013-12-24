@@ -1113,6 +1113,9 @@ namespace mango
 		else if(code == NM_REMOVE_FROM_PLAYLIST){
 			char *md5 = (char *)parameter;
 			PlayList::delAudioFromPlaylist(mCurrentPlaylistId,md5);
+		}else if(code == SDCARD_UNMOUNT){
+			if(getMainState() != 0x1210)
+				mListView->refresh();
 		}
 
 		return 0;
@@ -1552,8 +1555,14 @@ namespace mango
 		x = LIST_MUSIC_ICON_LEFT;
 		
 		if(!mMSkBitmap[index].isVaild()){
-			if(info->img_path!=NULL && info->img_path[0]=='/')
-				BitmapFactory::genBitmapFromFile(&mMSkBitmap[index],info->img_path,36,36);
+			if(info->img_path!=NULL && info->img_path[0]=='/'){
+				if(!BitmapFactory::genBitmapFromFile(&mMSkBitmap[index],info->img_path,36,36)){
+					char sdcardPath[300]={"/mnt/external_sd/.audio_data/album_img/"};
+					strcat(sdcardPath,info->img_path + sizeof("/mnt/sdcard/.album_img"));
+					//if(FileAttr::FileExist(sdPath))
+						BitmapFactory::genBitmapFromFile(&mMSkBitmap[index],sdcardPath,36,36);
+				}
+			}
 		}
 		//log_i("mMSkBitmap[%d] vai,%d,%s",index,info->id,info->img_path);
 
