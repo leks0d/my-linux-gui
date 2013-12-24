@@ -87,10 +87,24 @@ static const char *PlayerLock = "playerlock";
 				}
 				
 				gSettingProvider.query(SETTING_PLAYMODE_ID,&playMode);
-				gSettingProvider.query(SETTING_PLAYPOS_ID,&playpost);
+				//gSettingProvider.query(SETTING_PLAYPOS_ID,&playpost);
 				gSettingProvider.query(SETTING_GAPLESS_ID,&mGapless);
+
+				Cursor scur;
+				gSettingProvider.queryCursor(SETTING_PLAYPOS_ID,&scur);
+
+				for(i=0;i<len;i++){
+					CString md5;
+					scur.getValueCstring(0,"name",md5);
+					
+					log_i("mplaylist[%d].md5=%s,md5=%d",i,mplaylist[i].md5,md5.string);
+					
+					if( strcmp(mplaylist[i].md5,md5.string) == 0){
+						moveToPosition(i);
+						break;
+					}
+				}
 				
-				moveToPosition(playpost);		
 			}
 			void Playinglist::checkPlayintList(const char *dir){
 				int i;
@@ -139,7 +153,11 @@ static const char *PlayerLock = "playerlock";
 				}
 				
 				if(getCount()>0){
-					gSettingProvider.update(SETTING_PLAYPOS_ID,mCurrent);
+					gSettingProvider.updateSDcard(mCurrent,getPlayingItem()->md5,SETTING_PLAYPOS_ID);
+
+					if(isPlaying()||inPause){
+						gmediaprovider.updateAddTime(getCurrent(),getPlayingItem()->id);
+					}
 				}
 				
 			}
@@ -480,6 +498,12 @@ static const char *PlayerLock = "playerlock";
 						}else{
 							mThread.create(Playinglist::CloseMuteRunnig,(void*)200);
 						}
+					}else if(getPlayingItem()->add_time>1000){
+						mango::Thread::sleep(1000);
+						mParticleplayer->seekTo(getPlayingItem()->add_time);
+						gmediaprovider.updateAddTime(0,getPlayingItem()->id);
+						getPlayingItem()->add_time=0;
+						mThread.create(Playinglist::CloseMuteRunnig,(void*)1000);						
 					}else{
 						mThread.create(Playinglist::CloseMuteRunnig,(void*)200);
 					}
@@ -546,17 +570,13 @@ Exit:
 
 			int Playinglist::getCurrent(){
 				int cur;
-				unsigned long t,s;
-
-				t = Time::getMicrosecond();
 				
 				if(mParticleplayer!=NULL){
 					cur = mParticleplayer->getCurrentPosition();
 				}else{
 					cur = 0;
 				}
-				s = Time::getMicrosecond()-t;
-				//log_i("cur=%d,spec=%ld",cur,s);
+
 				return cur;
 			}
 
@@ -570,6 +590,9 @@ Exit:
 					return mParticleplayer->isPlaying();
 				else
 					return 0;
+			}
+			int Playinglist::isPause(){
+				return inPause;
 			}
 			bool Playinglist::isSpdifOut(){
 				if(mParticleplayer != NULL)

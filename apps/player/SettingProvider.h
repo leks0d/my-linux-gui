@@ -65,7 +65,7 @@ val_7 INTEGER\
 			void dataBaseInit(void);
 			int insert(int id,int value);
 			int insert(int id,int value,const char *str);
-			int updateSDcard(__u32 value,char* buf);
+			int updateSDcard(__u32 value,char* buf,int id=SETTING_SCANSDCARDSTATE_ID);
 			int update(int id,int value);
 			int queryCursor(int id,Cursor *cur);
 			int query(int id,int *value);

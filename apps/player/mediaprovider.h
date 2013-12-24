@@ -250,6 +250,7 @@ md5 TEXT\
 		int queryCursor(char *where, Cursor* cur);
 		int querySqlCursor(char *sql, Cursor* cur);
 		int updateInPlay(int value,int id =-1);
+		int updateAddTime(int value,int id);
 		int deleteMusicOnDir(const char *dir);
 		int del(char *table,int id);
 		virtual ~mediaprovider(void);

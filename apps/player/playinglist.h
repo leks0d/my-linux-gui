@@ -66,6 +66,7 @@ namespace mango
 			int getCurrent();
 			int getCount();
 			int isPlaying();
+			int isPause();
 			bool isSpdifOut();
 			void setSpdifOut(bool isSpdifOut);
 			void setPlayMode(int mode);

@@ -246,9 +246,11 @@ namespace mango
 		//log_i("tag currentinfo->img_path=0x%x:%s",currentinfo->img_path,currentinfo->img_path);
 		mMSkBitmap->createFile(currentinfo->img_path);
 		if(!mMSkBitmap->isVaild()){
-			char sdcardPath[300]={"/mnt/external_sd/.audio_data/album_img/"};
-			strcat(sdcardPath,currentinfo->img_path + sizeof("/mnt/sdcard/.album_img"));
-			mMSkBitmap->createFile(sdcardPath);
+			if(currentinfo->img_path!=NULL && currentinfo->img_path[0] == '/'){
+				char sdcardPath[300]={"/mnt/external_sd/.audio_data/album_img/"};
+				strcat(sdcardPath,currentinfo->img_path + sizeof("/mnt/sdcard/.album_img"));
+				mMSkBitmap->createFile(sdcardPath);
+			}
 		}
 		//BitmapFactory::decodeFile(mMSkBitmap,"/mnt/sdcard/cover.jpg",109,109);
 #endif
@@ -281,6 +283,11 @@ namespace mango
 			duration = currentinfo->duration;
 			current = current - currentinfo->cueStart;
 			if(current<0){
+				current = 0;
+			}
+		}else if(currentinfo->add_time>0 && !mPlayinglist->isPlaying() && !mPlayinglist->isPause()){
+			current = currentinfo->add_time;
+			if( duration<=1 || (duration>1 && current>duration)){
 				current = 0;
 			}
 		}

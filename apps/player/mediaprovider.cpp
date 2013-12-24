@@ -1420,6 +1420,16 @@ namespace mango
 
 		return exec(sql,0,0);
 	}
+	int mediaprovider::updateAddTime(int value,int id){
+		char *ptr,sql[1024];
+		
+		ptr = sql;
+		if(id>0){
+			ptr += sprintf(ptr,"update music set add_time=%d where _id=%d",value,id);
+			exec(sql,0,0);
+		}
+		return 0;
+	}
 	int mediaprovider::deleteMusicOnDir(const char *dir){
 		char sql[1024];
 		sprintf(sql,"delete from music where path like '%s/%%'",dir);

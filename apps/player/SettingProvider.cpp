@@ -141,13 +141,13 @@ namespace mango
 		}
 		return vol;
 	}
-	int SettingProvider::updateSDcard(__u32 value,char* buf){
+	int SettingProvider::updateSDcard(__u32 value,char* buf,int id){
 		int ret = 0;
 		char *pErrMsg = 0;
 		char *ptr,sql[1024];
 		
 		ptr = sql;
-		sprintf(ptr,"update settings set value=%d,name='%s' where _id=%d",value,buf,SETTING_SCANSDCARDSTATE_ID);
+		sprintf(ptr,"update settings set value=%d,name='%s' where _id=%d",value,buf,id);
 		
 		ret = sqlite3_exec(db,sql,0,0,&pErrMsg);
 		

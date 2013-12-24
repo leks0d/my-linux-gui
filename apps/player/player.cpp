@@ -329,8 +329,8 @@ namespace mango
 		//shutDown();
 	}
 	void Player::shutDown(){	
-		mPlayinglist->stopPlayer();
 		mPlayinglist->savePlayintList();
+		mPlayinglist->stopPlayer();
 		gSettingProvider.dbclose();
 		Environment::sync();
 	}
