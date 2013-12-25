@@ -54,6 +54,7 @@ namespace mango
 		}
 	}
 	void PowerManager::setForcePoweroffTime(int index){
+		mForcePowerOffTimeCount = 0;
 		mForcePowerOffTime = force[index];
 		writeTime(mForcePowerOffTime);
 	}
@@ -85,7 +86,6 @@ namespace mango
 		if(gPlayer.mPlayingView != NULL && 
 			(gPlayer.mPlayingView->isUsmCon || gPlayer.mPlayingView->isMediaScanning)){
 			atuoPoweroffCount = 0;
-			mForcePowerOffTimeCount = 0;
 		}
 		
 		if(atuoPoweroffCount>=poweroffTime && poweroffTime != -1){
@@ -97,6 +97,7 @@ namespace mango
 			log_i("send mForcePowerOff message.");
 			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,NM_POWER_OFF,0);
 			resetCount();
+			mForcePowerOffTimeCount = 0;
 		}
 #if 0
 		if(gPlayer.mPlayingView!=NULL)
@@ -109,7 +110,6 @@ namespace mango
 	void PowerManager::resetCount(){
 		atuoCount = 0;
 		atuoPoweroffCount = 0;
-		mForcePowerOffTimeCount = 0;
 	}
 
 	void PowerManager::setPowerState(){
