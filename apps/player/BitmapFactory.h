@@ -22,6 +22,7 @@ namespace mango
 			static void install();
 			static void reboot();
 			static void openMute();
+			static void openadb();
 			static void sync();
 			static void logcat();
 			static unsigned int logcatRunnig(void *parameter);

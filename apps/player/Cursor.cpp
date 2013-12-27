@@ -76,11 +76,17 @@ namespace mango
 			if(cstr == key){
 				mKey.remove(i);
 				mValue.remove(i);
+				mLen-- ;
 				ret = true;
 				break;
 			}
 		}
 		return ret;		
+	}
+	void CursorItem::clearAll(){
+		mKey.removeAll();
+		mValue.removeAll();
+		mLen = 0;
 	}
 	CursorItem& CursorItem::operator=(CursorItem& cursorItem){
 		mKey = cursorItem.mKey;

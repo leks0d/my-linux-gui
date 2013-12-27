@@ -543,11 +543,7 @@ CStringArray::CStringArray(){
 	mLen = mMax = 0;
 }
 CStringArray::~CStringArray(){
-	if(mList != NULL){
-		delete[] mList;
-		mList = NULL;
-	}
-	mLen = mMax = 0;
+	removeAll();
 }
 void CStringArray::remove(int val){
 	int i;
@@ -558,6 +554,13 @@ void CStringArray::remove(int val){
 		mList[mLen-1] = NULL;
 		mLen--;
 	}
+}
+void CStringArray::removeAll(){
+	if(mList != NULL){
+		delete[] mList;
+		mList = NULL;
+	}
+	mLen = mMax = 0;	
 }
 int CStringArray::addCString(CString& cstr){
 	if(mLen>=mMax){

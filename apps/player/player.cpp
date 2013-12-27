@@ -453,13 +453,16 @@ namespace mango
 	int  Player::getVolume(void)
 	{
 #ifndef WIN32
-		FILE* file;
+		FILE* file = NULL;
 		char buffer[20]={0};
 		int currentVolume;
 		int maxVolume;
 		int minVolume;
 
-		file  = fopen("/dev/codec_volume", "rt");
+		file  = fopen("/dev/codec_volume", "r");
+		if(file == NULL)
+			file  = fopen("/sys/class/codec/wm8740_volume", "r");
+		
 		if (file == NULL) {
 			log_e("/dev/codec_volume");
 			return -1;
@@ -480,13 +483,17 @@ namespace mango
 
 	void Player::setVolume(int volume)
 	{
-		FILE* file;
+		FILE* file = NULL;
 		char buffer[20]={0};
 		int ret;
 		
 		volumeMutex.lock();
-		
-		file  = fopen("/dev/codec_volume", "wt");
+
+		if(FileAttr::FileExist("/dev/codec_volume"))
+			file  = fopen("/dev/codec_volume", "w");
+		else if(FileAttr::FileExist("/sys/class/codec/wm8740_volume"))
+			file  = fopen("/sys/class/codec/wm8740_volume", "w");
+			
 		if (file != NULL) {
 			sprintf(buffer, "%d", volume);
 			ret = fwrite(buffer, 1, strlen(buffer) + 1, file);	

@@ -158,7 +158,12 @@ namespace mango
 			mListView->deleteAllItems();
 			mPowerListAdapter = new SettingListAdapter(mListView,ADAPTER_PLAYING);
 			mPowerListAdapter->setData(img,imgsec,text,count);
-			mPowerListAdapter->mLayoutleft = 80;
+			if(gSessionLocal.getLangId() == LANGID_RU
+				|| gSessionLocal.getLangId() == 9)
+				mPowerListAdapter->mLayoutleft = 20;
+			else
+				mPowerListAdapter->mLayoutleft = 100;
+
 		}else
 			mPowerListAdapter->refresh();
 		

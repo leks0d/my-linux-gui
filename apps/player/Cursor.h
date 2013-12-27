@@ -15,6 +15,7 @@ namespace mango
 			void setValue(const char* key,const char* value);
 			void setValue(const char* key,int value);
 			bool getValue(const char* key,CString& outValue);
+			void clearAll();
 			bool removeItem(const char* key);
 			CursorItem& operator=(CursorItem& cursorItem);
 	};

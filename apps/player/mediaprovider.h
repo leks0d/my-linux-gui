@@ -207,6 +207,8 @@ md5 TEXT\
 			bool queryFile(CursorItem& item,AudioFileInfo& info);
 			void insertCursor(CursorItem& item);
 			void copyData();
+			void genExImgPath(CString& img,CString& exImg);
+			bool isImgExist(CursorItem& item);
 			bool checkAlbumImage(CursorItem& item);
 			void albumImageBack();
 	};

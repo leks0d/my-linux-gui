@@ -202,6 +202,8 @@ AudioId3::AudioId3(char* file)
 	
 	mInterfaceID3 = NULL;
 	mFFmepgId3 = NULL;
+	picdata = NULL;
+	piclength = 0;
 	
 	f = fopen(file,"r");
 	if(f>0){
@@ -261,12 +263,43 @@ int AudioId3::GetTags(int id, char *data)
 }
 int AudioId3::PicValid(){
 	int ret = -1;
+	
 	if(mFFmepgId3 != NULL){
 		ret = mFFmepgId3->PicValid();
 		if(ret){
 			piclength = mFFmepgId3->piclength;
 			picdata = mFFmepgId3->picdata;
 		}
+	}
+	if(mInterfaceID3 != NULL){
+		char *tagData;
+		int   tagDataSize;
+		
+		tagDataSize = mInterfaceID3->getTag(IID3_APIC, &tagData);
+		
+		if (tagDataSize > 0)
+		{
+			int headerSize = 0;
+
+			if (strnicmp(tagData + 1, "image/jpeg", 10) == 0)
+			{
+				headerSize = 1 + 11 + 2;
+
+			}
+			else if(strnicmp(tagData + 1, "image/png", 9) == 0)
+			{
+				headerSize = 1 + 10 + 2;
+			}
+			
+			int dataSize = tagDataSize - headerSize;
+			
+		   	if(dataSize > 0){
+		   		piclength = dataSize;
+				picdata = tagData + headerSize;
+				ret = 1;
+		   	}
+			
+		}			
 	}
 	return ret;
 }

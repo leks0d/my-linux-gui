@@ -40,7 +40,7 @@ namespace mango
 		Rect rect;
 		int firstLeft = 98;
 		
-		rect.setEx((320-60)/2,95,60,15);
+		rect.setEx(0,95,320,15);
 		mVolumeStr = new TextView(SETTING_BACK, TEXT("mBack"), this, &rect, 0);
 		mVolumeStr->setTextColor(COLOR_WHITE);
 		mVolumeStr->setTextResoure(STR_VOLUME);

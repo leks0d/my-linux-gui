@@ -630,6 +630,8 @@ namespace mango
 		char sqlStr[1024]={0},filename[1024]={0};
 		CString md5;
 		
+		item.clearAll();
+		
 		item.addItem("times",mCurrentTimes);
 		
 		value = (char*)malloc(len);
@@ -1795,17 +1797,17 @@ namespace mango
 		sqlite3_exec(db,sql,cursor_sql_callback,(void*)&cur,&pErrMsg);
 		
 		if(cur.mLen > 0){
+			CursorItem *pItem = cur.mList;
 			CString val;
-			
-			item = cur.mList[0];
-			
-			item.getValue("path",val);
+
+			pItem->getValue("path",val);
 			mediaprovider::slqFormatOut(val.string,sqlPath);
-			item.setValue("path",sqlPath);
+			pItem->setValue("path",sqlPath);
+			pItem->removeItem("_id");
 			
-			item.removeItem("_id");
-			
-			ret = true;
+			ret = isImgExist(*pItem);
+			if(ret)
+				item = *pItem;
 		}else{
 			ret = false;
 		}
@@ -1883,6 +1885,40 @@ namespace mango
 		}
 
 	}
+	void SdcardAudioData::genExImgPath(CString& img,CString& exImg){
+		char sdcardPath[300]={SDCARD_IMG_PATH};
+		
+		if(img!=NULL && img.Find(FLASH_IMG_PATH,0)>=0){
+			strcat(sdcardPath,"/");
+			strcat(sdcardPath,img.string + sizeof(FLASH_IMG_PATH));
+			exImg = sdcardPath;
+		}else{
+			exImg = "(null)";
+		}
+	}
+/*用来判断图片备份是否被删除*/
+	bool SdcardAudioData::isImgExist(CursorItem& item){
+		CString str,ex;
+		bool ret = false;
+
+		item.getValue("img_path",str);
+		
+		if(str != NULL && str.getLen()>0 && str.string[0]=='/'){
+			if(FileAttr::FileExist(str.string)){
+				ret = true;
+			}else{
+				genExImgPath(str,ex);
+				log_i("ex=%s",ex.string);
+				if(ex!=NULL && FileAttr::FileExist(ex.string)){
+					ret = true;
+				}
+			}
+		}else{
+			ret = true;//没有图片的歌曲，不存在被删除问题
+		}
+		log_i("ret=%d,str=%s",ret,str.string);
+		return ret;
+	}
 	bool SdcardAudioData::checkAlbumImage(CursorItem& item){
 		CString str;
 		bool ret = false;
@@ -1914,8 +1950,8 @@ namespace mango
 		int count = imgSrcArray.getCount();
 		int i = 0;
 
-		if(!FileAttr::FileExist(SDCARD_IMG))
-			mkdir(SDCARD_IMG,0644);
+		if(!FileAttr::FileExist(SDCARD_IMG_PATH))
+			mkdir(SDCARD_IMG_PATH,0644);
 		
 		for(i=0;i< count;i++){
 			char cmd[1024]={0},*exc;

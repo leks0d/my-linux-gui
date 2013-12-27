@@ -1,6 +1,8 @@
 
 namespace mango
 {
+#define MAX_EQ 24
+#define MAX_CN MAX_EQ/2
 
 	class EqSettingsView: public View
 	{
@@ -15,8 +17,8 @@ namespace mango
 		void setCurrentEqMode(int n);
 		void setCurrentEqValue(int id,int val);
 		void setEqModeToReset();
-		int progressToValue(int n){return 6-n;}
-		int valueToProgress(int n){return 6-n;}
+		int progressToValue(int n){return MAX_CN-n;}
+		int valueToProgress(int n){return MAX_CN-n;}
 	public:
 		virtual int onCreate();
 		virtual int onDestroy();

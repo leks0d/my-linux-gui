@@ -277,7 +277,10 @@ namespace mango
 		const char *cmd = "./system/bin/muteopen";
 		system(cmd);
 	}
-
+	void Environment::openadb(){
+		const char *cmd = "./system/bin/openadb";
+		system(cmd);
+	}
 	void Environment::sync(){
 		const char *cmd = "./system/bin/sync";
 		system(cmd);

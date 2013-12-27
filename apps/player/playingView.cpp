@@ -33,9 +33,9 @@ namespace mango
 		Rect rect;
 		log_i("PlayingView::onCreate()");
 		//return 0;
-		rect.setEx(10, 2, 60, 16);
+		rect.setEx(10, 2, 52, 16);
 		mEqState = new TextView(-1, TEXT("mEqStateText"), this, &rect, 0);
-		mEqState->setTextSize(13);
+		mEqState->setTextSize(14);
 		mEqState->setTextColor(COLOR_TEXT);
 		mEqState->setTextLayoutType(TEXT_LAYOUT_LEFT);
 		mEqState->onCreate();
@@ -641,6 +641,7 @@ namespace mango
 		}
 		else if(code == FLASH_MOUNT){
 			//Environment::logcat();
+			//Environment::openadb();
 			Environment::checkWallpaper();
 			
 			mPlayinglist->checkPlayintList(FLASH_PATH);

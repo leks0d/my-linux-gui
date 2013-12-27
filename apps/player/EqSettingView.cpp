@@ -83,7 +83,7 @@ namespace mango
 		for(i=0;i<8;i++){
 			rect.setEx(diver*i+freLeft+6, 66, diver, 132);
 			mVerticalSeekBar[i] = new VerticalSeekBar(i, TEXT("mTitle"), this, &rect, 0);
-			mVerticalSeekBar[i]->setMax(12);
+			mVerticalSeekBar[i]->setMax(MAX_EQ);
 			mVerticalSeekBar[i]->setImageResoure(IDP_EQ_SEEKBAR,IDP_EQ_SEEKBAR,IDP_EQ_SEEKBAR_THUMB);
 		}
 

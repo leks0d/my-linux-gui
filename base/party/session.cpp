@@ -3,7 +3,7 @@
 #ifndef WIN32
 #include <linux/input.h>
 #endif
-//#define FBIOPAN_DISPLAY 0x4628
+#define FBIOPAN_DISPLAY 0x4628
 namespace mango
 {
 	#define TCC_LCD_FB_IOCTL_DISP_ONOFF				0x10
