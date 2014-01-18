@@ -34,6 +34,7 @@ namespace mango
 			int mGapless;
 			int inPause;
 			int isWakeLock;
+			int mOrderBy;
 			
 			Playinglist();
 			~Playinglist();

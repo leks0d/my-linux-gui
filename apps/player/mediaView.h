@@ -85,6 +85,7 @@ namespace mango
 		ArrayMediaInfo *mMusicArrayList;
 		char *mWhere;
 		char *mSql;
+		int mOrderBy;
 	};
 
 	class AlbumAdapter : public BaseAdapter

@@ -37,7 +37,8 @@ static const char *PlayerLock = "playerlock";
 				inPause = 0;
 				mParticleplayer = NULL;
 				isWakeLock = 0;
-
+				mOrderBy = -1;
+				
 				clearPlay();
 			}
 
@@ -62,6 +63,7 @@ static const char *PlayerLock = "playerlock";
 				gSettingProvider.query(SETTING_PLAYMODE_ID,&playMode);
 				gSettingProvider.query(SETTING_PLAYPOS_ID,&playpost);
 				gSettingProvider.query(SETTING_GAPLESS_ID,&mGapless);
+				gSettingProvider.query(SETTING_PLAYLIST_ORDER_ID,&mOrderBy);
 				
 				log_i("playpost = %d,countd",playpost);
 				moveToPosition(playpost);
@@ -69,8 +71,41 @@ static const char *PlayerLock = "playerlock";
 			void Playinglist::cursorInit(){
 				int i,playpost;
 				Cursor cur;
+				char *ptr,where[1024];
+				char *orderby = NULL;
+				int count;
+
+				log_i("%s,%d",__func__,__LINE__);
 				
-				gmediaprovider.queryCursor("where inplay>0 order by inplay",&cur);
+				gSettingProvider.query(SETTING_PLAYLIST_ORDER_ID,&mOrderBy);
+				
+				ptr = where;
+				
+				switch(mOrderBy){
+					case MEDIA_ORDER_TILE:
+						orderby = MUSIC_TITLE_KEY;
+						break;
+					case MEDIA_ORDER_ALBUM:
+						orderby = MUSIC_ALBUM_KEY;
+						break;
+					case MEDIA_ORDER_ARTIST:
+						orderby = MUSIC_ART_KEY;
+						break;
+					case MEDIA_ORDER_TIME:
+						orderby = MUSIC_TIMES;
+						break;
+				}
+				
+				log_i("mOrderBy=%d,orderby=%s",mOrderBy,orderby);
+				
+				if(orderby!=NULL)
+					ptr += sprintf(ptr,"where inplay>0 order by %s ",orderby);
+				else
+					ptr += sprintf(ptr,"where inplay>0 order by inplay");
+				
+				log_i("where=%s",where);
+				
+				gmediaprovider.queryCursor(where,&cur);
 
 				for(i=0;i<cur.mLen;i++){
 					int inplay;
@@ -97,7 +132,7 @@ static const char *PlayerLock = "playerlock";
 					CString md5;
 					scur.getValueCstring(0,"name",md5);
 					
-					log_i("mplaylist[%d].md5=%s,md5=%d",i,mplaylist[i].md5,md5.string);
+					//log_i("mplaylist[%d].md5=%s,md5=%d",i,mplaylist[i].md5,md5.string);
 					
 					if( strcmp(mplaylist[i].md5,md5.string) == 0){
 						moveToPosition(i);
@@ -159,7 +194,8 @@ static const char *PlayerLock = "playerlock";
 						gmediaprovider.updateAddTime(getCurrent(),getPlayingItem()->id);
 					}
 				}
-				
+
+				gSettingProvider.update(SETTING_PLAYLIST_ORDER_ID,mOrderBy);
 			}
 			void Playinglist::removeItem(int n){
 				int i;

@@ -247,7 +247,7 @@ namespace mango
 		mMSkBitmap->createFile(currentinfo->img_path);
 		if(!mMSkBitmap->isVaild()){
 			if(currentinfo->img_path!=NULL && currentinfo->img_path[0] == '/'){
-				char sdcardPath[300]={"/mnt/external_sd/.audio_data/album_img/"};
+				char sdcardPath[1024]={"/mnt/external_sd/.audio_data/album_img/"};
 				strcat(sdcardPath,currentinfo->img_path + sizeof("/mnt/sdcard/.album_img"));
 				mMSkBitmap->createFile(sdcardPath);
 			}

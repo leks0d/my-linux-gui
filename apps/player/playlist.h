@@ -40,7 +40,7 @@ remark TEXT\
 _id INTEGER PRIMARY KEY autoincrement,\
 playlist_id INTEGER,\
 audio_md5 TEXT\
-);" 
+);"
 
 	
 		class PlayList{

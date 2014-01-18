@@ -17,6 +17,7 @@ namespace mango
 	#define SETTING_AUTOPOWEROFF_ID			10
 	#define SETTING_SCANSDCARDSTATE_ID		11
 	#define SETTING_FORCE_POWEROFF_ID		12
+	#define SETTING_PLAYLIST_ORDER_ID		13
 
 	#define SETTING_DEFAULT_VOLUME	170
 
@@ -32,6 +33,7 @@ namespace mango
 	#define SETTING_AUTOPOWEROFF_NAME  			"autopoweroffTime"
 	#define SETTING_SCANSDCARDSTATE_NAME  		"scanSdcardState"
 	#define SETTING_FORCE_POWEROFF_NAME			"forcePowerOff"
+	#define SETTING_PLAYLIST_ORDER_NAME			"playlistorder"
 
 	#define EQ_CUSTOM_ID		0
 	#define EQ_POP_ID			1

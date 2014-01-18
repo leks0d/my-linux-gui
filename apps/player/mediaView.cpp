@@ -829,14 +829,14 @@ namespace mango
 					{
 
 						TCHAR path[MAX_PATH];
-						char utf8Path[300],*ptr,parent[255];
+						char utf8Path[MAX_PATH],*ptr,parent[MAX_PATH];
 						char *where = NULL;
-						char sqlpath[300];
+						char sqlpath[MAX_PATH];
 						int count;
 						ArrayMediaInfo *pinfo;
 						
 						pinfo = new ArrayMediaInfo();
-						ptr = where = new char[300];
+						ptr = where = new char[MAX_PATH];
 						
 						String::copy(path, mCurrentPath);
 						File::pathAddBackslash(path);
@@ -856,7 +856,7 @@ namespace mango
 							//if(mPlayinglist->isItemExsit(pinfo->getMediaInfo(0))<0){
 							if(1){
 								ArrayMediaInfo arrayInfo;
-								char sqlParent[350];
+								char sqlParent[MAX_PATH];
 								
 								if(mPlayinglist == NULL)
 									mPlayinglist = new Playinglist();
@@ -864,9 +864,9 @@ namespace mango
 								mPlayinglist->clearAll();
 								
 								mediaprovider::slqFormatOut(parent,sqlParent);
-								ptr = where = new char[300];
+								ptr = where = new char[MAX_PATH*3];
 								ptr += sprintf(ptr," where path like '%s/%%' and not path like '%s/%%/%%' ",sqlParent,sqlParent);
-								
+								//ptr += sprintf(ptr," where path like '%s/%%'",sqlParent);
 								count = gmediaprovider.queryMusicArray(where,&arrayInfo);
 								arrayInfo.sort();
 								mPlayinglist->addArrayItem(arrayInfo);
@@ -948,10 +948,14 @@ namespace mango
 								
 								if(pt.x>iconRight){
 									if(adapter != NULL){
-										//if(getMainState() != 0x1300){
-											mPlayinglist->clearAll();
-											mPlayinglist->addArrayItem(*(adapter->mMusicArrayList));		
-										//}
+										
+										if(getMainState() == 0x1300)
+											mPlayinglist->mOrderBy = adapter->mOrderBy;
+										else
+											mPlayinglist->mOrderBy = -1;
+										
+										mPlayinglist->clearAll();
+										mPlayinglist->addArrayItem(*(adapter->mMusicArrayList));		
 										playMediaInfo(adapter->mMusicArrayList->getMediaInfo(record->m_lvItem.iItem),1);
 									}
 								}else if(pt.x>LIST_MUSIC_ICON_LEFT-10){
@@ -1117,7 +1121,7 @@ namespace mango
 			if(getMainState() != 0x1210)
 				mListView->refresh();
 		}
-
+		log_i("MediaView::onNotify end");
 		return 0;
 	}
 
@@ -1344,7 +1348,7 @@ namespace mango
 		mlist = list;
 		mWhere = NULL;
 		mSql = NULL;
-		
+		mOrderBy = 0;
 		mMusicArrayList = new ArrayMediaInfo();
 	}
 	void MusicAdapter::setMusicOrderby(int order){
@@ -1353,7 +1357,8 @@ namespace mango
 		int count,i;
 		
 		ptr = where;
-
+		mOrderBy = order;
+		
 		switch(order){
 			case MEDIA_ORDER_TILE:
 				orderby = MUSIC_TITLE_KEY;
@@ -1377,7 +1382,7 @@ namespace mango
 	void MusicAdapter::refresh(){
 		int count,i;
 		
-		mMusicArrayList->clear();		
+		mMusicArrayList->clear();
 		if(mSql == NULL){
 			count = gmediaprovider.queryMusicArray(mWhere,mMusicArrayList);
 		}else{

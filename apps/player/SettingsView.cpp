@@ -162,7 +162,7 @@ namespace mango
 				|| gSessionLocal.getLangId() == 9)
 				mPowerListAdapter->mLayoutleft = 20;
 			else
-				mPowerListAdapter->mLayoutleft = 100;
+				mPowerListAdapter->mLayoutleft = 60;
 
 		}else
 			mPowerListAdapter->refresh();

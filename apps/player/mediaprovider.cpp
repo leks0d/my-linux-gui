@@ -15,7 +15,9 @@ namespace mango
 	{
 		int i;
 		Musicdbinfo **ppt,*pt,*data;
-		
+#if SQLITE_LOG
+		log_i("-----");
+#endif
 		ppt = (Musicdbinfo **)use;
 		pt = *ppt;
 		data = (Musicdbinfo *)malloc(sizeof(Musicdbinfo));
@@ -237,7 +239,6 @@ namespace mango
 				value*=ary;
 		}
 		return value;
-			
 	}
 	static void strlwr(char *string){
 		int wid = 'a' - 'A';
@@ -1344,7 +1345,7 @@ namespace mango
 		
 		if(db == 0)
 			return SQLITE_ERROR;
-		//log_i("sqlite3_exec");
+
 		ret = sqlite3_exec( db, sql, callback, arg, &pErrMsg );
 		
 		if(ret != SQLITE_OK){
@@ -1358,7 +1359,7 @@ namespace mango
 
 	int mediaprovider::insert(char *table,mediainfo *info)
 	{
-		char *ptr,sql[1024*3];
+		char *ptr,sql[1024*5];
 
 		ptr = sql;
 		ptr += sprintf(ptr,"insert into %s (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ",
@@ -1377,7 +1378,7 @@ namespace mango
 	}
 	int mediaprovider::insertCursorItem(CursorItem& item){
 		int i;
-		char *ptr,sql[1024*3];
+		char *ptr,sql[1024*5];
 		
 		ptr = sql;
 		ptr += sprintf(ptr,"insert into music (");
@@ -1459,10 +1460,10 @@ namespace mango
 			return 0;
 		else{
 			count++;
-			while(pt->next!=0){				
+			while(pt->next!=0){			
 				pt = pt->next;
 				count++;
-			}			
+			}
 		}
 
 		infolist = (mediainfo*)malloc(sizeof(mediainfo)*count);
@@ -1491,7 +1492,7 @@ namespace mango
 
 		int mediaprovider::queryMusicArray(char *where, void *array)
 		{
-			char *ptr,sql[1024];
+			char *ptr,sql[1024*5];
 			Musicdbinfo *info,*pt;
 			ArrayMediaInfo *arraylist;
 			int count = 0;
@@ -1512,7 +1513,7 @@ namespace mango
 	
 			pt = info;
 
-			//log_i("exec complete");
+			log_i("exec complete");
 			if(pt == 0){
 				return 0;
 			}else{
@@ -1691,7 +1692,7 @@ namespace mango
 	void AudioFileArray::listFile(const char *file,bool recursion){
 		int 	i;
 		DIR* 	d;
-		char 	direct[255];
+		char 	direct[MAX_PATH];
 		struct dirent* de;
 		CString cover;
 		CStringArray musicList;
@@ -1908,7 +1909,7 @@ namespace mango
 				ret = true;
 			}else{
 				genExImgPath(str,ex);
-				log_i("ex=%s",ex.string);
+				//log_i("ex=%s",ex.string);
 				if(ex!=NULL && FileAttr::FileExist(ex.string)){
 					ret = true;
 				}
@@ -1916,7 +1917,7 @@ namespace mango
 		}else{
 			ret = true;//没有图片的歌曲，不存在被删除问题
 		}
-		log_i("ret=%d,str=%s",ret,str.string);
+		//log_i("ret=%d,str=%s",ret,str.string);
 		return ret;
 	}
 	bool SdcardAudioData::checkAlbumImage(CursorItem& item){
@@ -1963,7 +1964,7 @@ namespace mango
 			imgBackArray.getCString(i,des);
 			
 			sprintf(exc,"busybox cp %s %s",src.string,des.string);
-			log_i("%s",exc);
+			//log_i("%s",exc);
 			system(exc);
 		}
 		

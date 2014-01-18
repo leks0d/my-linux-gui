@@ -487,6 +487,7 @@ int CString::Mid(int start,int len,CString& out){
 //ret:0-fail,1-sucess.
 int CString::toIneger(int *val){
 	int ret = 0;
+	*val = 0;
 	if(string){
 		//log_i("string=%s",string);
 		ret = sscanf(string,"%d",val);
