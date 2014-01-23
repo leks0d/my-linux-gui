@@ -192,6 +192,8 @@ static int tagConvert(int n){
 			ret = IID3_GENRE;break;
 		case METADATA_KEY_TITLE:
 			ret = IID3_TITLE;break;
+		case METADATA_KEY_DURATION:
+			ret = IID3_DURATION;break;
 	}
 	return ret;
 }
@@ -244,16 +246,19 @@ int AudioId3::GetTags(int id, char *data)
 	int ret = -1;
 	if(mInterfaceID3!=NULL){
 		ret = mInterfaceID3->getTag(tagConvert(id),&val);
-		
-		if(ret<=0){
-			ret = 0;
-		}else if (val[0] == 0 || val[0] == 0x03){
-			strcpy(data,val+1);
-		}else if(val[0] == 1 && val[1] == (char)0xff && val[2] == (char)0xfe){
-			char *szBuf = strndup16to8((const char16_t*)(val + 3), (ret-3)/2);
-			strcpy(data,szBuf);
+		if(id == METADATA_KEY_DURATION){
+			ret = sprintf(data,"%d",ret);
 		}else{
-			ret = 0;
+			if(ret<=0){
+				ret = 0;
+			}else if (val[0] == 0 || val[0] == 0x03){
+				strcpy(data,val+1);
+			}else if(val[0] == 1 && val[1] == (char)0xff && val[2] == (char)0xfe){
+				char *szBuf = strndup16to8((const char16_t*)(val + 3), (ret-3)/2);
+				strcpy(data,szBuf);
+			}else{
+				ret = 0;
+			}
 		}
 	}
 	if(mFFmepgId3 != NULL){

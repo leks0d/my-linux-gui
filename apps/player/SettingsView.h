@@ -83,6 +83,8 @@ namespace mango
 		int getMainState(){return mainState;}
 		void backEvent();
 	public:
+		static int getLeftByLanguage(int languageId);
+	public:
 		MediaListView*  mListView;
 		TextView* mTitle;
 		Button* mBack;

@@ -108,16 +108,10 @@ namespace mango
 		if(mAdvanceListAdapter == NULL){
 			mListView->deleteAllItems();
 			mAdvanceListAdapter = new SettingListAdapter(mListView,ADAPTER_PLAYING);
-			mAdvanceListAdapter->mLayoutleft = 60;
+			
 		}
 		mAdvanceListAdapter->setData(img,imgsec,text,count);
-
-		if(gSessionLocal.getLangId() == LANGID_RU
-			||gSessionLocal.getLangId() == LANGID_LA
-			||gSessionLocal.getLangId() == LANGID_PU)
-			mAdvanceListAdapter->mLayoutleft = 20;
-		else
-			mAdvanceListAdapter->mLayoutleft = 80;
+		mAdvanceListAdapter->mLayoutleft = getLeftByLanguage(gSessionLocal.getLangId());
 		
 		mTitle->setTextResoure(STR_SETTING_ADVANCED);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
@@ -138,10 +132,7 @@ namespace mango
 		}else
 			mSettingListAdapter->refresh();
 
-		if(gSessionLocal.getLangId() == LANGID_RU)
-			mSettingListAdapter->mLayoutleft = 20;
-		else
-			mSettingListAdapter->mLayoutleft = 100;
+		mSettingListAdapter->mLayoutleft = getLeftByLanguage(gSessionLocal.getLangId());
 		
 		mTitle->setTextResoure(MUSIC_MUSIC_FUN);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
@@ -158,14 +149,10 @@ namespace mango
 			mListView->deleteAllItems();
 			mPowerListAdapter = new SettingListAdapter(mListView,ADAPTER_PLAYING);
 			mPowerListAdapter->setData(img,imgsec,text,count);
-			if(gSessionLocal.getLangId() == LANGID_RU
-				|| gSessionLocal.getLangId() == 9)
-				mPowerListAdapter->mLayoutleft = 20;
-			else
-				mPowerListAdapter->mLayoutleft = 60;
-
 		}else
 			mPowerListAdapter->refresh();
+
+		mPowerListAdapter->mLayoutleft = getLeftByLanguage(gSessionLocal.getLangId());
 		
 		mTitle->setTextResoure(STR_ADVANCE_POWER);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
@@ -252,8 +239,8 @@ namespace mango
 		int imgsec[]={0,0,0,0,0};
 		int text[]={STR_LANGUAGE_EN,STR_LANGUAGE_CN,STR_LANGUAGE_JA,STR_LANGUAGE_JAP,STR_LANGUAGE_KR,
 			STR_LANGUAGE_TH,STR_LANGUAGE_RU,STR_LANGUAGE_SP,STR_LANGUAGE_PU,STR_LANGUAGE_DE,
-			STR_LANGUAGE_FR};
-		int i,count = 11;
+			STR_LANGUAGE_FR,STR_LANGUAGE_DU};
+		int i,count = 12;
 		
 		if(mLanguageListAdapter == NULL){
 			mListView->deleteAllItems();
@@ -268,7 +255,27 @@ namespace mango
 		setMainState(0x1410);
 	}
 
-	
+	int SettingsView::getLeftByLanguage(int languageId){
+		int ret = 20;
+		
+		switch(languageId){
+			case LANGID_RU:
+			case LANGID_LA:
+			case LANGID_PU:
+			case LANGID_DE:
+			case LANGID_FR:	
+				ret = 20;break;
+			case LANGID_SIMPLIFIED:
+			case LANGID_ENGLISH:
+			case LANGID_TRADITIONAL:
+			case LANGID_JAPANESE:
+			case LANGID_KOREAN:
+			case LANGID_TH:	
+				ret = 80;break;
+		}
+		
+		return ret;
+	}
 	void SettingsView::initGaplessList(){
 		int img[]={0,0,0,0};
 		int imgsec[]={0,0,0,0};

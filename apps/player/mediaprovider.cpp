@@ -520,13 +520,9 @@ namespace mango
 		
 		scannerStop = false;
 		
-		tt0 = Time::getMicrosecond();
-		
 		checkfile(path);
 		mTimesSync();
 		fileArray.startScanFile(path,recursion);
-
-		tt1 = Time::getMicrosecond();
 			
 		for(i=0;i<fileArray.mLen;i++){
 			int p;
@@ -559,20 +555,11 @@ namespace mango
 			if(scannerStop)
 				break;
 		}
-		
-		tt2 = Time::getMicrosecond();
-		
-		
-		tt3 = Time::getMicrosecond();
-
-		t0 = tt1 - tt0;
-		t1 = tt2 - tt1;
-		t2 = tt3 - tt2;
 
 		if(fileArray.mLen == 0){
 			sendMsgProgress(100);
 		}
-		log_i("time,t0=%ldms,t1=%ldms,td_=%ldms,td=%ldms",t0/1000,t1/1000,td_/1000,td/1000);
+
 		Thread::sleep(100);
 		mMutex.unlock();
 	}
@@ -707,7 +694,6 @@ namespace mango
 		
 		memset(value, 0, len);
 		if (m_id3.GetTags(METADATA_KEY_DURATION, value)){
-			
 			item.addItem("duration",str_to_int(value));
 		}else{
 			item.addItem("duration",0);
@@ -1773,7 +1759,7 @@ namespace mango
 			if(ret != SQLITE_OK){
 				log_e("MUSIC_TABLE_CREATE error");
 				db = NULL;
-			}			
+			}
 
 		}
 		else{

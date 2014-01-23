@@ -129,7 +129,7 @@ namespace mango
 		
 		if(strcmp(board,"rk2928")==0){
 			mModelNumber->setTextString("DX50");
-			mFirmwareVersion->setTextString("V1.2.7");
+			mFirmwareVersion->setTextString("V1.2.8");
 		}else if(strcmp(board,"rk3026")==0){
 			mModelNumber->setTextString("DX90");
 			mFirmwareVersion->setTextString("V1.0.0");

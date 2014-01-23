@@ -438,6 +438,10 @@ namespace mango
 			mListView->deleteAllItems();
 			mMainListAdapter->refresh();
 		}
+		if(gSessionLocal.getLangId()<=5)
+			mMainListAdapter->mLayoutleft = 100;//SettingsView::getLeftByLanguage(gSessionLocal.getLangId());
+		else
+			mMainListAdapter->mLayoutleft = 60;
 		//mListView->setZoneY(mMainListAdapter->getYoffset(),false);
 #endif
 		mTitle->setTextResoure(MUSIC_MY_MUSIC);
@@ -1705,7 +1709,7 @@ namespace mango
 		y = rect.top;
 
 		index = lvitem->iItem;
-		x+=100;
+		x+=mLayoutleft;
 		if(isSec)
 			canvas.drawImageResource(mSecImgRes[index],x,y+10);
 		else
@@ -1745,6 +1749,8 @@ namespace mango
 			return IDP_MUSIC_WMA;
 		}else if(strcmp(type,"aac") == 0){
 			return IDP_MUSIC_AAC;
+		}else if(strcmp(type,"dsf") == 0){
+			return IDP_MUSIC_DSF;
 		}else
 			return IDP_MUSIC_ICON;
 	}
