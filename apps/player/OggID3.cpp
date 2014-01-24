@@ -1,6 +1,13 @@
 #ifdef WIN32
 #include <Windows.h>
 #endif
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <memory.h>
+#include <string.h>
+
+#include "base64.h"
 #include "player.h"
 
 #ifndef SAFE_DELETE
@@ -96,6 +103,7 @@ int OggID3::getPageBodySize(unsigned char segNum, unsigned char *segTable)
 }
 
 
+#define BIG_ENDIAN_TO_INT(b)  ((int)((((unsigned int)b[0]) << 24) | (((unsigned int)b[1]) << 16) | (((unsigned int)b[2]) << 8) | (((unsigned int)b[3]) << 0)))
 
 int OggID3::setFile(FILE *stream)
 {
@@ -151,8 +159,8 @@ int OggID3::setFile(FILE *stream)
 		return ret ;
 
 	
-	 if (id3TagTotalSize > 1024 * 16)
-		 id3TagTotalSize = 1024 * 16;
+	 if (id3TagTotalSize > 1024 * 64)
+		 id3TagTotalSize = 1024 * 64;
 
 	 if (mId3Buf == NULL || mId3BufSize < id3TagTotalSize)
 	 {
@@ -193,6 +201,9 @@ void OggID3::analyseId3Buffer(char *buf, int size)
 	unsigned short tagFlag;
 	int tagCount;
 	int status  = 0;
+
+	char *out;
+	size_t outlen;
 
 	while (size > 4)
 	{
@@ -253,6 +264,63 @@ void OggID3::analyseId3Buffer(char *buf, int size)
 			pTag[4 + 11] = 0x03;
 			mTagDataSize[IID3_TRACKNUMBER] = tagSize - 11;
 		}
+		else if (strnicmp(pTag+4, "METADATA_BLOCK_PICTURE=", 23) == 0)
+		{
+			if (base64_decode_alloc(pTag + 4 + 23, tagSize - 23, &out, &outlen))
+			{
+				//http://wiki.xiph.org/VorbisComment#METADATA_BLOCK_PICTURE
+				//4 Bytes ? 3 - Cover (front)
+				//4 Bytes * The length of the MIME type string in bytes. 
+				//n Bytes The MIME type string
+				//4 Bytes length of the description string in bytes
+				//n Bytes The description of the picture, in UTF-8.  
+				//4 Bytes The width of the picture in pixels. 
+				//4 Bytes The height of the picture in pixels. 
+				//4 Bytes The color depth of the picture in bits-per-pixel.
+				//4 Bytes For indexed-color pictures (e.g. GIF), 
+				//4 Bytes The length of the picture data in bytes. 
+				//n Bytes The binary picture data. 
+
+				unsigned char* b;
+				int cover;
+				int mimeLen;
+				int desLen;
+				int picDataLen;
+				b = (unsigned char*)out;
+				cover = BIG_ENDIAN_TO_INT(b);
+
+				b += 4;
+				mimeLen = BIG_ENDIAN_TO_INT(b);
+				b += 4 + mimeLen;
+
+				desLen = BIG_ENDIAN_TO_INT(b);
+				b += 4 + desLen;
+				
+				b += 4; //width
+				b += 4; //height
+				b += 4; //color depth
+				b += 4; //indexed-color
+
+				picDataLen = BIG_ENDIAN_TO_INT(b);
+				b += 4;
+
+				if (cover == 3 && mimeLen < tagSize - 23 && picDataLen < tagSize - 23)
+				{
+					b = (unsigned char*)pTag + 4 + 23;
+					*b++ = '\0'; 
+					memcpy (b, out + 8, mimeLen);
+					b += mimeLen;
+					*b++ = '\0'; 
+					*b++ = '\0'; 
+					*b++ = '\0';
+					memcpy (b, out + 8 + mimeLen + 4 + desLen + 4 * 5, picDataLen);
+
+					mTagData[IID3_APIC]  = pTag + 4 + 23;
+					mTagDataSize[IID3_APIC] = picDataLen + mimeLen + 4;
+				}
+				free(out);
+			}
+		}
 
 		size -= (int)(tagSize + 4);
 		pTag += (tagSize + 4);
@@ -274,4 +342,3 @@ int OggID3::getTag(int id, char **data)
 	*data = mTagData[id];
 	return mTagDataSize[id];
 }
-

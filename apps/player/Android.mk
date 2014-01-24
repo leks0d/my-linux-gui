@@ -71,6 +71,7 @@ LOCAL_SRC_FILES += DsfID3.cpp
 LOCAL_SRC_FILES += InterfaceID3.cpp
 LOCAL_SRC_FILES += OggID3.cpp
 LOCAL_SRC_FILES += AudioId3.cpp
+LOCAL_SRC_FILES += base64.cpp
 
 LOCAL_CPPFLAGS:=\
 -I $(MY_ANDROID_SOURCE)/frameworks/base/core/jni/android/graphics\
