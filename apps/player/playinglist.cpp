@@ -708,13 +708,22 @@ Exit:
 				}
 			}else if(mParticleplayer->isPlaying()){
 				log_i("mParticleplayer->isPlaying");
+				
 				mParticleplayer->pause();
+				
+				if(gPlayer.mBoardType == 1)
+					gPlayer.openWm8740Mute();
+				
 				releaseWakeLock();
 				inPause = 1;
 				ret = 2;
 			}else if(inPause == 1){
 				log_i("mParticleplayer inPause");
 				mParticleplayer->start();
+				
+				if(gPlayer.mBoardType == 1)
+					gPlayer.closeWm8740Mute();
+				
 				setWakeLock();
 				inPause = 0;
 				ret = 3;

@@ -48,6 +48,7 @@ namespace mango
 #if 1	
 		int i,ret;
 		setBootWakeLock(1);
+		initBoardInfo();
 		initialize();
 		gSettingProvider.initialize();
 		initSettings();
@@ -333,6 +334,19 @@ namespace mango
 		mPlayinglist->stopPlayer();
 		gSettingProvider.dbclose();
 		Environment::sync();
+	}
+	void Player::initBoardInfo(){
+		char board[PROP_VALUE_MAX]={0};
+		__system_property_get("ro.board.platform",board);
+		
+		if(strcmp(board,"rk2928")==0){
+			mBoardType = 0;
+		}else if(strcmp(board,"rk3026")==0){
+			mBoardType = 1;
+		}else{
+			mBoardType = -1;
+		}
+		log_i("ro.board.platform=%s,mBoardType=%d",board,mBoardType);
 	}
 	void Player::VolumeCheck(){
 		int value;

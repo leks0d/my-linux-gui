@@ -210,7 +210,7 @@ namespace mango
 		void setBootWakeLock(int en);
 		void shutDown();
 		void VolumeCheck();
-		
+		void initBoardInfo();
 	public:
 		MediaView*  mMeidaView;
 		PlayingView* mPlayingView;
@@ -243,6 +243,7 @@ namespace mango
 		PlayerSwitch *mHeadestSwitch;
 
 		bool volumeInitFail;
+		int mBoardType;//-1-unknow,0-rk2926,1-rk3026.
 	};
 	
 	extern Player  gPlayer;

@@ -597,7 +597,9 @@ namespace mango
 		
 		if(ioctl(mfbDevice, FBIOPUT_VSCREENINFO, &info)==-1)
 			log_e("FBIOGET_VSCREENINFO set yres_virtual to 480 fail \n") ;
-
+		
+		ioctl(mfbDevice, FBIOPAN_DISPLAY, &info);
+		
 		pAddress = mmap(0, SCREEN_BUFFER_BYTES * 2, PROT_READ | PROT_WRITE, MAP_SHARED, mfbDevice, 0);
 		if (pAddress == MAP_FAILED)
 		{
