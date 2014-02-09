@@ -494,7 +494,7 @@ static const char *PlayerLock = "playerlock";
 					mCueStart = getPlayingItem()->cueStart;					
 					return 0;
 				}
-				
+
 				mPlayingPath = playPath;
 				mIsCue = getPlayingItem()->isCue;
 				mCueStart = getPlayingItem()->cueStart;
@@ -503,6 +503,12 @@ static const char *PlayerLock = "playerlock";
 					return -3;
 				
 				log_i("Playinglist::startPlayPosition needStart=%d, %d/%d:%s",needStart,mCurrent,len,playPath);
+
+				if(inPause){
+					inPause = 0;
+					if(gPlayer.mBoardType == 1)
+						gPlayer.closeWm8740Mute();
+				}
 				
 				if(needGapless&&mGapless>0&&mParticleplayer->setNextSongForGapless(playPath)){
 				
@@ -514,11 +520,9 @@ static const char *PlayerLock = "playerlock";
 					if(mParticleplayer->stop()){log_i("stop() success!");}else{log_i("stop() fail!");goto Exit;}
 					if(mParticleplayer->setSource(playPath)){log_i("setSource() success!");}else{log_i("setSource() fail!");goto Exit;}
 					if(mParticleplayer->prepare()){log_i("prepare() success!");}else{log_i("prepare() fail!");goto Exit;}
-					//if(mParticleplayer->seekTo(15*1000)){log_i("seekTo() success!");}else{log_i("seekTo() fail!");return -1;}
+					
 					if(needStart)
 						if(mParticleplayer->start()){log_i("start() success!");}else{log_i("start() fail!");goto Exit;}
-					
-					
 					
 					if(getPlayingItem()->isCue)
 					{
@@ -720,9 +724,11 @@ Exit:
 			}else if(inPause == 1){
 				log_i("mParticleplayer inPause");
 				mParticleplayer->start();
-				
-				if(gPlayer.mBoardType == 1)
+
+				if(gPlayer.mBoardType == 1){
+					Thread::sleep(200);
 					gPlayer.closeWm8740Mute();
+				}
 				
 				setWakeLock();
 				inPause = 0;
