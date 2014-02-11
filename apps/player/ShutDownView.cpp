@@ -100,7 +100,10 @@ namespace mango
 
 	int ShutDownView::onPaint(Canvas& canvas)
 	{
-		canvas.drawImageResource(IDP_SHUTDOWM_LOGO,0,0,false);
+		if(gPlayer.mBoardType == 1)
+			canvas.drawImageResource(IDP_SHUTDOWM_LOGO_DX90,0,0,false);
+		else
+			canvas.drawImageResource(IDP_SHUTDOWM_LOGO,0,0,false);
 		return 0;
 	}
 

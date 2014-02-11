@@ -66,7 +66,11 @@ namespace mango
 		
 		rect.setEx(6, 30, 109, 109);
 		mAlbumImage = new ImageView(PLAYING_IDB_ALBUM_IMAGE, TEXT("mAlbumImage"), this, &rect, 0);
-		mAlbumImage->setImageResoure(IDP_MUSICINFO_ICON);
+		if(gPlayer.mBoardType==1)
+			mAlbumImage->setImageResoure(IDP_MUSICINFO_ICON_DX90);
+		else
+			mAlbumImage->setImageResoure(IDP_MUSICINFO_ICON);
+
 		mAlbumImage->setBitmapAlps(true);
 		
 		rect.setEx(left, 32, 120, 20);
