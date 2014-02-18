@@ -182,8 +182,6 @@ namespace mango
 	}
 
 	void PlayingView::ViewInit(void){
-		log_i("PlayingView::ViewInit");
-
 		Mstring* mstr;
 		mediainfo* currentinfo;
 		int duration = 0;
@@ -375,7 +373,6 @@ namespace mango
 		}else{
 			mEqState->setTextResoure(0);
 		}
-		log_i("end");
 	}
 	
 	void PlayingView::updateAudioInfo(){
@@ -470,10 +467,8 @@ namespace mango
 			isNeedFresh = 0;
 		}else if(fromView == NULL && code == NM_PLAY_COM){
 			Playinglist *list = (Playinglist *)parameter;
-			log_i("PlayingView::onNotify NM_PLAY_COM");
 			list->callbackPlay();
 			ViewInit();
-			log_i("PlayingView::onNotify NM_PLAY_COM leave");
 		}else if(parameter == mSeekBar){
 			switch(code){
 				case NM_SEEKBAR_DOWM:
@@ -740,7 +735,6 @@ namespace mango
 
 	int PlayingView::onKeyUp(int keyCode, int flag)
 	{
-		log_i("enter");
 		switch(keyCode)	{
 			case KEYCODE_BACK:
 				break;

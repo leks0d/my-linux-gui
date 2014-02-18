@@ -156,7 +156,7 @@ namespace mango
 		evnetCount = readBytes / sizeof(struct input_event);
 		for (i = 0 ; i < evnetCount ; i++)
 		{
-			log_i("type = %d, code = %d, value = %d", EventBuf[i].type, EventBuf[i].code, EventBuf[i].value);
+			//log_i("type = %d, code = %d, value = %d", EventBuf[i].type, EventBuf[i].code, EventBuf[i].value);
 
 			switch (EventBuf[i].type)
 			{
@@ -182,10 +182,10 @@ namespace mango
 				break;
 
 			default:
-				log_d ("Unknow type %d \n", EventBuf[i].type) ;
+				//log_d ("Unknow type %d \n", EventBuf[i].type) ;
 				break ;
 			}
-			log_i("end");
+			//log_i("end");
 		}
 
 	}

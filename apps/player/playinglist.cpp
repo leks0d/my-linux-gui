@@ -463,7 +463,7 @@ static const char *PlayerLock = "playerlock";
 					PlayerInit();
 					Environment::openMute();
 				}
-				
+	
 				if(mParticleplayer == NULL)
 					return -1;
 				
@@ -472,6 +472,8 @@ static const char *PlayerLock = "playerlock";
 				
 				char *playPath = getPlayingItem()->path;
 				
+				log_i("Playinglist::startPlayPosition needStart=%d, %d/%d:%s",needStart,mCurrent,len,playPath);
+
 				if(getPlayingItem()->isCue == 0 
 					&& mPlayingPath != NULL 
 					&& mPlayingPath == playPath
@@ -491,7 +493,7 @@ static const char *PlayerLock = "playerlock";
 
 					mPlayingPath = playPath;
 					mIsCue = getPlayingItem()->isCue;
-					mCueStart = getPlayingItem()->cueStart;					
+					mCueStart = getPlayingItem()->cueStart;				
 					return 0;
 				}
 
@@ -502,7 +504,7 @@ static const char *PlayerLock = "playerlock";
 				if(playPath == NULL || !FileAttr::FileExist(playPath) || Environment::get_file_size(playPath)<10)
 					return -3;
 				
-				log_i("Playinglist::startPlayPosition needStart=%d, %d/%d:%s",needStart,mCurrent,len,playPath);
+				
 
 				if(inPause){
 					inPause = 0;
@@ -904,6 +906,89 @@ Exit:
 				
 				mParticleplayer->seekTo(pos);
 			}
+		}
+		void Playinglist::sort(int sortby){
+			mediainfo info;
+			int i,count;
+
+			log_i("ArrayMediaInfo sort by %d,len=%d",sortby,len);
+			
+			for(count = len;count>1;count--){
+				for(i=0;i<count-1;i++){
+					if(compare(&mplaylist[i],&mplaylist[i+1],sortby) > 0){
+						info = mplaylist[i];
+						mplaylist[i] = mplaylist[i+1];
+						mplaylist[i+1] = info;
+						
+						if(mCurrent == i)
+							mCurrent = i+1;
+						else if(mCurrent == (i+1))
+							mCurrent = i;
+					}
+				}
+			}
+		}
+		bool Playinglist::needSortByTrack(){
+			int i,count = 0;
+
+			for(i=0;i<len;i++){
+				if(mplaylist[i].track<1000)
+					count++;
+			}
+
+			if(count>1)
+				return true;
+			else
+				return false;
+		}
+		int Playinglist::compare(mediainfo *first,mediainfo *end,int sortby){
+			int ret=0;
+			
+			if(sortby == 0){//order by name
+				if(first->name_key == NULL)
+					ret = -1;
+				else if(end->name_key ==NULL)
+					ret = 1;
+				else
+					ret = strcmp(first->title_key,end->title_key);
+			}else if(sortby == 1){//order by track
+				ret = strcmp(first->album_key,end->album_key);
+				if(ret == 0){
+					if(first->track < end->track){
+						if(first->track != 0)	//zero order in the end.
+							ret = -1;
+						else
+							ret = 1;
+					}else if(first->track > end->track){
+						if(end->track!=0)		//zero order in the end.
+							ret = 1;
+						else
+							ret = -1;
+					}else{
+						ret = strcmp(first->title_key,end->title_key);
+					}
+				}
+			}else if(sortby == 2){
+				ret = strcmp(first->artist_key,end->artist_key);
+				if(!ret){
+					ret = strcmp(first->album_key,end->album_key);
+					if(!ret){
+						if(first->track < end->track)
+							ret = 1;
+						else if(first->track > end->track)
+							ret = -1;
+					}
+				}
+			}else if(sortby == 3){
+				if(first->times < end->times)
+					ret = 1;
+				else if(first->times > end->times)
+					ret = -1;
+				else
+					ret = 0;
+			}
+			//log_i("ArrayMediaInfo::compare ret = %d",ret);
+			return ret;
 		}
 
 		Playinglist *mPlayinglist = NULL;

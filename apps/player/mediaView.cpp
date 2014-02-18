@@ -296,12 +296,13 @@ namespace mango
 				case SETTING_TITLE:{
 						switch(getMainState()){
 							case 0x1300:
+							case 0x1100:
 								if(menuIsShow())
 									dismissOrderByMenu();
 								else
 									showOrderByMenu();
 								break;
-						}			
+						}
 						break;
 					}
 				case MEDIA_ORDER_TILE:
@@ -310,7 +311,10 @@ namespace mango
 				case MEDIA_ORDER_TIME:
 					dismissOrderByMenu();
 					mListView->deleteAllItems();
-					mMusicAdapter->setMusicOrderby(id);
+					switch(getMainState()){
+						case 0x1300:mMusicAdapter->setMusicOrderby(id);break;
+						case 0x1100:mPlayinglist->sort(id-MEDIA_ORDER_TILE);mPlayingListAdapter->refresh();break;
+					}
 					break;
 			}
 			return -1;
@@ -1260,7 +1264,7 @@ namespace mango
 	}
 
 	void MediaView::onMainStateChange(int mainState){
-		if(mainState == 0x1300){
+		if(mainState == 0x1300 || mainState == 0x1100){
 			mTitle->setShowIcon(true);
 		}else{
 			mTitle->setShowIcon(false);

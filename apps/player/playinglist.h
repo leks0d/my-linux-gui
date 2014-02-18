@@ -90,6 +90,9 @@ namespace mango
 			void fastRewind();
 			void mediaInfoCpy(int des,mediainfo *src);
 			void clearPlay();
+			void sort(int sortby = 0);
+			bool needSortByTrack();
+			int compare(mediainfo *first,mediainfo *end,int sortby);
 			//char* mstrcpy(char *str,char *arg);
 			static void playerCallback(void* calldata, int evnet, int param0, int param1);
 			static unsigned int CloseMuteRunnig(void *parameter);

@@ -241,7 +241,7 @@ namespace mango
 					*value = 170;
 				}
 			}
-			log_i("SettingProvider::query array=%d",array->getCount());
+			//log_i("SettingProvider::query array=%d",array->getCount());
 			return array->getCount();
 		}
 	}

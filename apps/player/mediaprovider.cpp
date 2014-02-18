@@ -546,7 +546,7 @@ namespace mango
 			}
 
 			p = (i+1)*100/(fileArray.mLen + sdcard.imgSrcArray.getCount()/ 5);
-			
+			//log_i("p=%d,i=%d,mLen=%d,count=%d",p,i,fileArray.mLen,sdcard.imgSrcArray.getCount()/ 5);
 			if(progress<p){
 				progress = p;
 				sendMsgProgress(progress);

@@ -45,10 +45,10 @@ namespace mango
 			pathlen = strlen(path)+1;
 			mFilePath = new char[pathlen];
 			memcpy(mFilePath,path,pathlen);
-			log_i("open file:%s",mFilePath);
+
 			mFile = fopen(mFilePath, "rb");
 			if (mFile == NULL) {
-				log_e ("Can't open resource file %s \n", path);
+				log_e ("Can't open resource file %s", path);
 				safeDelete(mFilePath);
 				return;
 			}
@@ -57,7 +57,7 @@ namespace mango
 			
 			width = headr[0];
 			height = headr[1];
-			log_i("width=%d,height=%d",width,height);
+
 			mBits = new int[width*height];
 			
 			fseek(mFile,sizeof(int)*2,SEEK_SET);
