@@ -202,6 +202,7 @@ md5 TEXT\
 			bool isSdcard;
 			bool existBack;
 			int insertItemCount;
+			int scanFileNum;
 			SdcardAudioData(const char* path);
 			~SdcardAudioData();
 			bool queryFile(CursorItem& item,AudioFileInfo& info);
@@ -211,6 +212,7 @@ md5 TEXT\
 			bool isImgExist(CursorItem& item);
 			bool checkAlbumImage(CursorItem& item);
 			void albumImageBack();
+			void setScanFileNum(int num);
 	};
 	struct Musicdb{
 		mediainfo info;

@@ -544,8 +544,8 @@ namespace mango
 				if(existSDcard == 0)
 					sdcard.insertCursor(curItem);
 			}
-			
-			p = (i+1)*100/fileArray.mLen;
+
+			p = (i+1)*100/(fileArray.mLen + sdcard.imgSrcArray.getCount()/ 5);
 			
 			if(progress<p){
 				progress = p;
@@ -1935,7 +1935,7 @@ namespace mango
 	
 	void SdcardAudioData::albumImageBack(){
 		int count = imgSrcArray.getCount();
-		int i = 0;
+		int i = 0,p;
 
 		if(!FileAttr::FileExist(SDCARD_IMG_PATH))
 			mkdir(SDCARD_IMG_PATH,0644);
@@ -1952,10 +1952,14 @@ namespace mango
 			sprintf(exc,"busybox cp %s %s",src.string,des.string);
 			//log_i("%s",exc);
 			system(exc);
+			p = (scanFileNum+i/5+1)*100 / (scanFileNum+count/5);
+			gmediaprovider.sendMsgProgress(p);
 		}
 		
 	}
-
+	void SdcardAudioData::setScanFileNum(int num){
+		scanFileNum = num;
+	}
 	SdcardAudioData::~SdcardAudioData(){
 		if(db != NULL){
 			sqlite3_close(db);
