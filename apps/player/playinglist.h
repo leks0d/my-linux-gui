@@ -83,7 +83,7 @@ namespace mango
 			void seekTo(int n);
 			void stopPlayer();
 			void stopForSdcardEject();
-			void setPauseToStart(){ if(inPause&&mParticleplayer != NULL){mParticleplayer->start();inPause = 0;} }
+			void setPauseToStart(){ if(inPause&&mParticleplayer != NULL){mParticleplayer->start();setInPauseState(0);} }
 			void setPlayPause();
 			void clearAll();
 			void fastForward();
@@ -96,6 +96,7 @@ namespace mango
 			//char* mstrcpy(char *str,char *arg);
 			static void playerCallback(void* calldata, int evnet, int param0, int param1);
 			static unsigned int CloseMuteRunnig(void *parameter);
+			void setInPauseState(int state);
 	};		
 	extern Playinglist *mPlayinglist;
 

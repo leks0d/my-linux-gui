@@ -34,7 +34,7 @@ static const char *PlayerLock = "playerlock";
 				mMax = 0;
 				playMode = 0;
 				mplaylist = NULL;
-				inPause = 0;
+				inPause = 0;//init
 				mParticleplayer = NULL;
 				isWakeLock = 0;
 				mOrderBy = -1;
@@ -247,6 +247,20 @@ static const char *PlayerLock = "playerlock";
 				mIsCue = 0;
 				mPlayingPath = "null";
 				mCueStart = 0;
+			}
+			void Playinglist::setInPauseState(int state){
+				if(inPause!=state){
+					inPause = state;
+					if(state){
+						if(gPlayer.mBoardType == 1)
+							gPlayer.openWm8740Mute();
+					}else{
+						if(gPlayer.mBoardType == 1){
+							Thread::sleep(200);
+							gPlayer.closeWm8740Mute();
+						}
+					}
+				}
 			}
 			void Playinglist::mediaInfoCpy(int des,mediainfo *src){
 				//log_i("enter src=0x%x",src);
@@ -507,9 +521,7 @@ static const char *PlayerLock = "playerlock";
 				
 
 				if(inPause){
-					inPause = 0;
-					if(gPlayer.mBoardType == 1)
-						gPlayer.closeWm8740Mute();
+					setInPauseState(0);
 				}
 				
 				if(needGapless&&mGapless>0&&mParticleplayer->setNextSongForGapless(playPath)){
@@ -717,23 +729,18 @@ Exit:
 				
 				mParticleplayer->pause();
 				
-				if(gPlayer.mBoardType == 1)
-					gPlayer.openWm8740Mute();
+				setInPauseState(1);
 				
 				releaseWakeLock();
-				inPause = 1;
 				ret = 2;
 			}else if(inPause == 1){
 				log_i("mParticleplayer inPause");
 				mParticleplayer->start();
 
-				if(gPlayer.mBoardType == 1){
-					Thread::sleep(200);
-					gPlayer.closeWm8740Mute();
-				}
-				
+				setInPauseState(0);
+			
 				setWakeLock();
-				inPause = 0;
+
 				ret = 3;
 			}else{
 				log_i("mParticleplayer startPlay");
@@ -808,7 +815,7 @@ Exit:
 		void Playinglist::setPlayPause(){
 			if(mParticleplayer!=NULL&&mParticleplayer->isPlaying()){
 				mParticleplayer->pause();
-				inPause = 1;
+				setInPauseState(1);
 			}
 		}
 		void Playinglist::setWakeLock(){
@@ -863,7 +870,7 @@ Exit:
 			if(mParticleplayer != NULL){
 				mParticleplayer->stop();
 			}
-			inPause = 0;
+			setInPauseState(0);
 			releaseWakeLock();
 		}
 		void Playinglist::clearAll(){
