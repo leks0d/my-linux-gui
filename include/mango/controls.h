@@ -199,6 +199,7 @@ namespace mango
 		int  mPressedImageId;
 		int  mNormalImageId;
 		bool mPressed;
+		DWORD mTouchDownTime;
 	};
 
 	class ImageView : public View

@@ -523,7 +523,7 @@ namespace mango
 		checkfile(path);
 		mTimesSync();
 		fileArray.startScanFile(path,recursion);
-			
+		sdcard.setScanFileNum(fileArray.mLen);
 		for(i=0;i<fileArray.mLen;i++){
 			int p;
 			int existSDcard = 0;
@@ -555,7 +555,7 @@ namespace mango
 			if(scannerStop)
 				break;
 		}
-
+		
 		if(fileArray.mLen == 0){
 			sendMsgProgress(100);
 		}

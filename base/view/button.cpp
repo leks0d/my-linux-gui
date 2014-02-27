@@ -51,6 +51,7 @@ namespace mango
 	int Button::onTouchDown(int x, int y, int flag)
 	{
 		mPressed = true;
+		mTouchDownTime = Time::getMillisecond();
 		invalidateRect();
 		return 0;
 	}
@@ -64,7 +65,8 @@ namespace mango
 		invalidateRect();
 		//log_i("onTouchUp postMessage VM_COMMAND:%d",mId);
 		getRect(rect);
-		if(x <= rect.getWidth() && y <= rect.getHight()){
+		DWORD upTime = Time::getMillisecond() - mTouchDownTime;
+		if(x <= rect.getWidth() && y <= rect.getHight() && upTime>CLICK_MIN_DURATION){
 			postMessage(getParent(), VM_COMMAND, mId, (unsigned int)this);
 			getParent()->onNotify(this,NM_CLICK,NULL);
 		}

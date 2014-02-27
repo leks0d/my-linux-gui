@@ -35,6 +35,8 @@ namespace mango
 #define TOUCH_FLAG_UP    0x0002
 #define TOUCH_FLAG_MOVE  0x0003
 
+#define CLICK_MIN_DURATION 	20	//ms
+
 #define NM_CLICK     				1   
 #define NM_DISPLAY     			2  
 #define NM_DISMISS     			3

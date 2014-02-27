@@ -1196,12 +1196,17 @@ namespace mango
 		}
 		else if (!mGestureDetector.isMove())
 		{
-			index =  getIndex(mFocusedRecord);
-			if (index >= 0)
-			{
-				mSelectedIndex = index ;
-				getParent()->onNotify(this, NM_CLICK, (void*)index);
-				//postMessage(getParent(), VM_NOTIFY, NM_CLICK, index);
+			DWORD onUpTime = Time::getMillisecond();
+			onUpTime = onUpTime - mFocusedTime;
+			//log_i("validateGesture: onUpTime=%ld",onUpTime);
+			if(onUpTime>CLICK_MIN_DURATION){	//设置click的最小时间(ms)
+				index =  getIndex(mFocusedRecord);
+				if (index >= 0)
+				{
+					mSelectedIndex = index ;
+					getParent()->onNotify(this, NM_CLICK, (void*)index);
+					//postMessage(getParent(), VM_NOTIFY, NM_CLICK, index);
+				}
 			}
 		}
 

@@ -120,7 +120,8 @@ namespace mango
 					{
 						if ((!(uMode & TSMM_XDIRECTION)) && (abs(dy) > TOUCHSCREEN_FAST_MIN_CY))
 						{
-							iShift  = abs(dy) - TOUCHSCREEN_FAST_MIN_CY ;
+							iShift  = abs(dy) - TOUCHSCREEN_FAST_MIN_CY - 15;
+							if(iShift<-10) iShift = 1;else if(iShift<=-5) iShift = 2;else if(iShift<=1) iShift = 3;
 							iShift  = min((TOUCHSCREEN_FAST_MAX_CY - TOUCHSCREEN_FAST_MIN_CY), iShift) ;
 							irSpeed = iShift * 100 / (TOUCHSCREEN_FAST_MAX_CY - TOUCHSCREEN_FAST_MIN_CY) ;
 							if (dy < 0)
