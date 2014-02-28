@@ -796,6 +796,9 @@ namespace mango
 	
 	Player  gPlayer;
 	MSkBitmap gWallpaperBitmap;
+	uint32_t (*possibleEncodings)(const char*) = NULL;
+	void (*ponvertValues)(uint32_t,const char*,char*) = NULL;
+	uint32_t mLocaleEncoding = kEncodingGBK;
 };
 
 
@@ -805,5 +808,28 @@ int main (int argc, char* argv[])
 #ifndef WIN32
 	//mango::Thread::sleep(1000 * 3);
 #endif
+#ifdef CONVERT_UTF8
+			log_i("------dlopen (/system/lib/libmedia.so)------");
+			void *	filehandle = dlopen("/system/lib/libmedia.so", RTLD_NOW);
+			
+			if(filehandle){
+				mango::possibleEncodings = (uint32_t (*)(const char*))dlsym(filehandle, "_ZN7android6mytestEPKc");
+				mango::ponvertValues = (void (*)(uint32_t,const char*,char*))dlsym(filehandle, "_ZN7android5myponEjPKcPc");
+				if(mango::possibleEncodings){
+					log_i("---------->get method possibleEncodings success");
+				}else{
+					log_i("---------->get possibleEncodings fail:%s",dlerror());
+				}
+
+				if(mango::ponvertValues){
+					log_i("---------->get method ponvertValues success");
+				}else{
+					log_i("---------->get ponvertValues fail:%s",dlerror());
+				}
+			}else{
+				log_i("dlopen (/system/lib/libmedia.so) fail!");
+			}
+#endif
+
 	return mango::gPlayer.main();
 }

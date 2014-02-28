@@ -39,13 +39,28 @@
 #include "OggID3.h"
 #include "DsfID3.h"
 #include "AudioId3.h"
+#include <dlfcn.h>
+#include "Uvcontert.h"
 
 
 #define ARRAY_LIST_NUM 100
+#define CONVERT_UTF8
 
 namespace mango
 {	
 //#define NEED_SLEEP
+	enum {
+		kEncodingNone				= 0,
+		kEncodingShiftJIS			= (1 << 0),
+		kEncodingGBK				= (1 << 1),
+		kEncodingBig5				= (1 << 2),
+		kEncodingEUCKR				= (1 << 3),
+		kEncodingUTF8				= (1<<4),
+		kEncodingWin1251		   = (1<<5),
+		kEncodingWin1252		   = (1<<6),
+		kEncodingAll				= (kEncodingShiftJIS | kEncodingGBK | kEncodingBig5 | kEncodingEUCKR|kEncodingUTF8|kEncodingWin1251|kEncodingWin1252),
+	};
+
 
 	enum{
 		IOCTRL_BRIGTNESS_READ=0,
@@ -248,4 +263,7 @@ namespace mango
 	
 	extern Player  gPlayer;
 	extern MSkBitmap gWallpaperBitmap;
+	extern uint32_t (*possibleEncodings)(const char*);
+	extern void (*ponvertValues)(uint32_t,const char*,char*);
+	extern uint32_t mLocaleEncoding;
 };

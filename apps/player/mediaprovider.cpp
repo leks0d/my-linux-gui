@@ -6,6 +6,51 @@
 namespace mango
 {
 	unsigned long t0=0,t1=0,t2=0;
+	
+	int uvcontertUtf8(const char *entry,char * out){
+		uint8_t* src = (uint8_t *)entry;
+		uint8_t uch;
+		uint32_t tmpEncoding,encoding;
+		bool noAsci = false;
+		int ret = 0;
+		
+		if(!entry)
+			return 0;
+		
+        while ((uch = *src++)) {
+			if (uch & 0x80){
+				noAsci = true;
+				break;
+			}
+        }
+		log_i("noAsci=%d",noAsci);
+		if(noAsci){
+			if(possibleEncodings&&ponvertValues){
+				tmpEncoding = possibleEncodings(entry);
+				log_i("tmpEncoding=0x%x",tmpEncoding);
+				encoding = tmpEncoding;
+				if(encoding != kEncodingAll && encoding != kEncodingNone)
+				{
+					// if the locale encoding matches, then assume we have a native encoding.
+						if (encoding & mLocaleEncoding)
+							ponvertValues(mLocaleEncoding,entry,out);
+						else if(encoding & kEncodingEUCKR)
+							ponvertValues(kEncodingEUCKR,entry,out);
+						else if(encoding & kEncodingGBK)
+							ponvertValues(kEncodingGBK,entry,out);
+						else if(encoding & kEncodingBig5)
+							ponvertValues(kEncodingBig5,entry,out);
+						else if(encoding & kEncodingShiftJIS)
+							ponvertValues(kEncodingShiftJIS,entry,out);
+						else
+							return 0;
+						ret = 1;
+				}
+			}
+		}
+		return ret;
+	}
+
 
 	static void strlwr(char *string);
 	static char * getfiletype(char *file);
@@ -534,6 +579,7 @@ namespace mango
 				existSDcard = 1;
 			}else{
 				analyzeAudioID3(curItem,fileArray.mList[i]);
+				log_i("--->analyzeAudioID3 out");
 			}
 			if(sdcard.isSdcard){
 				sdcard.checkAlbumImage(curItem);
@@ -617,6 +663,8 @@ namespace mango
 		int len = 1024;
 		char sqlStr[1024]={0},filename[1024]={0};
 		CString md5;
+		Uvcontert mUvcontert;
+		CString contertOut;
 		
 		item.clearAll();
 		
@@ -637,17 +685,6 @@ namespace mango
 		
 		strlwr(filename,sqlStr);
 		item.addItem("name_key",sqlStr);
-
-		memset(value, 0, len);
-		if (m_id3.GetTags(METADATA_KEY_TITLE, value)){
-			slqCheck(value);
-		}else{
-			getFileTitle(filename,value);
-		}
-		item.addItem("title",value);
-		
-		strlwr(value,sqlStr);
-		item.addItem("title_key",sqlStr);
 		
 		item.addItem("inPlay",0);
 
@@ -658,17 +695,23 @@ namespace mango
 			item.addItem("track",1000);
 		}
 		
+/*********************************Uvcontert********************************/		
+#if 1
+		memset(value, 0, len);
+		if (m_id3.GetTags(METADATA_KEY_TITLE, value)){
+		}else{
+			getFileTitle(filename,value);
+		}
+		slqCheck(value);
+		mUvcontert.addItem(value);
+		
 		memset(value, 0, len);
 		if (m_id3.GetTags(METADATA_KEY_ALBUM, value)){
-
 		}else{
 			getFileParentName(info.path.string,value);
 		}
 		slqCheck(value);
-		item.addItem("album",value);
-		
-		strlwr(value,sqlStr);
-		item.addItem("album_key",sqlStr);
+		mUvcontert.addItem(value);
 		
 		memset(value, 0, len);
 		if (m_id3.GetTags(METADATA_KEY_ARTIST, value)){
@@ -676,11 +719,27 @@ namespace mango
 			sprintf(value,"(null)");
 		}
 		slqCheck(value);
-		item.addItem("artist",value);
+		mUvcontert.addItem(value);
 		
-		strlwr(value,sqlStr);
+		mUvcontert.doContert();
+		
+		mUvcontert.getItem(0,contertOut);
+		item.addItem("title",contertOut.string);
+		strlwr(contertOut.string,sqlStr);
+		item.addItem("title_key",sqlStr);
+
+		mUvcontert.getItem(1,contertOut);
+		item.addItem("album",contertOut.string);
+		strlwr(contertOut.string,sqlStr);
+		item.addItem("album_key",sqlStr);
+		
+		mUvcontert.getItem(2,contertOut);
+		item.addItem("artist",contertOut.string);
+		strlwr(contertOut.string,sqlStr);
 		item.addItem("artist_key",sqlStr);
-		
+#endif
+/*************************Uvcontert UFT-8***************************************/
+
 		memset(value, 0, len);
 		if (m_id3.GetTags(METADATA_KEY_GENRE, value)){
 		}else{
@@ -737,7 +796,7 @@ namespace mango
 		}else{
 			item.addItem("img_path","(null)");
 		}
-
+		log_i("------>end");
 		free(value);
 		value = NULL;
 	}
