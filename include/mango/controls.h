@@ -28,7 +28,7 @@ namespace mango
 			return 0;
 		}
 		void createFile(char* path){
-			int headr[2],pathlen;
+			int headr[2],pathlen,ret;
 			FILE* mFile;
 			
 			if(path == NULL){
@@ -53,16 +53,23 @@ namespace mango
 				return;
 			}
 
-			fread(headr, 1, sizeof(int)*2, mFile);
-			
-			width = headr[0];
-			height = headr[1];
-
+			ret = fread(headr, 1, sizeof(int)*2, mFile);
+			if(ret == sizeof(int)*2){
+				width = headr[0];
+				height = headr[1];
+			}else{
+				release();
+				goto exit;
+			}
 			mBits = new int[width*height];
 			
 			fseek(mFile,sizeof(int)*2,SEEK_SET);
-			fread(mBits,1,sizeof(int)*width*height,mFile);
-			
+			ret = fread(mBits,1,sizeof(int)*width*height,mFile);
+			if(ret != sizeof(int)*width*height){
+				release();
+				goto exit;
+			}
+exit:				
 			fclose(mFile);
 		}
 		void create(int *bit,int w,int h){

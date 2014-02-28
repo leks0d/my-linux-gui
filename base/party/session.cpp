@@ -757,11 +757,11 @@ namespace mango
 #else
 		ppszfilename[0] = MANGO_ROOT"font/msyh.ttf";
 		ppszfilename[1] = MANGO_ROOT"font/arial.ttf";
-	//	ppszfilename[2] = MANGO_ROOT"font/DroidSans.ttf";
+		ppszfilename[2] = MANGO_ROOT"font/DroidSansFallback.ttf";
 #endif
 //		ft_ex_meminit (malloc (ift_ex_mem_size), ift_ex_mem_size) ;
 
-		ft_ex_TrueTypeInit ((char **)ppszfilename, 2); //2) ;
+		ft_ex_TrueTypeInit ((char **)ppszfilename, 3); //2) ;
 	}
 
 
@@ -962,6 +962,11 @@ namespace mango
 		}
 		mLanguageId = langid;
 
+		if(mLanguageId == LANGID_SIMPLIFIED 	|| 
+			mLanguageId == LANGID_TRADITIONAL	||
+			mLanguageId == LANGID_JAPANESE)
+			gFontCache.resetCache();
+		
 		return true;
 	}
 

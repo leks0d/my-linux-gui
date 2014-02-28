@@ -96,30 +96,25 @@ namespace mango
 
 		switch(UnicodeLanguge::getWcharLanguge(wchar)){
 			case LANGID_ENGLISH:
-				font = 1;
-				break;
-			case LANGID_SIMPLIFIED:
-			case LANGID_JAPANESE:	
-				font = 1;
-				break;
 			case LANGID_UNKNOW:
-				font = 1;
+					font = 1;
+					break;
+					
+			case LANGID_JAPANESE:
+			case LANGID_SIMPLIFIED:	
+				if(gSessionLocal.getLangId() == LANGID_JAPANESE)
+					font = 2;
+				else
+					font = 1;
 				break;
+				
 			default:
 				font = 0;
 				break;
 		}
-		//font = 0;
-		//if (wchar <= 256)
-		//{
-			ft_ex_iTrueTypeSetSize(font, mFontSize);
-			bits = ft_ex_TrueTypeGetCharBmp(font, wchar, &bmpSize, dyExtra);
-		//}
-		//else
-		//{
-		//	ft_ex_iTrueTypeSetSize (1, mFontSize);
-		//	bits = ft_ex_TrueTypeGetCharBmp(1, wchar, &bmpSize, dyExtra);
-		//}
+		
+		ft_ex_iTrueTypeSetSize(font, mFontSize);
+		bits = ft_ex_TrueTypeGetCharBmp(font, wchar, &bmpSize, dyExtra);
 
 		size->cx = bmpSize.cx;
 		size->cy = bmpSize.cy;
@@ -183,7 +178,13 @@ namespace mango
 		safeFree(mCache);
 
 	}
+	void FontCache::resetCache(){
+		safeFree(mCache);
+		int memBytes  = 1024 * 1024;
+		void *memAddr = malloc(memBytes);
 
+		init(16, memAddr, memBytes);
+	}
 
 	//字体Cache 全局初始化
 	bool FontCache::init (int maxFontSize, void *memAddr, int memBytes)
@@ -307,7 +308,7 @@ namespace mango
 	typedef struct CharRange {
 		uint16_t first;
 		uint16_t last;
-	};
+	} TCharRange;
 	
 	#define ARRAY_SIZE(x)   (sizeof(x) / sizeof(*x))
 	

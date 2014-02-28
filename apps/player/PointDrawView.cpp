@@ -89,8 +89,6 @@ namespace mango
 		mstr->mSprintf("%d",brightness);
 
 		mBrightnessValue->setTextString(mstr->mstr);
-
-		mTitle->setTextResoure(STR_ADVANCE_SHOWTOUCH);	
 	}
 
 	int PointDrawView::onDestroy()

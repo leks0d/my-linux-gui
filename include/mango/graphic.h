@@ -134,7 +134,7 @@ namespace mango
 
 		bool getCharBmp(int fontSize, WCHAR wchar, Size *size, int *dyExtra, unsigned char** fontBmp);
 		void setCharBmp (int fontSize, WCHAR wchar, Size& size, int dyExtra, unsigned char*	fontBmp);
-
+		void resetCache();
 
 
 	private:
