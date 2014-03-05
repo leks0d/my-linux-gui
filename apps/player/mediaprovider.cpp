@@ -610,6 +610,21 @@ namespace mango
 		mMutex.unlock();
 	}
 #endif
+	int mediaprovider::clearCacheFile(){
+		int ret;
+		char sql[1024];
+		char cmd[1024]={0};
+		
+		sprintf(sql,"delete from music");
+		ret = exec(sql,0,0);
+
+		sprintf(cmd,"busybox rm -rf /mnt/sdcard/.album_img");
+		system(cmd);
+		sprintf(cmd,"busybox rm -rf /mnt/external_sd/.audio_data");
+		system(cmd);
+
+		return 0;
+	}
 	int mediaprovider::externVolumeScanner(char *path){
 		ScanInfo *info;
 		char *file;
@@ -629,9 +644,13 @@ namespace mango
 			
 			media->scanCanStop = true;
 			media->sendMsgStart();
-			
-			media->mediascanner(path,true);
-			
+			if(strcmp(path,"null") == 0){
+				media->clearCacheFile();
+				media->mediascanner("/mnt/sdcard",true);
+				media->mediascanner("/mnt/external_sd",true);
+			}else{
+				media->mediascanner(path,true);
+			}
 			media->sendMsgEnd();
 			media->scanCanStop = false;
 			

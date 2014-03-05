@@ -226,6 +226,7 @@ md5 TEXT\
 		int mediascanner(char *path,bool recursion);
 		int filescanner(char *path);
 		int externVolumeScanner(char *path);
+		int clearCacheFile();
 		int sendMsgStart();
 		int sendMsgEnd();
 		int sendMsgProgress(int progress);

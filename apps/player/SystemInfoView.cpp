@@ -132,7 +132,7 @@ namespace mango
 			mFirmwareVersion->setTextString("V1.2.9");
 		}else if(strcmp(board,"rk3026")==0){
 			mModelNumber->setTextString("DX90");
-			mFirmwareVersion->setTextString("V1.0.1");
+			mFirmwareVersion->setTextString("V2.0.0");
 		}
 		
 		updateTotalMem();

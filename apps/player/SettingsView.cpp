@@ -91,16 +91,16 @@ namespace mango
 
 
 	void SettingsView::initAdvanceList(){
-		int img[]={IDP_ADVANCE_LANGUGE,IDP_ADVANCE_DISPLAY,IDP_ADVANCE_BATTARY,IDP_ADVANCE_SYSTEM_INFO,IDP_SYSTEM_RESET,IDP_ADVANCE_SYSTEM_INFO};
-		int imgsec[]={IDP_ADVANCE_LANGUGE_S,IDP_ADVANCE_DISPLAY_S,IDP_ADVANCE_BATTARY_S,IDP_ADVANCE_SYSTEM_INFO_S,IDP_SYSTEM_RESET_S,IDP_ADVANCE_SYSTEM_INFO_S};
-		int text[]={STR_ADVANCE_LANGUAGE,STR_ADVANCE_DISPLAY,STR_ADVANCE_POWER,STR_ADVANCE_SYSINFO,STR_SYSTEM_RESTET,STR_SYSTEM_UPDATE};
+		int img[]={IDP_ADVANCE_LANGUGE,IDP_ADVANCE_DISPLAY,IDP_ADVANCE_BATTARY,IDP_ADVANCE_LIBRARY,IDP_ADVANCE_SYSTEM_INFO,IDP_SYSTEM_RESET,IDP_ADVANCE_SYSTEM_INFO};
+		int imgsec[]={IDP_ADVANCE_LANGUGE_S,IDP_ADVANCE_DISPLAY_S,IDP_ADVANCE_BATTARY_S,IDP_ADVANCE_LIBRARY,IDP_ADVANCE_SYSTEM_INFO_S,IDP_SYSTEM_RESET_S,IDP_ADVANCE_SYSTEM_INFO_S};
+		int text[]={STR_ADVANCE_LANGUAGE,STR_ADVANCE_DISPLAY,STR_ADVANCE_POWER,STR_RESCAN_LIBRARY,STR_ADVANCE_SYSINFO,STR_SYSTEM_RESTET,STR_SYSTEM_UPDATE};
 
-		int i,count = 6;
-		
+		int i,count = sizeof(img)/sizeof(int);
+
 		if(FileAttr::FileExist("/mnt/sdcard/update.img")){
-			count = 6;
+			count = count;
 		}else{
-			count = 5;
+			count = count-1;
 		}
 		
 		log_i("SettingsView::initAdvanceList");
@@ -345,11 +345,14 @@ namespace mango
 							initPowerList();
 							break;
 						case 3:
-							gPlayer.showSystemInfoView(); break;
+							gmediaprovider.externVolumeScanner("null");
+							break;							
 						case 4:
+							gPlayer.showSystemInfoView(); break;
+						case 5:
 							gPlayer.showChosenView(ChosenView::CHOSEN_RECOVERY);
 							break;
-						case 5:
+						case 6:
 							gPlayer.showChosenView(ChosenView::CHOSEN_SYSTEMUPDATE);
 							break;
 						}
