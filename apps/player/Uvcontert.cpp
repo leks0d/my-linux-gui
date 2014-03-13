@@ -44,7 +44,6 @@ void Uvcontert::addItem(const char * str){
 	uint32_t tmp = getpossibleEncodings(str);
 	entry.addString(str);
 	encode = encode & tmp;
-	log_i("tmp=0x%x,encode=0x%x",tmp,encode);
 }
 void Uvcontert::doContert(){
 	uint32_t locale;
@@ -60,8 +59,8 @@ void Uvcontert::doContert(){
 		CString item;
 		
 		entry.getCString(i,item);
-		
-		if(encode != kEncodingAll && encode != kEncodingNone){
+
+		if(encode != kEncodingAll && encode != kEncodingNone)){
 			if(encode & locale){
 				ponvertValues(locale,item.string,out);
 			}else if(encode & kEncodingShiftJIS){

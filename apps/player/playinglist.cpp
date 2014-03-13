@@ -252,10 +252,10 @@ static const char *PlayerLock = "playerlock";
 				if(inPause!=state){
 					inPause = state;
 					if(state){
-						if(gPlayer.mBoardType == 1)
+						if(gPlayer.mCodecType == 1)
 							gPlayer.openWm8740Mute();
 					}else{
-						if(gPlayer.mBoardType == 1){
+						if(gPlayer.mCodecType == 1){
 							Thread::sleep(200);
 							gPlayer.closeWm8740Mute();
 						}

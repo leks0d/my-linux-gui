@@ -66,7 +66,7 @@ namespace mango
 		
 		rect.setEx(6, 30, 109, 109);
 		mAlbumImage = new ImageView(PLAYING_IDB_ALBUM_IMAGE, TEXT("mAlbumImage"), this, &rect, 0);
-		if(gPlayer.mBoardType==1)
+		if(gPlayer.mProductType==1)
 			mAlbumImage->setImageResoure(IDP_MUSICINFO_ICON_DX90);
 		else
 			mAlbumImage->setImageResoure(IDP_MUSICINFO_ICON);
@@ -616,9 +616,10 @@ namespace mango
 				mBattery = val;
 			}
 			if(gPlayer.mSpdifSwitch->isToSwicth()){
-				isSpdifIn = gPlayer.isSpdifIn();
-				//gPlayer.openCodecPower(!isSpdifIn);
-				mPlayinglist->setSpdifOut(isSpdifIn);
+				if(gPlayer.mCodecType == 0){
+					isSpdifIn = gPlayer.isSpdifIn();
+					mPlayinglist->setSpdifOut(isSpdifIn);
+				}
 				gPlayer.mSpdifSwitch->resetSwicth();
 			}
 			if(gPlayer.mHeadestSwitch->isToSwicth()){

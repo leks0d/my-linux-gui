@@ -347,6 +347,14 @@ namespace mango
 			mBoardType = -1;
 		}
 		log_i("ro.board.platform=%s,mBoardType=%d",board,mBoardType);
+
+		if(FileAttr::FileExist(ES9018_VOLUME)){
+			mCodecType = 1;
+			mProductType = 1;
+		}else{
+			mCodecType = 0;
+			mProductType = 0;
+		}
 	}
 	void Player::VolumeCheck(){
 		int value;
@@ -475,7 +483,7 @@ namespace mango
 
 		file  = fopen("/dev/codec_volume", "r");
 		if(file == NULL)
-			file  = fopen("/sys/class/codec/wm8740_volume", "r");
+			file  = fopen(ES9018_VOLUME, "r");
 		
 		if (file == NULL) {
 			log_e("/dev/codec_volume");
@@ -505,8 +513,8 @@ namespace mango
 
 		if(FileAttr::FileExist("/dev/codec_volume"))
 			file  = fopen("/dev/codec_volume", "w");
-		else if(FileAttr::FileExist("/sys/class/codec/wm8740_volume"))
-			file  = fopen("/sys/class/codec/wm8740_volume", "w");
+		else if(FileAttr::FileExist(ES9018_VOLUME))
+			file  = fopen(ES9018_VOLUME, "w");
 			
 		if (file != NULL) {
 			sprintf(buffer, "%d", volume);

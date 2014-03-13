@@ -45,6 +45,7 @@
 
 #define ARRAY_LIST_NUM 100
 #define CONVERT_UTF8
+#define ES9018_VOLUME "/sys/class/codec/es9018_volume"
 
 namespace mango
 {	
@@ -259,6 +260,8 @@ namespace mango
 
 		bool volumeInitFail;
 		int mBoardType;//-1-unknow,0-rk2926,1-rk3026.
+		int mCodecType;//-1-unknow,0-wm8740,1-es9018.
+		int mProductType;//0-dx50,1-dx90.
 	};
 	
 	extern Player  gPlayer;

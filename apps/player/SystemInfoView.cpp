@@ -127,10 +127,10 @@ namespace mango
 		mTitle->setTextResoure(STR_ADVANCE_SYSINFO);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		
-		if(strcmp(board,"rk2928")==0){
+		if(gPlayer.mProductType == 0){
 			mModelNumber->setTextString("DX50");
 			mFirmwareVersion->setTextString("V1.2.9");
-		}else if(strcmp(board,"rk3026")==0){
+		}else if(gPlayer.mProductType == 1){
 			mModelNumber->setTextString("DX90");
 			mFirmwareVersion->setTextString("V2.0.0");
 		}
@@ -144,7 +144,7 @@ namespace mango
 		char *ipath = "/mnt/sdcard";
 		char *epath = "/mnt/external_sd";
 		Mstring *mstr;
-		mstr = new Mstring(20);
+		mstr = new Mstring(50);
 		
 		Environment::space_info(ipath,total,avail,free);
 		Environment::memSizeToStr(total,iSpaceAll);

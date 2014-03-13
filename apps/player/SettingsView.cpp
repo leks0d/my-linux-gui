@@ -345,7 +345,7 @@ namespace mango
 							initPowerList();
 							break;
 						case 3:
-							gmediaprovider.externVolumeScanner("null");
+							gPlayer.showChosenView(ChosenView::CHOSEN_RESCAN);
 							break;							
 						case 4:
 							gPlayer.showSystemInfoView(); break;

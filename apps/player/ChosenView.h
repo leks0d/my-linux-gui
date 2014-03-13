@@ -9,6 +9,7 @@ namespace mango
 		const static int CHOSEN_RECOVERY = 2;
 		const static int CHOSEN_SYSTEMUPDATE = 3;
 		const static int CHOSEN_DELETFILE = 4;
+		const static int CHOSEN_RESCAN = 5;
 		
 	public:
 		ChosenView(void);

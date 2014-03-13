@@ -102,6 +102,10 @@ namespace mango
 				titleres = STR_OPERATE_DELETE;
 				noticeres = STR_FILE_DELETE_MESSAGE;
 				break;
+			case CHOSEN_RESCAN:
+				titleres = STR_RESCAN_LIBRARY;
+				noticeres = STR_FILE_DELETE_MESSAGE;
+				break;				
 		}
 		mBrightnessValue->setTextResoure(noticeres);
 		mTitle->setTextResoure(titleres);
@@ -140,6 +144,9 @@ namespace mango
 			case CHOSEN_DELETFILE:
 				gMessageQueue.post(mCallView,VM_NOTIFY,NM_CHOSEN_CALLBY,1);
 				break;
+			case CHOSEN_RESCAN:
+				gmediaprovider.externVolumeScanner("null");
+				break;				
 		}
 	}
 	void ChosenView::setCallView(View *view){
@@ -170,7 +177,7 @@ namespace mango
 		}else if(fromView == mHome){
 			gPlayer.showPlayingView();
 		}else if(parameter == mMyMusicText){
-			if(mType == CHOSEN_DELETFILE){
+			if(mType == CHOSEN_DELETFILE || mType == CHOSEN_RESCAN){
 				dispatchEvent();
 				gPlayer.dismissView(this);
 			}else{
