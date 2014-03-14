@@ -86,6 +86,9 @@ namespace mango
 			invalidateRect();
 		}
 	}
+	int ImageView::onTouchUp(int x, int y, int flag){
+		postMessage(getParent(), VM_NOTIFY, IMAGEVIEW_TOUCH_UP, (unsigned int)this);
+	}
 };
 
 

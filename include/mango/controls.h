@@ -224,6 +224,7 @@ exit:
 			void setVisiable(bool visiable);
 			bool getVisiable(){return mVisiable;}
 			virtual int onPaint(Canvas& canvas);
+			virtual int onTouchUp(int x, int y, int flag);
 		private:
 			char *mImagePath;
 			int resId;
@@ -369,6 +370,7 @@ class ValueTextView : public View
 #define VSEEKBAR_TOUCH_CHANGE 	0xF0000002
 #define VSEEKBAR_TOUCH_UP 		0xF0000003
 #define VSEEKBAR_TEXTVIEW_UP 		0xF0000004
+#define IMAGEVIEW_TOUCH_UP 		0xF0000005
 
 
 class VerticalSeekBar : public View

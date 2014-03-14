@@ -60,7 +60,7 @@ void Uvcontert::doContert(){
 		
 		entry.getCString(i,item);
 
-		if(encode != kEncodingAll && encode != kEncodingNone)){
+		if(encode != kEncodingAll && encode != kEncodingNone){
 			if(encode & locale){
 				ponvertValues(locale,item.string,out);
 			}else if(encode & kEncodingShiftJIS){

@@ -59,4 +59,4 @@ APP_MODULES += libParticleOmxil-prebuild
 APP_MODULES += libParticleOmxal-prebuild
 
 APP_MODULES += MangoPlayer 
-
+APP_MODULES += usbhifi 

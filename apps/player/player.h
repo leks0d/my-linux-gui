@@ -41,6 +41,7 @@
 #include "AudioId3.h"
 #include <dlfcn.h>
 #include "Uvcontert.h"
+#include "USBHiFi.h"
 
 
 #define ARRAY_LIST_NUM 100
@@ -246,6 +247,7 @@ namespace mango
 		KeyLockView *mKeyLockView;
 		ChosenView *mChosenView;
 		PlaylistOperateView *mPlaylistOperateView;
+		USBHiFi *mUSBHiFi;
 		Mutex muteMutex;
 		Mutex volumeMutex;
 		int muteCount;

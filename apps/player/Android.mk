@@ -30,6 +30,12 @@ LOCAL_SRC_FILES := libs/$(TARGET_ARCH_ABI)/libskia.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
+LOCAL_MODULE := libHifiPCM-prebuild
+LOCAL_SRC_FILES := libs/$(TARGET_ARCH_ABI)/libHifiPCM.a
+include $(PREBUILT_STATIC_LIBRARY)
+
+
+include $(CLEAR_VARS)
 LOCAL_ARM_MODE := arm
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../include
@@ -73,6 +79,7 @@ LOCAL_SRC_FILES += OggID3.cpp
 LOCAL_SRC_FILES += AudioId3.cpp
 LOCAL_SRC_FILES += base64.cpp
 LOCAL_SRC_FILES += Uvcontert.cpp
+LOCAL_SRC_FILES += USBHiFi.cpp
 
 LOCAL_CPPFLAGS:=\
 -I $(MY_ANDROID_SOURCE)/frameworks/base/core/jni/android/graphics\
@@ -92,6 +99,20 @@ LOCAL_LDLIBS :=  -llog -lcutils -licuuc -licui18n -lutils -lsqlite -L/home/liuwe
 
 
 LOCAL_STATIC_LIBRARIES := Mango
+LOCAL_STATIC_LIBRARIES += libHifiPCM-prebuild
 
+
+include $(BUILD_EXECUTABLE)
+
+include $(CLEAR_VARS)
+
+LOCAL_ARM_MODE := arm
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../include
+LOCAL_SRC_FILES := audiousb.cpp
+LOCAL_LDLIBS :=  -llog -lcutils -licuuc -licui18n -lutils -lsqlite -L/home/liuwenlong/backup/lib
+LOCAL_STATIC_LIBRARIES := Mango
+LOCAL_STATIC_LIBRARIES += libHifiPCM-prebuild
+
+LOCAL_MODULE    := usbhifi
 
 include $(BUILD_EXECUTABLE)

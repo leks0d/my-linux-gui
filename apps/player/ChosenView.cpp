@@ -104,13 +104,12 @@ namespace mango
 				break;
 			case CHOSEN_RESCAN:
 				titleres = STR_RESCAN_LIBRARY;
-				noticeres = STR_FILE_DELETE_MESSAGE;
-				break;				
+				noticeres = STR_RESCAN_LIBRARY_MESSAGE;
+				break;
 		}
 		mBrightnessValue->setTextResoure(noticeres);
 		mTitle->setTextResoure(titleres);
 		gPowerManager->setPowerState(POWER_STATE_ON);
-		log_i("set power state POWER_STATE_ON");
 	}
 
 	unsigned int ChosenView::PoweroffRunnig(void *parameter){

@@ -86,7 +86,8 @@ namespace mango
 #endif
 		holdKeyProbe();
 		log_i("end");
-
+		//mUSBHiFi = new USBHiFi(TEXT("Playing"), NULL, NULL, 0, SW_NORMAL);
+		//mUSBHiFi->onCreate();
 		//openOrCloseMute(true);
 		//Environment::openMute();
 		return messageLoop();

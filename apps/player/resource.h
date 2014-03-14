@@ -21,7 +21,7 @@ Notes:
 																
 Revision History:												
 																
-   2014-3-5 16:57:58 Created by Fibo Lu						
+   2014-3-13 11:41:2 Created by Fibo Lu						
 																
 --*/															
 																
@@ -145,7 +145,7 @@ Revision History:
 #define STR_SLEEP_TIME_3			0x0072
 #define STR_LANGUAGE_DU				0x0073
 #define STR_RESCAN_LIBRARY			0x0074
-#define STR_FILE_DELETE_MESSAGE		0x0075
+#define STR_RESCAN_LIBRARY_MESSAGE	0x0075
 																
 #define RESOURCE_STRING_MAX_CHARS					68
 																

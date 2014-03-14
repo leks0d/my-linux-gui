@@ -129,6 +129,8 @@ namespace mango
 			gPlayer.showSettingsView();
 		}else if(fromView == mHome && NM_CLICK){
 			gPlayer.showPlayingView();
+		}else if(fromView == mDisplayIcon){
+			system("setprop persist.sys.usb.config adb");
 		}
 		
 		return 0;
