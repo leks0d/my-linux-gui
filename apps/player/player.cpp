@@ -52,8 +52,9 @@ namespace mango
 		initialize();
 		gSettingProvider.initialize();
 		initSettings();
-		
-		//spdifProbe();
+#if CODEC_VOLUME		
+		setHardwareVolume(255);
+#endif
 		gmediaprovider.initialize();
 		
 		mPlayinglist = new Playinglist();
@@ -475,7 +476,7 @@ namespace mango
 	
 	int  Player::getVolume(void)
 	{
-#ifndef WIN32
+#if CODEC_VOLUME
 		FILE* file = NULL;
 		char buffer[20]={0};
 		int currentVolume;
@@ -499,6 +500,11 @@ namespace mango
 		fclose(file);
 		//log_i("Player::getVolume currentVolume=%d",currentVolume);
 		return currentVolume;
+#else
+		if(mPlayinglist)
+			if(mPlayinglist->mParticleplayer)
+				return mPlayinglist->mParticleplayer->getAudioVolume();
+		return mPlayerVolume;
 #endif
 		return 0;
 	}
@@ -506,6 +512,7 @@ namespace mango
 
 	void Player::setVolume(int volume)
 	{
+#if CODEC_VOLUME	
 		FILE* file = NULL;
 		char buffer[20]={0};
 		int ret;
@@ -524,6 +531,32 @@ namespace mango
 		}
 		
 		volumeMutex.unlock();
+#else
+	if(mPlayinglist)
+		if(mPlayinglist->mParticleplayer)
+			mPlayinglist->mParticleplayer->setAudioVolume(volume);
+		mPlayerVolume = volume;
+#endif
+	}
+	void Player::setHardwareVolume(int volume){
+		FILE* file = NULL;
+		char buffer[20]={0};
+		int ret;
+		
+		volumeMutex.lock();
+
+		if(FileAttr::FileExist("/dev/codec_volume"))
+			file  = fopen("/dev/codec_volume", "w");
+		else if(FileAttr::FileExist(ES9018_VOLUME))
+			file  = fopen(ES9018_VOLUME, "w");
+			
+		if (file != NULL) {
+			sprintf(buffer, "%d", volume);
+			ret = fwrite(buffer, 1, strlen(buffer) + 1, file);	
+			fclose(file);
+		}
+		
+		volumeMutex.unlock();		
 	}
 	void Player::ioctrlBrightness(int cmd,int* brightness){
 		int fd=0;

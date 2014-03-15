@@ -184,5 +184,16 @@ namespace particle
 		return -1;
 	}
 
+	bool MediaPlayerInterface::setAudioVolume(int volume)
+	{
+		return 0;
+	}
+
+	int  MediaPlayerInterface::getAudioVolume()
+	{
+		return -1;
+	}
+
+
 
 };

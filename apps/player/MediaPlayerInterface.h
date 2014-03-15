@@ -100,6 +100,9 @@ namespace particle
 		virtual bool selectAudioChunnel(int chunnel);
 		virtual int  getAudioChunnel();
 
+		virtual bool setAudioVolume(int volume);
+		virtual int  getAudioVolume();
+
 	};
 
 	extern MediaServiceData*   gMediaServiceData;

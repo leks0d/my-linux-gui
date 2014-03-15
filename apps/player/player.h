@@ -47,6 +47,7 @@
 #define ARRAY_LIST_NUM 100
 #define CONVERT_UTF8
 #define ES9018_VOLUME "/sys/class/codec/es9018_volume"
+#define CODEC_VOLUME	0
 
 namespace mango
 {	
@@ -213,6 +214,7 @@ namespace mango
 		void dismissView(View *view);
 		int  getVolume(void);
 		void setVolume(int volume);
+		void setHardwareVolume(int volume);
 		void setPowerState();
 		void ioctrlBrightness(int cmd,int* brightness);
 		int holdKeyProbe();
@@ -260,6 +262,7 @@ namespace mango
 		PlayerSwitch *mSpdifSwitch;
 		PlayerSwitch *mHeadestSwitch;
 
+		int mPlayerVolume;
 		bool volumeInitFail;
 		int mBoardType;//-1-unknow,0-rk2926,1-rk3026.
 		int mCodecType;//-1-unknow,0-wm8740,1-es9018.

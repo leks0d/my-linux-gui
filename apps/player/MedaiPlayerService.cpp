@@ -519,6 +519,23 @@ namespace particle
 	}
 
 
+	bool MediaPlayerService::setAudioVolume(int volume)
+	{
+		if (mPlayer)
+			mPlayer->setAudioVolume(volume);
+	}
+
+
+	int  MediaPlayerService::getAudioVolume()
+	{
+		if (mPlayer)
+			return mPlayer->getAudioVolume();
+		else
+			return -1;
+	}
+
+
+
 	bool MediaPlayerService::mediaInit(const char * filename)
 	{
 		XADataSource		audioSource;

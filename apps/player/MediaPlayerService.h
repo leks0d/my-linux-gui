@@ -76,6 +76,9 @@ namespace particle
 		bool selectAudioChunnel(int chunnel);
 		int  getAudioChunnel();
 
+		bool setAudioVolume(int volume);
+		int  getAudioVolume();
+
 	public:
 		static void playerCallback(XAPlayItf caller, void * pContext, XAuint32 eventId);
 		void playerCallbackProc(XAPlayItf caller, void * pContext, XAuint32 eventId);

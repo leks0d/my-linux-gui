@@ -96,7 +96,7 @@ namespace mango
 		if(mBkgImage>0)
 			canvas.drawImageResource(mBkgImage, mBkgX, mBkgY);
 		if(mSeekImage>0)
-			canvas.drawImageResource(mSeekImage, mSeekX, mSeekY,mSeekWidth,10);
+			canvas.drawImageResource(mSeekImage, mSeekX, mSeekY,mSeekWidth,4);
 #endif		
 		return 0;
 	}
