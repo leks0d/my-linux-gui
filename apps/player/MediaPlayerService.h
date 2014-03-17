@@ -115,6 +115,7 @@ namespace particle
 		int					mOutMinSampleRate;
 		int					mGaplessDuration;
 		int					mAudioChunnel;
+		int					mVolume;
 		particle::Mutex     mMutex;
 	};
 };

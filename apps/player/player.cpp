@@ -29,6 +29,7 @@ namespace mango
 		mKeyLockView = NULL;
 		mChosenView = NULL;
 		mPlaylistOperateView = NULL;
+		mUSBAudioConnectView = NULL;
 		
 		powerState = 0;
 		isBootLock = 0;
@@ -52,9 +53,7 @@ namespace mango
 		initialize();
 		gSettingProvider.initialize();
 		initSettings();
-#if CODEC_VOLUME		
-		setHardwareVolume(255);
-#endif
+
 		gmediaprovider.initialize();
 		
 		mPlayinglist = new Playinglist();
@@ -73,8 +72,11 @@ namespace mango
 		
 		mSocketDetect = new SocketDetect();
 		mSocketDetect->setPlayerEventInterface((UseEventInterface*)mPlayerEventInterface);
-		
 		ret = mSocketDetect->SocketInit();
+		
+		mKernelMsgGet = new KernelMsgGet();
+		mKernelMsgGet->setPlayerEventInterface((UseEventInterface*)mPlayerEventInterface);
+		
 		if(ret>0){log_i("mSocketDetect->SocketInit() sucess!");}else{log_i("mSocketDetect->SocketInit() fail.ret=%d",ret);}
 		
 		for(i=0;i<50;i++){
@@ -89,8 +91,8 @@ namespace mango
 		log_i("end");
 		//mUSBHiFi = new USBHiFi(TEXT("Playing"), NULL, NULL, 0, SW_NORMAL);
 		//mUSBHiFi->onCreate();
-		//openOrCloseMute(true);
-		//Environment::openMute();
+		openOrCloseMute(true);
+		Environment::openMute();
 		return messageLoop();
 	}
 	void Player::setBootWakeLock(int en){
@@ -454,6 +456,21 @@ namespace mango
 			mGroupOperateView->invalidateRect();
 			mGroupOperateView->setFocus();		
 		}
+	}
+	void Player::showUSBAudioConnectView(){
+		log_i("showUSBAudioConnectView");
+		if (mUSBAudioConnectView == NULL) {
+			mUSBAudioConnectView = new USBAudioConnectView(TEXT("USBAudio"), NULL, NULL, 0, SW_NORMAL);
+			mUSBAudioConnectView->onCreate();
+		}else {
+			gSession.mViewZAxis.bringViewToTop(mUSBAudioConnectView);
+		}
+		if (mUSBAudioConnectView){
+			mUSBAudioConnectView->invalidateRect();
+			mUSBAudioConnectView->setFocus();
+			mUSBAudioConnectView->setAudioInfo("null");
+		}
+		log_i("showUSBAudioConnectView");
 	}
 	void Player::dismissView(View *view){
 		View *displayView;

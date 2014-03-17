@@ -2,14 +2,14 @@
 namespace mango
 {
 
-	class UsmConnectView: public View
+	class USBAudioConnectView: public View
 	{
 	public:
-		UsmConnectView(void);
-		UsmConnectView(const TCHAR* title, View* parent, Rect* rect, int style, int show = SW_NORMAL);
-		virtual ~UsmConnectView(void);
+		USBAudioConnectView(void);
+		USBAudioConnectView(const TCHAR* title, View* parent, Rect* rect, int style, int show = SW_NORMAL);
+		virtual ~USBAudioConnectView(void);
 		void initView();
-		
+		void setAudioInfo(const char* recv);
 	public:
 		virtual int onCreate();
 		virtual int onDestroy();
@@ -45,7 +45,7 @@ namespace mango
 		int count;
 		int mMax;
 		int isNeedPaint;
-
+		
 	};
 
 };

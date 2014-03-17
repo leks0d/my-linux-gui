@@ -59,6 +59,8 @@ namespace particle
 		mGaplessDuration = 0;
 
 		mAudioChunnel = 0;
+		
+		mVolume = 128;
 	}
 
 	MediaPlayerService::~MediaPlayerService()
@@ -523,15 +525,18 @@ namespace particle
 	{
 		if (mPlayer)
 			mPlayer->setAudioVolume(volume);
+
+		mVolume = volume;
 	}
 
 
 	int  MediaPlayerService::getAudioVolume()
 	{
-		if (mPlayer)
-			return mPlayer->getAudioVolume();
-		else
-			return -1;
+		//if (mPlayer)
+		//	return mPlayer->getAudioVolume();
+		//else
+		//	return -1;
+		return mVolume;
 	}
 
 
@@ -643,7 +648,10 @@ namespace particle
 
 			if (mAudioChunnel != 0)
 				mPlayer->selectAudioChunnel(mAudioChunnel);
-			
+
+
+			mPlayer->setAudioVolume(mVolume);
+
 
 			mPlayer->setIsPlayingAddress(&gMediaServiceData->mIsPlaying);
 			mPlayer->setCurrentPositionAddress(&gMediaServiceData->mCurrentPosition);
@@ -723,3 +731,5 @@ namespace particle
 	}
 
 };
+
+

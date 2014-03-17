@@ -2,15 +2,19 @@
 #include "mango/thread.h"
 #include <android/log.h> 
 #include <sys/system_properties.h>
-
+#include <sys/socket.h>
+#include <cutils/sockets.h>
+#include <poll.h>
+#include <sys/un.h>  
 #define LOG_TAG "AudioUSB"
 
 #if 1
+#define logi(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #else
 #define logi(...)
 #endif
-		
+	int gRun = 1;		
 	//volatile
 	typedef struct tagRingBufferContext
 	{
@@ -84,7 +88,7 @@
 
 	void RingBuffer::setBufferSize(unsigned int size)
 	{
-		//log_i("RingBuffer::setBufferSize size =%d, mBuffer=0x%x", size,  mBuffer);
+		log_i("RingBuffer::setBufferSize size =%d, mBuffer=0x%x", size,  mBuffer);
 
 		if (mBuffer == NULL)
 			free(mBuffer);
@@ -96,7 +100,7 @@
 		mOut = 0;
 		mSize = size;
 
-//		log_i("RingBuffer::setBufferSize size =%d, mBuffer=0x%x", size,  mBuffer);
+		log_i("RingBuffer::setBufferSize size =%d, mBuffer=0x%x", size,  mBuffer);
 	}
 
 
@@ -233,6 +237,48 @@
 		
 		return result;
 	}
+int sendMyMsg(const char *msg){
+    int connect_fd;
+    int ret;
+    char snd_buf[1024];
+    int i;
+    static struct sockaddr_un srv_addr;
+//creat unix socket
+    connect_fd=socket(AF_UNIX,SOCK_STREAM,0);
+    if(connect_fd<0)  
+    {
+        perror("cannot create communication socket");
+        return 0;
+    }
+    srv_addr.sun_family=AF_UNIX;  
+    strcpy(srv_addr.sun_path,"UNIX_domain");  
+//connect server  
+    ret=connect(connect_fd,(struct sockaddr*)&srv_addr,sizeof(srv_addr));  
+    if(ret==-1)  
+    {
+        LOGI("connect err:%s",strerror(errno));
+        close(connect_fd);
+        return 0;
+    }
+    memset(snd_buf,0,1024);
+    strcpy(snd_buf,msg);
+//send info server
+   	write(connect_fd,snd_buf,sizeof(snd_buf));
+    close(connect_fd);
+    return 1;
+}
+
+void sendAudioMsg(int rate,int bit){
+	int ret;
+	char buf[1024];
+	
+	sprintf(buf,"usbAudio msg:Rate=%d,Bit=%d",rate,bit);
+	
+	ret = sendMyMsg(buf);
+	
+	if(ret)
+		LOGI("send audioMsg buf=%s",buf);
+}
 
 	RingBuffer  gHiFiRing;
 
@@ -247,6 +293,8 @@
 		unsigned int  len1, len2, size;
 		unsigned char *dataPos = (unsigned char *)data;
 		int	count = dataSize;
+		
+		logi("WriteRingBuffer %s",dataPos);
 		
 		while (count > 0)  
 		{
@@ -383,18 +431,18 @@
 		FILE *fp = NULL;
 		int  readlen;
 		unsigned char *buffer[512];
-		
-		LOGI("USBHiFiReading start");
-		
+
+		log_i("USBHiFi::USBHiFiReading");
+
+
 		while(1)
 		{
-			if (fp == NULL && isHifiMode())
+			if (fp == NULL// && gReadingTouchCount
+				)
 				fp = fopen("/dev/android_hifi", "r");
 			if (fp)
 			{
 				readlen = fread(buffer, 1, 16, fp);
-				fclose(fp);
-				
 				if (readlen > 0)
 				{
 					gReadingCount += readlen;
@@ -403,9 +451,14 @@
 			}
 			else
 			{
+				logi("fopen /dev/android_hifi fail usleep ");
+			//	strcpy((char*)buffer, "a12345");
+			//	WriteRingBuffer(buffer, 6);
 				usleep(1000 * 1000);
 			}
+
 		}
+
 		return 0;
 	}
 
@@ -416,6 +469,23 @@
 	//mMixer.mHifiRingBuffer.set(ringBufferContext, ringBufferContext + 1);
 	//mMixer.mHifiRingBuffer.clear();
 
+	unsigned int USBConnectDetect(void *parameter)
+	{
+		while(1)
+		{
+			if(!isHifiMode()){
+				char board[PROP_VALUE_MAX]={0};
+				__system_property_get("init.svc.usbd",board);
+				if(strcmp(board,"running")==0){
+					gRun = 0;
+					usleep(1000 * 1000);
+					sendMyMsg("usbAudio stop");
+					
+				}
+			}
+			usleep(1000 * 1000);
+		}
+	}
 
 
 extern "C"
@@ -566,17 +636,26 @@ int gSendingCount = 0;
 typedef void* (*PTHREAD_START_ROUTINE)(void*);
 int main (int argc, char* argv[])
 {
+		int n = 10;
 		pthread_t		readThreadId ;
 		pthread_t		sendThreadId ;
 		
 		gHiFiRing.setBufferSize(1024 * 4);
 		gHiFiRing.clear();
 	
-		pthread_create(&readThreadId, NULL, (PTHREAD_START_ROUTINE)USBHiFiReading, NULL);
-		pthread_join(readThreadId,NULL);
+		pthread_create(&readThreadId, NULL, (PTHREAD_START_ROUTINE)USBHiFiReading, (void*)(&n));
+		//pthread_join(readThreadId,NULL);
 		
-		pthread_create(&sendThreadId, NULL, (PTHREAD_START_ROUTINE)USBHiFiSending, NULL);
+		pthread_create(&sendThreadId, NULL, (PTHREAD_START_ROUTINE)USBHiFiSending, (void*)(&n));
+		//pthread_join(sendThreadId,NULL);
 		
+		//pthread_create(&sendThreadId, NULL, (PTHREAD_START_ROUTINE)USBConnectDetect, (void*)(&n));
+		
+		LOGI("usbhifi init end-.");
+		while(1){
+			usleep(1000 * 1000);
+			gReadingTouchCount++;
+		}
 		
 		return 0;
 }

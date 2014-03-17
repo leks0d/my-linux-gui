@@ -714,6 +714,14 @@ namespace mango
 			gmediaprovider.externFileCheck();
 		}else if(code == SDCARD_SHARE_UNMOUNT){
 			isSdcardShare = 1;
+		}else if(code == USBHIFI_AUDIO_MSG){
+			mPlayinglist->stopPlayer();
+			gPlayer.showUSBAudioConnectView();
+		}else if(code == USBHIFI_AUDIO_STOP){
+			system("stop usbd");
+			gPlayer.dismissView(gPlayer.mUSBAudioConnectView);
+			system("start usbd");
+			log_i("----------USBHIFI_AUDIO_STOP");
 		}
 		return 0;
 	}

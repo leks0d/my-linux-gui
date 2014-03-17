@@ -3,40 +3,66 @@
 #include <linux/netlink.h>
 #include <cutils/sockets.h>
 #include <poll.h>
-#include <sys/un.h>   
-#define UNIX_DOMAIN "UNIX_domain" 
-#define UNIX_MSG_FLASH_UNMOUNT "Volume flash /mnt/sdcard state changed from 4 (Mounted) to 5 (Unmounting)"
-#define UNIX_MSG_FLASH_MOUNT   "Volume flash /mnt/sdcard state changed from 3 (Checking) to 4 (Mounted)"
-#define UNIX_MSG_SDCARD_UNMOUNT   "Volume sdcard /mnt/external_sd state changed from 1 (Idle-Unmounted) to 0 (No-Media)"
-#define UNIX_MSG_SDCARD_MOUNT   "Volume sdcard /mnt/external_sd state changed from 3 (Checking) to 4 (Mounted)"
-#define UNIX_MSG_SDCARD_START_UMOUNT "Volume sdcard /mnt/external_sd state changed from 4 (Mounted) to 5 (Unmounting)"
-#define UNIX_MSG_SDCARD_SHARE		"Volume sdcard /mnt/external_sd state changed from 1 (Idle-Unmounted) to 7 (Shared-Unmounted)"
+#include <sys/un.h>  
+
+#define USB_MSG_CHANGE "change@/devices/virtual/android_usb/android0"
+#define USB_MSG_PATH "/devices/virtual/android_usb/android0/state"
+
 namespace mango
 {
-	const char HEADSET_STATE_PATH[]= "/sys/class/switch/h2w/state";
-	const char  headName[]={"SWITCH_NAME=h2w"};
-	const char  headState[]={"SWITCH_STATE="};
-	char  sdcardState[]=SDCARD_BLOCK_PATH;
-	SocketDetect::SocketDetect(void){
-/********************开机检测SD card 状态，判断是否需要扫描*************************/		
-		if(!FileAttr::FileExist(sdcardState)){
-			Environment::sdcardNeedScanner();	//not SD card ,create file.
-		}else{
-			log_i("exist Sdcard ,don't create file.");	//exist Sdcard ,don't create file.
+#define USB_FUNCTION_PATH 	"/sys/class/android_usb/android0/functions"
+#define USB_STATE_PATH 	"/sys/class/android_usb/android0/state"
+#define USB_FUNCTION_HIFI "hifi\n"
+#define USB_CONNECT_STAT "DISCONNECTED\n"
+	
+		int isHifiUSBMode(){
+			int fd = -1;
+			int result = 0;
+			char buf[20] = {0};
+			
+			fd = open(USB_FUNCTION_PATH, O_RDONLY);
+			if(fd<=0){
+					return 0;
+			}
+			read(fd,buf,20);
+			close(fd);
+			
+			if(strcmp(buf,USB_FUNCTION_HIFI)==0){
+//			if(1){	
+						fd = open(USB_STATE_PATH, O_RDONLY);
+						if(fd<=0){
+								log_i("open %s fail",USB_STATE_PATH);
+								return 0;
+						}
+						read(fd,buf,20);
+						close(fd);
+						
+						if(strcmp(buf,USB_CONNECT_STAT)!=0){
+							result = 1;
+						}
+						
+						log_i("isHifiMode buf=%s result=%d",buf,result);
+			}else{
+					result = 0;
+			}
+			
+			return result;
 		}
-/************如果开机时没有没有SD卡，创建boot文件，有则不创建************************/
+
+	KernelMsgGet::KernelMsgGet(void){
 		mPlayerEventInterface=NULL;
+		SocketInit();
 	}
 
-	SocketDetect::~SocketDetect(void){
+	KernelMsgGet::~KernelMsgGet(void){
 	}
 	
-	unsigned int SocketDetect::DetectLoop(void* p){
-		SocketDetect *socketDetect = (SocketDetect *)p;
-		socketDetect->DetectRun();
+	unsigned int KernelMsgGet::DetectLoop(void* p){
+		KernelMsgGet *ikernelMsgGet = (KernelMsgGet *)p;
+		ikernelMsgGet->DetectRun();
 	}
-#if 0	
-	int SocketDetect::SocketInit(){
+#if 1	
+	int KernelMsgGet::SocketInit(){
     struct sockaddr_nl addr;
     int sz = 64*1024;
     int s;
@@ -65,7 +91,7 @@ namespace mango
     return (mFd >= 0);		
 	}
 #else
-	int SocketDetect::SocketInit(){
+	int KernelMsgGet::SocketInit(){
     socklen_t clt_addr_len;  
     int listen_fd;  
     int com_fd;  
@@ -134,8 +160,8 @@ namespace mango
 	}
 #endif	
 	
-#if 0	
-	void SocketDetect::DetectRun(void){
+#if 1	
+	void KernelMsgGet::DetectRun(void){
 		char buffer[1024];
 		int len;
 		while (1){
@@ -157,11 +183,23 @@ namespace mango
 		      }
 		    }
 		    buffer[len] = '\0';
-		    log_i("SocketDetect::DetectRun %s",buffer);
+		    log_i("KernelMsgGet::DetectRun %s",buffer);
+			if(strstr(buffer,USB_MSG_CHANGE)){
+				//log_i("isHifiMode()=%d",isHifiUSBMode())
+				if(isHifiUSBMode()){
+					//system("start usbd");
+					if(mPlayerEventInterface != NULL)
+						mPlayerEventInterface->onKeyDispatch(USBHIFI_AUDIO_MSG,VM_MEDIA,0);	
+					log_i("start usbd");
+				}else{
+					if(mPlayerEventInterface != NULL)
+						mPlayerEventInterface->onKeyDispatch(USBHIFI_AUDIO_STOP,VM_MEDIA,0);	
+				}
+			}
 		}
 	}
 #else
-void SocketDetect::DetectRun(void){
+void KernelMsgGet::DetectRun(void){
 	char recv[1024];
 	int len,com_fd,ret;
 	struct sockaddr_un clt_addr;

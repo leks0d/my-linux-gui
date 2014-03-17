@@ -6,10 +6,11 @@
 #include "mango.h"
 #include "resource.h"
 #include "mediainfo.h"
-#include "SocketDetect.h"
 #include "AlarmManager.h"
 #include "CCue.h"
 #include "Cursor.h"
+#include "KernelMsgGet.h"
+#include "SocketDetect.h"
 #include "mediaprovider.h"
 #include "ArrayMediaInfo.h"
 #include "playlist.h"
@@ -42,12 +43,12 @@
 #include <dlfcn.h>
 #include "Uvcontert.h"
 #include "USBHiFi.h"
-
+#include "USBAudioConnectView.h"
 
 #define ARRAY_LIST_NUM 100
 #define CONVERT_UTF8
 #define ES9018_VOLUME "/sys/class/codec/es9018_volume"
-#define CODEC_VOLUME	0
+#define CODEC_VOLUME	1
 
 namespace mango
 {	
@@ -211,6 +212,7 @@ namespace mango
 		int showChosenView(int type,View *call=NULL);
 		int showPlaylistOperateView(PlayListItem& info);
 		void showGroupOperateView();
+		void showUSBAudioConnectView();
 		void dismissView(View *view);
 		int  getVolume(void);
 		void setVolume(int volume);
@@ -249,6 +251,8 @@ namespace mango
 		KeyLockView *mKeyLockView;
 		ChosenView *mChosenView;
 		PlaylistOperateView *mPlaylistOperateView;
+		USBAudioConnectView *mUSBAudioConnectView;
+		KernelMsgGet *mKernelMsgGet;
 		USBHiFi *mUSBHiFi;
 		Mutex muteMutex;
 		Mutex volumeMutex;

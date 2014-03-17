@@ -537,7 +537,7 @@ static const char *PlayerLock = "playerlock";
 					
 					if(needStart)
 						if(mParticleplayer->start()){log_i("start() success!");}else{log_i("start() fail!");goto Exit;}
-					mParticleplayer->setAudioVolume(gPlayer.mPlayerVolume);
+					//mParticleplayer->setAudioVolume(gPlayer.mPlayerVolume);
 					if(getPlayingItem()->isCue)
 					{
 						if(getPlayingItem()->cueStart>1000){

@@ -1,7 +1,7 @@
 
 namespace mango
 {
-	class SocketDetect{
+	class KernelMsgGet{
 			int mFd;
 			
 			Thread mDetectThread;
@@ -9,8 +9,8 @@ namespace mango
 		public:
 			CString mAudioBuf;
 			
-			SocketDetect();
-			~SocketDetect();
+			KernelMsgGet();
+			~KernelMsgGet();
 			int SocketInit();
 			void DetectRun();
 			static unsigned int DetectLoop(void* p);

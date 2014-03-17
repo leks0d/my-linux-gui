@@ -63,6 +63,8 @@ namespace mango
 #define SDCARD_FILE_CHECK 		24
 #define SDCARD_SHARE_UNMOUNT		25
 #define MEDIA_SCANNER_PROGRESS 	26
+#define USBHIFI_AUDIO_MSG 		27
+#define USBHIFI_AUDIO_STOP 		28
 
 #define SDCARD_PATH 	"/mnt/external_sd"
 #define FLASH_PATH 	"/mnt/sdcard"

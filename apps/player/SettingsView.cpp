@@ -3,7 +3,44 @@
 
 namespace mango
 {
-	
+#define USB_FUNCTION_PATH 	"/sys/class/android_usb/android0/functions"
+#define USB_STATE_PATH 	"/sys/class/android_usb/android0/state"
+#define USB_FUNCTION_HIFI "hifi\n"
+#define USB_CONNECT_STAT "DISCONNECTED\n"
+
+	int isHifiMode(){
+		int fd = -1;
+		int result = 0;
+		char buf[20] = {0};
+		
+		fd = open(USB_FUNCTION_PATH, O_RDONLY);
+		if(fd<=0){
+				log_i("open %s fail",USB_FUNCTION_PATH);
+				return 0;
+		}
+		read(fd,buf,20);
+		close(fd);
+		
+		if(strcmp(buf,USB_FUNCTION_HIFI)==0){
+				result = 1;
+		}else{
+				result = 0;
+		}
+		
+		return result;
+	}	
+	void setUsbMode(int mode){
+		if(mode){
+			log_i("------------>set usb hifi");
+			system("stop usbd");
+			system("setprop persist.sys.usb.config hifi");
+			system("start usbd");
+		}else{
+			log_i("------------>set usb storage");
+			//system("stop usbd");
+			system("setprop persist.sys.usb.config mass_storage");
+		}
+	}
 	enum
 	{
 		ADAPTER_PLAYING = 0xf0c0,	
@@ -29,6 +66,7 @@ namespace mango
 		mPowerListAdapter = NULL;
 		mPoweroffListAdapter = NULL;
 		mForcepoweroffListAdapter = NULL;
+		mUSBSettingListAdapter = NULL;
 	}
 
 	SettingsView::~SettingsView(void)
@@ -119,10 +157,10 @@ namespace mango
 		setMainState(0x1400);
 	}
 	void SettingsView::initMainList(){
-		int img[]={IDP_SETTING_EQ,IDP_SETTING_PLAYORDER,IDP_SETTING_GAPLESS,IDP_SETTING_MUSICINFO,IDP_SETTING_ADVANCED,0};
-		int imgsec[]={IDP_SETTING_EQ_S,IDP_SETTING_PLAYORDER_S,IDP_SETTING_GAPLESS_S,IDP_SETTING_MUSICINFO_S,IDP_SETTING_ADVANCED_S,0};
-		int text[]={STR_SETTING_EQ,STR_SETTING_PLAYOODER,STR_SETTING_GAPLESS,STR_SETTING_MUSICINFO,STR_SETTING_ADVANCED,0};
-		int i,count = 5;
+		int img[]={IDP_SETTING_EQ,IDP_SETTING_PLAYORDER,IDP_SETTING_GAPLESS,IDP_SETTING_MUSICINFO,IDP_SETTING_ADVANCED,IDB_DUSBOTG_ICON};
+		int imgsec[]={IDP_SETTING_EQ_S,IDP_SETTING_PLAYORDER_S,IDP_SETTING_GAPLESS_S,IDP_SETTING_MUSICINFO_S,IDP_SETTING_ADVANCED_S,IDB_DUSBOTG_ICON};
+		int text[]={STR_SETTING_EQ,STR_SETTING_PLAYOODER,STR_SETTING_GAPLESS,STR_SETTING_MUSICINFO,STR_SETTING_ADVANCED,STR_USB_CONECT_SETTING};
+		int i,count = sizeof(img)/sizeof(int);
 		
 		mListView->deleteAllItems();
 		
@@ -231,9 +269,25 @@ namespace mango
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mTitle->invalidateRect();
 		setMainState(0x1433);
-
 	}
-
+	void SettingsView::initUSBSettingList(){
+		int img[]={0,0,0,0};
+		int imgsec[]={0,0,0,0};
+		int text[]={STR_USB_MODE_STORAGE,STR_USB_MODE_DAC};
+		int i,count = sizeof(text)/sizeof(text[0]);
+		
+		if(mUSBSettingListAdapter== NULL){
+			mListView->deleteAllItems();
+			mUSBSettingListAdapter = new USBSettingListAdapter(mListView,ADAPTER_PLAYING);
+			mUSBSettingListAdapter->setData(img,imgsec,text,count);
+		}else
+			mUSBSettingListAdapter->refresh();
+		
+		mTitle->setTextResoure(STR_USB_CONECT_SETTING);
+		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
+		mTitle->invalidateRect();
+		setMainState(0x1500);		
+	}
 	void SettingsView::initLanguageList(){
 		int img[]={0,0,0,0,0};
 		int imgsec[]={0,0,0,0,0};
@@ -323,7 +377,7 @@ namespace mango
 						case 4:
 							initAdvanceList();	break;
 						case 5:
-							gPlayer.showPointDrawView();	break;
+							initUSBSettingList();	break;
 					}
 					break;
 				case 0x1200:
@@ -388,6 +442,10 @@ namespace mango
 						gPowerManager->setForcePoweroffTime(index);
 						mForcepoweroffListAdapter->refresh();
 						break;
+				case 0x1500:
+						setUsbMode(index);
+						mUSBSettingListAdapter->refresh();
+						break;
 				}
 			}
 			
@@ -430,8 +488,9 @@ namespace mango
 				break;
 			case 0x1200:
 			case 0x1300:
-			case 0x1400:	
-				initMainList(); 	
+			case 0x1400:
+			case 0x1500:	
+				initMainList();
 				break;
 			case 0x1410:	
 			case 0x1430:
@@ -704,6 +763,35 @@ namespace mango
 		canvas.drawTextResource(mTextRes[index],x,y+13);
 		x+=150;
 		if(index == gPowerManager->getForcePoweroffTime())
+			canvas.drawImageResource(IDP_LISTITEM_SEC,x,y+13);
+		else
+			canvas.drawImageResource(IDP_LISTITEM_NO_SEC,x,y+13);
+	}
+	USBSettingListAdapter::USBSettingListAdapter(ListView* list,int id)
+		: SettingListAdapter(list,id){
+
+	}
+	void USBSettingListAdapter::PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec){
+		int	 x, y,index;
+		
+		x = rect.left;
+		y = rect.top;
+
+		index = lvitem->iItem;
+		x+=50;
+		if(isSec)
+			canvas.drawImageResource(mSecImgRes[index],x,y+10);
+		else
+			canvas.drawImageResource(mImgRes[index],x,y+10);
+		x+=33;
+		if(isSec)
+			canvas.setTextColor(RGB(255,149,0));
+		else
+			canvas.setTextColor(COLOR_TEXT);	
+		canvas.setTextSize(18);
+		canvas.drawTextResource(mTextRes[index],x,y+13);
+		x+=150;
+		if(index == isHifiMode())
 			canvas.drawImageResource(IDP_LISTITEM_SEC,x,y+13);
 		else
 			canvas.drawImageResource(IDP_LISTITEM_NO_SEC,x,y+13);

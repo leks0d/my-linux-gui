@@ -1,6 +1,7 @@
 
 namespace mango
 {
+	int isHifiMode();
 
 
 	class PlayModeListAdapter : public SettingListAdapter
@@ -51,6 +52,14 @@ namespace mango
 			ForcepoweroffListAdapter(ListView* list,int id);
 			virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);
 	};
+	class USBSettingListAdapter : public SettingListAdapter
+	{
+		public:
+			USBSettingListAdapter(void){}
+			~USBSettingListAdapter(void){}
+			USBSettingListAdapter(ListView* list,int id);
+			virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);
+	};
 
 
 	class SettingsView: public View
@@ -79,6 +88,7 @@ namespace mango
 		void initLanguageList();
 		void initAutoPoweroffList();
 		void initForcePoweroffList();
+		void initUSBSettingList();
 		void setMainState(int state){ mainState = state;log_i("mainState = 0x%x",mainState);}
 		int getMainState(){return mainState;}
 		void backEvent();
@@ -98,6 +108,7 @@ namespace mango
 		LanguageListAdapter* mLanguageListAdapter;
 		PoweroffListAdapter* mPoweroffListAdapter;
 		ForcepoweroffListAdapter* mForcepoweroffListAdapter;
+		USBSettingListAdapter* mUSBSettingListAdapter;
 	private:
 		int		mMode;					//menu菜单 媒体库index 收藏夹 或 浏览路径
 		int		mPath;
