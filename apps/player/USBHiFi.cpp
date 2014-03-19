@@ -528,7 +528,30 @@ int gSendingCount = 0;
 		return 0;
 	}
 
+void PcmWrite::start(){
+	int i;
+	struct pcm*		mHiFiOut;
+	unsigned char  data[HIFI_PACKET_SIZE - 4] = {0};
+	
+	unsigned flags = PCM_OUT;
+	flags |= PCM_STEREO;
+	flags |= (AUDIO_HW_OUT_PERIOD_MULT - 1) << PCM_PERIOD_SZ_SHIFT;
+	flags |= (AUDIO_HW_OUT_PERIOD_CNT - PCM_PERIOD_CNT_MIN) << PCM_PERIOD_CNT_SHIFT;
+		
+	mHiFiOut = hifi_pcm_open(flags, 2, 44100, 16);
 
+	if (!hifi_pcm_ready(mHiFiOut)){
+		hifi_pcm_close(mHiFiOut);
+		log_i("fail to open pcm");
+		return;
+	}
+	log_i("PcmWrite start-.");
+	for(i=0;i<30;i++)
+		pcm_write(mHiFiOut, data, HIFI_PACKET_SIZE - 4);
+	
+	hifi_pcm_close(mHiFiOut);
+	log_i("PcmWrite end.");
+}
 
 	USBHiFi::USBHiFi(void)
 	{

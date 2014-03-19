@@ -79,7 +79,7 @@ namespace mango
 	int SettingProvider::insert(int id,int value){
 		int ret = 0;
 		char *pErrMsg = 0;
-		char *ptr,sql[1024];
+		char *ptr,sql[1024]={0};
 		
 		ptr = sql;
 		sprintf(ptr,"insert into settings values(%d,%d)",id,value);
@@ -95,7 +95,7 @@ namespace mango
 	int SettingProvider::insert(int id,int value,const char *str){
 		int ret = 0;
 		char *pErrMsg = 0;
-		char *ptr,sql[1024];
+		char *ptr,sql[1024]={0};
 
 		if(id == SETTING_VOLUME_ID){
 			saveVolume(value);
@@ -145,7 +145,7 @@ namespace mango
 	int SettingProvider::updateSDcard(__u32 value,char* buf,int id){
 		int ret = 0;
 		char *pErrMsg = 0;
-		char *ptr,sql[1024];
+		char *ptr,sql[1024]={0};
 		
 		ptr = sql;
 		sprintf(ptr,"update settings set value=%d,name='%s' where _id=%d",value,buf,id);
@@ -164,7 +164,7 @@ namespace mango
 	int SettingProvider::update(int id,int value){
 		int ret = 0;
 		char *pErrMsg = 0;
-		char *ptr,sql[1024],safe[100];
+		char *ptr,sql[1024]={0},safe[100]={0};
 		
 		if(id == SETTING_VOLUME_ID){
 			/*int retry = 3;
@@ -196,7 +196,7 @@ namespace mango
 	int SettingProvider::queryCursor(int id,Cursor *cur){
 		int ret = 0;
 		char *pErrMsg = 0;
-		char *ptr,sql[1024];
+		char *ptr,sql[1024]={0};
 
 		ptr = sql;
 		sprintf(ptr,"select * from settings where _id=%d",id);
@@ -213,7 +213,7 @@ namespace mango
 	int SettingProvider::query(int id,int *value){
 		int ret = 0;
 		char *pErrMsg = 0;
-		char *ptr,sql[1024];
+		char *ptr,sql[1024]={0};
 		IntegerArray *array;
 		array = new IntegerArray();
 
@@ -229,7 +229,7 @@ namespace mango
 		ret = sqlite3_exec(db,sql,SettingProvider::sql_callback,(void*)array,&pErrMsg);
 			
 		if(ret != SQLITE_OK){
-			log_e("sqlite3_exec error : %s\n",pErrMsg);			
+			log_e("sqlite3_exec error : %s\n",pErrMsg);		
 		}
 		if(value == NULL)
 			return array->getItem(0);
@@ -249,7 +249,7 @@ namespace mango
 	int SettingProvider::EqQuery(int id,int *value){
 		int ret = 0;
 		char *pErrMsg = 0;
-		char *ptr,sql[1024];
+		char *ptr,sql[1024]={0};
 		IntegerArray *array;
 		array = new IntegerArray();
 		
@@ -270,7 +270,7 @@ namespace mango
 	int SettingProvider::EqInsert(int id,int *value){
 		int ret = 0;
 		char *pErrMsg = 0;
-		char *ptr,sql[1024];
+		char *ptr,sql[1024]={0};
 		
 		ptr = sql;
 		sprintf(ptr,"insert into eqdata values(%d,%d,%d,%d,%d,%d,%d,%d,%d)",
@@ -287,7 +287,7 @@ namespace mango
 	int SettingProvider::EqUpdate(int id,int *value){
 		int ret = 0;
 		char *pErrMsg = 0;
-		char *ptr,sql[1024];
+		char *ptr,sql[1024]={0};
 		
 		ptr = sql;
 		sprintf(ptr,"update eqdata set val_0=%d,val_1=%d,val_2=%d,val_3=%d,val_4=%d,val_5=%d,val_6=%d,val_7=%d where _id=%d",

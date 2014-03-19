@@ -15,6 +15,32 @@ static const char *PlayerLock = "playerlock";
 #ifndef WIN32
 	//	particle::MediaPlayerInterface*  mParticleplayer = NULL; // = particle::createMediaPlayer();
 #endif
+
+void Playinglist::startSlient(){
+#if 0
+	particle::MediaPlayerInterface*  mtemp = particle::createMediaPlayer();
+	const char* etc = "/system/etc/T SN(LR).mp3";
+	
+	if(FileAttr::FileExist(etc)){
+		log_i("enter play slient.");
+		gPlayer.openWm8740Mute();
+		mtemp->stop();
+		mtemp->setSource(etc);
+		mtemp->prepare();
+		mtemp->start();
+		Thread::sleep(200);
+		gPlayer.closeWm8740Mute();
+		Thread::sleep(1000);
+		log_i("play slient stop.");
+		mtemp->stop();
+	}
+#else
+	PcmWrite pcmWrite;
+	gPlayer.openWm8740Mute();
+	gPlayer.closeWm8740Mute();
+	pcmWrite.start();
+#endif	
+}
 			static	char* mstrcpy(char *str,char *arg){
 				int len;		
 				if(arg == NULL)
@@ -27,7 +53,7 @@ static const char *PlayerLock = "playerlock";
 			}
 
 			Playinglist::Playinglist(){
-				particle::MediaPlayerInterface*  mtemp;
+
 				
 				len = 0;
 				mCurrent = 0;
@@ -784,11 +810,11 @@ Exit:
 			gSettingProvider.query(SETTING_GAPLESS_ID,&gaplessEn);
 			gSettingProvider.query(SETTING_EQMODE_ID,&eqMode);
 			gSettingProvider.EqQuery(eqMode,EqValue);
-#if CODEC_VOLUME
+if(gPlayer.mCodecType==0){
 			;
-#else
+}else if(gPlayer.mCodecType==1){
 			mParticleplayer->setAudioVolume(gPlayer.mPlayerVolume);
-#endif
+}
 			mParticleplayer->audioEqualizerEnable(eqOpen);
 			mParticleplayer->setGaplessDuration(GaplessValue[gaplessEn]);
 			setEq(EqValue);

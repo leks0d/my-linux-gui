@@ -437,7 +437,7 @@ void sendAudioMsg(int rate,int bit){
 
 		while(1)
 		{
-			if (fp == NULL// && gReadingTouchCount
+			if (fp == NULL //&& isHifiMode()
 				)
 				fp = fopen("/dev/android_hifi", "r");
 			if (fp)
@@ -452,8 +452,6 @@ void sendAudioMsg(int rate,int bit){
 			else
 			{
 				logi("fopen /dev/android_hifi fail usleep ");
-			//	strcpy((char*)buffer, "a12345");
-			//	WriteRingBuffer(buffer, 6);
 				usleep(1000 * 1000);
 			}
 

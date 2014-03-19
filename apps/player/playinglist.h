@@ -38,6 +38,7 @@ namespace mango
 			
 			Playinglist();
 			~Playinglist();
+			void startSlient();
 			void setWakeLock();
 			void releaseWakeLock();
 			mediainfo *getPlayingItem();

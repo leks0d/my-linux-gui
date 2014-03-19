@@ -59,6 +59,7 @@ namespace mango
 		mPlayinglist = new Playinglist();
 		//mPlayinglist->initPlayintList();		
 		mPlayinglist->cursorInit();
+		mPlayinglist->startSlient();
 		//mango::Thread::sleep(1000 * 3);
 		
 		mSpdifSwitch = new PlayerSwitch();
@@ -93,6 +94,7 @@ namespace mango
 		//mUSBHiFi->onCreate();
 		openOrCloseMute(true);
 		Environment::openMute();
+		
 		return messageLoop();
 	}
 	void Player::setBootWakeLock(int en){
@@ -493,7 +495,7 @@ namespace mango
 	
 	int  Player::getVolume(void)
 	{
-#if CODEC_VOLUME
+if(gPlayer.mCodecType==0){
 		FILE* file = NULL;
 		char buffer[20]={0};
 		int currentVolume;
@@ -517,19 +519,20 @@ namespace mango
 		fclose(file);
 		//log_i("Player::getVolume currentVolume=%d",currentVolume);
 		return currentVolume;
-#else
+}
+else if(gPlayer.mCodecType==1){
 		if(mPlayinglist)
 			if(mPlayinglist->mParticleplayer)
 				return mPlayinglist->mParticleplayer->getAudioVolume();
 		return mPlayerVolume;
-#endif
+}
 		return 0;
 	}
 
 
 	void Player::setVolume(int volume)
 	{
-#if CODEC_VOLUME	
+if(gPlayer.mCodecType==0){
 		FILE* file = NULL;
 		char buffer[20]={0};
 		int ret;
@@ -548,12 +551,14 @@ namespace mango
 		}
 		
 		volumeMutex.unlock();
-#else
+}
+else if(gPlayer.mCodecType==1){
+
 	if(mPlayinglist)
 		if(mPlayinglist->mParticleplayer)
 			mPlayinglist->mParticleplayer->setAudioVolume(volume);
 		mPlayerVolume = volume;
-#endif
+}
 	}
 	void Player::setHardwareVolume(int volume){
 		FILE* file = NULL;

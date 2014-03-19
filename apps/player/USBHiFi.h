@@ -26,4 +26,10 @@ namespace mango
 		Thread mSendCodecThread;
 
 	};
+	class PcmWrite{
+		public:
+			PcmWrite(void){}
+			~PcmWrite(void){}
+			void start();
+	};
 };

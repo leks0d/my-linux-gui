@@ -716,11 +716,19 @@ namespace mango
 			isSdcardShare = 1;
 		}else if(code == USBHIFI_AUDIO_MSG){
 			mPlayinglist->stopPlayer();
+			Environment::openMute();
+			gPlayer.openWm8740Mute();
+			gPlayer.closeWm8740Mute();
 			gPlayer.showUSBAudioConnectView();
+			//if(gPlayer.mCodecType==1)	
+			//	gPlayer.setHardwareVolume(200);
 		}else if(code == USBHIFI_AUDIO_STOP){
 			system("stop usbd");
 			gPlayer.dismissView(gPlayer.mUSBAudioConnectView);
 			system("start usbd");
+			//if(gPlayer.mCodecType==1)	
+			//	gPlayer.setHardwareVolume(255);
+			
 			log_i("----------USBHIFI_AUDIO_STOP");
 		}
 		return 0;

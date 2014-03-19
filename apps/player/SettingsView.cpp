@@ -33,11 +33,12 @@ namespace mango
 		if(mode){
 			log_i("------------>set usb hifi");
 			system("stop usbd");
+			system("setprop persist.usb.debug 1");
 			system("setprop persist.sys.usb.config hifi");
 			system("start usbd");
 		}else{
 			log_i("------------>set usb storage");
-			//system("stop usbd");
+			system("setprop persist.usb.debug 0");
 			system("setprop persist.sys.usb.config mass_storage");
 		}
 	}
