@@ -546,7 +546,7 @@ void PcmWrite::start(){
 		return;
 	}
 	log_i("PcmWrite start-.");
-	for(i=0;i<30;i++)
+	for(i=0;i<50;i++)
 		pcm_write(mHiFiOut, data, HIFI_PACKET_SIZE - 4);
 	
 	hifi_pcm_close(mHiFiOut);

@@ -19,7 +19,7 @@ static const char *PlayerLock = "playerlock";
 void Playinglist::startSlient(){
 #if 0
 	particle::MediaPlayerInterface*  mtemp = particle::createMediaPlayer();
-	const char* etc = "/system/etc/T SN(LR).mp3";
+	const char* etc = "/system/etc/test.mp3";
 	
 	if(FileAttr::FileExist(etc)){
 		log_i("enter play slient.");
@@ -810,11 +810,13 @@ Exit:
 			gSettingProvider.query(SETTING_GAPLESS_ID,&gaplessEn);
 			gSettingProvider.query(SETTING_EQMODE_ID,&eqMode);
 			gSettingProvider.EqQuery(eqMode,EqValue);
-if(gPlayer.mCodecType==0){
-			;
-}else if(gPlayer.mCodecType==1){
+#if CODEC_VOLUME
+			mParticleplayer->setAudioVolume(255);
+			log_i("codec volume,setAudioVolume(255)");
+#else
 			mParticleplayer->setAudioVolume(gPlayer.mPlayerVolume);
-}
+			log_i("AudioVolume,init mPlayerVolume=%d",gPlayer.mPlayerVolume);
+#endif
 			mParticleplayer->audioEqualizerEnable(eqOpen);
 			mParticleplayer->setGaplessDuration(GaplessValue[gaplessEn]);
 			setEq(EqValue);
