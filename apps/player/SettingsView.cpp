@@ -124,7 +124,7 @@ namespace mango
 	{
 		log_i("MediaView::onPaint");
 		Environment::drawWallpaper(canvas);
-		canvas.drawImageResource(IDP_MUSIC_TITLEBAR,0,0,false);
+		canvas.drawImageResource(IDP_MUSIC_TITLEBAR,0,0,true);
 		return 0;
 	}
 
@@ -158,9 +158,9 @@ namespace mango
 		setMainState(0x1400);
 	}
 	void SettingsView::initMainList(){
-		int img[]={IDP_SETTING_EQ,IDP_SETTING_PLAYORDER,IDP_SETTING_GAPLESS,IDP_SETTING_MUSICINFO,IDP_SETTING_ADVANCED,IDB_DUSBOTG_ICON};
-		int imgsec[]={IDP_SETTING_EQ_S,IDP_SETTING_PLAYORDER_S,IDP_SETTING_GAPLESS_S,IDP_SETTING_MUSICINFO_S,IDP_SETTING_ADVANCED_S,IDB_DUSBOTG_ICON};
-		int text[]={STR_SETTING_EQ,STR_SETTING_PLAYOODER,STR_SETTING_GAPLESS,STR_SETTING_MUSICINFO,STR_SETTING_ADVANCED,STR_USB_CONECT_SETTING};
+		int img[]={IDP_SETTING_EQ,IDP_SETTING_PLAYORDER,IDP_SETTING_GAPLESS,IDP_SETTING_MUSICINFO,IDB_DUSBOTG_ICON,IDP_SETTING_ADVANCED};
+		int imgsec[]={IDP_SETTING_EQ_S,IDP_SETTING_PLAYORDER_S,IDP_SETTING_GAPLESS_S,IDP_SETTING_MUSICINFO_S,IDB_DUSBOTG_ICON,IDP_SETTING_ADVANCED_S};
+		int text[]={STR_SETTING_EQ,STR_SETTING_PLAYOODER,STR_SETTING_GAPLESS,STR_SETTING_MUSICINFO,STR_USB_CONECT_SETTING,STR_SETTING_ADVANCED};
 		int i,count = sizeof(img)/sizeof(int);
 		
 		mListView->deleteAllItems();
@@ -375,9 +375,9 @@ namespace mango
 							initGaplessList();		break;
 						case 3:
 							gPlayer.showMusicInfoView(mPlayinglist->getPlayingItem());	break;
-						case 4:
-							initAdvanceList();	break;
 						case 5:
+							initAdvanceList();	break;
+						case 4:
 							initUSBSettingList();	break;
 					}
 					break;

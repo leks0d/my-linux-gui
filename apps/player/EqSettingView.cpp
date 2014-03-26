@@ -198,8 +198,8 @@ namespace mango
 	{
 		log_i("MediaView::onPaint");
 		Environment::drawWallpaper(canvas);
-		canvas.drawImageResource(IDP_MUSIC_TITLEBAR,0,0,false);	
-		canvas.drawImageResource(IDP_BACKGROUND_BOTTOM, 0, 211, false);
+		canvas.drawImageResource(IDP_MUSIC_TITLEBAR,0,0,true);	
+		canvas.drawImageResource(IDP_BACKGROUND_BOTTOM, 0, 211, true);
 		return 0;
 	}
 

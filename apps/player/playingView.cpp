@@ -444,9 +444,8 @@ namespace mango
 		Brush brush(ARGB(100,25, 25, 25));
 		//log_i("PlayingView::onPaint");
 		Environment::drawWallpaper(canvas);
-		rect.setEx(0, 0, 320, 21);
-		canvas.fillRect(rect, brush);
-		canvas.drawImageResource(IDP_BACKGROUND_BOTTOM, 0, 211, false);
+		canvas.drawImageResource(IDP_MUSIC_TITLEBAR,0,0,true);
+		canvas.drawImageResource(IDP_BACKGROUND_BOTTOM, 0, 211, true);
 
 		//log_i("PlayingView::onPaint complete");
 		

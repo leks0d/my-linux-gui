@@ -104,7 +104,7 @@ namespace mango
 			log_i("atuoPoweroffCount=%d,mForcePowerOffTimeCount=%d,isUsmCon=%d,isMediaScanning=%d,isPlaying=%d\
 ,poweroffTime=%d,mForcePowerOffTime=%d",atuoPoweroffCount,mForcePowerOffTimeCount,gPlayer.mPlayingView->isUsmCon,
 			gPlayer.mPlayingView->isMediaScanning,mPlayinglist->isPlaying(),poweroffTime,mForcePowerOffTime);
-#endif		
+#endif
 	}
 
 	void PowerManager::resetCount(){

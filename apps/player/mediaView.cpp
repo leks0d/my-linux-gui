@@ -277,7 +277,7 @@ namespace mango
 		
 		
 		Environment::drawWallpaper(canvas);
-		canvas.drawImageResource(IDP_MUSIC_TITLEBAR,0,0,false);
+		canvas.drawImageResource(IDP_MUSIC_TITLEBAR,0,0,true);
 		return 0;
 	}
 
