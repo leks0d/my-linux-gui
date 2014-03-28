@@ -36,6 +36,7 @@ namespace mango
 		mNormalBgdResId = 0;
 		mSelectDisBgdResId = 0;
 		onTouchFresh = true;
+		mSelect = 0;
 	}
 
 
