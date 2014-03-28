@@ -29,6 +29,7 @@ namespace mango
 	{
 		INIT_LIST_HEAD(&mViewHead);
 		messageQueue = &gMessageQueue;
+		isPainting = 0;
 	}
 
 

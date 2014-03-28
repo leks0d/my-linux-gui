@@ -107,8 +107,10 @@ namespace mango
 	{
 		if (getCapture () != this)
 			return 0 ;
-
-		cartoonDrag(x - mTouchPrevPosition.x);
+		
+		if(!gViewZAxis.isPainting)
+			cartoonDrag(x - mTouchPrevPosition.x);
+		
 		mTouchPrevPosition.set(x, y);
 	
 		return 0 ;

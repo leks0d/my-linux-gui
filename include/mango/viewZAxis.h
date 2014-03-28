@@ -63,7 +63,7 @@ namespace mango
 		bool mExistInvalidateView;
 		class Session* mSession;
 		class MessageQueue  *messageQueue;
-
+		int isPainting;
 	private:
 		View* getToppestItem();
 		View* getBottommestItem();

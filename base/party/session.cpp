@@ -98,10 +98,12 @@ namespace mango
 			mViewZAxis.invalidScreenRectToView();
 			if (!mViewZAxis.mExistInvalidateView)
 				continue;
-
+				
+			gViewZAxis.isPainting = 1;
 			mViewZAxis.sendPainMessageToAllInvalidateView();
-
+			
 			gSessionLocal.swapScreenFrontBuffer();
+			gViewZAxis.isPainting = 0;
 		}
 	}
 
