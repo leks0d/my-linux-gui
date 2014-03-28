@@ -195,8 +195,8 @@ namespace mango
 	{
 		Canvas* canvas;
 		
-		getParent()->onPaint(*(getParent()->getCanvas()));
-		getParent()->releaseCanvas();
+		//getParent()->onPaint(*(getParent()->getCanvas()));
+		//getParent()->releaseCanvas();
 
 		canvas = getCanvas();
 
