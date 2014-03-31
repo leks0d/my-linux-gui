@@ -1,5 +1,6 @@
 #include "SkStream.h"
 #include "SkImageDecoder.h"
+#include "SkImageEncoder.h"
 #include "SkBitmap.h"
 #include "SkCanvas.h"
 #include "SkDevice.h"

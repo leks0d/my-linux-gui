@@ -8,6 +8,8 @@ namespace mango
 		static bool decodeFile(MSkBitmap* mMSkBitmap,char* path,int w,int h);
 		static bool decodeBuffer(MSkBitmap* mMSkBitmap,void* buf,int size,int w,int h);
 		static bool genBitmapFromFile(MSkBitmap* mMSkBitmap,char* path,int w,int h);
+		static void caputerScreen();
+		static void caputerDrawScreen();
 	};
 
 	class Environment{

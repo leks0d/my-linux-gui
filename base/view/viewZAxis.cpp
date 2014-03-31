@@ -531,13 +531,16 @@ namespace mango
 		return view ;
 	}
 
-	
+#define INVAL_COUNT	1
 	//给无效窗口发WM_PAINT, 并返回哪一些层存无效窗口, 用SendMessage
 	bool ViewZAxis::sendPainMessageToAllInvalidateView()
 	{
 		View*  view;
 		int	count;
-
+#if INVAL_COUNT
+		View* invalidView[500];
+		int invalidCount=0,i;
+#endif
 		mMutex.lock() ;
 		mExistInvalidateView = false;
 		mMutex.unlock() ;
@@ -547,9 +550,29 @@ namespace mango
 			view = findInvalidateView();
 			if (view == NULL)
 				break ;
-
+			
+#if INVAL_COUNT
+			for(i=0;i<invalidCount;i++){
+				if(view == invalidView[i])
+					break;
+			}
+			if(i == invalidCount){
+				invalidView[invalidCount] = view;
+				invalidCount++;
+				messageQueue->send(view, VM_PAINT);
+				//messageQueue->send(invalidView[0], VM_ACTIVATE);
+				//log_i("invalidCount senddraw view=%s,view=0x%x",view->name,view);
+			}else{
+				log_i("invalidCount view=%s,view=0x%x",view->name,view);
+			}
+#else
 			messageQueue->send(view, VM_PAINT);
+#endif
+
 		}
+#if INVAL_COUNT		
+		//log_i("count=%d,invalidCount=%d",count,invalidCount);
+#endif		
 		return true;
 	}
 

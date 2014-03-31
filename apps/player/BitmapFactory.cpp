@@ -126,7 +126,59 @@ namespace mango
 			//log_i("DecodeFile space time %dms",end);
 		}		
 	}
+	void BitmapFactory::caputerScreen(){
+		SkBitmap skBitmap,*pskBitmap = NULL;
+		//SkCanvas *skCanvas = NULL;
+		int w = gSession.mScreen.mWidth;
+		int h = gSession.mScreen.mHeight;
+		
+		pskBitmap = new SkBitmap();
+		pskBitmap->setConfig(SkBitmap::kARGB_8888_Config,w,h);
+		pskBitmap->allocPixels();
+		if(gSession.mScreen.mYOffset == 0)
+			memcpy((char *)pskBitmap->getPixels(),(char *)gSessionLocal.mSurface[1].mBits,w*h*4);
+		else
+			memcpy((char *)pskBitmap->getPixels(),(char *)gSessionLocal.mSurface[0].mBits,w*h*4);
+		
+		SkImageEncoder::EncodeFile("/mnt/screen.png", *pskBitmap, SkImageEncoder::kPNG_Type, 100);
 
+		log_i("--------->caputerScreen");
+		delete pskBitmap;
+	}
+	void getDrawName(CString& out){
+		int i=0;
+		
+		while(1){
+			char path[100]={0};
+
+			sprintf(path,"/mnt/draw/darw_%d.png",i);
+			if(!FileAttr::FileExist(path)){
+				out = path;
+				break;
+			}
+			i++;
+		}
+		
+	}
+	void BitmapFactory::caputerDrawScreen(){
+		SkBitmap skBitmap,*pskBitmap = NULL;
+		//SkCanvas *skCanvas = NULL;
+		int w = gSession.mScreen.mWidth;
+		int h = gSession.mScreen.mHeight;
+		CString out;
+
+		getDrawName(out);
+		pskBitmap = new SkBitmap();
+		pskBitmap->setConfig(SkBitmap::kARGB_8888_Config,w,h);
+		pskBitmap->allocPixels();
+
+		memcpy((char *)pskBitmap->getPixels(),(char *)gSessionLocal.mStockGraphic.mBitmap.getBits(),w*h*4);
+		
+		SkImageEncoder::EncodeFile(out.string, *pskBitmap, SkImageEncoder::kPNG_Type, 100);
+
+		delete pskBitmap;
+		log_i("--->invalidCount caputerDrawScreen:%s",out.string);
+	}
 	void Environment::space_info(const char *path,__u32& toatl,__u32& avail,__u32& free)
 	{
 		struct statfs sfs;

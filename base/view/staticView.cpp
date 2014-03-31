@@ -13,7 +13,7 @@ namespace mango
 	StaticView::StaticView(const TCHAR* title, View* parent, Rect* rect, int style, int show)
 		:View(title, parent, rect, style, show)
 	{
-		updateTextPaintExtent(title);
+		//updateTextPaintExtent(title);
 	}
 
 
@@ -77,7 +77,6 @@ namespace mango
 		{
 			canvas.setTextColor(mColor);
 			canvas.setTextSize(mTextSize);
-			//canvas.drawImageResource(mBkRes,0,0);
 			if (mTitlePaintExtent.cx < rect.right - rect.left)
 				canvas.drawText(title, -1, rect, DT_SINGLELINE | DT_NOPREFIX);
 			else
@@ -157,11 +156,11 @@ namespace mango
 		if (title)
 		{
 			
-			canvas = getCanvas();
+			canvas = &gSessionLocal.mStockGraphic.mCanvas;
 			canvas->setTextColor(mColor);
 			canvas->setTextSize(mTextSize);
 			canvas->getTextExtentPoint(title, -1, mTitlePaintExtent);
-			releaseCanvas();
+			//releaseCanvas();
 		}
 		else
 		{

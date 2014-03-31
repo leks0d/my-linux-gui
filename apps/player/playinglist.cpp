@@ -811,7 +811,7 @@ Exit:
 			gSettingProvider.query(SETTING_EQMODE_ID,&eqMode);
 			gSettingProvider.EqQuery(eqMode,EqValue);
 #if CODEC_VOLUME
-			mParticleplayer->setAudioVolume(255);
+			//mParticleplayer->setAudioVolume(255);
 			log_i("codec volume,setAudioVolume(255)");
 #else
 			mParticleplayer->setAudioVolume(gPlayer.mPlayerVolume);
