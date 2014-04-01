@@ -64,7 +64,7 @@ void Playinglist::startSlient(){
 				mParticleplayer = NULL;
 				isWakeLock = 0;
 				mOrderBy = -1;
-				
+				mLastPlayTime = 0;
 				clearPlay();
 			}
 
@@ -544,7 +544,10 @@ void Playinglist::startSlient(){
 				if(playPath == NULL || !FileAttr::FileExist(playPath) || Environment::get_file_size(playPath)<10)
 					return -3;
 				
-				
+				ULONGLONG interval = Time::getMillisecond() - mLastPlayTime;
+				if(interval<PLAY_INTERVAL){
+					Thread::sleep(PLAY_INTERVAL - interval);
+				}
 
 				if(inPause){
 					setInPauseState(0);
@@ -590,7 +593,7 @@ void Playinglist::startSlient(){
 					gPlayer.VolumeCheck();
 				
 				}
-				
+				mLastPlayTime = Time::getMillisecond();
 				if(needGapless&&mGapless>0){
 					//mParticleplayer->setNextSongForGapless(playPath);//(getItem(mCurrent+1)->path);
 				}

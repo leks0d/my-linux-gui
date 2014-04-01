@@ -7,7 +7,7 @@
 #include <fcntl.h>
 #include "MediaPlayerInterface.h"
 
-
+#define PLAY_INTERVAL 200 //ms
 
 namespace mango
 {
@@ -35,6 +35,7 @@ namespace mango
 			int inPause;
 			int isWakeLock;
 			int mOrderBy;
+			ULONGLONG mLastPlayTime;
 			
 			Playinglist();
 			~Playinglist();

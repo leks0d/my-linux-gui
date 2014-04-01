@@ -148,19 +148,28 @@ namespace mango
 	}
 
 
-
+#define DEBGU 1
 	void StaticView::updateTextPaintExtent(const TCHAR* title)
 	{
 		Canvas* canvas;
 
 		if (title)
 		{
-			
+#if DEBGU
+			gSessionLocal.mCanvasMutex.lock();
 			canvas = &gSessionLocal.mStockGraphic.mCanvas;
+#else
+			canvas = getCanvas();
+#endif
 			canvas->setTextColor(mColor);
 			canvas->setTextSize(mTextSize);
 			canvas->getTextExtentPoint(title, -1, mTitlePaintExtent);
-			//releaseCanvas();
+#if DEBGU
+			releaseCanvas();
+#else
+			releaseCanvas();
+#endif
+
 		}
 		else
 		{
