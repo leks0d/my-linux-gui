@@ -85,7 +85,7 @@ namespace mango
 
 		rect.setEx(left, 55, 188, 25); 
 		mMusicNameStatic = new StaticView(TEXT("mMusicName"), this, &rect, 0);
-		mMusicNameStatic->setTextColor(RGB(248,136,0));
+		mMusicNameStatic->setTextColor(COLOR_PLAY_ORANGE);
 		mMusicNameStatic->setTextSize(23);
 		mMusicNameStatic->setTextBkRes(IDP_PLAYING_MUSICNAME_BK);
 		
@@ -445,7 +445,7 @@ namespace mango
 		//log_i("PlayingView::onPaint");
 		Environment::drawWallpaper(canvas);
 		canvas.drawImageResource(IDP_MUSIC_TITLEBAR,0,0,true);
-		canvas.drawImageResource(IDP_BACKGROUND_BOTTOM, 0, 211, true);
+		canvas.drawImageResource(IDP_BACKGROUND_BOTTOM, 1, 211, true);
 
 		//log_i("PlayingView::onPaint complete");
 		

@@ -239,7 +239,7 @@ namespace mango
 		y = rect.top;
 		
 		if(isSec)
-			canvas.setTextColor(RGB(255,149,0));
+			canvas.setTextColor(COLOR_PLAY_ORANGE);
 		else
 			canvas.setTextColor(COLOR_TEXT);
 		

@@ -964,10 +964,7 @@ namespace mango
 		}
 		mLanguageId = langid;
 
-		if(mLanguageId == LANGID_SIMPLIFIED 	|| 
-			mLanguageId == LANGID_TRADITIONAL	||
-			mLanguageId == LANGID_JAPANESE)
-			gFontCache.resetCache();
+		gFontCache.resetCache();
 		
 		return true;
 	}

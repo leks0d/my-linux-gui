@@ -1322,7 +1322,7 @@ namespace mango
 		x = LIST_MUSIC_ICON_LEFT;
 		canvas.drawImageResource(MediaView::getMusicIcon(info->path),x,y+5);
 		if(isSec)
-			canvas.setTextColor(RGB(255,149,0));
+			canvas.setTextColor(COLOR_PLAY_ORANGE);
 		else
 			canvas.setTextColor(COLOR_TEXT);
 		canvas.setTextSize(16);
@@ -1464,7 +1464,7 @@ namespace mango
 		x = LIST_MUSIC_ICON_LEFT;
 		canvas.drawImageResource(MediaView::getMusicIcon(info->path),x,y+5);
 		if(isSec)
-			canvas.setTextColor(RGB(255,149,0));
+			canvas.setTextColor(COLOR_PLAY_ORANGE);
 		else
 			canvas.setTextColor(COLOR_TEXT);
 		x= x+40;
@@ -1585,7 +1585,7 @@ namespace mango
 			canvas.drawImageResource(IDP_LISTICON_ALBUM,x,y+5);
 		
 		if(isSec)
-			canvas.setTextColor(RGB(255,149,0));
+			canvas.setTextColor(COLOR_PLAY_ORANGE);
 		else
 			canvas.setTextColor(COLOR_TEXT);
 		canvas.setTextSize(16);
@@ -1634,7 +1634,7 @@ namespace mango
 		canvas.drawImageResource(IDP_LIST_GENRE_ICON,x,y+1);
 		
 		if(isSec)
-			canvas.setTextColor(RGB(255,149,0));
+			canvas.setTextColor(COLOR_PLAY_ORANGE);
 		else
 			canvas.setTextColor(COLOR_TEXT);
 		canvas.setTextSize(18);
@@ -1692,7 +1692,7 @@ namespace mango
 		canvas.drawImageResource(IDP_LISTICON_ARTIST,x,y+5);
 
 		if(isSec)
-			canvas.setTextColor(RGB(255,149,0));
+			canvas.setTextColor(COLOR_PLAY_ORANGE);
 		else
 			canvas.setTextColor(COLOR_TEXT);
 		
@@ -1720,7 +1720,7 @@ namespace mango
 			canvas.drawImageResource(mImgRes[index],x,y+10);
 		x+=33;
 		if(isSec)
-			canvas.setTextColor(RGB(255,149,0));
+			canvas.setTextColor(COLOR_PLAY_ORANGE);
 		else
 			canvas.setTextColor(COLOR_TEXT);	
 		canvas.setTextSize(18);

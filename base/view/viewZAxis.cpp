@@ -538,7 +538,7 @@ namespace mango
 		View*  view;
 		int	count;
 #if INVAL_COUNT
-		View* invalidView[500];
+		View* invalidView[500]={0};
 		int invalidCount=0,i;
 #endif
 		mMutex.lock() ;
