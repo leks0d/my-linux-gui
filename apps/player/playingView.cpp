@@ -52,7 +52,7 @@ namespace mango
 		mNextButton->setPressedImageId(IDP_PLAYING_NEXT_ACTIVE);
 		mNextButton->onCreate();
 		
-		rect.setEx(145, 178, 32, 23);
+		rect.setEx(145, 178, 32, 30);
 		mPlayButton = new Button(PLAYING_IDB_PLAY, TEXT("mPlayButton"), this, &rect, 0);
 		mPlayButton->setNormalImageId(IDP_PLAYING_PLAY_ACTIVE);
 		mPlayButton->setPressedImageId(IDP_PLAYING_PLAY_ACTIVE);

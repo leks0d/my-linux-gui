@@ -405,7 +405,7 @@ namespace mango
 	}
 	void MediaView::initRootDirect(){
 		int img[]={IDP_DFLASH_ICON,IDP_DSDCARD_ICON,IDB_DUSBOTG_ICON};
-		int imgsec[]={IDP_DFLASH_ICON,IDP_DSDCARD_ICON,IDB_DUSBOTG_ICON};
+		int imgsec[]={IDP_DFLASH_ICON_S,IDP_DSDCARD_ICON_S,IDB_DUSBOTG_ICON_S};
 		int text[]={STR_D_FLASH,STR_D_SDCAR,STR_D_USBOTG};
 		int i,count = 3;
 		
@@ -423,6 +423,8 @@ namespace mango
 		
 		int img[]={IDP_PLAYING_LIST,IDP_FILE_LIST,IDP_PLAYLIST_LIST,
 			IDP_ALL_MUSIC,IDP_ALBUM_LIST,IDP_ARTIST_LIST,IDP_GENRE_LIST};
+		int sec[]={IDP_PLAYING_LIST_S,IDP_FILE_LIST_S,IDP_PLAYLIST_LIST_S,
+			IDP_ALL_MUSIC_S,IDP_ALBUM_LIST_S,IDP_ARTIST_LIST_S,IDP_GENRE_LIST_S};		
 		int til[]={STR_PLAYING_LIST,STR_FILE_LIST,STR_LAYLIST_LIST,
 			STR_MUSIC_LIST,STR_ALBUM_LIST,STR_ARTIST_LIST,STR_GENRE_LIST};
 		int i,count = 7;
@@ -436,7 +438,7 @@ namespace mango
 #else
 		if(mMainListAdapter == NULL){
 			mMainListAdapter = new MainListAdapter(mListView,ADAPTER_PLAYING);
-			mMainListAdapter->setData(img,img,til,count);
+			mMainListAdapter->setData(img,sec,til,count);
 		}else{
 			log_i("mMainListAdapter->refresh()");
 			mListView->deleteAllItems();
