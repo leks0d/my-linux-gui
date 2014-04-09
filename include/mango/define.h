@@ -53,8 +53,8 @@
 
 #define ARGB(a,r,g,b)          ((COLORREF)(((BYTE)(b)|((WORD)((BYTE)(g))<<8))|(((DWORD)(BYTE)(r))<<16)|(((DWORD)(BYTE)(a))<<24)))
 
-#define COLOR_ORANGE RGB(255,149,0)
-#define COLOR_PLAY_ORANGE RGB(245,164,92)
+#define COLOR_ORANGE RGB(245,164,92)
+#define COLOR_PLAY_ORANGE COLOR_ORANGE
 #define COLOR_GRAY RGB(180,180,180)
 #define COLOR_WHITE RGB(255,255,255)
 #define COLOR_BLACK RGB(0,0,0)
