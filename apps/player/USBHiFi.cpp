@@ -548,7 +548,31 @@ void PcmWrite::start(){
 	log_i("PcmWrite start-.");
 	for(i=0;i<50;i++)
 		pcm_write(mHiFiOut, data, HIFI_PACKET_SIZE - 4);
-	
+
+#if 1
+	if(FileAttr::FileExist("/mnt/pcmdata")){
+		FILE *file = NULL;
+		char buf[1000];
+		int len = 0;
+		long offset = 0;
+		log_i("----->enter play /mnt/pcmdata");
+		file = fopen("/mnt/pcmdata","r");
+
+		if(file!=NULL){
+			while(1){
+				fseek(file,offset,SEEK_SET);
+				len = fread(buf,1,1000,file);
+				if(len>0){
+					pcm_write(mHiFiOut,buf,len);
+					offset = offset + len;
+				}else{
+					break;
+				}
+			}
+		}
+	}
+#endif
+
 	hifi_pcm_close(mHiFiOut);
 	log_i("PcmWrite end.");
 }

@@ -294,7 +294,6 @@ void sendAudioMsg(int rate,int bit){
 		unsigned char *dataPos = (unsigned char *)data;
 		int	count = dataSize;
 		
-		logi("WriteRingBuffer %s",dataPos);
 		
 		while (count > 0)  
 		{
@@ -571,7 +570,22 @@ int gSendingCount = 0;
 #define PCM_PERIOD_SZ_SHIFT 12
 #define PCM_PERIOD_SZ_MASK (0xF << PCM_PERIOD_SZ_SHIFT)
 
+void writePcm(unsigned char* buf,int size){
+	FILE *fp = NULL;
+	int offset = 0;
+	const char* pcmPath = "/mnt/pcmdata";
 
+	if(access(pcmPath,F_OK) != 0)
+		fp = fopen(pcmPath,"wb");
+	else
+		fp = fopen(pcmPath,"rb+");
+
+	if(fp!=NULL){
+		fseek(fp,0L,SEEK_END);
+		offset = fwrite(buf,1,size,fp);
+		fclose(fp);
+	}
+}
 
 
 	unsigned int USBHiFiSending(void *parameter)
@@ -621,8 +635,11 @@ int gSendingCount = 0;
 				if (packet->mType == HIFI_PACKET_TYPE_STOP)
 					break;
 				
-				if (packet->mType == HIFI_PACKET_TYPE_DATA)
+				if (packet->mType == HIFI_PACKET_TYPE_DATA){
+					//memset(packet->data,0,packet->mSize - 4);
+					//writePcm(packet->data,packet->mSize - 4);
 					pcm_write(mHiFiOut, packet->data, packet->mSize - 4);
+				}
 			}
 
 			hifi_pcm_close(mHiFiOut);

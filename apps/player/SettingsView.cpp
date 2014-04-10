@@ -37,9 +37,17 @@ namespace mango
 			system("setprop persist.sys.usb.config hifi");
 			system("start usbd");
 		}else{
-			log_i("------------>set usb storage");
-			system("setprop persist.usb.debug 0");
-			system("setprop persist.sys.usb.config mass_storage");
+			char board[PROP_VALUE_MAX]={0};
+			__system_property_get("persist.mango.storage.fun",board);
+			
+			if(strcmp(board,"adb")==0){
+				log_i("------------>set usb adb");
+				system("openadb");
+			}else{
+				log_i("------------>set usb storage");
+				system("setprop persist.usb.debug 0");
+				system("setprop persist.sys.usb.config mass_storage");
+			}
 		}
 	}
 	enum
