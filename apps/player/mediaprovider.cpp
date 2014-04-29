@@ -1929,6 +1929,12 @@ namespace mango
 		char cmd[300],ptr;
 		
 		log_i("isSdcard=%d;existBack=%d,insertItemCount=%d",isSdcard,existBack,insertItemCount);
+		if(isSdcard){
+			if(!FileAttr::FileExist(SDCARD_BLOCK_PATH)){
+				log_i("-------->sdcard eject,meidaprovider copydata stop.");
+				return;
+			}
+		}
 		
 		if(isSdcard  
 			&& (!existBack || insertItemCount>0)	){

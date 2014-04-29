@@ -56,7 +56,8 @@ namespace mango
 
 		if (view == NULL)
 			return processMessage(msg);
-
+		//log_i("msg.getId()=%d,view->name=%s",msg.getId(),view->name);
+		
 		switch(msg.getId())
 		{
 		case VM_PAINT:

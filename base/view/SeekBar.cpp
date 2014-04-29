@@ -22,6 +22,7 @@ namespace mango
 		mBkgY = 8;
 		mSeekX = 12;
 		mSeekY = 14;
+		mSeekWidth = 0;
 	}
 
 

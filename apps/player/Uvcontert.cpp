@@ -25,10 +25,13 @@ namespace mango
 				if(tmpEncoding != kEncodingAll && tmpEncoding != kEncodingNone){
 					encoding = tmpEncoding;
 				}
-			}else
+			}else{
+				encoding = kEncodingAll;
 				log_i("-----possibleEncodings is null");
-		}else
+			}
+		}else{
 			encoding = kEncodingAll;
+		}
 		
 		return encoding;		
 	}
@@ -60,7 +63,7 @@ void Uvcontert::doContert(){
 		
 		entry.getCString(i,item);
 
-		if(encode != kEncodingAll && encode != kEncodingNone){
+		if(ponvertValues && encode != kEncodingAll && encode != kEncodingNone){
 			if(encode & locale){
 				ponvertValues(locale,item.string,out);
 			}else if(encode & kEncodingShiftJIS){

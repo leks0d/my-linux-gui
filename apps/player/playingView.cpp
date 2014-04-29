@@ -677,6 +677,9 @@ namespace mango
 			isSdcardShare = 0;
 		}else if(code == SDCARD_START_UNMOUNT){
 			mPlayinglist->stopForSdcardEject();
+			
+			if(gmediaprovider.mediaCanStop())
+				gmediaprovider.stopMediaScanner();
 		}else if(code == SDCARD_UNMOUNT){
 			isSdcardShare = 0;
 			gPlayer.dismissView(gPlayer.mSdcardInsertView);

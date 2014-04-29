@@ -46,7 +46,7 @@
 #include "USBAudioConnectView.h"
 
 #define ARRAY_LIST_NUM 100
-#define CONVERT_UTF8
+//#define CONVERT_UTF8
 #define ES9018_VOLUME "/sys/class/codec/es9018_volume"
 #define CODEC_VOLUME	1
 

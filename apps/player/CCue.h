@@ -7,7 +7,7 @@
 #define AFX_CUE_H__8AC1B864_AD1D_4F0A_8A7F_84C62201DED9__INCLUDED_
 
 
-#define  SONGS_MAX  64
+#define  SONGS_MAX  128
 
 class CString{
 public:

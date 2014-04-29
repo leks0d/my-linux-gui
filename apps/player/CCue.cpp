@@ -294,8 +294,11 @@ int CCue::songs_parser()
 		
 		off += strlen(tag);
 		
-		if(song_parser(off,this->m_total_song)>=0)
-			this->m_total_song++;	
+		if(song_parser(off,this->m_total_song)>=0){
+			this->m_total_song++;
+			if(this->m_total_song>=SONGS_MAX)
+				break;
+		}
 	}
 	
 	for (i=0;i<m_total_song-1;i++)
