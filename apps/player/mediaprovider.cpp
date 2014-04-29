@@ -715,7 +715,7 @@ namespace mango
 		}
 		
 /*********************************Uvcontert********************************/		
-#if 1
+#ifdef CONVERT_UTF8
 		memset(value, 0, len);
 		if (m_id3.GetTags(METADATA_KEY_TITLE, value)){
 		}else{
@@ -755,6 +755,39 @@ namespace mango
 		mUvcontert.getItem(2,contertOut);
 		item.addItem("artist",contertOut.string);
 		strlwr(contertOut.string,sqlStr);
+		item.addItem("artist_key",sqlStr);
+#else
+		memset(value, 0, len);
+		if (m_id3.GetTags(METADATA_KEY_TITLE, value)){
+			slqCheck(value);
+		}else{
+			getFileTitle(filename,value);
+		}
+		item.addItem("title",value);
+
+		strlwr(value,sqlStr);
+		item.addItem("title_key",sqlStr);
+
+		memset(value, 0, len);
+		if (m_id3.GetTags(METADATA_KEY_ALBUM, value)){
+		}else{
+			getFileParentName(info.path.string,value);
+		}
+		slqCheck(value);
+		item.addItem("album",value);
+
+		strlwr(value,sqlStr);
+		item.addItem("album_key",sqlStr);
+
+		memset(value, 0, len);
+		if (m_id3.GetTags(METADATA_KEY_ARTIST, value)){
+		}else{
+			sprintf(value,"(null)");
+		}
+		slqCheck(value);
+		item.addItem("artist",value);
+
+		strlwr(value,sqlStr);
 		item.addItem("artist_key",sqlStr);
 #endif
 /*************************Uvcontert UFT-8***************************************/

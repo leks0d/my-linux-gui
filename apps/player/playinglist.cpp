@@ -560,6 +560,7 @@ void Playinglist::startSlient(){
 				
 				}else{
 					gPlayer.openWm8740Mute();
+					log_i("start stop() success!");
 					if(mParticleplayer->stop()){log_i("stop() success!");}else{log_i("stop() fail!");goto Exit;}
 					if(mParticleplayer->setSource(playPath)){log_i("setSource() success!");}else{log_i("setSource() fail!");goto Exit;}
 					if(mParticleplayer->prepare()){log_i("prepare() success!");}else{log_i("prepare() fail!");goto Exit;}
