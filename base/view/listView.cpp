@@ -880,8 +880,8 @@ namespace mango
 		
 		drawLen = 4*displayLen/count;
 		
-		if(drawLen <10)
-			drawLen = 10;
+		if(drawLen <20)
+			drawLen = 20;
 		
 		drawOffset = offset*(displayLen-drawLen)/((count-4)*53);
 
@@ -1220,6 +1220,7 @@ namespace mango
 		
 		mFocusedRecord = NULL ;
 		mSelectedIndex = -1 ;
+		mSelectedRecord = NULL;
 		return 0 ;
 	}
 	Point& ListView::getTouchPrevPosition(void){
