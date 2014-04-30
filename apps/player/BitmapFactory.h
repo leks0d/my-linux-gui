@@ -34,5 +34,6 @@ namespace mango
 			static void MD5(char* data,CString& out);
 			static void checkWallpaper();
 			static void drawWallpaper(Canvas& canvas);
+			static void setDigitalFilter(int val);
 	};
 };

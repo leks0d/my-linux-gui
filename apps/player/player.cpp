@@ -128,6 +128,9 @@ namespace mango
 		
 		if(gSettingProvider.query(SETTING_LANGUAGE_ID,&value))
 			gSessionLocal.setLangId(value);
+
+		if(gSettingProvider.query(SETTING_DIGITAL_FILTER_ID,&value))
+			Environment::setDigitalFilter(value);
 	}
 	
 	int Player::showPlayingView()

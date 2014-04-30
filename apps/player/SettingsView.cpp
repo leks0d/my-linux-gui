@@ -6,13 +6,19 @@ namespace mango
 #define USB_FUNCTION_PATH 	"/sys/class/android_usb/android0/functions"
 #define USB_STATE_PATH 	"/sys/class/android_usb/android0/state"
 #define USB_FUNCTION_HIFI "hifi\n"
+#define USB_FUNCTION_STORAGE "mass_storage\n"
+#define USB_FUNCTION_ADB "adb\n"
+#define USB_FUNCTION_NONE "none\n"
 #define USB_CONNECT_STAT "DISCONNECTED\n"
 
 	int isHifiMode(){
 		int fd = -1;
 		int result = 0;
 		char buf[20] = {0};
+		char board[PROP_VALUE_MAX]={0};
 		
+		__system_property_get("persist.usb.debug",board);	
+			
 		fd = open(USB_FUNCTION_PATH, O_RDONLY);
 		if(fd<=0){
 				log_i("open %s fail",USB_FUNCTION_PATH);
@@ -23,32 +29,47 @@ namespace mango
 		
 		if(strcmp(buf,USB_FUNCTION_HIFI)==0){
 				result = 1;
-		}else{
-				result = 0;
+		}else if(strcmp(buf,USB_FUNCTION_STORAGE)==0 || strcmp(buf,USB_FUNCTION_ADB)==0){
+				if(strcmp(board,"0")==0)
+					result = 0;
+				else
+					result = 2;
 		}
-		
 		return result;
 	}	
 	void setUsbMode(int mode){
-		if(mode){
+		if(mode == 1){
 			log_i("------------>set usb hifi");
 			system("stop usbd");
 			system("setprop persist.usb.debug 1");
 			system("setprop persist.sys.usb.config hifi");
 			system("start usbd");
-		}else{
+		}else if(mode == 0){
+			log_i("------------>set usb mass_storage");
+			system("setprop persist.usb.debug 0");
+			system("setprop persist.sys.usb.config mass_storage");
+		}else if(mode == 2){
 			char board[PROP_VALUE_MAX]={0};
 			__system_property_get("persist.mango.storage.fun",board);
-			
+
 			if(strcmp(board,"adb")==0){
 				log_i("------------>set usb adb");
 				system("openadb");
 			}else{
-				log_i("------------>set usb storage");
-				system("setprop persist.usb.debug 0");
-				system("setprop persist.sys.usb.config mass_storage");
+				log_i("------------>set usb chager");
+				system("setprop persist.usb.debug 1");
 			}
 		}
+	}
+	void setDigitalState(int val){
+		Environment::setDigitalFilter(val);
+		gSettingProvider.update(SETTING_DIGITAL_FILTER_ID,val);
+	}
+	int getDigitalState(){
+		int value = 0;
+		if(gSettingProvider.query(SETTING_DIGITAL_FILTER_ID,&value))
+			return value;
+		return -1;
 	}
 	enum
 	{
@@ -76,6 +97,7 @@ namespace mango
 		mPoweroffListAdapter = NULL;
 		mForcepoweroffListAdapter = NULL;
 		mUSBSettingListAdapter = NULL;
+		mDigitalFilterListAdapter = NULL;
 	}
 
 	SettingsView::~SettingsView(void)
@@ -166,9 +188,9 @@ namespace mango
 		setMainState(0x1400);
 	}
 	void SettingsView::initMainList(){
-		int img[]={IDP_SETTING_EQ,IDP_SETTING_PLAYORDER,IDP_SETTING_GAPLESS,IDP_SETTING_MUSICINFO,IDB_DUSBOTG_ICON,IDP_SETTING_ADVANCED};
-		int imgsec[]={IDP_SETTING_EQ_S,IDP_SETTING_PLAYORDER_S,IDP_SETTING_GAPLESS_S,IDP_SETTING_MUSICINFO_S,IDB_DUSBOTG_ICON_S,IDP_SETTING_ADVANCED_S};
-		int text[]={STR_SETTING_EQ,STR_SETTING_PLAYOODER,STR_SETTING_GAPLESS,STR_SETTING_MUSICINFO,STR_USB_CONECT_SETTING,STR_SETTING_ADVANCED};
+		int img[]={IDP_SETTING_EQ,IDP_SETTING_PLAYORDER,IDP_SETTING_GAPLESS,IDP_SETTING_MUSICINFO,IDB_DUSBOTG_ICON,IDP_SETTING_ADVANCED,IDP_SETTING_ADVANCED};
+		int imgsec[]={IDP_SETTING_EQ_S,IDP_SETTING_PLAYORDER_S,IDP_SETTING_GAPLESS_S,IDP_SETTING_MUSICINFO_S,IDB_DUSBOTG_ICON_S,IDP_SETTING_ADVANCED_S,IDP_SETTING_ADVANCED_S};
+		int text[]={STR_SETTING_EQ,STR_SETTING_PLAYOODER,STR_SETTING_GAPLESS,STR_SETTING_MUSICINFO,STR_USB_CONECT_SETTING,STR_SETTING_ADVANCED,STR_SETTING_DIGITAL_FILTER};
 		int i,count = sizeof(img)/sizeof(int);
 		
 		mListView->deleteAllItems();
@@ -282,7 +304,7 @@ namespace mango
 	void SettingsView::initUSBSettingList(){
 		int img[]={0,0,0,0};
 		int imgsec[]={0,0,0,0};
-		int text[]={STR_USB_MODE_STORAGE,STR_USB_MODE_DAC};
+		int text[]={STR_USB_MODE_STORAGE,STR_USB_MODE_DAC,STR_USB_MODE_CHANGER};
 		int i,count = sizeof(text)/sizeof(text[0]);
 		
 		if(mUSBSettingListAdapter== NULL){
@@ -296,6 +318,24 @@ namespace mango
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mTitle->invalidateRect();
 		setMainState(0x1500);		
+	}
+	void SettingsView::initDigitalFilterList(){
+		int img[]={0,0,0,0,0};
+		int imgsec[]={0,0,0,0,0};
+		int text[]={STR_SETTING_DIGITAL_FILTER_FAST,STR_SETTING_DIGITAL_FILTER_SLOW};
+		int i,count = 2;
+		
+		if(mDigitalFilterListAdapter == NULL){
+			mListView->deleteAllItems();
+			mDigitalFilterListAdapter = new DigitalFilterListAdapter(mListView,ADAPTER_PLAYING);
+			mDigitalFilterListAdapter->setData(img,imgsec,text,count);
+		}else
+			mDigitalFilterListAdapter->refresh();
+		
+		mTitle->setTextResoure(STR_POWER_SCREEN_OFF);
+		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
+		mTitle->invalidateRect();
+		setMainState(0x1600);
 	}
 	void SettingsView::initLanguageList(){
 		int img[]={0,0,0,0,0};
@@ -383,10 +423,12 @@ namespace mango
 							initGaplessList();		break;
 						case 3:
 							gPlayer.showMusicInfoView(mPlayinglist->getPlayingItem());	break;
-						case 5:
-							initAdvanceList();	break;
 						case 4:
 							initUSBSettingList();	break;
+						case 5:
+							initAdvanceList();		break;
+						case 6:
+							initDigitalFilterList();break;
 					}
 					break;
 				case 0x1200:
@@ -455,6 +497,10 @@ namespace mango
 						setUsbMode(index);
 						mUSBSettingListAdapter->refresh();
 						break;
+				case 0x1600:
+						setDigitalState(index);
+						mDigitalFilterListAdapter->refresh();
+						break;
 				}
 			}
 			
@@ -498,7 +544,8 @@ namespace mango
 			case 0x1200:
 			case 0x1300:
 			case 0x1400:
-			case 0x1500:	
+			case 0x1500:
+			case 0x1600:
 				initMainList();
 				break;
 			case 0x1410:	
@@ -655,6 +702,36 @@ namespace mango
 			canvas.drawImageResource(IDP_LISTITEM_NO_SEC,x,y+13);
 	}
 
+	DigitalFilterListAdapter::DigitalFilterListAdapter(ListView* list,int id)
+		: SettingListAdapter(list,id){
+
+	}
+
+	void DigitalFilterListAdapter::PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec){
+		int	 x, y,index;
+		
+		x = rect.left;
+		y = rect.top;
+
+		index = lvitem->iItem;
+		x+=50;
+		if(isSec)
+			canvas.drawImageResource(mSecImgRes[index],x,y+10);
+		else
+			canvas.drawImageResource(mImgRes[index],x,y+10);
+		x+=33;
+		if(isSec)
+			canvas.setTextColor(COLOR_PLAY_ORANGE);
+		else
+			canvas.setTextColor(COLOR_TEXT);	
+		canvas.setTextSize(18);
+		canvas.drawTextResource(mTextRes[index],x,y+13);
+		x+=150;
+		if(index == getDigitalState())
+			canvas.drawImageResource(IDP_LISTITEM_SEC,x,y+13);
+		else
+			canvas.drawImageResource(IDP_LISTITEM_NO_SEC,x,y+13);
+	}
 
 	GaplessListAdapter::GaplessListAdapter(ListView* list,int id)
 		: SettingListAdapter(list,id){

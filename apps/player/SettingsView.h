@@ -28,6 +28,14 @@ namespace mango
 			AutoSleepListAdapter(ListView* list,int id);
 			virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);
 	};
+	class DigitalFilterListAdapter : public SettingListAdapter
+	{
+		public:
+			DigitalFilterListAdapter(void){}
+			~DigitalFilterListAdapter(void){}
+			DigitalFilterListAdapter(ListView* list,int id);
+			virtual void PaintView(Canvas& canvas,Rect& rect,ListViewItem* lvitem,int isSec);
+	};
 	class LanguageListAdapter : public SettingListAdapter
 	{
 		public:
@@ -85,6 +93,7 @@ namespace mango
 		void initGaplessList();
 		void initAdvanceList();
 		void initAutoSleepList();
+		void initDigitalFilterList();
 		void initLanguageList();
 		void initAutoPoweroffList();
 		void initForcePoweroffList();
@@ -105,6 +114,7 @@ namespace mango
 		GaplessListAdapter* mGaplessListAdapter;
 		SettingListAdapter* mAdvanceListAdapter;
 		AutoSleepListAdapter* mAutoSleepListAdapter;
+		DigitalFilterListAdapter* mDigitalFilterListAdapter;
 		LanguageListAdapter* mLanguageListAdapter;
 		PoweroffListAdapter* mPoweroffListAdapter;
 		ForcepoweroffListAdapter* mForcepoweroffListAdapter;

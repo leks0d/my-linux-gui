@@ -430,4 +430,14 @@ namespace mango
 			canvas.drawImageResource(IDP_PLAYING_BACKGROUND,0,0,false);
 		}
 	}
+	void Environment::setDigitalFilter(int val){
+		char cmd[255]={0};
+
+		if(val)
+			sprintf(cmd,"echo '1'>/sys/class/codec/es9018_filter");
+		else
+			sprintf(cmd,"echo '0'>/sys/class/codec/es9018_filter");
+		
+		system(cmd);
+	}
 };
