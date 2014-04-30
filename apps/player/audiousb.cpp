@@ -6,7 +6,9 @@
 #include <cutils/sockets.h>
 #include <poll.h>
 #include <sys/un.h>  
+
 #define LOG_TAG "AudioUSB"
+typedef void* (*PTHREAD_START_ROUTINE)(void*);
 
 #if 1
 #define logi(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
@@ -14,6 +16,8 @@
 #else
 #define logi(...)
 #endif
+void openOrCloseWm8740Mute(bool enable);
+void startCloseCodecMute();
 	int gRun = 1;		
 	//volatile
 	typedef struct tagRingBufferContext
@@ -459,7 +463,6 @@ void sendAudioMsg(int rate,int bit){
 		return 0;
 	}
 
-
 	//ringBufferContext = (HifiRingBufferContext*)mRingBufferMemory;
 	//ringBufferContext->mSize = HIFI_HIFI_BUFFER_SIZE;
 	
@@ -612,9 +615,9 @@ void writePcm(unsigned char* buf,int size){
 
 			gPacketType = packet->mType;
 			memcpy(&gHiFiHeader, packet, sizeof(HIFI_PACKET_HEADER));
-
+			openOrCloseWm8740Mute(true);
 			mHiFiOut = hifi_pcm_open(flags, gHiFiHeader.mChannels, gHiFiHeader.mSamplingRate, gHiFiHeader.mBitPerSample);
-
+			startCloseCodecMute();
 			if (!hifi_pcm_ready(mHiFiOut)) 
 			{
 			//	logn_e("can't open hifi device");
@@ -648,7 +651,31 @@ void writePcm(unsigned char* buf,int size){
 
 		return 0;
 	} 
-typedef void* (*PTHREAD_START_ROUTINE)(void*);
+void openOrCloseWm8740Mute(bool enable){
+	int fd=0,state,volume;
+	char* path = "/sys/class/codec/wm8740_mute";
+	char rbuf;
+		
+	log_i("openOrCloseMute enable=%d",enable);
+			
+	fd = open(path,O_RDWR, 0);
+		
+	rbuf = enable?1:0;
+		
+	write(fd,&rbuf,1);
+		
+	close(fd);
+}
+unsigned int CloseCodecMute(void *parameter)
+{
+	usleep(1000 * 300);
+	openOrCloseWm8740Mute(false);		
+}
+void startCloseCodecMute(){
+	pthread_t		threadId;
+	pthread_create(&threadId,NULL,(PTHREAD_START_ROUTINE)CloseCodecMute,NULL);
+}
+
 int main (int argc, char* argv[])
 {
 		int n = 10;
@@ -662,15 +689,11 @@ int main (int argc, char* argv[])
 		//pthread_join(readThreadId,NULL);
 		
 		pthread_create(&sendThreadId, NULL, (PTHREAD_START_ROUTINE)USBHiFiSending, (void*)(&n));
-		//pthread_join(sendThreadId,NULL);
+		pthread_join(sendThreadId,NULL);
 		
 		//pthread_create(&sendThreadId, NULL, (PTHREAD_START_ROUTINE)USBConnectDetect, (void*)(&n));
 		
 		LOGI("usbhifi init end-.");
-		while(1){
-			usleep(1000 * 1000);
-			gReadingTouchCount++;
-		}
 		
 		return 0;
 }

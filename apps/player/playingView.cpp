@@ -15,6 +15,7 @@ namespace mango
 		mMSkBitmap = new MSkBitmap();
 		isNeedFreshOld = 0;
 		isUsmCon = 0;
+		isUsbAudioConnect = 0;
 		isMediaScanning = 0;
 		isSdcardShare = 0;
 	}
@@ -719,19 +720,13 @@ namespace mango
 		}else if(code == USBHIFI_AUDIO_MSG){
 			mPlayinglist->stopPlayer();
 			Environment::openMute();
-			gPlayer.openWm8740Mute();
-			gPlayer.closeWm8740Mute();
 			gPlayer.showUSBAudioConnectView();
-			//if(gPlayer.mCodecType==1)	
-			//	gPlayer.setHardwareVolume(200);
+			isUsbAudioConnect = 1;
 		}else if(code == USBHIFI_AUDIO_STOP){
 			system("stop usbd");
 			gPlayer.dismissView(gPlayer.mUSBAudioConnectView);
 			system("start usbd");
-			//if(gPlayer.mCodecType==1)	
-			//	gPlayer.setHardwareVolume(255);
-			
-			log_i("----------USBHIFI_AUDIO_STOP");
+			isUsbAudioConnect = 0;
 		}
 		return 0;
 	}

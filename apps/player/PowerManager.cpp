@@ -84,7 +84,7 @@ namespace mango
 		}
 		
 		if(gPlayer.mPlayingView != NULL && 
-			(gPlayer.mPlayingView->isUsmCon || gPlayer.mPlayingView->isMediaScanning)){
+			(gPlayer.mPlayingView->isUsmCon || gPlayer.mPlayingView->isMediaScanning || gPlayer.mPlayingView->isUsbAudioConnect)){
 			atuoPoweroffCount = 0;
 		}
 		

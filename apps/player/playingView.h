@@ -144,6 +144,7 @@ class KeyCount{
 	public:
 		KeyCount mKeyCount;
 		int isUsmCon;
+		int isUsbAudioConnect;
 		int isMediaScanning;
 		int isSdcardShare;//这个变量用来判断，有sd卡存在时，flash share->mount 不去check playinglist，到sdcard share->mount时再check
 	};
