@@ -132,7 +132,7 @@ namespace mango
 			mFirmwareVersion->setTextString("V1.2.9");
 		}else if(gPlayer.mProductType == 1){
 			mModelNumber->setTextString("DX90");
-			mFirmwareVersion->setTextString("V2.0.0");
+			mFirmwareVersion->setTextString("V2.0.5");
 		}
 		
 		updateTotalMem();

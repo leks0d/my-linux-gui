@@ -433,7 +433,7 @@ void sendAudioMsg(int rate,int bit){
 	{
 		FILE *fp = NULL;
 		int  readlen;
-		unsigned char *buffer[512];
+		unsigned char buffer[512];
 
 		log_i("USBHiFi::USBHiFiReading");
 
@@ -445,7 +445,7 @@ void sendAudioMsg(int rate,int bit){
 				fp = fopen("/dev/android_hifi", "r");
 			if (fp)
 			{
-				readlen = fread(buffer, 1, 16, fp);
+				readlen = fread(buffer, 1, 512, fp);
 				if (readlen > 0)
 				{
 					gReadingCount += readlen;
@@ -682,7 +682,7 @@ int main (int argc, char* argv[])
 		pthread_t		readThreadId ;
 		pthread_t		sendThreadId ;
 		
-		gHiFiRing.setBufferSize(1024 * 4);
+		gHiFiRing.setBufferSize(1024 * 4 * 2 * 4 );
 		gHiFiRing.clear();
 	
 		pthread_create(&readThreadId, NULL, (PTHREAD_START_ROUTINE)USBHiFiReading, (void*)(&n));
