@@ -619,6 +619,12 @@ namespace mango
 				if(gPlayer.mCodecType == 0){
 					isSpdifIn = gPlayer.isSpdifIn();
 					mPlayinglist->setSpdifOut(isSpdifIn);
+				}else if(gPlayer.mCodecType == 1){
+					isSpdifIn = gPlayer.isSpdifIn();
+					if(isSpdifIn)
+						system("echo '0'>/sys/class/codec/power");
+					else
+						system("echo '1'>/sys/class/codec/power");
 				}
 				gPlayer.mSpdifSwitch->resetSwicth();
 			}

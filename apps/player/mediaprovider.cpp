@@ -1152,7 +1152,7 @@ namespace mango
 	}
 	bool mediaprovider::cueCheckCursor(CursorItem& item,CString& pathStr){
 		CString dir;
-		char cuePath[300]={0};
+		char cuePath[MAX_PATH]={0};
 		bool ret = false;
 		CursorMediaInfo curMedia;
 		
@@ -1167,7 +1167,7 @@ namespace mango
 		return ret;	
 	}
 	bool mediaprovider::cueCheck(char *direct,mediainfo *info){
-		char cuePath[300];
+		char cuePath[MAX_PATH];
 		bool ret = false;
 		
 		memset(cuePath,0,300);
@@ -1456,7 +1456,7 @@ namespace mango
 
 	int mediaprovider::insert(char *table,mediainfo *info)
 	{
-		char *ptr,sql[1024*5];
+		char *ptr,sql[MAX_SQL];
 
 		ptr = sql;
 		ptr += sprintf(ptr,"insert into %s (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ",
@@ -1475,7 +1475,7 @@ namespace mango
 	}
 	int mediaprovider::insertCursorItem(CursorItem& item){
 		int i;
-		char *ptr,sql[1024*5];
+		char *ptr,sql[MAX_SQL];
 		
 		ptr = sql;
 		ptr += sprintf(ptr,"insert into music (");
@@ -1531,13 +1531,13 @@ namespace mango
 		return 0;
 	}
 	int mediaprovider::deleteMusicOnDir(const char *dir){
-		char sql[1024];
+		char sql[MAX_SQL];
 		sprintf(sql,"delete from music where path like '%s/%%'",dir);
 		return exec(sql,0,0);
 	}
 	int mediaprovider::querymusic(char *where, mediainfo **minfo)
 	{
-		char *ptr,sql[1024];
+		char *ptr,sql[MAX_SQL];
 		Musicdbinfo *info,*pt;
 		mediainfo *infolist;
 		int count = 0;
@@ -1589,7 +1589,7 @@ namespace mango
 
 		int mediaprovider::queryMusicArray(char *where, void *array)
 		{
-			char *ptr,sql[1024*5];
+			char *ptr,sql[MAX_SQL];
 			Musicdbinfo *info,*pt;
 			ArrayMediaInfo *arraylist;
 			int count = 0;
@@ -1630,7 +1630,7 @@ namespace mango
 		}
 		int mediaprovider::queryArrayMedia(char *where, void *array)
 		{
-			char *ptr,sql[1024];
+			char *ptr,sql[MAX_SQL];
 			Musicdbinfo *info,*pt;
 			ArrayMediaInfo *arraylist;
 			int count = 0;
@@ -1672,7 +1672,7 @@ namespace mango
 			return count;
 		}
 	int mediaprovider::queryCursor(char *where, Cursor* cur){
-			char *ptr,sql[1024];
+			char *ptr,sql[MAX_SQL];
 			int count = 0;
 			
 			log_i("-------queryCursor");
@@ -1915,7 +1915,7 @@ namespace mango
 	void SdcardAudioData::insertCursor(CursorItem& item){
 		int i,ret;
 		char *pErrMsg = 0;
-		char *ptr,sql[1024*5];
+		char *ptr,sql[MAX_SQL];
 
 		if(db == NULL)
 			return;
@@ -2029,7 +2029,7 @@ namespace mango
 
 		item.getValue("img_path",str);
 		
-		char sdcardPath[300]={"/mnt/external_sd/.audio_data/album_img/"};
+		char sdcardPath[MAX_PATH]={"/mnt/external_sd/.audio_data/album_img/"};
 		
 		if( FileAttr::FileExist(str.string) ){
 

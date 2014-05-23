@@ -45,8 +45,8 @@ typedef char *PSZ;
 #endif  //!BASETYPES 
 
 
-#define MAX_PATH          (260*3)
-
+#define MAX_PATH          (1024)
+#define MAX_SQL          (1024*6)
 #ifndef NULL
 #ifdef __cplusplus
 #define NULL    0

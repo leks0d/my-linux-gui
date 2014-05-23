@@ -344,7 +344,7 @@ namespace mango
 		TCHAR	fileName[MAX_PATH];
 		int     fileAttribute;
 		File    file;
-		char    cName[255];
+		char    cName[MAX_PATH];
 		
 		if (!file.findOpen(mCurrentPath)) {
 			log_e ("findOpen") ;
@@ -1065,14 +1065,14 @@ namespace mango
 		else if(fromView == NULL && code == NM_DISPLAY){
 			log_i("NM_DISPLAY");
 			if(mNeedPlayPath != NULL){
-				char *ptr,parent[255];
+				char *ptr,parent[MAX_PATH];
 				char *where = NULL;
-				char sqlpath[300];
+				char sqlpath[MAX_PATH];
 				int count;
 				ArrayMediaInfo *pinfo;
 		
 				pinfo = new ArrayMediaInfo();
-				ptr = where = new char[300];
+				ptr = where = new char[MAX_SQL];
 						
 				mediaprovider::slqFormatOut(mNeedPlayPath,sqlpath);
 						
@@ -1087,14 +1087,14 @@ namespace mango
 				if(count>0){
 					char* name;
 					ArrayMediaInfo arrayInfo;
-					char sqlParent[350];
+					char sqlParent[MAX_SQL];
 					
 					if(mPlayinglist == NULL)
 						mPlayinglist = new Playinglist();
 					mPlayinglist->clearAll();
 
 					mediaprovider::slqFormatOut(parent,sqlParent);
-					ptr = where = new char[300];
+					ptr = where = new char[MAX_SQL];
 					ptr += sprintf(ptr," where path like '%s/%%' and not path like '%s/%%/%%' ",sqlParent,sqlParent);
 					count = gmediaprovider.queryMusicArray(where,&arrayInfo);	
 					arrayInfo.sort();
@@ -1113,7 +1113,7 @@ namespace mango
 		else if(code == SDCARD_START_UNMOUNT){
 			char *ret = NULL;
 			char *ptr = NULL;
-			char utf8Path[300];
+			char utf8Path[MAX_SQL];
 							
 			Charset::wideCharToMultiByte(CP_UTF8, mCurrentPath, String::lstrlen(mCurrentPath), utf8Path, MAX_PATH * 3);
 
@@ -1136,7 +1136,7 @@ namespace mango
 	}
 
 	int MediaView::getArrayInfoFromFile(char *path,ArrayMediaInfo& array,CString& cover){
-		char direct[255];
+		char direct[MAX_PATH];
 		int     fileAttribute;
 		File    file;
 		mediainfo info;

@@ -21,7 +21,7 @@ Notes:
 																
 Revision History:												
 																
-   2014-4-30 16:38:15 Created by Fibo Lu						
+   2014-5-16 21:36:22 Created by Fibo Lu						
 																
 --*/															
 																
@@ -269,23 +269,25 @@ Revision History:
 #define IDP_SETTING_BACK			0x0639
 #define IDP_SETTING_BACK_SEC		0x063A
 #define IDP_SETTING_BGD				0x063B
-#define IDP_SETTING_EQ				0x063C
-#define IDP_SETTING_EQ_S			0x063D
-#define IDP_SETTING_GAPLESS			0x063E
-#define IDP_SETTING_GAPLESS_S		0x063F
-#define IDP_SETTING_MUSICINFO		0x0640
-#define IDP_SETTING_MUSICINFO_S		0x0641
-#define IDP_SETTING_PLAYORDER		0x0642
-#define IDP_SETTING_PLAYORDER_S		0x0643
-#define IDP_SHUTDOWM_LOGO			0x0644
-#define IDP_SHUTDOWM_LOGO_DX90		0x0645
-#define IDP_STORAGE_SPACE			0x0646
-#define IDP_STORAGE_USE				0x0647
-#define IDP_SYSTEM_RESET			0x0648
-#define IDP_SYS_FUNCTION			0x0649
-#define IDP_SYSTEM_RESET_S			0x064A
-#define IDP_USB_CONECT				0x064B
-#define IDP_VULUME_ICON				0x064C
-#define IDP_VULUME_ICON_BK			0x064D
+#define IDP_SETTING_DF				0x063C
+#define IDP_SETTING_DF_S			0x063D
+#define IDP_SETTING_EQ				0x063E
+#define IDP_SETTING_EQ_S			0x063F
+#define IDP_SETTING_GAPLESS			0x0640
+#define IDP_SETTING_GAPLESS_S		0x0641
+#define IDP_SETTING_MUSICINFO		0x0642
+#define IDP_SETTING_MUSICINFO_S		0x0643
+#define IDP_SETTING_PLAYORDER		0x0644
+#define IDP_SETTING_PLAYORDER_S		0x0645
+#define IDP_SHUTDOWM_LOGO			0x0646
+#define IDP_SHUTDOWM_LOGO_DX90		0x0647
+#define IDP_STORAGE_SPACE			0x0648
+#define IDP_STORAGE_USE				0x0649
+#define IDP_SYSTEM_RESET			0x064A
+#define IDP_SYS_FUNCTION			0x064B
+#define IDP_SYSTEM_RESET_S			0x064C
+#define IDP_USB_CONECT				0x064D
+#define IDP_VULUME_ICON				0x064E
+#define IDP_VULUME_ICON_BK			0x064F
 //--End Png from player
 																

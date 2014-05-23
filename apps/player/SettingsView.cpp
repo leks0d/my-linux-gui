@@ -56,8 +56,9 @@ namespace mango
 				log_i("------------>set usb adb");
 				system("openadb");
 			}else{
-				log_i("------------>set usb chager");
+				log_i("------------>set usb chager");				
 				system("setprop persist.usb.debug 1");
+				system("setprop persist.sys.usb.config mass_storage");
 			}
 		}
 	}
@@ -188,9 +189,9 @@ namespace mango
 		setMainState(0x1400);
 	}
 	void SettingsView::initMainList(){
-		int img[]={IDP_SETTING_EQ,IDP_SETTING_PLAYORDER,IDP_SETTING_GAPLESS,IDP_SETTING_MUSICINFO,IDB_DUSBOTG_ICON,IDP_SETTING_ADVANCED,IDP_SETTING_ADVANCED};
-		int imgsec[]={IDP_SETTING_EQ_S,IDP_SETTING_PLAYORDER_S,IDP_SETTING_GAPLESS_S,IDP_SETTING_MUSICINFO_S,IDB_DUSBOTG_ICON_S,IDP_SETTING_ADVANCED_S,IDP_SETTING_ADVANCED_S};
-		int text[]={STR_SETTING_EQ,STR_SETTING_PLAYOODER,STR_SETTING_GAPLESS,STR_SETTING_MUSICINFO,STR_USB_CONECT_SETTING,STR_SETTING_ADVANCED,STR_SETTING_DIGITAL_FILTER};
+		int img[]={IDP_SETTING_EQ,IDP_SETTING_PLAYORDER,IDP_SETTING_GAPLESS,IDP_SETTING_MUSICINFO,IDB_DUSBOTG_ICON,IDP_SETTING_DF,IDP_SETTING_ADVANCED};
+		int imgsec[]={IDP_SETTING_EQ_S,IDP_SETTING_PLAYORDER_S,IDP_SETTING_GAPLESS_S,IDP_SETTING_MUSICINFO_S,IDB_DUSBOTG_ICON_S,IDP_SETTING_DF_S,IDP_SETTING_ADVANCED_S};
+		int text[]={STR_SETTING_EQ,STR_SETTING_PLAYOODER,STR_SETTING_GAPLESS,STR_SETTING_MUSICINFO,STR_USB_CONECT_SETTING,STR_SETTING_DIGITAL_FILTER,STR_SETTING_ADVANCED};
 		int i,count = sizeof(img)/sizeof(int);
 		
 		mListView->deleteAllItems();
@@ -332,7 +333,7 @@ namespace mango
 		}else
 			mDigitalFilterListAdapter->refresh();
 		
-		mTitle->setTextResoure(STR_POWER_SCREEN_OFF);
+		mTitle->setTextResoure(STR_SETTING_DIGITAL_FILTER);
 		mTitle->setTextLayoutType(TEXT_LAYOUT_CENTER);
 		mTitle->invalidateRect();
 		setMainState(0x1600);
@@ -426,9 +427,10 @@ namespace mango
 						case 4:
 							initUSBSettingList();	break;
 						case 5:
-							initAdvanceList();		break;
+							initDigitalFilterList();break;	
 						case 6:
-							initDigitalFilterList();break;
+							initAdvanceList();		break;
+						
 					}
 					break;
 				case 0x1200:

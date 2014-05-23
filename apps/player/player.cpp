@@ -88,6 +88,7 @@ namespace mango
 		gAlarmManager->initialize();
 		gAlarmManager->setAlarmWakeup(6);
 #endif
+		spdifProbe();
 		holdKeyProbe();
 		log_i("end");
 		//mUSBHiFi = new USBHiFi(TEXT("Playing"), NULL, NULL, 0, SW_NORMAL);
@@ -661,7 +662,9 @@ namespace mango
 		bool isSpidfIn;
 		isSpidfIn = isSpdifIn();
 		if(isSpidfIn)
-			openCodecPower(!isSpidfIn);
+			system("echo '0'>/sys/class/codec/power");
+		else
+			system("echo '1'>/sys/class/codec/power");
 	}
 	
 	bool Player::isSpdifIn(){
@@ -832,7 +835,8 @@ namespace mango
 			}
 		}else if(keyCode == KEYCODE_LONG_POWER&&action == VM_KEYDOWN){
 			//gPlayer.showShutDownView();
-			gPlayer.showChosenView(ChosenView::CHOSEN_POWEROFF);
+			//gPlayer.showChosenView(ChosenView::CHOSEN_POWEROFF);
+			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,NM_POWER_OFF,keyCode);
 		}else if(action == VM_MEDIA){
 			gMessageQueue.post(gPlayer.mPlayingView,VM_NOTIFY,keyCode,0);
 			gMessageQueue.post(gPlayer.mMeidaView,VM_NOTIFY,keyCode,0);

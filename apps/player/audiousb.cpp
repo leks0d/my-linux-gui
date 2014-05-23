@@ -16,9 +16,59 @@ typedef void* (*PTHREAD_START_ROUTINE)(void*);
 #else
 #define logi(...)
 #endif
+
 void openOrCloseWm8740Mute(bool enable);
 void startCloseCodecMute();
-	int gRun = 1;		
+	int gRun = 1;
+	int mWakeLockCount = 0;
+	void lockWake(bool lock)
+	{
+		FILE* class_fs = NULL;
+		char buffer[2];
+	
+		if (lock)
+		{
+			if (mWakeLockCount > 0)
+			{
+				mWakeLockCount++;
+				return;
+			}
+	
+			mWakeLockCount++;
+		}
+		else
+		{
+			if (mWakeLockCount > 1)
+			{
+				mWakeLockCount--;
+				return;
+			}
+	
+			if (mWakeLockCount <= 0)
+				return;
+	
+			mWakeLockCount--;
+		}
+	
+		do
+		{
+			class_fs  = fopen("/sys/class/codec/wake", "wt");
+			if (class_fs == NULL)
+			{
+				log_m("Can't open  /sys/class/codec/wake");
+				break;
+			}
+	
+			buffer[0] = lock? '1' : '0'; 
+			buffer[1] = '\0';
+			fwrite(buffer, 1, 2, class_fs);
+	
+		}while(0);
+	
+		if (class_fs)
+			fclose(class_fs);
+	}
+
 	//volatile
 	typedef struct tagRingBufferContext
 	{
@@ -624,7 +674,7 @@ void writePcm(unsigned char* buf,int size){
 				hifi_pcm_close(mHiFiOut);
 				continue;
 			}
-
+			lockWake(true);
 
 			while(1)
 			{
@@ -644,7 +694,7 @@ void writePcm(unsigned char* buf,int size){
 					pcm_write(mHiFiOut, packet->data, packet->mSize - 4);
 				}
 			}
-
+			lockWake(false);
 			hifi_pcm_close(mHiFiOut);
 			mHiFiOut = NULL;
 		}
@@ -682,7 +732,7 @@ int main (int argc, char* argv[])
 		pthread_t		readThreadId ;
 		pthread_t		sendThreadId ;
 		
-		gHiFiRing.setBufferSize(1024 * 4 * 2 * 4 );
+		gHiFiRing.setBufferSize(1024 * 4 * 2 * 4*2 );
 		gHiFiRing.clear();
 	
 		pthread_create(&readThreadId, NULL, (PTHREAD_START_ROUTINE)USBHiFiReading, (void*)(&n));

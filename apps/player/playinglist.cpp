@@ -687,6 +687,7 @@ Exit:
 
 			void Playinglist::setSpdifOut(bool isSpdif){
 				int playPostion;
+				log_i("--->setSpdifOut:%d",isSpdif);
 				if(mParticleplayer != NULL){
 					if(mParticleplayer->isSpdifOut() != isSpdif){
 						mParticleplayer->enableSpdifOut(isSpdif);
