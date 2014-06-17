@@ -17,6 +17,8 @@ typedef void* (*PTHREAD_START_ROUTINE)(void*);
 #define logi(...)
 #endif
 
+int gBytesPerSec = 0;
+
 void openOrCloseWm8740Mute(bool enable);
 void startCloseCodecMute();
 	int gRun = 1;
@@ -252,6 +254,11 @@ void startCloseCodecMute();
 		return (mOut == mIn);
 	}
 
+	unsigned int RingBuffer::getDataLen()
+	{
+		return mIn - mOut;
+	}
+
 #define USB_FUNCTION_PATH 	"/sys/class/android_usb/android0/functions"
 #define USB_STATE_PATH 	"/sys/class/android_usb/android0/state"
 #define USB_FUNCTION_HIFI "hifi\n"
@@ -485,7 +492,7 @@ void sendAudioMsg(int rate,int bit){
 		int  readlen;
 		unsigned char buffer[512];
 
-		log_i("USBHiFi::USBHiFiReading");
+		log_i("--->USBHiFi::USBHiFiReading");
 
 
 		while(1)
@@ -500,6 +507,12 @@ void sendAudioMsg(int rate,int bit){
 				{
 					gReadingCount += readlen;
 					WriteRingBuffer(buffer, readlen);
+
+					//如果buffer 的数据长于100ms 则睡50ms
+					if (gBytesPerSec && gHiFiRing.getDataLen() > gBytesPerSec / 10)
+					{
+						usleep(1000 * 50);
+					}
 				}
 			}
 			else
@@ -675,6 +688,8 @@ void writePcm(unsigned char* buf,int size){
 				continue;
 			}
 			lockWake(true);
+			log_i("Channels=%d,SamplingRate=%d,BitPerSample=%d",gHiFiHeader.mChannels,gHiFiHeader.mSamplingRate,gHiFiHeader.mBitPerSample);
+			gBytesPerSec = gHiFiHeader.mSamplingRate * gHiFiHeader.mBitPerSample / 8 * gHiFiHeader.mChannels;
 
 			while(1)
 			{
@@ -696,6 +711,8 @@ void writePcm(unsigned char* buf,int size){
 			}
 			lockWake(false);
 			hifi_pcm_close(mHiFiOut);
+
+			gBytesPerSec = 0;
 			mHiFiOut = NULL;
 		}
 
