@@ -427,7 +427,10 @@ namespace mango
 		if(gWallpaperBitmap.isVaild()){
 			canvas.drawBitmap(gWallpaperBitmap.mBits,0,0,gWallpaperBitmap.width,gWallpaperBitmap.height);
 		}else{
-			canvas.drawImageResource(IDP_PLAYING_BACKGROUND,0,0,false);
+			if(gPlayer.mProductType == 0)
+				canvas.drawImageResource(IDP_PLAYING_BACKGROUND,0,0,false);
+			else
+				canvas.drawImageResource(IDP_PLAYING_BACKGROUND_DX90,0,0,false);
 		}
 	}
 	void Environment::setDigitalFilter(int val){

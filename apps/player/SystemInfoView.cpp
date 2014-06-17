@@ -129,7 +129,7 @@ namespace mango
 		
 		if(gPlayer.mProductType == 0){
 			mModelNumber->setTextString("DX50");
-			mFirmwareVersion->setTextString("V1.2.9");
+			mFirmwareVersion->setTextString("V1.5.0");
 		}else if(gPlayer.mProductType == 1){
 			mModelNumber->setTextString("DX90");
 			mFirmwareVersion->setTextString("V2.0.5");

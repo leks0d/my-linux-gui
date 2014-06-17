@@ -906,7 +906,8 @@ namespace mango
 		case LANGID_LA:
 		case 9:
 		case 10:
-		case 11:	
+		case 11:
+		case 12:	
 			path = conCodePageFileName[6] ;
 			break ;
 		case LANGID_PU:
