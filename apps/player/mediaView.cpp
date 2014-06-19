@@ -878,7 +878,7 @@ namespace mango
 								ptr += sprintf(ptr," where path like '%s/%%' and not path like '%s/%%/%%' ",sqlParent,sqlParent);
 								//ptr += sprintf(ptr," where path like '%s/%%'",sqlParent);
 								count = gmediaprovider.queryMusicArray(where,&arrayInfo);
-								arrayInfo.sort();
+								arrayInfo.sort(2);
 								mPlayinglist->addArrayItem(arrayInfo);
 							}
 							mPlayinglist->playMediaInfo(pinfo->getMediaInfo(0));

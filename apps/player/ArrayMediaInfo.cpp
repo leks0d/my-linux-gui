@@ -115,7 +115,7 @@ namespace mango
 				else if(end->name_key ==NULL)
 					ret = 1;
 				else
-					ret = strcmp(first->title_key,end->title_key);
+					ret = strcmp(first->name_key,end->name_key);
 			}
 			//log_i("ArrayMediaInfo::compare ret = %d",ret);
 			return ret;
