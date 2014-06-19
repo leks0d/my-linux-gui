@@ -42,6 +42,7 @@ namespace mango
 		int 	mainState;
 		int mpx;
 		int mpy;
+		int mClickCount;
 	};
 
 };

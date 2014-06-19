@@ -64,6 +64,8 @@ namespace mango
 		
 		if(px >= mWidth)
 			px = mWidth;
+		if(px <= 0)
+			px = 0;
 		
 		mSeekWidth = px;
 		mProgress = mSeekWidth*mMax/mWidth;
@@ -87,18 +89,18 @@ namespace mango
 	{
 		int imageId = 0;
 		Rect rect;
-#if 0		
+#if 0
 		if(mBkgImage>0&&mSeekImage>0&&mThumbImage>0){
 			canvas.drawImageResource(mBkgImage, mBkgLeft, 8);
 			canvas.drawImageResource(mSeekImage, mSeekLeft, 14, mSeekWidth, 4);
 			//canvas.drawImageResource(mThumbImage, mThumbX, 0);
 		}
-#else		
+#else
 		if(mBkgImage>0)
 			canvas.drawImageResource(mBkgImage, mBkgX, mBkgY);
 		if(mSeekImage>0)
 			canvas.drawImageResource(mSeekImage, mSeekX, mSeekY,mSeekWidth,4);
-#endif		
+#endif
 		return 0;
 	}
 	

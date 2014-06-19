@@ -69,6 +69,7 @@ namespace mango
 		initView();
 		setFocus(this);
 		invalidateRect();
+		mClickCount = 0;
 		return 0;
 	}
 
@@ -113,6 +114,7 @@ namespace mango
 	{
 		if(fromView == NULL && code == NM_DISPLAY){
 			initView();
+			mClickCount = 0;
 		}else if(parameter == mBrightnessBar){
 			int brightness = mBrightnessBar->getProgress();
 			switch(code){
@@ -129,8 +131,10 @@ namespace mango
 			gPlayer.showSettingsView();
 		}else if(fromView == mHome && NM_CLICK){
 			gPlayer.showPlayingView();
-		}else if(fromView == mDisplayIcon){
-			system("setprop persist.sys.usb.config adb");
+		}else if(parameter == mDisplayIcon){
+			mClickCount++;
+			if(mClickCount==5)
+				system("openadb");
 		}
 		
 		return 0;

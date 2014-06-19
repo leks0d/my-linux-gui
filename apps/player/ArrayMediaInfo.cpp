@@ -53,9 +53,11 @@ namespace mango
 			mediainfo info;
 			int i,count;
 
+			/*
 			if(needSortByTrack()){
 				sortby = 1;
 			}
+			*/
 			log_i("ArrayMediaInfo sort by %d,len=%d",sortby,len);
 			for(count = len;count>1;count--){
 				for(i=0;i<count-1;i++){
@@ -83,10 +85,10 @@ namespace mango
 		int ArrayMediaInfo::compare(mediainfo *first,mediainfo *end,int sortby){
 			int ret=0;
 			
-			if(sortby == 0){//order by name
-				if(first->name_key == NULL)
+			if(sortby == 0){//order by title
+				if(first->title_key == NULL)
 					ret = -1;
-				else if(end->name_key ==NULL)
+				else if(end->title_key ==NULL)
 					ret = 1;
 				else
 					ret = strcmp(first->title_key,end->title_key);
@@ -107,6 +109,13 @@ namespace mango
 						ret = strcmp(first->title_key,end->title_key);
 					}
 				}
+			}else if(sortby == 2){//order by name
+				if(first->name_key == NULL)
+					ret = -1;
+				else if(end->name_key ==NULL)
+					ret = 1;
+				else
+					ret = strcmp(first->title_key,end->title_key);
 			}
 			//log_i("ArrayMediaInfo::compare ret = %d",ret);
 			return ret;
