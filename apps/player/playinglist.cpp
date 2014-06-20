@@ -278,13 +278,10 @@ void Playinglist::startSlient(){
 				if(inPause!=state){
 					inPause = state;
 					if(state){
-						if(gPlayer.mCodecType == 1)
 							gPlayer.openWm8740Mute();
 					}else{
-						if(gPlayer.mCodecType == 1){
 							Thread::sleep(200);
 							gPlayer.closeWm8740Mute();
-						}
 					}
 				}
 			}
@@ -554,10 +551,21 @@ void Playinglist::startSlient(){
 				}
 				
 				if(needGapless&&mGapless>0&&mParticleplayer->setNextSongForGapless(playPath)){
-				
-					if(mParticleplayer->gaplessPlay(playPath)){log_i("gaplessPlay() success!");}
-					else{log_i("gaplessPlay() fail!");stopPlayer();return -1;}
-				
+					
+					if(mParticleplayer->gaplessPlay(playPath)){
+						log_i("gaplessPlay() success!");
+					}else{
+						log_i("gaplessPlay() fail!");
+						stopPlayer();
+						return -1;
+					}
+					
+					if(getPlayingItem()->isCue && getPlayingItem()->cueStart>1000){
+						mParticleplayer->seekTo(getPlayingItem()->cueStart);
+					}else{
+					
+					}
+					
 				}else{
 					gPlayer.openWm8740Mute();
 					log_i("start stop() success!");

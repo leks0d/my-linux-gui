@@ -619,13 +619,14 @@ namespace mango
 				if(gPlayer.mCodecType == 0){
 					isSpdifIn = gPlayer.isSpdifIn();
 					mPlayinglist->setSpdifOut(isSpdifIn);
-				}else if(gPlayer.mCodecType == 1){
-					isSpdifIn = gPlayer.isSpdifIn();
-					if(isSpdifIn)
-						system("echo '0'>/sys/class/codec/power");
-					else
-						system("echo '1'>/sys/class/codec/power");
 				}
+				
+				isSpdifIn = gPlayer.isSpdifIn();
+				if(isSpdifIn)
+					system("echo '0'>/sys/class/codec/power");
+				else
+					system("echo '1'>/sys/class/codec/power");
+				
 				gPlayer.mSpdifSwitch->resetSwicth();
 			}
 			if(gPlayer.mHeadestSwitch->isToSwicth()){
@@ -717,6 +718,7 @@ namespace mango
 			log_i("isNeedFresh = %d",isNeedFresh);
 		}else if(code == NM_POWER_OFF){
 			log_i("----------NM_POWER_OFF");
+			gPowerManager->setPowerState(0);
 			gPlayer.showShutDownView();
 			mShutdowmThread.create(PlayingView::shutdownRunnig, this);
 		}else if(code == SDCARD_FILE_CHECK){
